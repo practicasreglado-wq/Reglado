@@ -106,7 +106,15 @@
           </label>
           <label>
             Nuevo telefono
-            <input v-model.trim="phoneForm.phone" type="tel" required />
+            <input
+              v-model.trim="phoneForm.phone"
+              type="tel"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              maxlength="15"
+              placeholder="600123123"
+              @input="handlePhoneInput"
+            />
           </label>
         </template>
 
@@ -208,6 +216,16 @@ function openModal(type) {
 function closeModal() {
   activeModal.value = "";
   modalError.value = "";
+}
+
+function handlePhoneInput(event) {
+  const target = event.target;
+  if (!(target instanceof HTMLInputElement)) {
+    return;
+  }
+
+  const sanitized = target.value.replace(/\D/g, "").slice(0, 15);
+  phoneForm.phone = sanitized;
 }
 
 async function submitActiveModal() {

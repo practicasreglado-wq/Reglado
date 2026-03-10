@@ -19,11 +19,10 @@ class AuthController
             $firstName === '' ||
             $lastName === '' ||
             $email === '' ||
-            $phone === '' ||
             $password === '' ||
             $passwordConfirmation === ''
         ) {
-            Response::json(['error' => 'username, first_name, last_name, email, phone, password and password_confirmation are required'], 422);
+            Response::json(['error' => 'username, first_name, last_name, email, password and password_confirmation are required'], 422);
         }
 
         if (!preg_match('/^[a-zA-Z0-9._-]{3,30}$/', $username)) {
@@ -34,7 +33,7 @@ class AuthController
             Response::json(['error' => 'invalid email'], 422);
         }
 
-        if (!preg_match('/^[0-9+\s()-]{7,20}$/', $phone)) {
+        if ($phone !== '' && !preg_match('/^[0-9]{7,15}$/', $phone)) {
             Response::json(['error' => 'invalid phone'], 422);
         }
 
@@ -48,21 +47,30 @@ class AuthController
 
         $name = trim($firstName . ' ' . $lastName);
         $hash = password_hash($password, PASSWORD_BCRYPT);
+        [$plainToken, $tokenHash, $expiresAt] = self::buildVerificationToken();
 
         try {
-            $userId = User::create($username, $email, $hash, $name, $firstName, $lastName, $phone, 'user');
-            [$plainToken, $tokenHash, $expiresAt] = self::buildVerificationToken();
-            User::createVerificationToken($userId, $tokenHash, $expiresAt);
+            if (User::findByEmail($email) || User::findByUsername($username)) {
+                SecurityLogger::log('register_conflict', null, ['email' => $email, 'username' => $username]);
+                Response::json(['error' => 'email or username already exists'], 409);
+            }
+
+            if (User::findPendingRegistrationConflict($email, $username)) {
+                Response::json(['error' => 'there is already a pending registration for this email or username'], 409);
+            }
+
+            $pendingId = User::createPendingRegistration($username, $email, $hash, $name, $firstName, $lastName, $phone, $tokenHash, $expiresAt);
 
             $verificationUrl = self::buildVerificationUrl($plainToken);
             $sent = MailService::sendVerificationEmail($email, $name, $verificationUrl);
 
             if (!$sent) {
-                Response::json(['error' => 'user created but verification email could not be sent'], 500);
+                User::deletePendingRegistration($pendingId);
+                Response::json(['error' => 'verification email could not be sent'], 500);
             }
 
             Response::json([
-                'message' => 'user created, check your email to confirm your account',
+                'message' => 'verification email sent, confirm your email to complete registration',
             ], 201);
         } catch (PDOException $e) {
             if ((int) $e->getCode() === 23000) {
@@ -124,15 +132,24 @@ class AuthController
         $tokenHash = hash('sha256', $token);
         $user = User::findByVerificationHash($tokenHash);
 
-        if (!$user) {
-            Response::json(['error' => 'invalid or expired verification token'], 400);
-        }
-
         try {
-            User::markEmailAsVerified((int) $user['id']);
-            $freshUser = User::findByEmail((string) $user['email']);
-            if (!$freshUser) {
-                Response::json(['error' => 'could not load verified user'], 500);
+            if ($user) {
+                User::markEmailAsVerified((int) $user['id']);
+                $freshUser = User::findByEmail((string) $user['email']);
+                if (!$freshUser) {
+                    Response::json(['error' => 'could not load verified user'], 500);
+                }
+            } else {
+                $pending = User::findPendingRegistrationByTokenHash($tokenHash);
+                if (!$pending) {
+                    Response::json(['error' => 'invalid or expired verification token'], 400);
+                }
+
+                if (User::findByEmail((string) $pending['email']) || User::findByUsername((string) $pending['username'])) {
+                    Response::json(['error' => 'email or username already exists'], 409);
+                }
+
+                $freshUser = User::createUserFromPendingRegistration((int) $pending['id']);
             }
 
             $jwt = JwtService::generate($freshUser);
@@ -176,6 +193,20 @@ class AuthController
 
         $user = User::findByEmail($email);
         if (!$user) {
+            $pending = User::findPendingRegistrationByEmail($email);
+            if ($pending) {
+                [$plainToken, $tokenHash, $expiresAt] = self::buildVerificationToken();
+                User::refreshPendingRegistrationToken((int) $pending['id'], $tokenHash, $expiresAt);
+                $url = self::buildVerificationUrl($plainToken);
+                $sent = MailService::sendVerificationEmail((string) $pending['email'], (string) $pending['name'], $url);
+
+                if (!$sent) {
+                    Response::json(['error' => 'could not send verification email'], 500);
+                }
+
+                Response::json(['message' => 'verification email sent']);
+            }
+
             Response::json(['message' => 'if the account exists, a verification email was sent']);
         }
 
@@ -319,7 +350,7 @@ class AuthController
         $data = self::getJsonInput();
         $phone = trim((string) ($data['phone'] ?? ''));
 
-        if (!preg_match('/^[0-9+\s()-]{7,20}$/', $phone)) {
+        if ($phone !== '' && !preg_match('/^[0-9]{7,15}$/', $phone)) {
             Response::json(['error' => 'invalid phone'], 422);
         }
 

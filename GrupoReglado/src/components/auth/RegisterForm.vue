@@ -4,30 +4,48 @@
       <h1>{{ title }}</h1>
       <p>{{ description }}</p>
 
-      <form class="clean-form" @submit.prevent="submitRegister">
+      <div v-if="registrationComplete" class="register-confirmation">
+        <p class="confirmation-title">Se ha enviado un correo de confirmacion.</p>
+        <p class="confirmation-text">
+          Hemos enviado un enlace de confirmacion a <strong>{{ submittedEmail }}</strong>. Confirma tu correo
+          para completar el registro.
+        </p>
+
+        <button class="btn-primary" type="button" @click="resetFormState">Volver al formulario</button>
+      </div>
+
+      <form v-else class="clean-form" @submit.prevent="submitRegister">
         <label>
           Nombre de usuario
           <input v-model.trim="username" type="text" placeholder="usuario123" required minlength="3" />
         </label>
 
         <label>
-          Nombre real
+          Nombre
           <input v-model.trim="firstName" type="text" placeholder="Nombre" required />
         </label>
 
         <label>
-          Apellido real
+          Apellido
           <input v-model.trim="lastName" type="text" placeholder="Apellido" required />
         </label>
 
         <label>
-          Correo real
+          Correo
           <input v-model.trim="email" type="email" placeholder="nombre@correo.com" required />
         </label>
 
         <label>
-          Telefono
-          <input v-model.trim="phone" type="tel" placeholder="+34 600 000 000" required />
+          Telefono(Opcional)
+          <input
+            v-model.trim="phone"
+            type="tel"
+            inputmode="numeric"
+            pattern="[0-9]*"
+            maxlength="15"
+            placeholder="600123123"
+            @input="handlePhoneInput"
+          />
         </label>
 
         <label>
@@ -80,6 +98,18 @@ const passwordConfirmation = ref("");
 const loading = ref(false);
 const error = ref("");
 const success = ref("");
+const registrationComplete = ref(false);
+const submittedEmail = ref("");
+
+function handlePhoneInput(event) {
+  const target = event.target;
+  if (!(target instanceof HTMLInputElement)) {
+    return;
+  }
+
+  const sanitized = target.value.replace(/\D/g, "").slice(0, 15);
+  phone.value = sanitized;
+}
 
 async function submitRegister() {
   loading.value = true;
@@ -103,7 +133,9 @@ async function submitRegister() {
       password_confirmation: passwordConfirmation.value,
     });
 
-    success.value = "Registro completado. Revisa tu correo y confirma tu cuenta para iniciar sesion.";
+    submittedEmail.value = email.value;
+    registrationComplete.value = true;
+    success.value = "Se ha enviado un correo de confirmacion.";
     password.value = "";
     passwordConfirmation.value = "";
   } catch (err) {
@@ -112,4 +144,32 @@ async function submitRegister() {
     loading.value = false;
   }
 }
+
+function resetFormState() {
+  registrationComplete.value = false;
+  success.value = "";
+  submittedEmail.value = "";
+}
 </script>
+
+<style scoped>
+.register-confirmation {
+  display: grid;
+  gap: 1rem;
+  padding: 1.5rem;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.confirmation-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.confirmation-text {
+  margin: 0;
+  color: rgba(15, 23, 42, 0.72);
+}
+</style>
