@@ -1,0 +1,48 @@
+/* Estilos Globales */
+
+/* Colores principales */
+:root {
+  --azul-principal: #1a2545;
+  --azul-secundario: #4a72c6;
+  --blanco: #ffffff;
+  --gris-claro: rgb(230, 249, 249);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  padding: 0;
+  margin: 0;
+  overflow-x: hidden;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Contenido principal */
+.main-content {
+  flex: 1;
+}
+/* ===== Scrollbar personalizada ===== */
+
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(232, 232, 232, 0.655);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--azul-principal);
+  border-radius: 10px;
+  border: 2px solid var(--gris-claro);
+  transition: background 0.3s ease;
+}
