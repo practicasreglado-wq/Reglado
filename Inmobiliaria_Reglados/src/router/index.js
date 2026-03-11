@@ -15,7 +15,6 @@ import ContributeAssets from "../views/ContributeAssets.vue";
 import FavoriteProperties from "../views/FavoriteProperties.vue";
 import Messages from "../views/Messages.vue";
 import PropertiesForSale from "../views/PropertiesForSale.vue";
-import Settings from "../views/Settings.vue";
 import MyPropertiesForSale from "../views/MyPropertiesForSale.vue";
 import CreateProperty from "../views/CreateProperty.vue";
 import ForgotPassword from "../views/ForgotPassword.vue";
@@ -39,7 +38,6 @@ const routes = [
       { path: "favorite-properties", component: FavoriteProperties },
       { path: "messages", component: Messages },
       { path: "properties-for-sale", component: PropertiesForSale },
-      { path: "settings", component: Settings },
       { path: "my-properties-for-sale", component: MyPropertiesForSale },
       { path: "create-property", component: CreateProperty },
     ],

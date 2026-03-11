@@ -76,7 +76,7 @@ export default {
 .overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.075);
+  background: rgba(0, 0, 0, 0.256);
 }
 
 /* CONTENIDO HERO */
@@ -99,14 +99,37 @@ export default {
   align-self: flex-start;
 }
 
-.hero h1 {
-  font-size: 7rem;
-  text-shadow: 0 2px 3px rgba(0, 0, 0, 0.605);
-  margin-bottom: 20px;
+.hero h1{
+  font-size:7rem;
+  background: linear-gradient(
+    140deg,
+    #ffffff 0%,
+    #d9d8d8 20%,
+    #c1c1c1 40%,
+    #cfcfcf 50%,
+    #cfcfcf 70%,
+    #e1e0e0 100%
+  );
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+  margin-bottom:20px;
+  text-shadow: 0 2px 3px rgba(218, 214, 214, 0.292);
 }
 
 .highlight {
-  color: #eabe2f;
+
+  background: linear-gradient(
+    135deg,
+    #5f4b08 0%,
+    #bd9b2c 20%,
+    #c9a227 45%,
+    #f2d46b 55%,
+    #c6a233 75%,
+    #6e560c 100%
+  );
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 2px 3px rgba(186, 129, 15, 0.326);
 }
 
 .description {

@@ -72,7 +72,11 @@ const irAAportar = () => {
 </script>
 <style scoped>
 .footer {
-  background-color: var(--azul-principal);
+  background: linear-gradient(
+    180deg,
+    #08335e,
+    #5a799f
+  );
   color: white;
   padding: 70px 80px 30px 80px;
 }

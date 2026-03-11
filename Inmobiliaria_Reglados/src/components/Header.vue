@@ -92,13 +92,22 @@ header .logo h1 {
   font-weight: 700;
   margin: 0;
   letter-spacing: 2px;
-  color: #eabe2f;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.906);
+  background: linear-gradient(
+    135deg,
+    #5f4b08 0%,
+    #bd9b2c 20%,
+    #c9a227 45%,
+    #f2d46b 55%,
+    #c6a233 75%,
+    #6e560c 100%
+  );
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 2px 3px rgba(186, 129, 15, 0.532);
 }
 
 .logo-text {
   text-decoration: none;
-  color: inherit;
 }
 
 .logo-text:hover {

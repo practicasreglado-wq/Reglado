@@ -22,11 +22,15 @@ export default {
 
 <style scoped>
 .dashboard {
-  min-height: 100vh;
+  min-height:100vh;
+  background: linear-gradient(
+    180deg,
+    #b6c6d6,
+    #eef2f7
+  );
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #d8dbe1;
 }
 
 .dashboard-container {

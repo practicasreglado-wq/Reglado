@@ -36,9 +36,9 @@
 </li>
 
 <li>
-  <router-link to="/profile/settings" @click="menuOpen = false">
-    Ajustes
-  </router-link>
+  <button class="sidebar-link" type="button" @click="goToSettings(); menuOpen = false">
+    Configuración
+  </button>
 </li>
 </ul>
 
@@ -169,6 +169,7 @@ import { useRouter, useRoute } from "vue-router";
 export default {
 
 setup(){
+
 const menuOpen = ref(false)
 const userStore = useUserStore()
 const router = useRouter()
@@ -176,6 +177,15 @@ const route = useRoute()
 
 const { user, selectedCategory: category, preferences } = storeToRefs(userStore)
 
+/* 👇 MOVER AQUÍ */
+function goToSettings() {
+
+  const base = import.meta.env.VITE_GRUPO_REGLADO_BASE_URL || "http://localhost:5173"
+  const settingsPath = import.meta.env.VITE_GRUPO_REGLADO_SETTINGS_PATH || "/configuracion"
+
+  window.location.href = new URL(settingsPath, base).toString()
+
+}
 
 onMounted(()=>{
 
@@ -187,13 +197,10 @@ userStore.setCategory(savedCategory)
 
 })
 
-
 const logout = async ()=>{
 await userStore.logout()
 router.push("/")
-
 }
-
 
 const hasPreferences = computed(()=>{
 
@@ -205,11 +212,9 @@ arr => Array.isArray(arr) && arr.length
 
 })
 
-
 const isProfileHome = computed(()=>{
 return route.path === "/profile/properties-for-sale"
 })
-
 
 const formatLabel = (key)=>{
 
@@ -226,7 +231,6 @@ uso:"Uso"
 return labels[key] || key
 }
 
-
 return{
 user,
 category,
@@ -235,7 +239,8 @@ hasPreferences,
 formatLabel,
 logout,
 isProfileHome,
-menuOpen
+menuOpen,
+goToSettings   // 👈 IMPORTANTE
 }
 
 }
@@ -250,7 +255,11 @@ menuOpen
 .profile{
 display:flex;
 min-height:100vh;
-background:#d8dbe1;
+background: linear-gradient(
+    180deg,
+    #b6c6d6,
+    #eef2f7
+  );
 }
 .menu-toggle{
 
@@ -278,7 +287,7 @@ z-index:1000;
 .sidebar{
 margin-top: 90px;
 width:300px;
-background:linear-gradient(to bottom,#101d41,#2c4692);
+background:linear-gradient(to bottom,#2f3e69,#0a315e);
 padding:25px;
 display:flex;
 flex-direction:column;
@@ -317,6 +326,26 @@ font-weight:600;
 
 .router-link-exact-active{
 background:#d6ab3e;
+}
+
+.sidebar-link{
+font-family: inherit;
+display:block;
+width:100%;
+padding:10px;
+border-radius:6px;
+text-decoration:none;
+color:white;
+font-size:1.2rem;
+background:none;
+border:none;
+text-align:left;
+cursor:pointer;
+}
+
+.sidebar-link:hover{
+background:#f0c14bd7;
+font-weight:600;
 }
 
 
