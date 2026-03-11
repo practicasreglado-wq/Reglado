@@ -35,6 +35,10 @@
         Reenviar correo de verificacion
       </button>
 
+      <p class="helper-text">
+        <RouterLink to="/recuperar-contrasena" @click="closeModal">Has olvidado tu contrasena?</RouterLink>
+      </p>
+
       <p class="register-text">
         No tienes cuenta?
         <RouterLink to="/registro" @click="closeModal">Registrate</RouterLink>
@@ -48,7 +52,7 @@ import { ref } from "vue";
 import { RouterLink } from "vue-router";
 import { auth } from "../services/auth";
 
-const props = defineProps({
+defineProps({
   open: {
     type: Boolean,
     default: false,

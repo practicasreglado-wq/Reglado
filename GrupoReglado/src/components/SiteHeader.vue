@@ -23,7 +23,7 @@
             :title="displayUsername"
             aria-label="Menu de usuario"
           >
-            <img :src="userIcon" alt="" class="user-icon" />
+            <span class="user-initial" aria-hidden="true">{{ userInitial }}</span>
           </button>
 
           <div v-if="userMenuOpen" class="user-menu" role="menu" aria-label="Menu de usuario">
@@ -45,7 +45,6 @@
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import { RouterLink, useRouter } from "vue-router";
 import logoSrc from "../assets/reglado-energy-logo.svg";
-import userIcon from "../assets/user-icon.svg";
 
 const props = defineProps({
   user: {
@@ -70,6 +69,15 @@ const displayUsername = computed(() => {
     return username.trim();
   }
   return props.user?.name || "Usuario";
+});
+
+const userInitial = computed(() => {
+  const source = displayUsername.value.trim();
+  if (source === "") {
+    return "U";
+  }
+
+  return source.charAt(0).toUpperCase();
 });
 
 function toggleUserMenu() {
@@ -196,10 +204,12 @@ onBeforeUnmount(() => {
   cursor: pointer;
 }
 
-.user-icon {
-  width: 19px;
-  height: 19px;
-  display: block;
+.user-initial {
+  color: #f6f8fc;
+  font-family: "Manrope", "Trebuchet MS", sans-serif;
+  font-size: 0.98rem;
+  font-weight: 800;
+  line-height: 1;
 }
 
 .user-menu {

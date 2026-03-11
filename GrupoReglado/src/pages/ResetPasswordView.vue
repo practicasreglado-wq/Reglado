@@ -1,0 +1,74 @@
+<template>
+  <section class="form-page">
+    <div class="form-card">
+      <h1>Restablecer contrasena</h1>
+      <p>Introduce tu nueva contrasena.</p>
+
+      <form class="clean-form" @submit.prevent="submitReset">
+        <label>
+          Nueva contrasena
+          <input v-model="newPassword" type="password" placeholder="********" required minlength="6" />
+        </label>
+
+        <label>
+          Confirmar contrasena
+          <input
+            v-model="newPasswordConfirmation"
+            type="password"
+            placeholder="********"
+            required
+            minlength="6"
+          />
+        </label>
+
+        <p v-if="error" class="feedback error">{{ error }}</p>
+        <p v-if="success" class="feedback success">{{ success }}</p>
+
+        <button class="btn-primary" type="submit" :disabled="loading">
+          {{ loading ? "Guardando..." : "Guardar nueva contrasena" }}
+        </button>
+      </form>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { auth } from "../services/auth";
+
+const route = useRoute();
+const router = useRouter();
+
+const newPassword = ref("");
+const newPasswordConfirmation = ref("");
+const error = ref("");
+const success = ref("");
+const loading = ref(false);
+
+async function submitReset() {
+  const token = typeof route.query.token === "string" ? route.query.token.trim() : "";
+
+  if (!token) {
+    error.value = "El enlace de recuperacion no es valido.";
+    return;
+  }
+
+  loading.value = true;
+  error.value = "";
+  success.value = "";
+
+  try {
+    const response = await auth.resetPassword(token, newPassword.value, newPasswordConfirmation.value);
+    success.value = response.message || "Contrasena actualizada.";
+
+    setTimeout(() => {
+      router.push("/login");
+    }, 1200);
+  } catch (err) {
+    error.value = err instanceof Error ? err.message : "No fue posible restablecer la contrasena.";
+  } finally {
+    loading.value = false;
+  }
+}
+</script>

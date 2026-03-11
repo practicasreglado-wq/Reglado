@@ -33,6 +33,10 @@
         Reenviar correo de verificacion
       </button>
 
+      <p class="helper-text">
+        <RouterLink to="/recuperar-contrasena">Has olvidado tu contrasena?</RouterLink>
+      </p>
+
       <p class="register-text">
         No tienes cuenta?
         <RouterLink :to="registerUrl">Registrate</RouterLink>

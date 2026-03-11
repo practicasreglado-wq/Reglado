@@ -168,6 +168,24 @@ async function resendVerification(email) {
   });
 }
 
+async function requestPasswordReset(email) {
+  return request("/auth/request-password-reset", {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  });
+}
+
+async function resetPassword(token, newPassword, newPasswordConfirmation) {
+  return request("/auth/reset-password", {
+    method: "POST",
+    body: JSON.stringify({
+      token,
+      new_password: newPassword,
+      new_password_confirmation: newPasswordConfirmation,
+    }),
+  });
+}
+
 async function logout() {
   try {
     if (state.token) {
@@ -194,6 +212,8 @@ export const auth = {
   requestEmailChange,
   changePassword,
   resendVerification,
+  requestPasswordReset,
+  resetPassword,
   logout,
 };
 

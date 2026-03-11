@@ -22,6 +22,16 @@ class User
         return $user ?: null;
     }
 
+    public static function findByUsername(string $username): ?array
+    {
+        $db = Database::connect();
+        $stmt = $db->prepare('SELECT * FROM users WHERE username = ? LIMIT 1');
+        $stmt->execute([$username]);
+        $user = $stmt->fetch();
+
+        return $user ?: null;
+    }
+
     public static function create(
         string $username,
         string $email,
@@ -41,6 +51,150 @@ class User
         $stmt->execute([$username, $email, $passwordHash, $name, $firstName, $lastName, $phone, $role]);
 
         return (int) $db->lastInsertId();
+    }
+
+    public static function createPendingRegistration(
+        string $username,
+        string $email,
+        string $passwordHash,
+        string $name,
+        string $firstName,
+        string $lastName,
+        string $phone,
+        string $tokenHash,
+        string $expiresAt
+    ): int {
+        $db = Database::connect();
+        $cleanup = $db->prepare('DELETE FROM pending_registrations WHERE email = ? OR username = ?');
+        $cleanup->execute([$email, $username]);
+
+        $stmt = $db->prepare(
+            'INSERT INTO pending_registrations(username, email, password_hash, name, first_name, last_name, phone, token_hash, expires_at)
+             VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)'
+        );
+        $stmt->execute([$username, $email, $passwordHash, $name, $firstName, $lastName, $phone !== '' ? $phone : null, $tokenHash, $expiresAt]);
+
+        return (int) $db->lastInsertId();
+    }
+
+    public static function deletePendingRegistration(int $pendingId): void
+    {
+        $db = Database::connect();
+        $stmt = $db->prepare('DELETE FROM pending_registrations WHERE id = ?');
+        $stmt->execute([$pendingId]);
+    }
+
+    public static function findPendingRegistrationConflict(string $email, string $username): ?array
+    {
+        $db = Database::connect();
+        $stmt = $db->prepare(
+            'SELECT id, email, username
+             FROM pending_registrations
+             WHERE used_at IS NULL
+               AND expires_at > NOW()
+               AND (email = ? OR username = ?)
+             LIMIT 1'
+        );
+        $stmt->execute([$email, $username]);
+        $row = $stmt->fetch();
+
+        return $row ?: null;
+    }
+
+    public static function findPendingRegistrationByEmail(string $email): ?array
+    {
+        $db = Database::connect();
+        $stmt = $db->prepare(
+            'SELECT *
+             FROM pending_registrations
+             WHERE email = ?
+               AND used_at IS NULL
+               AND expires_at > NOW()
+             LIMIT 1'
+        );
+        $stmt->execute([$email]);
+        $row = $stmt->fetch();
+
+        return $row ?: null;
+    }
+
+    public static function refreshPendingRegistrationToken(int $pendingId, string $tokenHash, string $expiresAt): void
+    {
+        $db = Database::connect();
+        $stmt = $db->prepare(
+            'UPDATE pending_registrations
+             SET token_hash = ?, expires_at = ?, used_at = NULL
+             WHERE id = ?'
+        );
+        $stmt->execute([$tokenHash, $expiresAt, $pendingId]);
+    }
+
+    public static function findPendingRegistrationByTokenHash(string $tokenHash): ?array
+    {
+        $db = Database::connect();
+        $stmt = $db->prepare(
+            'SELECT *
+             FROM pending_registrations
+             WHERE token_hash = ?
+               AND used_at IS NULL
+               AND expires_at > NOW()
+             LIMIT 1'
+        );
+        $stmt->execute([$tokenHash]);
+        $row = $stmt->fetch();
+
+        return $row ?: null;
+    }
+
+    public static function createUserFromPendingRegistration(int $pendingId): array
+    {
+        $db = Database::connect();
+        $db->beginTransaction();
+
+        try {
+            $select = $db->prepare('SELECT * FROM pending_registrations WHERE id = ? AND used_at IS NULL LIMIT 1');
+            $select->execute([$pendingId]);
+            $pending = $select->fetch();
+
+            if (!$pending) {
+                throw new RuntimeException('pending registration not found');
+            }
+
+            $insert = $db->prepare(
+                'INSERT INTO users(username, email, password, name, first_name, last_name, phone, role, is_email_verified, email_verified_at)
+                 VALUES(?, ?, ?, ?, ?, ?, ?, ?, 1, NOW())'
+            );
+            $insert->execute([
+                $pending['username'],
+                $pending['email'],
+                $pending['password_hash'],
+                $pending['name'],
+                $pending['first_name'],
+                $pending['last_name'],
+                $pending['phone'],
+                'user',
+            ]);
+
+            $userId = (int) $db->lastInsertId();
+
+            $markPending = $db->prepare('UPDATE pending_registrations SET used_at = NOW() WHERE id = ?');
+            $markPending->execute([$pendingId]);
+
+            $user = $db->prepare('SELECT * FROM users WHERE id = ? LIMIT 1');
+            $user->execute([$userId]);
+            $freshUser = $user->fetch();
+
+            $db->commit();
+
+            if (!$freshUser) {
+                throw new RuntimeException('created user not found');
+            }
+
+            return $freshUser;
+        } catch (Throwable $e) {
+            $db->rollBack();
+            throw $e;
+        }
     }
 
     public static function updateUsername(int $userId, string $username): void

@@ -52,7 +52,7 @@
                 :title="displayUsername"
                 aria-label="Menu de usuario"
               >
-                <img :src="userIcon" alt="" class="user-icon" />
+                <span class="user-initial" aria-hidden="true">{{ userInitial }}</span>
               </button>
               <div v-if="userMenuOpen" class="user-menu" role="menu" aria-label="Menu de usuario">
                 <button class="user-menu-item" type="button" role="menuitem" @click="goToSettings">
@@ -132,7 +132,6 @@
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import logo from "../assets/reglado-energy-logo.svg";
 import adminUserIcon from "../assets/admin-user-icon.svg";
-import userIcon from "../assets/user-icon.svg";
 import { auth } from "../services/auth";
 
 const props = defineProps({
@@ -155,6 +154,15 @@ const displayUsername = computed(() => {
     return username.trim();
   }
   return props.user?.name || "Usuario";
+});
+
+const userInitial = computed(() => {
+  const source = displayUsername.value.trim();
+  if (source === "") {
+    return "U";
+  }
+
+  return source.charAt(0).toUpperCase();
 });
 
 function closeMobileMenu() {
@@ -293,7 +301,12 @@ onBeforeUnmount(() => {
   display: grid;
   place-items: center;
 }
-.user-icon{ width: 19px; height: 19px; display: block; }
+.user-initial{
+  color: rgba(233,238,246,.95);
+  font-size: 0.98rem;
+  font-weight: 800;
+  line-height: 1;
+}
 .user-menu-wrap{
   position: relative;
 }
