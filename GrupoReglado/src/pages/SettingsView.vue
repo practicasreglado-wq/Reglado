@@ -31,7 +31,7 @@
 
           <div class="setting-row">
             <div>
-              <strong>Email</strong>
+              <strong>Correo electrónico</strong>
               <p>{{ auth.state.user.email || "-" }}</p>
             </div>
             <button class="btn-outline" type="button" @click="openModal('email')">Cambiar</button>
