@@ -4,7 +4,7 @@
       <div class="hero-overlay"></div>
       <div class="hero-particles"></div>
 
-      <img class="hero-watermark-logo" :src="corporateLogo" alt="" aria-hidden="true" />
+      <div class="hero-watermark-logo" aria-hidden="true"></div>
 
       <div class="hero-content">
         <p class="hero-kicker">Portal corporativo</p>
@@ -179,7 +179,7 @@ import companyEnergy from "../assets/company-energy.png";
 import companyEnProceso from "../assets/company-enproceso.png";
 import companyMapas from "../assets/company-mapas.webp";
 import companyRealstate from "../assets/company-realstate.png";
-import heroBackground from "../assets/hero-reglado-group.png";
+import heroBackground from "../assets/RegladoFondo.gif";
 import corporateLogo from "../assets/reglado-energy-logo.svg";
 
 const heroSubtitle =
@@ -189,6 +189,7 @@ const heroSubtitleChars = computed(() => Array.from(heroSubtitle));
 
 const heroStyle = computed(() => ({
   "--hero-image": `url('${heroBackground}')`,
+  "--hero-logo": `url('${corporateLogo}')`,
 }));
 
 const realstateUrl = import.meta.env.VITE_REGLADO_REALSTATE_URL || "#";
@@ -198,10 +199,10 @@ const enProcesoUrl = import.meta.env.VITE_REGLADO_ENPROCESO_URL || "#";
 
 const companies = [
   {
-    name: "Reglado Realstate",
-    tag: "Realstate",
-    description: "Consultoria estrategica y legal enfocada a operaciones inmobiliarias.",
-    href: realstateUrl,
+    name: "Reglado Consultores",
+    tag: "Consultores",
+    description: "Consultoria estrategica y legal para operaciones, crecimiento y desarrollo empresarial.",
+    href: "https://regladoconsultores.com/",
     image: companyRealstate,
     logo: corporateLogo,
   },
@@ -217,15 +218,15 @@ const companies = [
     name: "Reglado Mapas",
     tag: "Mapas",
     description: "Plataforma geografica y visualizacion avanzada para decisiones de negocio.",
-    href: mapasUrl,
+    href: enProcesoUrl,
     image: companyMapas,
     logo: corporateLogo,
   },
   {
-    name: "Reglado EnProceso",
-    tag: "EnProceso",
-    description: "Tecnologia, innovacion e inversion para proyectos corporativos.",
-    href: enProcesoUrl,
+    name: "Reglado Realstate",
+    tag: "Realstate",
+    description: "Consultoria estrategica y legal enfocada a operaciones inmobiliarias.",
+    href: realstateUrl,
     image: companyEnProceso,
     logo: corporateLogo,
   },
@@ -244,7 +245,7 @@ const whatsappUrl = `https://wa.me/${rawWhatsapp || "34600000000"}`;
 <style scoped>
 .landing {
   display: grid;
-  gap: 1.4rem;
+  gap: 0;
 }
 
 .block {
@@ -271,13 +272,13 @@ const whatsappUrl = `https://wa.me/${rawWhatsapp || "34600000000"}`;
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-left: 0;
   border-right: 0;
-  border-radius: 0 0 28px 28px;
+  border-radius: 0;
   background-color: #1f324c;
   background-image:
     linear-gradient(115deg, rgba(14, 27, 45, 0.46), rgba(39, 61, 92, 0.3)),
     var(--hero-image);
-  background-size: cover, contain;
-  background-position: center, center;
+  background-size: cover, 112% 120%;
+  background-position: center, center center;
   background-repeat: no-repeat, no-repeat;
   background-attachment: scroll, fixed;
   box-shadow: 0 24px 48px rgba(13, 26, 45, 0.25);
@@ -307,12 +308,21 @@ const whatsappUrl = `https://wa.me/${rawWhatsapp || "34600000000"}`;
 
 .hero-watermark-logo {
   position: absolute;
-  inset: 0;
-  margin: auto;
-  width: min(58vw, 780px);
-  max-height: 70%;
-  opacity: 0.1;
-  filter: grayscale(100%) brightness(150%);
+  top: 50%;
+  right: clamp(0.1rem, 1.5vw, 1rem);
+  transform: translateY(-50%);
+  width: min(48vw, 610px);
+  aspect-ratio: 1 / 1;
+  background: rgba(39, 61, 92, 0.18);
+  -webkit-mask-image: var(--hero-logo);
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+  mask-image: var(--hero-logo);
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+  filter: blur(0.2px);
   pointer-events: none;
 }
 
@@ -345,9 +355,10 @@ const whatsappUrl = `https://wa.me/${rawWhatsapp || "34600000000"}`;
   background-size: 150% 150%;
   animation: titleSheen 7s ease-in-out infinite;
   font-size: clamp(2.6rem, 7.4vw, 6rem);
-  line-height: 0.94;
+  line-height: 1.02;
   letter-spacing: 0.01em;
   filter: drop-shadow(0 10px 22px rgba(8, 18, 34, 0.42));
+  padding-bottom: 0.08em;
 }
 
 .hero-subtitle {
@@ -418,6 +429,12 @@ const whatsappUrl = `https://wa.me/${rawWhatsapp || "34600000000"}`;
   border-right: 0;
   border-radius: 0;
   padding: clamp(1.15rem, 2.8vw, 1.85rem);
+  margin-top: 0;
+}
+
+.block-companies,
+.block-contact {
+  margin-top: 1.4rem;
 }
 
 .block-group::before {
@@ -434,27 +451,31 @@ const whatsappUrl = `https://wa.me/${rawWhatsapp || "34600000000"}`;
   position: relative;
   z-index: 1;
   max-width: 920px;
-  background: linear-gradient(160deg, #dcecff 0%, #cfe3ff 100%);
-  border: 1px solid rgba(149, 185, 239, 0.7);
-  border-radius: 14px;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
   padding: 0.9rem 1rem;
-  box-shadow: 0 8px 18px rgba(9, 22, 40, 0.16);
+  box-shadow: none;
+  margin: 0 auto;
+  text-align: center;
 }
 
 .group-intro h2 {
   margin: 0;
-  color: #162b45;
-  font-size: clamp(1.25rem, 2.2vw, 1.75rem);
+  color: rgba(185, 214, 255, 0.92);
+  font-size: clamp(1.6rem, 3vw, 2.35rem);
   line-height: 1.2;
   letter-spacing: -0.01em;
 }
 
 .group-intro p {
   margin: 0.68rem 0 0;
-  color: #2c4c73;
+  color: #fff;
   font-size: clamp(0.92rem, 1.35vw, 1rem);
   line-height: 1.45;
   max-width: 760px;
+  margin-inline: auto;
+  text-align: center;
 }
 
 .group-icons {
@@ -817,9 +838,17 @@ const whatsappUrl = `https://wa.me/${rawWhatsapp || "34600000000"}`;
   .block-hero {
     margin-top: -5.5rem;
     min-height: 74vh;
-    border-radius: 0 0 18px 18px;
-    background-size: cover, cover;
+    border-radius: 0;
+    background-size: cover, 150% 128%;
     background-attachment: scroll, scroll;
+  }
+
+  .hero-watermark-logo {
+    top: auto;
+    right: 0.1rem;
+    bottom: 1.25rem;
+    transform: none;
+    width: min(58vw, 290px);
   }
 
   .group-icons {
