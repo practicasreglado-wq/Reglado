@@ -98,6 +98,8 @@ export default {
 
 <style scoped>
 .history-card {
+  position: relative;
+  overflow: hidden;
   background: linear-gradient(180deg, #ffffff, #f8fafc);
   border: 1px solid #dfe6f2;
   border-radius: 20px;
@@ -106,9 +108,30 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 18px;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.history-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, rgba(54, 84, 174, 0.08), transparent 35%, rgba(210, 180, 84, 0.08));
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+.history-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 20px 44px rgba(18, 38, 77, 0.12);
+}
+
+.history-card:hover::before {
+  opacity: 1;
 }
 
 .history-card__top {
+  position: relative;
   display: flex;
   justify-content: space-between;
   gap: 16px;
@@ -141,6 +164,7 @@ export default {
 }
 
 .history-card__list {
+  position: relative;
   list-style: none;
   padding: 0;
   margin: 0;
@@ -156,28 +180,57 @@ export default {
   border-radius: 14px;
   background: #f4f7fb;
   border: 1px solid #e4ebf6;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
 
 .history-card__item-label {
   color: #51627f;
+  transition: color 0.2s ease;
 }
 
 .history-card__item-value {
   color: #172a5d;
   text-align: right;
+  transition: color 0.2s ease;
+}
+
+.history-card__item:hover {
+  transform: translateX(4px);
+  border-color: #c5d4f1;
+  background: linear-gradient(135deg, #f8fbff, #edf3ff);
+  box-shadow: 0 12px 24px rgba(40, 72, 152, 0.08);
+}
+
+.history-card__item:hover .history-card__item-label {
+  color: #284898;
+}
+
+.history-card__item:hover .history-card__item-value {
+  color: #0f2147;
 }
 
 .history-card__toggle {
+  position: relative;
   margin-top: 16px;
-  padding: 0;
-  border: none;
-  background: none;
+  padding: 10px 16px;
+  border: 1px solid #d7e2f7;
+  border-radius: 999px;
+  background: #f5f8ff;
   color: #1f4aa8;
   font-weight: 700;
   cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.history-card__toggle:hover {
+  transform: translateY(-1px);
+  background: #eaf1ff;
+  border-color: #bfd0f4;
+  box-shadow: 0 10px 20px rgba(31, 74, 168, 0.12);
 }
 
 .history-card__actions {
+  position: relative;
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
@@ -208,6 +261,13 @@ export default {
   border: 1px solid #f1cccc;
 }
 
+.history-card__action--danger:hover {
+  background: #d94b4b;
+  color: white;
+  border-color: #d94b4b;
+  box-shadow: 0 12px 24px rgba(217, 75, 75, 0.22);
+}
+
 @media (max-width: 768px) {
   .history-card__top,
   .history-card__item,
@@ -217,6 +277,10 @@ export default {
 
   .history-card__item-value {
     text-align: left;
+  }
+
+  .history-card__item:hover {
+    transform: translateY(-2px);
   }
 }
 </style>
