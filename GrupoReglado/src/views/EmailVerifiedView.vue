@@ -1,7 +1,7 @@
-<template>
+﻿<template>
   <section class="form-page">
     <div class="form-card">
-      <h1>Verificacion de correo</h1>
+      <h1>Verificación de correo</h1>
 
       <p v-if="loading">Validando acceso...</p>
 
@@ -11,7 +11,7 @@
       </template>
 
       <template v-else>
-        <p class="feedback success">Se ha verificado tu email correctamente.</p>
+        <p class="feedback success">Se ha verificado tu correo correctamente.</p>
         <p>Seras redirigido al portal en {{ countdown }} segundos...</p>
         <RouterLink class="btn-primary inline-btn" to="/">Ir ahora</RouterLink>
       </template>
@@ -61,7 +61,7 @@ onMounted(async () => {
 
   if (!token) {
     loading.value = false;
-    error.value = "No se encontro el token de verificacion.";
+    error.value = "No se encontró el token de verificación.";
     return;
   }
 
@@ -70,7 +70,7 @@ onMounted(async () => {
     await auth.initialize();
 
     if (!auth.state.user) {
-      throw new Error("No se pudo iniciar la sesion con el token recibido.");
+      throw new Error("No se pudo iniciar la sesión con el token recibido.");
     }
 
     const queryReturnTo = typeof route.query.returnTo === "string" ? route.query.returnTo.trim() : "";
@@ -83,7 +83,7 @@ onMounted(async () => {
     startAutoRedirect();
   } catch (err) {
     auth.clearSession();
-    error.value = err instanceof Error ? err.message : "No se pudo completar la verificacion";
+    error.value = err instanceof Error ? err.message : "No se pudo completar la verificación";
   } finally {
     loading.value = false;
   }

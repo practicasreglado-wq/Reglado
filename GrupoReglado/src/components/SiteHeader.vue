@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <header ref="headerRef" class="topbar" :class="{ 'topbar-scrolled': isScrolled }">
     <RouterLink class="brand-link" to="/" aria-label="Ir al inicio">
       <img :src="logoSrc" alt="Reglado Energy" class="brand-logo" />
@@ -31,15 +31,15 @@
 
           <div v-if="userMenuOpen" class="user-menu" role="menu" aria-label="Menu de usuario">
             <button class="user-menu-item" type="button" role="menuitem" @click="goToSettings">
-              Configuracion
+              Configuración
             </button>
             <button class="user-menu-item danger" type="button" role="menuitem" @click="logout">
-              Cerrar sesion
+              Cerrar sesión
             </button>
           </div>
         </div>
       </template>
-      <button v-else class="btn-primary" @click="$emit('open-login')">Iniciar sesion</button>
+      <button v-else class="btn-primary" @click="$emit('open-login')">Iniciar sesión</button>
     </div>
 
     <div class="mobile-controls">
@@ -52,7 +52,7 @@
         class="user-pill mobile-user-trigger"
         to="/configuracion"
         :title="displayUsername"
-        aria-label="Configuracion de usuario"
+        aria-label="Configuración de usuario"
       >
         <span class="user-initial" aria-hidden="true">{{ userInitial }}</span>
       </RouterLink>
@@ -79,12 +79,12 @@
       <div class="mobile-session">
         <template v-if="user">
           <button class="mobile-session-action" type="button" role="menuitem" @click="logoutAndCloseMobile">
-            Cerrar sesion
+            Cerrar sesión
           </button>
         </template>
 
         <button v-else class="btn-primary mobile-login-btn" type="button" @click="openLoginFromMobile">
-          Iniciar sesion
+          Iniciar sesión
         </button>
       </div>
     </div>

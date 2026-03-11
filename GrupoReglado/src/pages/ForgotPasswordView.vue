@@ -1,8 +1,8 @@
-<template>
+﻿<template>
   <section class="form-page">
     <div class="form-card">
-      <h1>Recuperar contrasena</h1>
-      <p>Introduce tu correo y te enviaremos un enlace para restablecer la contrasena.</p>
+      <h1>Recuperar contraseña</h1>
+      <p>Introduce tu correo y te enviaremos un enlace para restablecer la contraseña.</p>
 
       <form class="clean-form" @submit.prevent="submitRequest">
         <label>

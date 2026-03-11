@@ -1,4 +1,4 @@
-import { reactive } from "vue";
+﻿import { reactive } from "vue";
 
 const API_BASE = import.meta.env.VITE_AUTH_API_URL || "http://localhost:8000";
 const TOKEN_KEY = "auth_token";
@@ -13,25 +13,25 @@ const state = reactive({
 
 const AUTH_MESSAGE_MAP = {
   "request failed": "La solicitud no se pudo completar.",
-  "invalid token": "Tu sesion no es valida. Vuelve a iniciar sesion.",
-  "token revoked": "Tu sesion ya no es valida. Vuelve a iniciar sesion.",
-  unauthorized: "Debes iniciar sesion para continuar.",
-  forbidden: "No tienes permisos para realizar esta accion.",
-  "too many requests, try again later": "Has realizado demasiados intentos. Intentalo mas tarde.",
-  "email not verified": "Debes confirmar tu correo antes de iniciar sesion.",
-  "invalid credentials": "Correo o contrasena incorrectos.",
+  "invalid token": "Tu sesión no es válida. Vuelve a iniciar sesión.",
+  "token revoked": "Tu sesión ya no es válida. Vuelve a iniciar sesión.",
+  unauthorized: "Debes iniciar sesión para continuar.",
+  forbidden: "No tienes permisos para realizar esta acción.",
+  "too many requests, try again later": "Has realizado demasiados intentos. Inténtalo más tarde.",
+  "email not verified": "Debes confirmar tu correo antes de iniciar sesión.",
+  "invalid credentials": "Correo o contraseña incorrectos.",
   "user not found": "No se ha encontrado ninguna cuenta con esos datos.",
   "email already registered": "Ya existe una cuenta con ese correo.",
-  "username already taken": "Ese nombre de usuario ya esta en uso.",
+  "username already taken": "Ese nombre de usuario ya está en uso.",
   "pending registration already exists": "Ya existe un registro pendiente para ese correo.",
-  "verification email sent": "Se ha enviado el correo de verificacion.",
+  "verification email sent": "Se ha enviado el correo de verificación.",
   "password reset email sent": "Si la cuenta existe, te hemos enviado un correo.",
-  "password reset successful": "La contrasena se ha actualizado correctamente.",
-  "password changed successfully": "La contrasena se ha actualizado correctamente.",
+  "password reset successful": "La contraseña se ha actualizado correctamente.",
+  "password changed successfully": "La contraseña se ha actualizado correctamente.",
   "email change verification sent": "Te hemos enviado un correo para confirmar el cambio de correo.",
   "email updated": "El correo se ha actualizado correctamente.",
-  "current password is incorrect": "La contrasena actual no es correcta.",
-  "password confirmation does not match": "Las contrasenas no coinciden.",
+  "current password is incorrect": "La contraseña actual no es correcta.",
+  "password confirmation does not match": "Las contraseñas no coinciden.",
 };
 
 function authHeaders() {
