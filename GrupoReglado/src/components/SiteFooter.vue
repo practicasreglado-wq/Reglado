@@ -1,17 +1,23 @@
-<template>
+﻿<template>
   <footer class="site-footer">
     <div class="container footer-layout">
       <div class="footer-main">
         <div class="footer-col">
           <h3>Grupo Reglado</h3>
           <p>Grupo empresarial en consultoria, energia, tecnologia, inmuebles e inversion.</p>
-          <a class="social-link" href="#" aria-label="LinkedIn">
+          <a
+            class="social-link"
+            href="https://www.linkedin.com/in/reglado-abogados-y-consultores-90b7a0233/"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="LinkedIn"
+          >
             <img :src="linkedinIcon" alt="" />
           </a>
         </div>
 
         <div class="footer-col">
-          <h3>Navegacion</h3>
+          <h3>Navegación</h3>
           <div class="footer-links">
             <a href="https://regladoconsultores.com/" target="_blank" rel="noreferrer">Reglado Consultores</a>
             <a :href="energyUrl" target="_blank" rel="noreferrer">Energy</a>
@@ -23,9 +29,8 @@
         <div class="footer-col">
           <h3>Contacto</h3>
           <div class="footer-contact">
-            <div><strong>Telefono:</strong> +34 600 000 000</div>
-            <div><strong>Email:</strong> info@regladogroup.com</div>
-            <div><strong>Soporte:</strong> soporte@regladogroup.com</div>
+            <div><strong>Teléfono:</strong> +34 911462674</div>
+            <div><strong>Email:</strong>info@regladoconsultores.com</div>
           </div>
         </div>
       </div>

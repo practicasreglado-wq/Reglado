@@ -1,8 +1,8 @@
-<template>
+﻿<template>
   <section class="admin-page">
     <div class="admin-head">
       <div>
-        <p class="admin-kicker">Administracion</p>
+        <p class="admin-kicker">Administración</p>
         <h1>Usuarios registrados</h1>
       </div>
       <button class="btn-primary" type="button" @click="loadUsers" :disabled="loading">
@@ -20,7 +20,7 @@
             <th>Usuario</th>
             <th>Nombre</th>
             <th>Email</th>
-            <th>Telefono</th>
+            <th>Teléfono</th>
             <th>Rol</th>
             <th>Verificado</th>
             <th>Alta</th>
@@ -34,7 +34,7 @@
             <td>{{ user.email || "-" }}</td>
             <td>{{ user.phone || "-" }}</td>
             <td>{{ user.role || "-" }}</td>
-            <td>{{ user.is_email_verified ? "Si" : "No" }}</td>
+            <td>{{ user.is_email_verified ? "Sí" : "No" }}</td>
             <td>{{ formatDate(user.created_at) }}</td>
           </tr>
           <tr v-if="!loading && users.length === 0">
