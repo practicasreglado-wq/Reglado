@@ -5,7 +5,6 @@
 ☰
 </button>
 
-<!-- SIDEBAR -->
 <div class="sidebar" :class="{ open: menuOpen }">
 
 <h3>Menú de perfil</h3>
@@ -30,6 +29,12 @@
 </li>
 
 <li>
+  <router-link to="/profile/search-history" @click="menuOpen = false">
+    Historial de búsquedas
+  </router-link>
+</li>
+
+<li>
   <router-link to="/profile/my-properties-for-sale" @click="menuOpen = false">
     Mis propiedades
   </router-link>
@@ -50,13 +55,9 @@ Cerrar sesión
 
 </div>
 
-
-<!-- CONTENIDO -->
 <div class="profile-content">
 
 <div v-if="user && isProfileHome">
-
-<!-- HERO PERFIL -->
 
 <div class="profile-hero">
 
@@ -66,19 +67,14 @@ Cerrar sesión
 </div>
 
 <div class="category-highlight">
-
-  <span class="category-label">Categoria actual:</span>
+  <span class="category-label">Categoría actual:</span>
 
   <div class="category-badge">
     {{ category }}
   </div>
-
 </div>
 
 </div>
-
-
-<!-- ACCIONES -->
 
 <div class="dashboard-grid">
 
@@ -121,29 +117,23 @@ stroke-linejoin="round"/>
 
 </div>
 
+<div v-if="preferenceEntries.length" class="preferences">
+<PreferencePanel :category="category" :entries="preferenceEntries" />
 
-<!-- PREFERENCIAS -->
+<div class="preferences-actions">
+<button
+  class="save-search-btn"
+  type="button"
+  :disabled="savingSearch"
+  @click="saveSearch"
+>
+  {{ savingSearch ? "Guardando..." : "Guardar búsqueda" }}
+</button>
 
-<div v-if="preferences && hasPreferences" class="preferences">
-
-<h3>Tus preferencias</h3>
-
-<template v-for="(group, key) in preferences" :key="key">
-
-<div v-if="Array.isArray(group) && group.length" class="pref-group">
-
-<h4>{{ formatLabel(key) }}</h4>
-
-<ul>
-<li v-for="(item,index) in group" :key="index">
-{{ item }}
-</li>
-</ul>
-
+<p v-if="saveSearchMessage" class="save-search-message">
+  {{ saveSearchMessage }}
+</p>
 </div>
-
-</template>
-
 </div>
 
 <div v-else class="no-pref">
@@ -151,7 +141,6 @@ No tienes preferencias guardadas todavía
 </div>
 
 </div>
-
 
 <router-view></router-view>
 
@@ -165,8 +154,14 @@ import { useUserStore } from "../stores/user";
 import { storeToRefs } from "pinia";
 import { ref, computed, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
+import PreferencePanel from "../components/PreferencePanel.vue";
+import { buildPreferenceEntries } from "../data/preferenceSchemas";
+import { backendJson } from "../services/backend";
 
 export default {
+components: {
+PreferencePanel,
+},
 
 setup(){
 
@@ -176,15 +171,14 @@ const router = useRouter()
 const route = useRoute()
 
 const { user, selectedCategory: category, preferences } = storeToRefs(userStore)
+const savingSearch = ref(false)
+const saveSearchMessage = ref("")
 
-/* 👇 MOVER AQUÍ */
 function goToSettings() {
-
   const base = import.meta.env.VITE_GRUPO_REGLADO_BASE_URL || "http://localhost:5173"
   const settingsPath = import.meta.env.VITE_GRUPO_REGLADO_SETTINGS_PATH || "/configuracion"
 
   window.location.href = new URL(settingsPath, base).toString()
-
 }
 
 onMounted(()=>{
@@ -202,45 +196,53 @@ await userStore.logout()
 router.push("/")
 }
 
-const hasPreferences = computed(()=>{
-
-if(!preferences.value) return false
-
-return Object.values(preferences.value).some(
-arr => Array.isArray(arr) && arr.length
+const preferenceEntries = computed(() =>
+buildPreferenceEntries(category.value, preferences.value)
 )
 
-})
+const saveSearch = async () => {
+  if (!user.value?.iduser || !category.value || !preferenceEntries.value.length) {
+    saveSearchMessage.value = "No hay una búsqueda completa para guardar."
+    return
+  }
+
+  savingSearch.value = true
+  saveSearchMessage.value = ""
+
+  try {
+    const payload = await backendJson("api/save_search.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        user_id: user.value.iduser,
+        category: category.value,
+        preferences: preferences.value,
+      }),
+    })
+
+    saveSearchMessage.value = payload.message || "Búsqueda guardada correctamente."
+  } catch (err) {
+    saveSearchMessage.value = err.message || "No se pudo guardar la búsqueda."
+  } finally {
+    savingSearch.value = false
+  }
+}
 
 const isProfileHome = computed(()=>{
 return route.path === "/profile/properties-for-sale"
 })
 
-const formatLabel = (key)=>{
-
-const labels = {
-estrellas:"Estrellas",
-servicios:"Servicios",
-ubicacion:"Ubicación",
-tipo:"Tipo",
-caracteristicas:"Características",
-zona:"Zona",
-uso:"Uso"
-}
-
-return labels[key] || key
-}
-
 return{
 user,
 category,
-preferences,
-hasPreferences,
-formatLabel,
+preferenceEntries,
 logout,
 isProfileHome,
 menuOpen,
-goToSettings   // 👈 IMPORTANTE
+goToSettings,
+saveSearch,
+savingSearch,
+saveSearchMessage
 }
 
 }
@@ -249,40 +251,25 @@ goToSettings   // 👈 IMPORTANTE
 </script>
 
 <style scoped>
-
-/* LAYOUT GENERAL */
-
 .profile{
 display:flex;
 min-height:100vh;
-background: linear-gradient(
-    180deg,
-    #b6c6d6,
-    #eef2f7
-  );
+background: linear-gradient(180deg, #b6c6d6, #eef2f7);
 }
+
 .menu-toggle{
-
 display:none;
-
 position:fixed;
 top:70px;
-
 background:#172a5d;
 color:white;
-
 border:none;
 border-radius:8px;
-
 padding:10px 12px;
 font-size:1rem;
-
 cursor:pointer;
-
 z-index:1000;
 }
-
-/* SIDEBAR */
 
 .sidebar{
 margin-top: 90px;
@@ -348,26 +335,18 @@ background:#f0c14bd7;
 font-weight:600;
 }
 
-
-/* CONTENIDO */
-
 .profile-content{
 flex:1;
 margin-top: 90px;
 padding:40px;
 }
 
-
-/* HERO PERFIL */
-
 .profile-hero{
 display:flex;
 justify-content:space-between;
 align-items:center;
-
 background:linear-gradient(135deg,#172a5d,#3654ae);
 color:white;
-
 padding:30px;
 border-radius:15px;
 margin-bottom:30px;
@@ -383,8 +362,6 @@ font-size:1.1rem;
 opacity:0.9;
 }
 
-/* CATEGORY HIGHLIGHT */
-
 .category-highlight{
 display:flex;
 flex-direction:column;
@@ -399,23 +376,15 @@ margin-bottom:6px;
 }
 
 .category-badge{
-
 background:linear-gradient(135deg,#d2b454,#f0c14b);
 color:#172a5d;
-
 font-size:1.3rem;
 font-weight:700;
-
 padding:10px 25px;
 border-radius:30px;
-
 box-shadow:0 4px 15px rgba(0,0,0,0.2);
 letter-spacing:0.5px;
-
 }
-
-
-/* DASHBOARD CARDS */
 
 .dashboard-grid{
 display:grid;
@@ -428,12 +397,9 @@ margin-bottom:40px;
 background:white;
 padding:25px;
 border-radius:12px;
-
 box-shadow:0 6px 20px rgba(0,0,0,0.1);
-
 text-decoration:none;
 color:#333;
-
 transition:0.25s;
 }
 
@@ -446,12 +412,9 @@ box-shadow:0 10px 30px rgba(0,0,0,0.15);
 display:flex;
 align-items:center;
 justify-content:center;
-
 width:40px;
 height:40px;
-
 margin-bottom:10px;
-
 color:#3654ae;
 }
 
@@ -465,49 +428,53 @@ font-size:0.9rem;
 color:#666;
 }
 
-
-/* PREFERENCIAS */
-
 .preferences{
+margin-top: 10px;
+}
+
+.preferences-actions{
+display:flex;
+flex-direction:column;
+align-items:flex-start;
+gap:12px;
+margin-top:18px;
+}
+
+.save-search-btn{
+padding:12px 20px;
+border:none;
+border-radius:999px;
+background:linear-gradient(135deg,#172a5d,#3654ae);
+color:white;
+font-weight:700;
+cursor:pointer;
+box-shadow:0 10px 22px rgba(23,42,93,0.18);
+transition:transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.save-search-btn:hover:not(:disabled){
+transform:translateY(-2px);
+box-shadow:0 14px 28px rgba(23,42,93,0.24);
+}
+
+.save-search-btn:disabled{
+opacity:0.7;
+cursor:not-allowed;
+}
+
+.save-search-message{
+margin:0;
+color:#51627f;
+font-weight:600;
+}
+
+.no-pref{
 background:white;
 padding:25px;
 border-radius:12px;
 box-shadow:0 6px 20px rgba(0,0,0,0.1);
+color:#51627f;
 }
-
-.preferences h3{
-margin-bottom:15px;
-font-size:1.75rem;
-color:#172a5d;
-text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
-}
-
-.pref-group{
-margin-bottom:15px;
-}
-
-.pref-group h4{
-margin-bottom:8px;
-font-size:1.3rem;
-}
-
-.pref-group ul{
-display:flex;
-flex-wrap:wrap;
-gap:8px;
-padding:0;
-list-style:none;
-}
-
-.pref-group li{
-background:#d6dced;
-border-radius:20px;
-padding:6px 14px;
-font-size:0.9rem;
-}
-
-
-/* LOGOUT */
 
 .logout-item{
 margin-top:80px;
@@ -532,15 +499,6 @@ transition:0.2s;
 background:rgba(239, 68, 68, 0.747);
 }
 
-.pref-group li:hover{
-background:#f0c14b;
-color:#172a5d;
-cursor:pointer;
-}
-
-
-/* MENU RESPONSIVE */
-
 @media(max-width:768px){
 
 .menu-toggle{
@@ -548,17 +506,13 @@ display:block;
 }
 
 .sidebar{
-
 position:fixed;
 top:0;
 margin-top: 70px;
 left:-260px;
-
 height:100vh;
 width:260px;
-
 transition:0.3s;
-
 z-index:999;
 }
 
@@ -576,54 +530,46 @@ padding-top:80px;
 
 }
 
-/* ===== MOVIL MUY PEQUEÑO ===== */
-
 @media (max-width: 400px){
 
 .profile-content{
-  margin-top: 70px;
+margin-top: 70px;
 padding:15px;
 }
 
-/* boton menu */
 .menu-toggle{
-  font-size: 1rem;
-  padding: 8px 12px;
+font-size: 1rem;
+padding: 8px 12px;
 }
 
-/* menu lateral */
 .sidebar{
-  width: 200px;
-  padding: 15px;
+width: 200px;
+padding: 15px;
 }
 
-/* titulo del menu */
 .sidebar h3{
-  margin-top: 50px;
-  font-size: 1.3rem;
-  margin-bottom: 10px;
+margin-top: 50px;
+font-size: 1.3rem;
+margin-bottom: 10px;
 }
 
-/* lista */
 .sidebar ul{
-  gap: 6px;
-}
-/* links */
-.sidebar a{
-  font-size: 0.9rem;
-  padding: 6px;
+gap: 6px;
 }
 
-/* contenido principal */
+.sidebar a{
+font-size: 0.9rem;
+padding: 6px;
+}
+
 .profile-content{
-  padding: 15px;
+padding: 15px;
 }
 
 .profile-hero{
-  flex-direction:column;
-  text-align:center;
-  gap: 15px;
-
+flex-direction:column;
+text-align:center;
+gap: 15px;
 }
 }
 </style>

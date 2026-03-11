@@ -17,6 +17,7 @@ import Messages from "../views/Messages.vue";
 import PropertiesForSale from "../views/PropertiesForSale.vue";
 import MyPropertiesForSale from "../views/MyPropertiesForSale.vue";
 import CreateProperty from "../views/CreateProperty.vue";
+import SearchHistory from "../views/SearchHistory.vue";
 import ForgotPassword from "../views/ForgotPassword.vue";
 import ResetPassword from "../views/ResetPassword.vue";
 import AuthCallback from "../views/AuthCallback.vue";
@@ -38,6 +39,7 @@ const routes = [
       { path: "favorite-properties", component: FavoriteProperties },
       { path: "messages", component: Messages },
       { path: "properties-for-sale", component: PropertiesForSale },
+      { path: "search-history", component: SearchHistory },
       { path: "my-properties-for-sale", component: MyPropertiesForSale },
       { path: "create-property", component: CreateProperty },
     ],
