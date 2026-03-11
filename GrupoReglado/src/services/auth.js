@@ -11,6 +11,29 @@ const state = reactive({
   loading: false,
 });
 
+const AUTH_MESSAGE_MAP = {
+  "request failed": "La solicitud no se pudo completar.",
+  "invalid token": "Tu sesion no es valida. Vuelve a iniciar sesion.",
+  "token revoked": "Tu sesion ya no es valida. Vuelve a iniciar sesion.",
+  unauthorized: "Debes iniciar sesion para continuar.",
+  forbidden: "No tienes permisos para realizar esta accion.",
+  "too many requests, try again later": "Has realizado demasiados intentos. Intentalo mas tarde.",
+  "email not verified": "Debes confirmar tu correo antes de iniciar sesion.",
+  "invalid credentials": "Correo o contrasena incorrectos.",
+  "user not found": "No se ha encontrado ninguna cuenta con esos datos.",
+  "email already registered": "Ya existe una cuenta con ese correo.",
+  "username already taken": "Ese nombre de usuario ya esta en uso.",
+  "pending registration already exists": "Ya existe un registro pendiente para ese correo.",
+  "verification email sent": "Se ha enviado el correo de verificacion.",
+  "password reset email sent": "Si la cuenta existe, te hemos enviado un correo.",
+  "password reset successful": "La contrasena se ha actualizado correctamente.",
+  "password changed successfully": "La contrasena se ha actualizado correctamente.",
+  "email change verification sent": "Te hemos enviado un correo para confirmar el cambio de correo.",
+  "email updated": "El correo se ha actualizado correctamente.",
+  "current password is incorrect": "La contrasena actual no es correcta.",
+  "password confirmation does not match": "Las contrasenas no coinciden.",
+};
+
 function authHeaders() {
   return state.token ? { Authorization: `Bearer ${state.token}` } : {};
 }
@@ -32,8 +55,12 @@ async function request(path, options = {}) {
   }
 
   if (!response.ok) {
-    const message = payload.error || payload.message || "request failed";
+    const message = translateAuthMessage(payload.error || payload.message || "request failed");
     throw new Error(message);
+  }
+
+  if (typeof payload.message === "string") {
+    payload.message = translateAuthMessage(payload.message);
   }
 
   return payload;
@@ -42,6 +69,7 @@ async function request(path, options = {}) {
 function setToken(token) {
   state.token = token || "";
   if (state.token) {
+    // Se persiste en ambos sitios para compartir sesion entre proyectos en el mismo navegador.
     localStorage.setItem(TOKEN_KEY, state.token);
     setCookie(COOKIE_TOKEN_KEY, state.token, COOKIE_MAX_AGE);
   } else {
@@ -186,6 +214,13 @@ async function resetPassword(token, newPassword, newPasswordConfirmation) {
   });
 }
 
+async function adminUsers() {
+  return request("/auth/admin/users", {
+    method: "GET",
+    headers: authHeaders(),
+  });
+}
+
 async function logout() {
   try {
     if (state.token) {
@@ -214,7 +249,9 @@ export const auth = {
   resendVerification,
   requestPasswordReset,
   resetPassword,
+  adminUsers,
   logout,
+  translateMessage: translateAuthMessage,
 };
 
 function setCookie(name, value, maxAgeSeconds) {
@@ -234,4 +271,13 @@ function getCookie(name) {
     }
   }
   return "";
+}
+
+function translateAuthMessage(message) {
+  if (typeof message !== "string") {
+    return "La solicitud no se pudo completar.";
+  }
+
+  // La API mantiene mensajes tecnicos en ingles; el frontend los traduce antes de pintarlos.
+  return AUTH_MESSAGE_MAP[message.toLowerCase()] || message;
 }

@@ -366,4 +366,16 @@ class User
             throw $e;
         }
     }
+
+    public static function listAll(): array
+    {
+        $db = Database::connect();
+        $stmt = $db->query(
+            'SELECT id, username, email, name, first_name, last_name, phone, role, is_email_verified, email_verified_at, created_at
+             FROM users
+             ORDER BY created_at DESC, id DESC'
+        );
+
+        return $stmt->fetchAll() ?: [];
+    }
 }

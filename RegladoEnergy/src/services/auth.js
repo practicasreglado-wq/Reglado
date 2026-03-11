@@ -13,10 +13,13 @@ const state = reactive({
 
 const AUTH_MESSAGE_MAP = {
   "request failed": "La solicitud no se pudo completar.",
-  "invalid token": "Tu sesión no es válida. Vuelve a iniciar sesión.",
-  "token revoked": "Tu sesión ya no es válida. Vuelve a iniciar sesión.",
-  unauthorized: "Debes iniciar sesión para continuar.",
-  "too many requests, try again later": "Has realizado demasiados intentos. Inténtalo más tarde.",
+  "invalid token": "Tu sesion no es valida. Vuelve a iniciar sesion.",
+  "token revoked": "Tu sesion ya no es valida. Vuelve a iniciar sesion.",
+  unauthorized: "Debes iniciar sesion para continuar.",
+  forbidden: "No tienes permisos para realizar esta accion.",
+  "too many requests, try again later": "Has realizado demasiados intentos. Intentalo mas tarde.",
+  "email not verified": "Debes confirmar tu correo antes de iniciar sesion.",
+  "invalid credentials": "Correo o contrasena incorrectos.",
 };
 
 function authHeaders() {
@@ -49,6 +52,7 @@ async function request(path, options = {}) {
 function setToken(token) {
   state.token = token || "";
   if (state.token) {
+    // Energy reutiliza la cookie compartida para detectar una sesion iniciada en GrupoReglado.
     localStorage.setItem(TOKEN_KEY, state.token);
     setCookie(COOKIE_TOKEN_KEY, state.token, COOKIE_MAX_AGE);
   } else {
@@ -135,5 +139,9 @@ function getCookie(name) {
 }
 
 function translateAuthMessage(message) {
-  return AUTH_MESSAGE_MAP[message] || message;
+  if (typeof message !== "string") {
+    return "La solicitud no se pudo completar.";
+  }
+
+  return AUTH_MESSAGE_MAP[message.toLowerCase()] || message;
 }

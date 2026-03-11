@@ -502,6 +502,32 @@ class AuthController
         Response::json(['user' => self::mapUser($user)]);
     }
 
+    public static function adminUsers(): void
+    {
+        self::requireAdmin();
+
+        $users = array_map(
+            static function (array $user): array {
+                return [
+                    'id' => (int) $user['id'],
+                    'username' => $user['username'] ?? null,
+                    'first_name' => $user['first_name'] ?? null,
+                    'last_name' => $user['last_name'] ?? null,
+                    'phone' => $user['phone'] ?? null,
+                    'name' => $user['name'] ?? null,
+                    'role' => $user['role'] ?? null,
+                    'email' => $user['email'] ?? null,
+                    'is_email_verified' => (int) ($user['is_email_verified'] ?? 0),
+                    'email_verified_at' => $user['email_verified_at'] ?? null,
+                    'created_at' => $user['created_at'] ?? null,
+                ];
+            },
+            User::listAll()
+        );
+
+        Response::json(['users' => $users]);
+    }
+
     public static function logout(): void
     {
         $token = AuthMiddleware::extractBearerToken();
@@ -571,6 +597,7 @@ class AuthController
             Response::json(['error' => 'user not found'], 404);
         }
 
+        // Cada cambio de perfil devuelve un JWT nuevo para no dejar datos obsoletos en cliente.
         $token = JwtService::generate($user);
 
         Response::json([
@@ -592,5 +619,16 @@ class AuthController
             'role' => $user['role'] ?? null,
             'email' => $user['email'] ?? null,
         ];
+    }
+
+    private static function requireAdmin(): array
+    {
+        $session = AuthMiddleware::handle();
+
+        if (($session['role'] ?? null) !== 'admin') {
+            Response::json(['error' => 'forbidden'], 403);
+        }
+
+        return $session;
     }
 }

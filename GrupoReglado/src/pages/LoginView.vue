@@ -98,7 +98,7 @@ async function submitLogin() {
   } catch (err) {
     const message = err instanceof Error ? err.message : "No fue posible iniciar sesion";
     error.value = message;
-    canResend.value = message === "email not verified";
+    canResend.value = message === "Debes confirmar tu correo antes de iniciar sesion.";
   } finally {
     loading.value = false;
   }
@@ -116,7 +116,7 @@ async function resendMail() {
 
   try {
     const response = await auth.resendVerification(email.value);
-    success.value = response.message || "Correo de verificacion reenviado";
+    success.value = response.message || "Correo de verificacion reenviado.";
   } catch (err) {
     error.value = err instanceof Error ? err.message : "No fue posible reenviar el correo";
   } finally {

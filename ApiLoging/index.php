@@ -28,6 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';
 $method = $_SERVER['REQUEST_METHOD'];
 
+// Router minimo centralizado: mantiene los endpoints visibles en un solo punto.
 if ($uri === '/auth/register' && $method === 'POST') {
     AuthController::register();
 }
@@ -78,6 +79,10 @@ if ($uri === '/auth/change-password' && $method === 'POST') {
 
 if ($uri === '/auth/me' && $method === 'GET') {
     AuthController::me();
+}
+
+if ($uri === '/auth/admin/users' && $method === 'GET') {
+    AuthController::adminUsers();
 }
 
 if ($uri === '/auth/logout' && $method === 'POST') {
