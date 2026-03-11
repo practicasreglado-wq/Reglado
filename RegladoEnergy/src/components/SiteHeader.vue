@@ -73,9 +73,31 @@
         </div>
       </nav>
 
-      <button class="burger" @click="toggleMobileMenu" aria-label="Abrir menu">
-        <span></span><span></span><span></span>
-      </button>
+      <div class="mobile-controls">
+        <router-link
+          v-if="isAdmin"
+          to="/admin"
+          class="admin-pill mobile-admin-pill"
+          title="Panel de administracion"
+          aria-label="Panel de administracion"
+        >
+          <img :src="adminUserIcon" alt="" class="admin-icon" />
+        </router-link>
+
+        <button
+          v-if="user"
+          class="user-pill mobile-user-trigger"
+          :title="displayUsername"
+          aria-label="Configuracion de usuario"
+          @click="handleMobileSettings"
+        >
+          <span class="user-initial" aria-hidden="true">{{ userInitial }}</span>
+        </button>
+
+        <button class="burger" @click="toggleMobileMenu" aria-label="Abrir menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
     </div>
 
     <div v-if="open" class="mobile">
@@ -91,7 +113,7 @@
               :class="{ open: mobileClientsOpen }"
               @click.stop.prevent="mobileClientsOpen = !mobileClientsOpen"
               aria-hidden="true"
-            >?</span>
+            >⌄</span>
           </router-link>
 
           <div v-show="mobileClientsOpen" class="m-submenu">
@@ -106,15 +128,7 @@
         <router-link @click="closeMobileMenu" to="/sobre-nosotros" class="m-link">Sobre nosotros</router-link>
         <router-link @click="closeMobileMenu" to="/contacto" class="btn primary glow mobile-action" v-glow>
           Solicitar analisis
-        </router-link>
-
-        <router-link v-if="isAdmin" @click="closeMobileMenu" to="/admin" class="btn mobile-action">
-          Panel de administración
-        </router-link>
-
-        <template v-if="user">
-          <div class="mobile-user">Sesión: {{ displayUsername }}</div>
-          <button @click="handleMobileSettings" class="btn mobile-action">Configuración</button>
+        </router-link>        <template v-if="user">
           <button @click="handleMobileLogout" class="btn mobile-action">Salir</button>
         </template>
 
@@ -361,6 +375,7 @@ onBeforeUnmount(() => {
 .burger{ display:none; background: transparent; border:none; cursor:pointer; width: 44px; height: 44px; border-radius: 14px; -webkit-tap-highlight-color: transparent; outline: none; }
 .burger span{ display:block; height:2px; margin:6px 10px; background: rgba(233,238,246,.85); }
 .burger:focus-visible{ outline: 2px solid rgba(242,197,61,.7); outline-offset: 2px; }
+.mobile-controls{ display:none; align-items:center; gap:10px; }
 .mobile{ position: absolute; top: 100%; left: 0; right: 0; z-index: 70; border-top: 1px solid rgba(255,255,255,.08); background: rgba(15, 16, 11, 0.95); box-shadow: 0 20px 40px rgba(0,0,0,.35); }
 .mobile-inner{ padding: 14px 0 18px; display:flex; flex-direction:column; gap: 10px; }
 .m-group{ display:flex; flex-direction:column; gap: 8px; }
@@ -374,13 +389,13 @@ onBeforeUnmount(() => {
 .m-sublink.router-link-active{ color: rgba(233,238,246,.9); border-color: rgba(242,197,61,.52); border-bottom-color: rgba(242,197,61,.52); background: rgba(242,197,61,.16); }
 .m-link{ padding: 12px 12px; border-radius: 14px; border: 1px solid rgba(242,197,61,.84); border-bottom: 1px solid rgba(242,197,61,.84); background: transparent; }
 .m-link.router-link-active{ color: rgba(233,238,246,.9); border-color: rgba(242,197,61,.84); border-bottom-color: rgba(242,197,61,.84); background: rgba(242,197,61,.16); }
-.mobile-action{ width: 100%; min-height: 38px; padding: 8px 12px; font-size: 13px; border-radius: 12px; }
-.mobile-user{
-  color: rgba(233,238,246,.9);
-  font-size: 13px;
-  border: 1px solid rgba(255,255,255,.2);
-  border-radius: 12px;
-  padding: 9px 12px;
+.mobile-action{ width: 100%; min-height: 38px; padding: 8px 12px; font-size: 13px; border-radius: 12px; }
+@media (max-width: 980px){
+  .nav{ display:none; }
+  .mobile-controls{ display:flex; }
+  .burger{ display:block; }
+  .mobile-admin-pill,
+  .mobile-user-trigger{ display:grid; }
 }
-@media (max-width: 980px){ .nav{ display:none; } .burger{ display:block; } }
 </style>
+

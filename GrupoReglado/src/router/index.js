@@ -6,6 +6,7 @@ import LoginView from "../pages/LoginView.vue";
 import SettingsView from "../pages/SettingsView.vue";
 import ForgotPasswordView from "../pages/ForgotPasswordView.vue";
 import ResetPasswordView from "../pages/ResetPasswordView.vue";
+import AdminView from "../pages/AdminView.vue";
 
 const routes = [
   { path: "/", name: "portal", component: PortalView },
@@ -14,6 +15,7 @@ const routes = [
   { path: "/recuperar-contrasena", name: "recuperar-contrasena", component: ForgotPasswordView },
   { path: "/restablecer-contrasena", name: "restablecer-contrasena", component: ResetPasswordView },
   { path: "/configuracion", name: "configuracion", component: SettingsView },
+  { path: "/admin", name: "admin", component: AdminView },
   {
     path: "/verificacion-exitosa",
     name: "verificacion-exitosa",

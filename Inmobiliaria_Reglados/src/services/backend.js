@@ -17,6 +17,7 @@ export function getCallbackUrl() {
 
 export function buildExternalAuthUrl(path) {
   const url = new URL(path, GROUP_BASE);
+  // El proyecto origen siempre recibe el token en esta ruta unica de callback.
   url.searchParams.set("returnTo", getCallbackUrl());
   return url.toString();
 }
