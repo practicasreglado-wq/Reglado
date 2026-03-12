@@ -1,235 +1,220 @@
 <template>
   <footer class="footer">
-    <div class="footer-container">
-      <div class="footer-col brand">
-        <h2>INMOBILIARIA · RS</h2>
-        <p>
-          Boutique inmobiliaria especializada en activos singulares,
-          edificios, hoteles y grandes operaciones.
-          Discreción, análisis y resultados.
-        </p>
-      </div>
+    <div class="footer-shell">
+      <div class="footer-grid">
+        <section class="footer-brand">
+          <div class="footer-pill">Reglado RS</div>
+          <p class="footer-copy">
+            Boutique inmobiliaria especializada en activos singulares, edificios,
+            hoteles y grandes operaciones. Discrecion, analisis y resultados.
+          </p>
 
-      <div class="footer-col">
-        <h3>ACTIVOS</h3>
-        <ul>
-          <li>Hoteles</li>
-          <li>Edificios</li>
-          <li>Parking</li>
-          <li>Activos Singulares</li>
-          <li>Fincas</li>
-        </ul>
-      </div>
-
-      <div class="footer-col">
-        <h3>EMPRESA</h3>
-        <ul>
-          <li>
-            <router-link to="/#about-us" class="footer-link">Quiénes somos</router-link>
-          </li>
-          <li>
-            <router-link to="/contacto" class="footer-link">Contacto</router-link>
-          </li>
- </ul>
-      </div>
-
-      <div class="footer-col">
-        <h3>ACCESO</h3>
-        <ul>
-          <li>Panel Privado</li>
-          <li>Deja tu búsqueda</li>
-          <li>Solicitar NDA</li>
-          <li>
-            <a href="#" @click.prevent="irAAportar" class="footer-link highlight">
-            Aportar activo
+          <div class="footer-social">
+            <a href="#" class="social-link" aria-label="LinkedIn">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M6.94 8.5V18M6.88 6.2a1.32 1.32 0 1 0 0-2.64 1.32 1.32 0 0 0 0 2.64ZM11 18v-5.36c0-1.56.84-2.56 2.22-2.56 1.29 0 1.93.88 1.93 2.56V18M3 3h18v18H3z"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
             </a>
-          </li>
-        </ul>
-      </div>
-    </div>
+            <a href="#" class="social-link" aria-label="Instagram">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect
+                  x="3.2"
+                  y="3.2"
+                  width="17.6"
+                  height="17.6"
+                  rx="4.6"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                />
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="4.1"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                />
+                <circle cx="17.3" cy="6.9" r="1.1" fill="currentColor" />
+              </svg>
+            </a>
+          </div>
+        </section>
 
-    <div class="footer-bottom">
-      <span>© 2026 RS Real Estate · Todos los derechos reservados</span>
-      <span>Aviso legal · Privacidad · Cookies · RGPD</span>
+        <nav class="footer-column" aria-label="Navegacion del pie">
+          <div class="footer-pill">Navegacion</div>
+          <ul>
+            <li><a href="#" @click.prevent="goWithoutLoader('/')">Inicio</a></li>
+            <li><a href="#" @click.prevent="goWithoutLoader('/#about-us')">Quienes somos</a></li>
+            <li><a href="#" @click.prevent="goWithoutLoader('/contacto')">Contacto</a></li>
+          </ul>
+        </nav>
+
+        <section class="footer-column">
+          <div class="footer-pill">Contacto</div>
+          <ul class="footer-contact">
+            <li><strong>Tel:</strong> +34 600 000 000</li>
+            <li><strong>Email:</strong> contacto@rsrealestate.com</li>
+            <li>Madrid · Barcelona · Costa del Sol</li>
+          </ul>
+        </section>
+      </div>
+
+      <div class="footer-bottom">
+        <span>© 2026 RS Real Estate. Todos los derechos reservados.</span>
+        <span>Aviso legal · Privacidad · Cookies · RGPD</span>
+      </div>
     </div>
   </footer>
 </template>
 
 <script setup>
-import { useUserStore } from "@/stores/user";
 import { useRouter } from "vue-router";
 
-const userStore = useUserStore();
 const router = useRouter();
 
-const irAAportar = () => {
-  if (userStore.isLoggedIn) {
-    router.push('/contribute-assets');
-  } else {
-    router.push('/give-info');
-  }
+const markSkipNextLoader = () => {
+  window.sessionStorage.setItem("skip-next-loader", "true");
 };
+
+const markSkipNextTransition = () => {
+  window.sessionStorage.setItem("skip-next-page-transition", "true");
+};
+
+const goWithoutLoader = (target) => {
+  markSkipNextLoader();
+  markSkipNextTransition();
+  router.push(target);
+};
+
 </script>
+
 <style scoped>
 .footer {
-  background: linear-gradient(
-    180deg,
-    #08335e,
-    #5a799f
-  );
-  color: white;
-  padding: 70px 80px 30px 80px;
+  background: linear-gradient(180deg, #08335e, #5a799f);
+  color: #fff;
+  padding: 68px 32px 30px;
 }
 
-.footer-container {
-  display: flex;
-  justify-content: space-between;
-  gap: 60px;
-  margin-bottom: 50px;
+.footer-shell {
+  width: min(1200px, 100%);
+  margin: 0 auto;
 }
 
-.footer-col {
-  flex: 1;
-}
-
-.brand h2 {
-  font-size: 1.6rem;
-  margin-bottom: 20px;
-  font-weight: 700;
-}
-
-.brand p {
-  line-height: 1.7;
-  opacity: 0.9;
-  max-width: 300px;
-}
-
-.footer-col h3 {
-  margin-bottom: 20px;
-  font-size: 1.1rem;
-  letter-spacing: 1px;
-}
-
-.footer-col ul {
-  list-style: none;
-  padding: 0;
-}
-
-.footer-col li {
-  margin-bottom: 12px;
-  opacity: 0.85;
-  cursor: pointer;
-  transition: 0.3s ease;
-}
-
-.footer-link {
-  text-decoration: none;
-  color: inherit;
-  display: block;
-}
-
-.footer-col li:hover {
-  opacity: 1;
-}
-
-.footer-bottom {
-  display: flex;
-  justify-content: space-between;
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
-  padding-top: 20px;
-  font-size: 0.9rem;
-  opacity: 0.85;
-}
-
-
-/* =========================
-TABLET
-========================= */
-
-@media (max-width: 1024px) {
-
-.footer {
-  padding: 60px 50px 30px 50px;
-}
-
-.footer-container {
-  gap: 40px;
-}
-
-.brand p {
-  max-width: 250px;
-}
-
-}
-
-
-/* =========================
-TABLET PEQUEÑA
-========================= */
-
-@media (max-width: 768px) {
-
-.footer {
-  padding: 60px 40px 30px 40px;
-}
-
-.footer-container {
+.footer-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 40px;
+  grid-template-columns: 1.3fr 0.9fr 0.9fr;
+  gap: 64px;
+  margin-bottom: 28px;
 }
 
-.brand {
-  grid-column: span 2;
+.footer-brand,
+.footer-column {
+  display: grid;
+  align-content: start;
+  gap: 18px;
 }
 
-.brand p {
-  max-width: 100%;
+.footer-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 10px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
 }
 
-.footer-bottom {
-  flex-direction: column;
-  gap: 10px;
-  text-align: center;
+.footer-copy {
+  max-width: 430px;
+  margin: 0;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.88);
 }
 
+.footer-social {
+  display: flex;
+  gap: 14px;
+  margin-top: 22px;
 }
 
-
-/* =========================
-MOVIL
-========================= */
-
-@media (max-width: 480px) {
-
-.footer {
-  padding: 50px 25px 25px 25px;
+.social-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  text-decoration: none;
 }
 
-.footer-container {
-  grid-template-columns: 1fr;
-  gap: 35px;
+.social-link svg {
+  width: 24px;
+  height: 24px;
 }
 
-.brand {
-  grid-column: span 1;
+.footer-column ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
 }
 
-.brand h2 {
-  font-size: 1.4rem;
+.footer-column li,
+.footer-column a {
+  color: rgba(255, 255, 255, 0.92);
+  text-decoration: none;
+  font-size: 1.06rem;
 }
 
-.footer-col h3 {
+.footer-contact li {
   font-size: 1rem;
 }
 
-.footer-col li {
-  font-size: 0.95rem;
-}
-
 .footer-bottom {
-  font-size: 0.8rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+  color: rgba(255, 255, 255, 0.84);
+  font-size: 0.94rem;
 }
 
+@media (max-width: 900px) {
+  .footer-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 42px;
+  }
+
+  .footer-brand {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 640px) {
+  .footer {
+    padding: 54px 22px 26px;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .footer-bottom {
+    flex-direction: column;
+    text-align: left;
+  }
 }
 </style>

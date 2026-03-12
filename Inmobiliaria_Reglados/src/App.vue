@@ -48,6 +48,7 @@ export default {
     const route = useRoute();
     const isBootLoading = ref(true);
     const isRouteLoading = ref(false);
+    const skipNextTransition = ref(false);
     let removeBeforeHook;
     let removeAfterHook;
 
@@ -64,8 +65,37 @@ export default {
     const isProfileNavigation = (to, from) =>
       to.path.startsWith("/profile") && from.path.startsWith("/profile");
 
+    const consumeSkipNextLoader = () => {
+      if (typeof window === "undefined") {
+        return false;
+      }
+
+      const shouldSkip = window.sessionStorage.getItem("skip-next-loader") === "true";
+
+      if (shouldSkip) {
+        window.sessionStorage.removeItem("skip-next-loader");
+      }
+
+      return shouldSkip;
+    };
+
+    const consumeSkipNextTransition = () => {
+      if (typeof window === "undefined") {
+        return false;
+      }
+
+      const shouldSkip =
+        window.sessionStorage.getItem("skip-next-page-transition") === "true";
+
+      if (shouldSkip) {
+        window.sessionStorage.removeItem("skip-next-page-transition");
+      }
+
+      return shouldSkip;
+    };
+
     const pageTransitionName = (route) =>
-      isProfileRoute(route) ? "" : "page-transition";
+      isProfileRoute(route) || skipNextTransition.value ? "" : "page-transition";
 
     const pageTransitionKey = (route) =>
       isProfileRoute(route) ? "/profile" : route.fullPath;
@@ -74,7 +104,14 @@ export default {
       initRevealSystem();
 
       removeBeforeHook = router.beforeEach((to, from, next) => {
-        if (to.fullPath !== from.fullPath && !isProfileNavigation(to, from)) {
+        const skipLoader = consumeSkipNextLoader();
+        skipNextTransition.value = consumeSkipNextTransition();
+
+        if (
+          to.fullPath !== from.fullPath &&
+          !isProfileNavigation(to, from) &&
+          !skipLoader
+        ) {
           isRouteLoading.value = true;
         }
 
@@ -84,6 +121,7 @@ export default {
       removeAfterHook = router.afterEach((to, from) => {
         nextTick(() => {
           refreshAnimations();
+          skipNextTransition.value = false;
 
           if (!isProfileNavigation(to, from)) {
             window.setTimeout(() => {

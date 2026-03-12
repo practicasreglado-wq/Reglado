@@ -18,7 +18,7 @@
       <!-- Si está logeado -->
       <template v-else>
         <h1>
-          <span class="highlight">Bienvenido {{ user.nombre }}</span>
+          <span class="highlight">Bienvenido {{ user.nombre_usuario }}</span>
         </h1>
 
         <p>
