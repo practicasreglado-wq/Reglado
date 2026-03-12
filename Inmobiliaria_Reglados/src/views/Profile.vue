@@ -6,7 +6,13 @@
 </button>
 
 <div class="sidebar" :class="{ open: menuOpen }">
+<div class="profile-hero">
 
+<div class="hero-left">
+<h2>Hola {{ user.nombre_usuario }}</h2>
+<p>Bienvenido a tu panel de perfil</p>
+</div>
+</div>
 <h3>Menú de perfil</h3>
 
 <ul>
@@ -23,8 +29,8 @@
 </li>
 
 <li>
-  <router-link to="/profile/messages" @click="menuOpen = false">
-    Mensajes
+  <router-link to="/profile/search-history" @click="menuOpen = false">
+    Historial de búsquedas
   </router-link>
 </li>
 
@@ -59,22 +65,16 @@ Cerrar sesión
 
 <div v-if="user && isProfileHome">
 
-<div class="profile-hero">
-
-<div class="hero-left">
-<h2>Hola {{ user.nombre_usuario }}</h2>
-<p>Bienvenido a tu panel de perfil</p>
+<router-view
+v-if="isProfileHome"
+v-slot="{ Component, route }"
+>
+<transition name="profile-page-transition" mode="out-in">
+<div :key="route.fullPath" class="profile-route-shell profile-route-shell--top">
+<component :is="Component"></component>
 </div>
-
-<div class="category-highlight">
-  <span class="category-label">Categoría actual:</span>
-
-  <div class="category-badge">
-    {{ category }}
-  </div>
-</div>
-
-</div>
+</transition>
+</router-view>
 
 <div class="dashboard-grid">
 
@@ -89,19 +89,6 @@ stroke-linejoin="round"/>
 </div>
 <h4>Favoritos</h4>
 <p>Propiedades que has guardado</p>
-</router-link>
-
-<router-link to="/profile/messages" class="dashboard-card">
-<div class="card-icon">
-<svg viewBox="0 0 24 24" width="28" height="28" fill="none">
-<path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"
-stroke="currentColor"
-stroke-width="1.8"
-stroke-linejoin="round"/>
-</svg>
-</div>
-<h4>Mensajes</h4>
-<p>Contactos con propietarios</p>
 </router-link>
 
 <router-link to="/profile/my-properties-for-sale" class="dashboard-card">
@@ -142,7 +129,10 @@ No tienes preferencias guardadas todavía
 
 </div>
 
-<router-view v-slot="{ Component, route }">
+<router-view
+v-if="!isProfileHome"
+v-slot="{ Component, route }"
+>
 <transition name="profile-page-transition" mode="out-in">
 <div :key="route.fullPath" class="profile-route-shell">
 <component :is="Component"></component>
@@ -368,45 +358,19 @@ transform:translateY(8px);
 display:flex;
 justify-content:space-between;
 align-items:center;
-background:linear-gradient(135deg,#172a5d,#3654ae);
 color:white;
 padding:30px;
 border-radius:15px;
-margin-bottom:30px;
 }
 
 .hero-left h2{
 margin:0;
-font-size:2.3rem;
+font-size:2rem;
 }
 
 .hero-left p{
-font-size:1.1rem;
-opacity:0.9;
-}
-
-.category-highlight{
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-}
-
-.category-label{
 font-size:1rem;
-opacity:0.8;
-margin-bottom:6px;
-}
-
-.category-badge{
-background:linear-gradient(135deg,#d2b454,#f0c14b);
-color:#172a5d;
-font-size:1.3rem;
-font-weight:700;
-padding:10px 25px;
-border-radius:30px;
-box-shadow:0 4px 15px rgba(0,0,0,0.2);
-letter-spacing:0.5px;
+opacity:0.9;
 }
 
 .dashboard-grid{
@@ -414,6 +378,7 @@ display:grid;
 grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
 gap:20px;
 margin-bottom:40px;
+margin-top:36px;
 }
 
 .dashboard-card{

@@ -22,7 +22,7 @@
 
 <script>
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from "vue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import Header from "./components/Header.vue";
 import Footer from "./components/Footer.vue";
 import ScrollToTop from "./components/ScrollToTop.vue";
@@ -45,8 +45,10 @@ export default {
   setup() {
     const userStore = useUserStore();
     const router = useRouter();
+    const route = useRoute();
     const isBootLoading = ref(true);
     const isRouteLoading = ref(false);
+    const skipNextTransition = ref(false);
     let removeBeforeHook;
     let removeAfterHook;
 
@@ -63,8 +65,37 @@ export default {
     const isProfileNavigation = (to, from) =>
       to.path.startsWith("/profile") && from.path.startsWith("/profile");
 
+    const consumeSkipNextLoader = () => {
+      if (typeof window === "undefined") {
+        return false;
+      }
+
+      const shouldSkip = window.sessionStorage.getItem("skip-next-loader") === "true";
+
+      if (shouldSkip) {
+        window.sessionStorage.removeItem("skip-next-loader");
+      }
+
+      return shouldSkip;
+    };
+
+    const consumeSkipNextTransition = () => {
+      if (typeof window === "undefined") {
+        return false;
+      }
+
+      const shouldSkip =
+        window.sessionStorage.getItem("skip-next-page-transition") === "true";
+
+      if (shouldSkip) {
+        window.sessionStorage.removeItem("skip-next-page-transition");
+      }
+
+      return shouldSkip;
+    };
+
     const pageTransitionName = (route) =>
-      isProfileRoute(route) ? "" : "page-transition";
+      isProfileRoute(route) || skipNextTransition.value ? "" : "page-transition";
 
     const pageTransitionKey = (route) =>
       isProfileRoute(route) ? "/profile" : route.fullPath;
@@ -73,7 +104,14 @@ export default {
       initRevealSystem();
 
       removeBeforeHook = router.beforeEach((to, from, next) => {
-        if (to.fullPath !== from.fullPath && !isProfileNavigation(to, from)) {
+        const skipLoader = consumeSkipNextLoader();
+        skipNextTransition.value = consumeSkipNextTransition();
+
+        if (
+          to.fullPath !== from.fullPath &&
+          !isProfileNavigation(to, from) &&
+          !skipLoader
+        ) {
           isRouteLoading.value = true;
         }
 
@@ -83,6 +121,7 @@ export default {
       removeAfterHook = router.afterEach((to, from) => {
         nextTick(() => {
           refreshAnimations();
+          skipNextTransition.value = false;
 
           if (!isProfileNavigation(to, from)) {
             window.setTimeout(() => {
@@ -114,7 +153,13 @@ export default {
       teardownRevealSystem();
     });
 
-    const showLoader = computed(() => isBootLoading.value || isRouteLoading.value);
+    const showLoader = computed(() => {
+      if (route.path.startsWith("/profile")) {
+        return false;
+      }
+
+      return isBootLoading.value || isRouteLoading.value;
+    });
 
     return {
       handleRouteEntered,

@@ -11,26 +11,50 @@ handlePreflight();
 
 $context = requireAuthenticatedUser($pdo);
 $local = $context['local'];
+
+$selectedCategory = trim((string) ($_GET['categoria'] ?? ($local['categoria'] ?? '')));
 $preferences = decodeJsonArray($local['preferencias'] ?? null);
 
-$stmt = $pdo->prepare('
-    SELECT p.id, p.categoria, p.titulo, p.ubicacion_general, p.precio, p.metros_cuadrados, p.imagen_principal, p.caracteristicas_json, p.created_at
-    FROM propiedades_favoritas pf
-    INNER JOIN propiedades p ON p.id = pf.propiedad_id
-    WHERE pf.user_id = :user_id
-    ORDER BY pf.created_at DESC
+if ($selectedCategory === '') {
+    respondJson(200, [
+        'success' => true,
+        'properties' => [],
+        'category' => null,
+    ]);
+}
+
+$favoriteStmt = $pdo->prepare('
+    SELECT propiedad_id
+    FROM propiedades_favoritas
+    WHERE user_id = :user_id
 ');
-$stmt->execute([
+$favoriteStmt->execute([
     'user_id' => (int) $local['iduser'],
 ]);
+$favoriteIds = array_map('intval', array_column($favoriteStmt->fetchAll(PDO::FETCH_ASSOC), 'propiedad_id'));
+$favoriteLookup = array_fill_keys($favoriteIds, true);
 
-$favorites = [];
+$stmt = $pdo->prepare('
+    SELECT id, categoria, titulo, ubicacion_general, precio, metros_cuadrados, imagen_principal, caracteristicas_json, created_at
+    FROM propiedades
+    WHERE categoria = :categoria
+    ORDER BY created_at DESC, id DESC
+');
+$stmt->execute([
+    'categoria' => $selectedCategory,
+]);
+
+$properties = [];
 
 foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
     $characteristics = decodeJsonArray($row['caracteristicas_json'] ?? null);
     $match = calculatePropertyMatch($preferences, $characteristics);
 
-    $favorites[] = [
+    if ($match['percentage'] < 50) {
+        continue;
+    }
+
+    $properties[] = [
         'id' => (int) $row['id'],
         'categoria' => $row['categoria'],
         'titulo' => $row['titulo'],
@@ -39,14 +63,17 @@ foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
         'metros_cuadrados' => (int) $row['metros_cuadrados'],
         'imagen_principal' => $row['imagen_principal'],
         'image_url' => propertyImageUrl($row['imagen_principal'] ?? null),
+        'caracteristicas' => $characteristics,
         'match_percentage' => $match['percentage'],
         'match_count' => $match['matches'],
         'match_total' => $match['total'],
-        'is_favorite' => true,
+        'is_favorite' => isset($favoriteLookup[(int) $row['id']]),
+        'created_at' => $row['created_at'],
     ];
 }
 
 respondJson(200, [
     'success' => true,
-    'properties' => $favorites,
+    'category' => $selectedCategory,
+    'properties' => $properties,
 ]);

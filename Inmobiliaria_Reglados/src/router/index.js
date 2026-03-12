@@ -13,7 +13,6 @@ import Team from "../views/Team.vue";
 import GiveInfo from "../views/GiveInfo.vue";
 import ContributeAssets from "../views/ContributeAssets.vue";
 import FavoriteProperties from "../views/FavoriteProperties.vue";
-import Messages from "../views/Messages.vue";
 import PropertiesForSale from "../views/PropertiesForSale.vue";
 import MyPropertiesForSale from "../views/MyPropertiesForSale.vue";
 import CreateProperty from "../views/CreateProperty.vue";
@@ -37,7 +36,6 @@ const routes = [
     children: [
       { path: "", redirect: "/profile/properties-for-sale" },
       { path: "favorite-properties", component: FavoriteProperties },
-      { path: "messages", component: Messages },
       { path: "properties-for-sale", component: PropertiesForSale },
       { path: "search-history", component: SearchHistory },
       { path: "my-properties-for-sale", component: MyPropertiesForSale },
