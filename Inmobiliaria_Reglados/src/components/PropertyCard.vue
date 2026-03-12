@@ -9,16 +9,23 @@
           class="favorite-button"
           :class="{ active: localFavorite, popping: isFavoritePopping }"
           type="button"
+          :title="localFavorite ? 'Quitar de favoritos' : 'Guardar en favoritos'"
           aria-label="Guardar en favoritos"
           @click="handleFavoriteClick"
         >
-          {{ localFavorite ? "★" : "☆" }}
+          <span class="favorite-icon">
+            {{ localFavorite ? "★" : "☆" }}
+          </span>
+
+          <span class="favorite-text">
+            {{ localFavorite ? "Guardado" : "Favorito" }}
+          </span>
         </button>
 
         <div class="match-pill" :style="matchBackgroundStyle">
           <span class="match-pill__icon">❤</span>
           <span class="match-pill__value" :style="matchValueStyle">
-            {{ animatedMatch }}% match
+            {{ animatedMatch }}%
           </span>
         </div>
       </div>
@@ -60,6 +67,7 @@ export default {
       isFavoritePopping: false,
     };
   },
+
   computed: {
     localFavorite() {
       return !!this.property.is_favorite;
@@ -76,9 +84,9 @@ export default {
 
       return {
         background: `linear-gradient(
-        90deg,
-        rgb(255, 101, 116) ${percentage}%,
-        rgba(255,255,255,0.8) ${percentage}%
+          90deg,
+          rgb(256, 55, 70,1) ${percentage}%,
+          rgba(255,255,255,0.75) ${percentage}%
         )`,
       };
     },
@@ -89,13 +97,8 @@ export default {
   },
 
   beforeUnmount() {
-    if (this.animationFrame) {
-      cancelAnimationFrame(this.animationFrame);
-    }
-
-    if (this.favoritePopTimeout) {
-      clearTimeout(this.favoritePopTimeout);
-    }
+    if (this.animationFrame) cancelAnimationFrame(this.animationFrame);
+    if (this.favoritePopTimeout) clearTimeout(this.favoritePopTimeout);
   },
 
   watch: {
@@ -106,9 +109,7 @@ export default {
 
   methods: {
     animateMatch() {
-      if (this.animationFrame) {
-        cancelAnimationFrame(this.animationFrame);
-      }
+      if (this.animationFrame) cancelAnimationFrame(this.animationFrame);
 
       const target = Number(this.property.match_percentage || 0);
       const start = performance.now();
@@ -148,9 +149,7 @@ export default {
     handleFavoriteClick() {
       this.isFavoritePopping = false;
 
-      if (this.favoritePopTimeout) {
-        clearTimeout(this.favoritePopTimeout);
-      }
+      if (this.favoritePopTimeout) clearTimeout(this.favoritePopTimeout);
 
       requestAnimationFrame(() => {
         this.isFavoritePopping = true;
@@ -183,13 +182,12 @@ export default {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  display: block;
 }
 
 .property-card__overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(10, 21, 46, 0.08), rgba(10, 21, 46, 0.42));
+  background: linear-gradient(180deg, rgba(10,21,46,0.08), rgba(10,21,46,0.42));
 }
 
 .property-card__actions {
@@ -202,89 +200,125 @@ export default {
   align-items: center;
 }
 
-.favorite-button {
-  padding: 0;
-  border: none;
-  background: transparent;
-  font-size: 1.8rem;
-  line-height: 1;
-  color: rgba(255, 255, 255, 0.94);
-  cursor: pointer;
-  text-shadow: 0 6px 18px rgba(10, 21, 46, 0.34);
-  transition: transform 0.18s ease, color 0.18s ease;
+/* FAVORITE BUTTON */
+
+.favorite-button{
+  display:flex;
+  align-items:center;
+  gap:6px;
+
+  padding:6px 12px;
+  border-radius:999px;
+  border:none;
+
+  background:rgba(255,255,255,0.95);
+  backdrop-filter:blur(8px);
+
+  font-size:0.9rem;
+  font-weight:600;
+
+  color:#c1a115;
+  cursor:pointer;
+
+  transition:all 0.2s ease;
 }
 
-.favorite-button.active {
-  color: #f2b632;
+.favorite-icon{
+  font-size:1.1rem;
+  padding-bottom: 5px;
 }
 
-.favorite-button.popping {
-  transform: scale(1.24) rotate(-8deg);
+.favorite-button:hover{
+  background:#c1a115;
+  transform:scale(1.05);
+  color: white;
 }
 
-.match-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 14px;
-  border-radius: 999px;
-  backdrop-filter: blur(10px);
-  color: #17305e;
-  font-weight: 700;
-  overflow: hidden;
-  transition: background 0.45s ease;
+.favorite-button.active .favorite-text{
+  color:white;
 }
 
-.match-pill__icon {
-  color: #cd2a4e;
+.favorite-button.active{
+  background:#c1a115;
+  color:white;
+  transform:scale(1.1);
 }
 
-.match-pill__value {
-  display: inline-block;
-  transform-origin: center;
+.favorite-button.popping{
+  animation:favoritePop 0.35s ease;
 }
 
-.property-card__body {
-  padding: 22px;
+@keyframes favoritePop{
+  0%{ transform:scale(1); }
+  50%{ transform:scale(1.3); }
+  100%{ transform:scale(1.1); }
 }
 
-.property-card__category {
-  margin-bottom: 10px;
-  color: #58709a;
-  font-size: 0.82rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+/* MATCH */
+
+.match-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:10px 14px;
+  border-radius:999px;
+  backdrop-filter:blur(10px);
+  color:#17305e;
+  font-weight:700;
+  overflow:hidden;
+  transition:background 0.45s ease;
 }
 
-.property-card__body h3 {
-  margin: 0 0 12px;
-  color: #172a5d;
-  font-size: 1.35rem;
+.match-pill__icon{
+  color:#aa1132;
+}
+
+.match-pill__value{
+  display:inline-block;
+  transform-origin:center;
+}
+
+.property-card__body{
+  padding:22px;
+}
+
+.property-card__category{
+  margin-bottom:10px;
+  color:#58709a;
+  font-size:0.82rem;
+  font-weight:700;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+}
+
+.property-card__body h3{
+  margin:0 0 12px;
+  color:#172a5d;
+  font-size:1.35rem;
 }
 
 .property-card__meta,
-.property-card__footer {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
+.property-card__footer{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
 }
 
-.property-card__meta {
-  margin-bottom: 18px;
-  color: #5c6980;
+.property-card__meta{
+  margin-bottom:18px;
+  color:#5c6980;
 }
 
-.property-card__footer {
-  align-items: end;
-  color: #172a5d;
+.property-card__footer{
+  align-items:end;
+  color:#172a5d;
 }
 
-.property-card__footer strong {
-  font-size: 1.1rem;
+.property-card__footer strong{
+  font-size:1.1rem;
 }
 
-.property-card__footer small {
-  color: #73819b;
+.property-card__footer small{
+  color:#73819b;
 }
 </style>

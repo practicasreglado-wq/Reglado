@@ -6,7 +6,13 @@
 </button>
 
 <div class="sidebar" :class="{ open: menuOpen }">
+<div class="profile-hero">
 
+<div class="hero-left">
+<h2>Hola {{ user.nombre_usuario }}</h2>
+<p>Bienvenido a tu panel de perfil</p>
+</div>
+</div>
 <h3>Menú de perfil</h3>
 
 <ul>
@@ -52,15 +58,6 @@ Cerrar sesión
 <div class="profile-content">
 
 <div v-if="user && isProfileHome">
-
-<div class="profile-hero">
-
-<div class="hero-left">
-<h2>Hola {{ user.nombre_usuario }}</h2>
-<p>Bienvenido a tu panel de perfil</p>
-</div>
-
-</div>
 
 <router-view
 v-if="isProfileHome"
@@ -355,20 +352,18 @@ transform:translateY(8px);
 display:flex;
 justify-content:space-between;
 align-items:center;
-background:linear-gradient(135deg,#172a5d,#3654ae);
 color:white;
 padding:30px;
 border-radius:15px;
-margin-bottom:30px;
 }
 
 .hero-left h2{
 margin:0;
-font-size:2.3rem;
+font-size:2rem;
 }
 
 .hero-left p{
-font-size:1.1rem;
+font-size:1rem;
 opacity:0.9;
 }
 
