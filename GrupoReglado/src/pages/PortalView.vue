@@ -1,6 +1,9 @@
-﻿<template>
+<template>
   <div class="landing">
     <section id="inicio" class="block block-hero" :style="heroStyle">
+      <video class="hero-video" autoplay muted loop playsinline preload="metadata">
+        <source :src="heroVideo" type="video/mp4" />
+      </video>
       <div class="hero-overlay"></div>
       <div class="hero-particles"></div>
 
@@ -15,12 +18,8 @@
         <h1>Reglado Group</h1>
 
         <p class="hero-subtitle" :aria-label="heroSubtitle">
-          <span
-            v-for="(char, index) in heroSubtitleChars"
-            :key="`hero-subtitle-${index}-${char}`"
-            class="hero-char"
-            :style="{ animationDelay: `${index * 0.016}s` }"
-          >
+          <span v-for="(char, index) in heroSubtitleChars" :key="`hero-subtitle-${index}-${char}`" class="hero-char"
+            :style="{ animationDelay: `${index * 0.016}s` }">
             {{ char === " " ? "\u00A0" : char }}
           </span>
         </p>
@@ -56,12 +55,7 @@
           <span class="icon-wrap" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none">
               <path d="M4 20H20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-              <path
-                d="M6 20V10L12 5L18 10V20"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linejoin="round"
-              />
+              <path d="M6 20V10L12 5L18 10V20" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
               <path d="M10 20V14H14V20" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
             </svg>
           </span>
@@ -71,12 +65,8 @@
         <li class="group-card" tabindex="0">
           <span class="icon-wrap" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none">
-              <path
-                d="M13 2L5 13H11L10 22L19 10H13L13 2Z"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linejoin="round"
-              />
+              <path d="M13 2L5 13H11L10 22L19 10H13L13 2Z" stroke="currentColor" stroke-width="1.8"
+                stroke-linejoin="round" />
             </svg>
           </span>
           <strong>Energia</strong>
@@ -96,13 +86,8 @@
         <li class="group-card" tabindex="0">
           <span class="icon-wrap" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none">
-              <path
-                d="M4 18H20M6 15L10 11L13 13L18 8"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
+              <path d="M4 18H20M6 15L10 11L13 13L18 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                stroke-linejoin="round" />
               <path d="M14 8H18V12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
             </svg>
           </span>
@@ -112,12 +97,8 @@
         <li class="group-card" tabindex="0">
           <span class="icon-wrap" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none">
-              <path
-                d="M12 3L13.9 8.1L19.4 8.4L15.1 11.8L16.6 17.1L12 14.1L7.4 17.1L8.9 11.8L4.6 8.4L10.1 8.1L12 3Z"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linejoin="round"
-              />
+              <path d="M12 3L13.9 8.1L19.4 8.4L15.1 11.8L16.6 17.1L12 14.1L7.4 17.1L8.9 11.8L4.6 8.4L10.1 8.1L12 3Z"
+                stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
             </svg>
           </span>
           <strong>Innovacion</strong>
@@ -162,7 +143,7 @@ import companyMapas from "../assets/company-mapas.webp";
 import companyRealstate from "../assets/company-realstate.png";
 import balanceIcon from "../assets/Balance.svg";
 import boltIcon from "../assets/Bolt.svg";
-import heroBackground from "../assets/RegladoFondo.gif";
+import heroVideo from "../assets/Bissness.mp4";
 import mapIcon from "../assets/Map.svg";
 import apartmentIcon from "../assets/Apartment.svg";
 import corporateLogo from "../assets/reglado-energy-logo.svg";
@@ -173,7 +154,6 @@ const heroSubtitle =
 const heroSubtitleChars = computed(() => Array.from(heroSubtitle));
 
 const heroStyle = computed(() => ({
-  "--hero-image": `url('${heroBackground}')`,
   "--hero-logo": `url('${corporateLogo}')`,
 }));
 
@@ -252,24 +232,28 @@ function scrollToCompanies() {
   width: 100vw;
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
-  margin-top: -7.25rem;
-  min-height: 100vh;
+  margin-top: calc(-1 * var(--content-top-padding) - var(--topbar-height));
+  min-height: 100svh;
   position: relative;
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-left: 0;
   border-right: 0;
   border-radius: 0;
   background-color: #1f324c;
-  background-image:
-    linear-gradient(115deg, rgba(14, 27, 45, 0.46), rgba(39, 61, 92, 0.3)),
-    var(--hero-image);
-  background-size: cover, 112% 120%;
-  background-position: center, center center;
-  background-repeat: no-repeat, no-repeat;
-  background-attachment: scroll, fixed;
   box-shadow: 0 24px 48px rgba(13, 26, 45, 0.25);
   display: grid;
   align-items: end;
+}
+
+.hero-video {
+  position: absolute;
+  inset: -1px;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  pointer-events: none;
+  display: block;
 }
 
 .hero-overlay {
@@ -682,15 +666,16 @@ function scrollToCompanies() {
   justify-self: center;
   text-decoration: none;
   border: 1px solid #bcc9dd;
-  color: #223754;
-  border-radius: 10px;
+  color: #ffffff;
+  background-color: #1f3553;
+  border-radius: 20px;
   padding: 0.5rem 0.82rem;
   font-weight: 700;
   transition: background 0.2s ease;
 }
 
 .company-link:hover {
-  background: #f1f5fb;
+  background: #2d4c79;
 }
 
 @keyframes charIn {
@@ -776,11 +761,9 @@ function scrollToCompanies() {
 
 @media (max-width: 760px) {
   .block-hero {
-    margin-top: -5.5rem;
-    min-height: calc(100svh + 1rem);
+    margin-top: calc(-1 * var(--content-top-padding) - var(--topbar-height));
+    min-height: 100svh;
     border-radius: 0;
-    background-size: cover, 185% 145%;
-    background-attachment: scroll, scroll;
     align-items: center;
   }
 
