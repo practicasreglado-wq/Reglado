@@ -1,0 +1,173 @@
+<template>
+  <section class="history-view">
+    <div class="history-header">
+      <div>
+        <p class="history-kicker">Perfil del comprador</p>
+        <h2>Historial de búsquedas</h2>
+      </div>
+      <div class="history-counter">{{ history.length }} guardadas</div>
+    </div>
+
+    <div v-if="loading" class="history-state">
+      Cargando historial...
+    </div>
+
+    <div v-else-if="error" class="history-state history-state--error">
+      {{ error }}
+    </div>
+
+    <div v-else-if="!history.length" class="history-state">
+      Aún no has guardado búsquedas.
+    </div>
+
+    <div v-else class="history-grid">
+      <SearchHistoryItem
+        v-for="item in history"
+        :key="item.id"
+        :item="item"
+        @apply="applySearch"
+        @delete="deleteSearch"
+      />
+    </div>
+  </section>
+</template>
+
+<script>
+import { onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
+import { useUserStore } from "../stores/user";
+import { backendJson } from "../services/backend";
+import SearchHistoryItem from "../components/SearchHistoryItem.vue";
+
+export default {
+  components: {
+    SearchHistoryItem,
+  },
+  setup() {
+    const router = useRouter();
+    const userStore = useUserStore();
+    const loading = ref(true);
+    const error = ref("");
+    const history = ref([]);
+
+    const loadHistory = async () => {
+      loading.value = true;
+      error.value = "";
+
+      try {
+        const payload = await backendJson("api/get_search_history.php");
+        history.value = Array.isArray(payload.history) ? payload.history : [];
+      } catch (err) {
+        error.value = err.message || "No se pudo cargar el historial.";
+      } finally {
+        loading.value = false;
+      }
+    };
+
+    const applySearch = async (item) => {
+      userStore.setCategory(item.category);
+      userStore.setPreferences({ ...item.preferences });
+
+      await router.push({
+        path: "/profile/properties-for-sale",
+        query: {
+          category: item.category,
+          restoredSearch: String(item.id),
+        },
+      });
+    };
+
+    const deleteSearch = async (item) => {
+      error.value = "";
+
+      try {
+        await backendJson("api/delete_search_history.php", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            search_id: item.id,
+            user_id: userStore.user?.iduser,
+          }),
+        });
+
+        history.value = history.value.filter((entry) => entry.id !== item.id);
+      } catch (err) {
+        error.value = err.message || "No se pudo eliminar la búsqueda.";
+      }
+    };
+
+    onMounted(loadHistory);
+
+    return {
+      applySearch,
+      deleteSearch,
+      error,
+      history,
+      loading,
+    };
+  },
+};
+</script>
+
+<style scoped>
+.history-view {
+  display: grid;
+  gap: 22px;
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 24px 28px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #172a5d, #3654ae);
+  color: white;
+}
+
+.history-kicker {
+  margin: 0 0 8px;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.history-header h2 {
+  margin: 0;
+  font-size: 2rem;
+}
+
+.history-counter {
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.history-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.history-state {
+  padding: 24px;
+  border-radius: 18px;
+  background: white;
+  box-shadow: 0 10px 24px rgba(18, 38, 77, 0.08);
+  color: #51627f;
+}
+
+.history-state--error {
+  color: #9f2d2d;
+}
+
+@media (max-width: 768px) {
+  .history-header {
+    flex-direction: column;
+  }
+}
+</style>
