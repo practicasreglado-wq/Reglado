@@ -34,7 +34,11 @@ onMounted(() => {
   auth.initialize();
 });
 
-function handleLogout() {
-  auth.logout();
+async function handleLogout() {
+  try {
+    await auth.logout();
+  } finally {
+    window.location.reload();
+  }
 }
 </script>
