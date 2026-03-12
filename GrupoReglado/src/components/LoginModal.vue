@@ -14,7 +14,7 @@
 
         <label>
           Contraseña
-          <input v-model="password" type="password" placeholder="********" required />
+          <PasswordField v-model="password" placeholder="********" required />
         </label>
 
         <p v-if="error" class="feedback error">{{ error }}</p>
@@ -50,6 +50,7 @@
 <script setup>
 import { ref } from "vue";
 import { RouterLink } from "vue-router";
+import PasswordField from "./PasswordField.vue";
 import { auth } from "../services/auth";
 
 defineProps({
@@ -111,4 +112,3 @@ async function resendMail() {
   }
 }
 </script>
-

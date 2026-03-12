@@ -7,12 +7,12 @@
       <form class="clean-form" @submit.prevent="submitReset">
         <label>
           Nueva contraseña
-          <input v-model="newPassword" type="password" placeholder="********" required minlength="6" />
+          <PasswordField v-model="newPassword" placeholder="********" required minlength="6" />
         </label>
 
         <label>
           Confirmar contraseña
-          <input v-model="newPasswordConfirmation" type="password" placeholder="********" required minlength="6" />
+          <PasswordField v-model="newPasswordConfirmation" placeholder="********" required minlength="6" />
         </label>
 
         <p v-if="error" class="feedback error">{{ error }}</p>
@@ -29,6 +29,7 @@
 <script setup>
 import { ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import PasswordField from "../components/PasswordField.vue";
 import { auth } from "../services/auth";
 
 const route = useRoute();

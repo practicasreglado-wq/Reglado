@@ -50,12 +50,12 @@
 
         <label>
           Contraseña *
-          <input v-model="password" type="password" placeholder="" required minlength="6" />
+          <PasswordField v-model="password" placeholder="" required minlength="6" />
         </label>
 
         <label>
           Repetir contraseña *
-          <input v-model="passwordConfirmation" type="password" placeholder="" required minlength="6" />
+          <PasswordField v-model="passwordConfirmation" placeholder="" required minlength="6" />
         </label>
 
         <p v-if="error" class="feedback error">{{ error }}</p>
@@ -71,6 +71,7 @@
 
 <script setup>
 import { ref } from "vue";
+import PasswordField from "../PasswordField.vue";
 import { auth } from "../../services/auth";
 
 defineProps({
