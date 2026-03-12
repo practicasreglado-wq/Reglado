@@ -464,23 +464,35 @@ export default {
 }
 
 /* ------------------------
-TABLETS
+TABLETS / LAPTOPS
 -------------------------*/
+@media (max-width: 1440px) {
 
-@media (max-width: 1024px) {
-
-  .categories{
-    gap:180px;
-    font-size:1.6rem;
+  .carousel{
+    padding:60px 0;
   }
 
-  .card{
-    width:220px;
-    height:300px;
+  .categories{
+    gap:100px;
+    font-size:1.35rem;
+    margin-bottom:50px;
   }
 
   .carousel-wrapper{
-    gap:30px;
+    gap:25px;
+  }
+
+  .cards{
+    gap:28px;
+  }
+
+  .card{
+    width:200px;
+    height:270px;
+  }
+
+  .center{
+    transform:scale(1.1);
   }
 
   .arrow{

@@ -165,7 +165,7 @@ return{category,form,currentForm,submit}
 
 .category-form {
   background: rgba(255, 255, 255, 0.95);
-  padding: 50px;
+  padding: 30px 50px;
   border-radius: 15px;
   width: 100%;
   max-width: 650px;
@@ -218,32 +218,52 @@ return{category,form,currentForm,submit}
   background-color: var(--azul-secundario);
 }
 
-@media (max-width: 1200px) {
+/* ------------------------
+QUESTIONS - LAPTOPS
+-------------------------*/
+@media (max-width: 1440px) {
 
-.right-side{
-  width: 65%;
-  padding: 40px;
-}
+  .questions-container{
+    max-width:750px;
+    padding:22px;
+  }
 
-.left-side{
-  padding: 50px;
-}
+  .questions-container h2{
+    font-size:1.35rem;
+    margin-bottom:18px;
+  }
 
-.left-content h1{
-  font-size: 3rem;
-}
+  .question{
+    margin-bottom:16px;
+  }
 
-.logo{
-  font-size: 2.4rem;
-}
+  .question-title{
+    font-size:0.9rem;
+    margin-bottom:8px;
+  }
 
-.label{
-  font-size: 2rem;
-}
+  .options{
+    gap:8px;
+  }
 
-.category-form{
-  padding: 40px;
-}
+  .option{
+    font-size:0.85rem;
+    padding:8px 12px;
+  }
+
+  .option input{
+    transform:scale(0.8);
+  }
+
+  .buttons{
+    margin-top:18px;
+    gap:12px;
+  }
+
+  .buttons button{
+    padding:8px 16px;
+    font-size:0.85rem;
+  }
 
 }
 
