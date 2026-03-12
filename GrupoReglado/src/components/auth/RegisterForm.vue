@@ -1,13 +1,13 @@
-<template>
+﻿<template>
   <section class="form-page">
     <div class="form-card">
       <h1>{{ title }}</h1>
       <p>{{ description }}</p>
 
       <div v-if="registrationComplete" class="register-confirmation">
-        <p class="confirmation-title">Se ha enviado un correo de confirmacion.</p>
+        <p class="confirmation-title">Se ha enviado un correo de confirmación.</p>
         <p class="confirmation-text">
-          Hemos enviado un enlace de confirmacion a <strong>{{ submittedEmail }}</strong>. Confirma tu correo
+          Hemos enviado un enlace de confirmación a <strong>{{ submittedEmail }}</strong>. Confirma tu correo
           para completar el registro.
         </p>
 
@@ -16,46 +16,46 @@
 
       <form v-else class="clean-form" @submit.prevent="submitRegister">
         <label>
-          Nombre de usuario
-          <input v-model.trim="username" type="text" placeholder="usuario123" required minlength="3" />
+          Nombre de usuario *
+          <input v-model.trim="username" type="text" placeholder="" required minlength="3" />
         </label>
 
         <label>
-          Nombre
-          <input v-model.trim="firstName" type="text" placeholder="Nombre" required />
+          Nombre *
+          <input v-model.trim="firstName" type="text" placeholder="" required />
         </label>
 
         <label>
-          Apellido
-          <input v-model.trim="lastName" type="text" placeholder="Apellido" required />
+          Apellido *
+          <input v-model.trim="lastName" type="text" placeholder="" required />
         </label>
 
         <label>
-          Correo
-          <input v-model.trim="email" type="email" placeholder="nombre@correo.com" required />
+          Correo Electrónico *
+          <input v-model.trim="email" type="email" placeholder="" required />
         </label>
 
         <label>
-          Telefono(Opcional)
+          Teléfono (Opcional)
           <input
             v-model.trim="phone"
             type="tel"
             inputmode="numeric"
             pattern="[0-9]*"
             maxlength="15"
-            placeholder="600123123"
+            placeholder=""
             @input="handlePhoneInput"
           />
         </label>
 
         <label>
-          Contrasena
-          <input v-model="password" type="password" placeholder="********" required minlength="6" />
+          Contraseña *
+          <PasswordField v-model="password" placeholder="" required minlength="6" />
         </label>
 
         <label>
-          Repetir contrasena
-          <input v-model="passwordConfirmation" type="password" placeholder="********" required minlength="6" />
+          Repetir contraseña *
+          <PasswordField v-model="passwordConfirmation" placeholder="" required minlength="6" />
         </label>
 
         <p v-if="error" class="feedback error">{{ error }}</p>
@@ -71,6 +71,7 @@
 
 <script setup>
 import { ref } from "vue";
+import PasswordField from "../PasswordField.vue";
 import { auth } from "../../services/auth";
 
 defineProps({
@@ -117,7 +118,7 @@ async function submitRegister() {
   success.value = "";
 
   if (password.value !== passwordConfirmation.value) {
-    error.value = "Las contrasenas no coinciden";
+    error.value = "Las contraseñas no coinciden";
     loading.value = false;
     return;
   }
@@ -135,7 +136,7 @@ async function submitRegister() {
 
     submittedEmail.value = email.value;
     registrationComplete.value = true;
-    success.value = "Se ha enviado un correo de confirmacion.";
+    success.value = "Se ha enviado un correo de confirmación.";
     password.value = "";
     passwordConfirmation.value = "";
   } catch (err) {
@@ -173,3 +174,4 @@ function resetFormState() {
   color: rgba(15, 23, 42, 0.72);
 }
 </style>
+

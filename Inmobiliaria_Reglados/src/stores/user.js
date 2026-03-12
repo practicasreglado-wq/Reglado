@@ -60,6 +60,7 @@ export const useUserStore = defineStore("user", {
         return;
       }
 
+      // Primero se hidrata con Auth API y despues se completa con datos propios de inmobiliaria.
       this.syncFromAuthUser(authUser);
 
       try {

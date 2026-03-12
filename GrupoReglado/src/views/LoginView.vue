@@ -1,7 +1,7 @@
-<template>
+﻿<template>
   <section class="form-page">
     <div class="form-card">
-      <h1>Iniciar sesion</h1>
+      <h1>Iniciar sesión</h1>
       <p>Accede con tu cuenta de ApiLoging.</p>
 
       <form class="clean-form" @submit.prevent="submitLogin">
@@ -11,7 +11,7 @@
         </label>
 
         <label>
-          Contrasena
+          Contraseña
           <input v-model="password" type="password" placeholder="********" required />
         </label>
 
@@ -30,12 +30,12 @@
         :disabled="loading"
         @click="resendMail"
       >
-        Reenviar correo de verificacion
+        Reenviar correo de verificación
       </button>
 
       <p class="register-text">
-        No tienes cuenta?
-        <RouterLink :to="registerUrl">Registrate</RouterLink>
+        ¿No tienes cuenta?
+        <RouterLink :to="registerUrl">Regístrate</RouterLink>
       </p>
     </div>
   </section>
@@ -85,14 +85,14 @@ async function submitLogin() {
 
   try {
     const payload = await auth.login(email.value, password.value);
-    success.value = "Sesion iniciada";
+    success.value = "Sesión iniciada";
 
     if (returnTo.value && payload?.token) {
       window.location.href = appendToken(returnTo.value, payload.token);
       return;
     }
   } catch (err) {
-    const message = err instanceof Error ? err.message : "No fue posible iniciar sesion";
+    const message = err instanceof Error ? err.message : "No fue posible iniciar sesión";
     error.value = message;
     canResend.value = message === "email not verified";
   } finally {
@@ -102,7 +102,7 @@ async function submitLogin() {
 
 async function resendMail() {
   if (!email.value) {
-    error.value = "Indica un email para reenviar la verificacion";
+    error.value = "Indica un correo para reenviar la verificación";
     return;
   }
 
@@ -112,7 +112,7 @@ async function resendMail() {
 
   try {
     const response = await auth.resendVerification(email.value);
-    success.value = response.message || "Correo de verificacion reenviado";
+    success.value = response.message || "Correo de verificación reenviado";
   } catch (err) {
     error.value = err instanceof Error ? err.message : "No fue posible reenviar el correo";
   } finally {

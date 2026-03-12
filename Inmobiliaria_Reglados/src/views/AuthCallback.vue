@@ -25,6 +25,7 @@ onMounted(async () => {
   }
 
   try {
+    // El callback solo guarda el token y delega toda la carga real de perfil al store.
     auth.setSession(token, null);
     await userStore.initializeSession();
 

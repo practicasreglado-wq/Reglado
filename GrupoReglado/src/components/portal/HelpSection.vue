@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <section id="contacto" class="contact-section">
     <div class="contact-heading">
       <h2>{{ title }}</h2>
@@ -12,7 +12,7 @@
       </a>
 
       <a class="contact-item" :href="`tel:${sanitizedPhone}`">
-        <span class="contact-label">Telefono</span>
+        <span class="contact-label">Teléfono</span>
         <strong>{{ phone }}</strong>
       </a>
 

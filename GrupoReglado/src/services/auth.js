@@ -1,4 +1,4 @@
-import { reactive } from "vue";
+﻿import { reactive } from "vue";
 
 const API_BASE = import.meta.env.VITE_AUTH_API_URL || "http://localhost:8000";
 const TOKEN_KEY = "auth_token";
@@ -10,6 +10,29 @@ const state = reactive({
   user: null,
   loading: false,
 });
+
+const AUTH_MESSAGE_MAP = {
+  "request failed": "La solicitud no se pudo completar.",
+  "invalid token": "Tu sesión no es válida. Vuelve a iniciar sesión.",
+  "token revoked": "Tu sesión ya no es válida. Vuelve a iniciar sesión.",
+  unauthorized: "Debes iniciar sesión para continuar.",
+  forbidden: "No tienes permisos para realizar esta acción.",
+  "too many requests, try again later": "Has realizado demasiados intentos. Inténtalo más tarde.",
+  "email not verified": "Debes confirmar tu correo antes de iniciar sesión.",
+  "invalid credentials": "Correo o contraseña incorrectos.",
+  "user not found": "No se ha encontrado ninguna cuenta con esos datos.",
+  "email already registered": "Ya existe una cuenta con ese correo.",
+  "username already taken": "Ese nombre de usuario ya está en uso.",
+  "pending registration already exists": "Ya existe un registro pendiente para ese correo.",
+  "verification email sent": "Se ha enviado el correo de verificación.",
+  "password reset email sent": "Si la cuenta existe, te hemos enviado un correo.",
+  "password reset successful": "La contraseña se ha actualizado correctamente.",
+  "password changed successfully": "La contraseña se ha actualizado correctamente.",
+  "email change verification sent": "Te hemos enviado un correo para confirmar el cambio de correo.",
+  "email updated": "El correo se ha actualizado correctamente.",
+  "current password is incorrect": "La contraseña actual no es correcta.",
+  "password confirmation does not match": "Las contraseñas no coinciden.",
+};
 
 function authHeaders() {
   return state.token ? { Authorization: `Bearer ${state.token}` } : {};
@@ -32,8 +55,12 @@ async function request(path, options = {}) {
   }
 
   if (!response.ok) {
-    const message = payload.error || payload.message || "request failed";
+    const message = translateAuthMessage(payload.error || payload.message || "request failed");
     throw new Error(message);
+  }
+
+  if (typeof payload.message === "string") {
+    payload.message = translateAuthMessage(payload.message);
   }
 
   return payload;
@@ -42,6 +69,7 @@ async function request(path, options = {}) {
 function setToken(token) {
   state.token = token || "";
   if (state.token) {
+    // Se persiste en ambos sitios para compartir sesion entre proyectos en el mismo navegador.
     localStorage.setItem(TOKEN_KEY, state.token);
     setCookie(COOKIE_TOKEN_KEY, state.token, COOKIE_MAX_AGE);
   } else {
@@ -186,6 +214,13 @@ async function resetPassword(token, newPassword, newPasswordConfirmation) {
   });
 }
 
+async function adminUsers() {
+  return request("/auth/admin/users", {
+    method: "GET",
+    headers: authHeaders(),
+  });
+}
+
 async function logout() {
   try {
     if (state.token) {
@@ -214,7 +249,9 @@ export const auth = {
   resendVerification,
   requestPasswordReset,
   resetPassword,
+  adminUsers,
   logout,
+  translateMessage: translateAuthMessage,
 };
 
 function setCookie(name, value, maxAgeSeconds) {
@@ -234,4 +271,13 @@ function getCookie(name) {
     }
   }
   return "";
+}
+
+function translateAuthMessage(message) {
+  if (typeof message !== "string") {
+    return "La solicitud no se pudo completar.";
+  }
+
+  // La API mantiene mensajes tecnicos en ingles; el frontend los traduce antes de pintarlos.
+  return AUTH_MESSAGE_MAP[message.toLowerCase()] || message;
 }

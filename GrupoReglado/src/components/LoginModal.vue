@@ -1,20 +1,20 @@
-<template>
+﻿<template>
   <div v-if="open" class="modal-backdrop" @click.self="closeModal">
-    <div class="modal-card" role="dialog" aria-modal="true" aria-label="Login">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-label="Iniciar sesión">
       <div class="modal-head">
-        <h2>Iniciar sesion</h2>
-        <button class="icon-btn" @click="closeModal" aria-label="Cerrar">x</button>
+        <h2>Iniciar sesión</h2>
+        <button class="icon-btn close-btn" @click="closeModal" aria-label="Cerrar">×</button>
       </div>
 
       <form class="clean-form" @submit.prevent="submitLogin">
         <label>
-          Email
-          <input v-model.trim="email" type="email" placeholder="usuario@tuempresa.com" required />
+          Correo Electrónico
+          <input v-model.trim="email" type="email" placeholder="" required />
         </label>
 
         <label>
-          Contrasena
-          <input v-model="password" type="password" placeholder="********" required />
+          Contraseña
+          <PasswordField v-model="password" placeholder="" required />
         </label>
 
         <p v-if="error" class="feedback error">{{ error }}</p>
@@ -32,16 +32,16 @@
         :disabled="loading"
         @click="resendMail"
       >
-        Reenviar correo de verificacion
+        Reenviar correo de verificación
       </button>
 
       <p class="helper-text">
-        <RouterLink to="/recuperar-contrasena" @click="closeModal">Has olvidado tu contrasena?</RouterLink>
+        <RouterLink to="/recuperar-contrasena" @click="closeModal">¿Has olvidado tu contraseña?</RouterLink>
       </p>
 
       <p class="register-text">
-        No tienes cuenta?
-        <RouterLink to="/registro" @click="closeModal">Registrate</RouterLink>
+        ¿No tienes cuenta?
+        <RouterLink to="/registro" @click="closeModal">Regístrate</RouterLink>
       </p>
     </div>
   </div>
@@ -50,6 +50,7 @@
 <script setup>
 import { ref } from "vue";
 import { RouterLink } from "vue-router";
+import PasswordField from "./PasswordField.vue";
 import { auth } from "../services/auth";
 
 defineProps({
@@ -80,12 +81,12 @@ async function submitLogin() {
 
   try {
     await auth.login(email.value, password.value);
-    success.value = "Sesion iniciada";
+    success.value = "Sesión iniciada";
     emit("success");
   } catch (err) {
-    const message = err instanceof Error ? err.message : "No fue posible iniciar sesion";
+    const message = err instanceof Error ? err.message : "No fue posible iniciar sesión";
     error.value = message;
-    canResend.value = message === "email not verified";
+    canResend.value = message === "Debes confirmar tu correo antes de iniciar sesión.";
   } finally {
     loading.value = false;
   }
@@ -93,7 +94,7 @@ async function submitLogin() {
 
 async function resendMail() {
   if (!email.value) {
-    error.value = "Indica un email para reenviar la verificacion";
+    error.value = "Indica un correo para reenviar la verificación";
     return;
   }
 
@@ -103,7 +104,7 @@ async function resendMail() {
 
   try {
     const response = await auth.resendVerification(email.value);
-    success.value = response.message || "Correo de verificacion reenviado";
+    success.value = response.message || "Correo de verificación reenviado.";
   } catch (err) {
     error.value = err instanceof Error ? err.message : "No fue posible reenviar el correo";
   } finally {
@@ -111,3 +112,28 @@ async function resendMail() {
   }
 }
 </script>
+
+<style scoped>
+.modal-card {
+  position: relative;
+}
+
+.close-btn {
+  position: absolute;
+  top: 0.55rem;
+  right: 0.75rem;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+  border-radius: 0;
+  font-size: 2rem;
+  line-height: 1;
+  font-weight: 500;
+  color: #162235;
+}
+
+.close-btn:hover {
+  opacity: 0.75;
+}
+</style>
