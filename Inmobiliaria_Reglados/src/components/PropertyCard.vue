@@ -15,7 +15,7 @@
           {{ localFavorite ? "★" : "☆" }}
         </button>
 
-        <div class="match-pill">
+        <div class="match-pill" :style="matchBackgroundStyle">
           <span class="match-pill__icon">❤</span>
           <span class="match-pill__value" :style="matchValueStyle">
             {{ animatedMatch }}% match
@@ -64,15 +64,30 @@ export default {
     localFavorite() {
       return !!this.property.is_favorite;
     },
+
     matchValueStyle() {
       return {
         transform: `scale(${this.matchScale})`,
       };
     },
+
+    matchBackgroundStyle() {
+      const percentage = this.animatedMatch || 0;
+
+      return {
+        background: `linear-gradient(
+        90deg,
+        rgb(255, 101, 116) ${percentage}%,
+        rgba(255,255,255,0.8) ${percentage}%
+        )`,
+      };
+    },
   },
+
   mounted() {
     this.animateMatch();
   },
+
   beforeUnmount() {
     if (this.animationFrame) {
       cancelAnimationFrame(this.animationFrame);
@@ -82,11 +97,13 @@ export default {
       clearTimeout(this.favoritePopTimeout);
     }
   },
+
   watch: {
     "property.match_percentage"() {
       this.animateMatch();
     },
   },
+
   methods: {
     animateMatch() {
       if (this.animationFrame) {
@@ -100,6 +117,7 @@ export default {
       const tick = (timestamp) => {
         const progress = Math.min((timestamp - start) / duration, 1);
         const eased = 1 - Math.pow(1 - progress, 3);
+
         this.animatedMatch = Math.round(target * eased);
         this.matchScale = 1 + (1 - eased) * 0.18;
 
@@ -184,13 +202,6 @@ export default {
   align-items: center;
 }
 
-.match-pill {
-  border: none;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(10px);
-}
-
 .favorite-button {
   padding: 0;
   border: none;
@@ -200,11 +211,7 @@ export default {
   color: rgba(255, 255, 255, 0.94);
   cursor: pointer;
   text-shadow: 0 6px 18px rgba(10, 21, 46, 0.34);
-  box-shadow: none;
-  transition:
-    transform 0.18s ease,
-    color 0.18s ease,
-    text-shadow 0.18s ease;
+  transition: transform 0.18s ease, color 0.18s ease;
 }
 
 .favorite-button.active {
@@ -220,12 +227,16 @@ export default {
   align-items: center;
   gap: 8px;
   padding: 10px 14px;
+  border-radius: 999px;
+  backdrop-filter: blur(10px);
   color: #17305e;
   font-weight: 700;
+  overflow: hidden;
+  transition: background 0.45s ease;
 }
 
 .match-pill__icon {
-  color: #dd4b6a;
+  color: #cd2a4e;
 }
 
 .match-pill__value {
