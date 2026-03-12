@@ -31,7 +31,7 @@
 
           <div class="setting-row">
             <div>
-              <strong>Email</strong>
+              <strong>Correo electrónico</strong>
               <p>{{ auth.state.user.email || "-" }}</p>
             </div>
             <button class="btn-outline" type="button" @click="openModal('email')">Cambiar</button>
@@ -113,15 +113,15 @@
         <template v-else-if="activeModal === 'password'">
           <label>
             Contraseña actual
-            <input v-model="passwordForm.currentPassword" type="password" required />
+            <PasswordField v-model="passwordForm.currentPassword" required />
           </label>
           <label>
             Nueva contraseña
-            <input v-model="passwordForm.newPassword" type="password" required minlength="6" />
+            <PasswordField v-model="passwordForm.newPassword" required minlength="6" />
           </label>
           <label>
             Confirmar nueva contraseña
-            <input v-model="passwordForm.newPasswordConfirmation" type="password" required minlength="6" />
+            <PasswordField v-model="passwordForm.newPasswordConfirmation" required minlength="6" />
           </label>
         </template>
 
@@ -137,6 +137,7 @@
 
 <script setup>
 import { computed, onMounted, reactive, ref } from "vue";
+import PasswordField from "../components/PasswordField.vue";
 import { auth } from "../services/auth";
 
 const success = ref("");
@@ -335,4 +336,3 @@ onMounted(() => {
   font-size: 0.9rem;
 }
 </style>
-

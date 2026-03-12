@@ -1,35 +1,30 @@
 <template>
-<div class="section">
-
-<h3>Tipo</h3>
-<div class="options">
-<label v-for="tipo in ['Rural','Agrícola','Forestal']" :key="tipo">
-<input type="checkbox" :value="tipo" v-model="form.tipo" />
-{{ tipo }}
-</label>
-</div>
-
-<h3>Características</h3>
-<div class="options">
-<label v-for="car in ['Agua potable','Acceso por carretera','Parcela vallada']" :key="car">
-<input type="checkbox" :value="car" v-model="form.caracteristicas" />
-{{ car }}
-</label>
-</div>
-
-<h3>Ubicación</h3>
-<div class="options">
-<label v-for="zona in ['Zona rural','Cerca de río','Montaña']" :key="zona">
-<input type="checkbox" :value="zona" v-model="form.zona" />
-{{ zona }}
-</label>
-</div>
-
-</div>
+  <PreferenceQuestionsForm
+    :form="form"
+    :prefix="prefix"
+    :questions="questions"
+  />
 </template>
 
 <script>
+import PreferenceQuestionsForm from "./PreferenceQuestionsForm.vue";
+import { getPreferenceSchema } from "../data/preferenceSchemas";
+
 export default {
-props:["form"]
-}
+  components: {
+    PreferenceQuestionsForm,
+  },
+  props: {
+    form: {
+      type: Object,
+      required: true,
+    },
+  },
+  data() {
+    return {
+      prefix: "fincas",
+      questions: getPreferenceSchema("Fincas")?.questions || [],
+    };
+  },
+};
 </script>

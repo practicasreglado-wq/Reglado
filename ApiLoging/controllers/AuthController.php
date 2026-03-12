@@ -150,6 +150,13 @@ class AuthController
                 }
 
                 $freshUser = User::createUserFromPendingRegistration((int) $pending['id']);
+
+                // Notion es un espejo operativo: si falla, no se bloquea el alta local.
+                try {
+                    NotionService::syncUserCreated($freshUser);
+                } catch (Throwable $syncError) {
+                    error_log('[AuthController] Notion sync failed: ' . $syncError->getMessage());
+                }
             }
 
             $jwt = JwtService::generate($freshUser);

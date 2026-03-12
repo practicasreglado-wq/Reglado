@@ -12,7 +12,7 @@
 
         <label>
           Contraseña
-          <input v-model="password" type="password" placeholder="********" required />
+          <PasswordField v-model="password" placeholder="********" required />
         </label>
 
         <p v-if="error" class="feedback error">{{ error }}</p>
@@ -48,6 +48,7 @@
 <script setup>
 import { computed, onMounted, ref } from "vue";
 import { RouterLink, useRoute } from "vue-router";
+import PasswordField from "../components/PasswordField.vue";
 import { auth } from "../services/auth";
 
 const route = useRoute();
@@ -136,4 +137,3 @@ onMounted(async () => {
   redirectIfAlreadyAuthenticated();
 });
 </script>
-

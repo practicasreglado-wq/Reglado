@@ -7,6 +7,7 @@ require_once __DIR__ . '/utils/Response.php';
 require_once __DIR__ . '/utils/Security.php';
 require_once __DIR__ . '/services/JwtService.php';
 require_once __DIR__ . '/services/MailService.php';
+require_once __DIR__ . '/services/NotionService.php';
 require_once __DIR__ . '/services/RateLimiter.php';
 require_once __DIR__ . '/services/SecurityLogger.php';
 require_once __DIR__ . '/models/User.php';

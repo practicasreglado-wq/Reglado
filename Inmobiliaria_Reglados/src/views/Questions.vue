@@ -36,6 +36,7 @@ import { useUserStore } from "../stores/user";
 import { useRouter, useRoute } from "vue-router";
 import { ref, computed } from "vue";
 import { backendJson } from "../services/backend";
+import { sanitizePreferences } from "../data/preferenceSchemas";
 import HotelesForm from "../components/HotelesForm.vue";
 import ParkingForm from "../components/ParkingForm.vue";
 import EdificiosForm from "../components/EdificiosForm.vue";
@@ -52,15 +53,12 @@ const route = useRoute()
 
 const category = ref(route.query.category || userStore.selectedCategory)
 
-const form = ref({
-estrellas:[],
-servicios:[],
-ubicacion:[],
-tipo:[],
-caracteristicas:[],
-zona:[],
-uso:[]
-})
+const form = ref(
+sanitizePreferences(
+  category.value,
+  userStore.preferences ? { ...userStore.preferences } : {}
+)
+)
 
 const forms={
 Hoteles:HotelesForm,
@@ -75,17 +73,19 @@ return forms[category.value]
 })
 
 const submit = async()=>{
+const cleanedPreferences = sanitizePreferences(category.value, form.value)
+
 await backendJson("save_preferences.php", {
 method:"POST",
 headers:{ "Content-Type":"application/json"},
 body:JSON.stringify({
 categoria:category.value,
-preferencias:form.value
+preferencias:cleanedPreferences
 })
 })
 
 userStore.setCategory(category.value)
-userStore.setPreferences({...form.value})
+userStore.setPreferences({...cleanedPreferences})
 
 router.push("/profile")
 
@@ -166,17 +166,20 @@ return{category,form,currentForm,submit}
 .category-form {
   background: rgba(255, 255, 255, 0.95);
   padding: 50px;
-  border-radius: 30px;
+  border-radius: 15px;
   width: 100%;
   max-width: 650px;
   box-shadow: 0 10px 40px rgba(0,0,0,0.35);
   max-height: 85vh;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .form-title {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
+  color: #172a5d;
 }
 
 /* 👇 ESTOS SON LOS QUE VIENEN DE LOS COMPONENTES HIJOS */
@@ -186,15 +189,14 @@ return{category,form,currentForm,submit}
 }
 
 .category-form :deep(.options) {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px 25px;
+  display: grid;
+  gap: 10px;
 }
 
 .category-form :deep(label) {
   display: flex;
   gap: 8px;
-  align-items: center;
+  align-items: flex-start;
   font-size: 0.95rem;
 }
 
