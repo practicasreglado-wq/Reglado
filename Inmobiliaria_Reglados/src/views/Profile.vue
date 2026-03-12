@@ -142,7 +142,13 @@ No tienes preferencias guardadas todavía
 
 </div>
 
-<router-view></router-view>
+<router-view v-slot="{ Component, route }">
+<transition name="profile-page-transition" mode="out-in">
+<div :key="route.fullPath" class="profile-route-shell">
+<component :is="Component"></component>
+</div>
+</transition>
+</router-view>
 
 </div>
 
@@ -339,6 +345,23 @@ font-weight:600;
 flex:1;
 margin-top: 90px;
 padding:40px;
+}
+
+.profile-route-shell{
+min-height:1px;
+}
+
+.profile-page-transition-enter-active,
+.profile-page-transition-leave-active{
+transition:
+opacity 0.2s ease,
+transform 0.2s ease;
+}
+
+.profile-page-transition-enter-from,
+.profile-page-transition-leave-to{
+opacity:0;
+transform:translateY(8px);
 }
 
 .profile-hero{

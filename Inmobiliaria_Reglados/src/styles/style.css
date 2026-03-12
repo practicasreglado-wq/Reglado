@@ -18,6 +18,18 @@ html, body {
   overflow-x: hidden;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: #f6f8fb;
+  color: #1a2545;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 #app {
   display: flex;
   flex-direction: column;
@@ -27,6 +39,89 @@ html, body {
 /* Contenido principal */
 .main-content {
   flex: 1;
+}
+
+.page-shell {
+  min-height: 100%;
+}
+
+.page-transition-enter-active,
+.page-transition-leave-active {
+  transition:
+    opacity 0.42s ease,
+    transform 0.42s ease,
+    filter 0.42s ease;
+}
+
+.page-transition-enter-from,
+.page-transition-leave-to {
+  opacity: 0;
+  transform: translateY(16px) scale(0.99);
+  filter: blur(6px);
+}
+
+.reveal-hidden {
+  opacity: 0;
+  transform: translateY(28px) scale(0.985);
+  transition:
+    opacity 0.7s ease,
+    transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: transform, opacity;
+}
+
+.reveal-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease,
+    background-color 0.22s ease,
+    border-color 0.22s ease,
+    opacity 0.22s ease;
+}
+
+button:hover:not(:disabled),
+[type="submit"]:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid rgba(74, 114, 198, 0.22);
+  outline-offset: 2px;
+}
+
+.dashboard-card,
+.property-card,
+.search-history-item,
+.message-card,
+.favorite-card,
+.preference-panel {
+  transition:
+    transform 0.28s ease,
+    box-shadow 0.28s ease,
+    filter 0.28s ease;
+}
+
+.dashboard-card:hover,
+.property-card:hover,
+.search-history-item:hover,
+.message-card:hover,
+.favorite-card:hover,
+.preference-panel:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 36px rgba(23, 42, 93, 0.14);
 }
 /* ===== Scrollbar personalizada ===== */
 
@@ -45,4 +140,25 @@ html, body {
   border-radius: 10px;
   border: 2px solid var(--gris-claro);
   transition: background 0.3s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .reveal-hidden,
+  .reveal-visible {
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }

@@ -14,7 +14,7 @@
 
     <div class="carousel-wrapper">
 
-      <button class="arrow" @click="prev">❮</button>
+      <button class="arrow" @click="prev">&#10094;</button>
 
       <!-- CARDS -->
       <div
@@ -29,24 +29,25 @@
         @touchend="endTouch"
       >
         <div
-  v-for="(item, index) in visibleItems"
-  :key="item.value"
-  class="card-wrapper"
->
-  <div class="mobile-title">
-    {{ item.title }}
-  </div>
+          v-for="(item, index) in visibleItems"
+          :key="item.value"
+          class="card-wrapper"
+          :style="cardStyle(index)"
+        >
+          <div class="mobile-title">
+            {{ item.title }}
+          </div>
 
-  <div
-    class="card"
-    :class="cardClass(index)"
-    :style="{ backgroundImage: `url(${item.image})` }"
-    @click.stop="selectCategory(index)"
-  ></div>
-</div>
+          <div
+            class="card"
+            :class="cardClass(index)"
+            :style="{ backgroundImage: `url(${item.image})` }"
+            @click.stop="selectCategory(index)"
+          ></div>
+        </div>
       </div>
 
-      <button class="arrow" @click="next">❯</button>
+      <button class="arrow" @click="next">&#10095;</button>
 
     </div>
   </div>
@@ -75,6 +76,10 @@ export default {
       startY: 0,
       endY: 0,
       isDragging: false,
+      dragOffset: 0,
+      dragVelocity: 0,
+      lastDragX: 0,
+      lastDragTime: 0,
 
       items: [
         { title: "Edificios", value: "Edificios", image: new URL('@/assets/edificios.png', import.meta.url).href },
@@ -122,10 +127,15 @@ export default {
     --------------------------*/
 
     startDrag(e) {
+      if (this.isAnimating) return;
 
       this.isDragging = true;
       this.startX = e.clientX;
       this.endX = e.clientX;
+      this.dragOffset = 0;
+      this.dragVelocity = 0;
+      this.lastDragX = e.clientX;
+      this.lastDragTime = performance.now();
 
     },
 
@@ -133,7 +143,15 @@ export default {
 
       if (!this.isDragging) return;
 
+      const now = performance.now();
+      const deltaX = e.clientX - this.lastDragX;
+      const deltaTime = Math.max(now - this.lastDragTime, 1);
+
       this.endX = e.clientX;
+      this.dragOffset = this.endX - this.startX;
+      this.dragVelocity = deltaX / deltaTime;
+      this.lastDragX = e.clientX;
+      this.lastDragTime = now;
 
     },
 
@@ -142,10 +160,11 @@ export default {
       if (!this.isDragging) return;
 
       const diff = this.endX - this.startX;
+      const momentum = diff + this.dragVelocity * 180;
 
-      if (Math.abs(diff) > 60) {
+      if (Math.abs(momentum) > 70) {
 
-        if (diff > 0) {
+        if (momentum > 0) {
           this.prev();
         } else {
           this.next();
@@ -154,6 +173,8 @@ export default {
       }
 
       this.isDragging = false;
+      this.dragOffset = 0;
+      this.dragVelocity = 0;
 
     },
 
@@ -162,11 +183,17 @@ export default {
     --------------------------*/
 
     startTouch(e) {
+      if (this.isAnimating) return;
 
       if (window.innerWidth <= 480) {
         this.startY = e.touches[0].clientY;
       } else {
         this.startX = e.touches[0].clientX;
+        this.endX = e.touches[0].clientX;
+        this.dragOffset = 0;
+        this.dragVelocity = 0;
+        this.lastDragX = e.touches[0].clientX;
+        this.lastDragTime = performance.now();
       }
 
     },
@@ -176,6 +203,16 @@ export default {
       if (window.innerWidth <= 480) {
         this.endY = e.touches[0].clientY;
       } else {
+        const now = performance.now();
+        const currentX = e.touches[0].clientX;
+        const deltaX = currentX - this.lastDragX;
+        const deltaTime = Math.max(now - this.lastDragTime, 1);
+
+        this.endX = currentX;
+        this.dragOffset = this.endX - this.startX;
+        this.dragVelocity = deltaX / deltaTime;
+        this.lastDragX = currentX;
+        this.lastDragTime = now;
         this.endX = e.touches[0].clientX;
       }
 
@@ -200,10 +237,11 @@ export default {
       } else {
 
         const diff = this.endX - this.startX;
+        const momentum = diff + this.dragVelocity * 180;
 
-        if (Math.abs(diff) > 50) {
+        if (Math.abs(momentum) > 60) {
 
-          if (diff > 0) {
+          if (momentum > 0) {
             this.prev();
           } else {
             this.next();
@@ -212,6 +250,9 @@ export default {
         }
 
       }
+
+      this.dragOffset = 0;
+      this.dragVelocity = 0;
 
     },
 
@@ -225,6 +266,25 @@ export default {
       if (index === 0) return "left";
       if (index === 2) return "right";
 
+    },
+
+    cardStyle(index) {
+      const zIndexMap = [1, 3, 1];
+
+      if (!this.dragOffset || window.innerWidth <= 480) {
+        return {
+          zIndex: zIndexMap[index] ?? 1,
+        };
+      }
+
+      const intensityMap = [0.55, 1, 0.55];
+      const offset = Math.max(Math.min(this.dragOffset, 90), -90) * intensityMap[index];
+      const tilt = Math.max(Math.min(this.dragOffset / 18, 6), -6);
+
+      return {
+        transform: `translateX(${offset}px) rotate(${tilt}deg)`,
+        zIndex: zIndexMap[index] ?? 1,
+      };
     },
 
     /* -------------------------
@@ -286,9 +346,12 @@ export default {
 <style scoped>
 
 .card-wrapper{
+  position:relative;
   display:flex;
   flex-direction:column;
   align-items:center;
+  transition:transform 0.32s ease-out;
+  will-change:transform;
 }
 
 .mobile-title{
