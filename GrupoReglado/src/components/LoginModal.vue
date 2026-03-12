@@ -3,7 +3,7 @@
     <div class="modal-card" role="dialog" aria-modal="true" aria-label="Iniciar sesión">
       <div class="modal-head">
         <h2>Iniciar sesión</h2>
-        <button class="icon-btn" @click="closeModal" aria-label="Cerrar">x</button>
+        <button class="icon-btn close-btn" @click="closeModal" aria-label="Cerrar">×</button>
       </div>
 
       <form class="clean-form" @submit.prevent="submitLogin">
@@ -14,7 +14,7 @@
 
         <label>
           Contraseña
-          <PasswordField v-model="password" placeholder="********" required />
+          <PasswordField v-model="password" placeholder="" required />
         </label>
 
         <p v-if="error" class="feedback error">{{ error }}</p>
@@ -112,3 +112,28 @@ async function resendMail() {
   }
 }
 </script>
+
+<style scoped>
+.modal-card {
+  position: relative;
+}
+
+.close-btn {
+  position: absolute;
+  top: 0.55rem;
+  right: 0.75rem;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+  border-radius: 0;
+  font-size: 2rem;
+  line-height: 1;
+  font-weight: 500;
+  color: #162235;
+}
+
+.close-btn:hover {
+  opacity: 0.75;
+}
+</style>
