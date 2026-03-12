@@ -22,7 +22,7 @@
 
 <script>
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from "vue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import Header from "./components/Header.vue";
 import Footer from "./components/Footer.vue";
 import ScrollToTop from "./components/ScrollToTop.vue";
@@ -45,6 +45,7 @@ export default {
   setup() {
     const userStore = useUserStore();
     const router = useRouter();
+    const route = useRoute();
     const isBootLoading = ref(true);
     const isRouteLoading = ref(false);
     let removeBeforeHook;
@@ -114,7 +115,13 @@ export default {
       teardownRevealSystem();
     });
 
-    const showLoader = computed(() => isBootLoading.value || isRouteLoading.value);
+    const showLoader = computed(() => {
+      if (route.path.startsWith("/profile")) {
+        return false;
+      }
+
+      return isBootLoading.value || isRouteLoading.value;
+    });
 
     return {
       handleRouteEntered,
