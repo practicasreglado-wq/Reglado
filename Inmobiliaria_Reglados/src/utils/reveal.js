@@ -37,8 +37,8 @@ const getObserver = () => {
         });
       },
       {
-        threshold: 0.14,
-        rootMargin: "0px 0px -8% 0px",
+        threshold: 0.06,
+        rootMargin: "0px 0px -2% 0px",
       }
     );
   }
