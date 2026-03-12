@@ -23,12 +23,6 @@
 </li>
 
 <li>
-  <router-link to="/profile/messages" @click="menuOpen = false">
-    Mensajes
-  </router-link>
-</li>
-
-<li>
   <router-link to="/profile/search-history" @click="menuOpen = false">
     Historial de búsquedas
   </router-link>
@@ -66,14 +60,6 @@ Cerrar sesión
 <p>Bienvenido a tu panel de perfil</p>
 </div>
 
-<div class="category-highlight">
-  <span class="category-label">Categoría actual:</span>
-
-  <div class="category-badge">
-    {{ category }}
-  </div>
-</div>
-
 </div>
 
 <router-view
@@ -100,19 +86,6 @@ stroke-linejoin="round"/>
 </div>
 <h4>Favoritos</h4>
 <p>Propiedades que has guardado</p>
-</router-link>
-
-<router-link to="/profile/messages" class="dashboard-card">
-<div class="card-icon">
-<svg viewBox="0 0 24 24" width="28" height="28" fill="none">
-<path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"
-stroke="currentColor"
-stroke-width="1.8"
-stroke-linejoin="round"/>
-</svg>
-</div>
-<h4>Mensajes</h4>
-<p>Contactos con propietarios</p>
 </router-link>
 
 <router-link to="/profile/my-properties-for-sale" class="dashboard-card">
@@ -397,27 +370,6 @@ font-size:2.3rem;
 .hero-left p{
 font-size:1.1rem;
 opacity:0.9;
-}
-
-.category-highlight{
-display:none;
-}
-
-.category-label{
-font-size:1rem;
-opacity:0.8;
-margin-bottom:6px;
-}
-
-.category-badge{
-background:linear-gradient(135deg,#d2b454,#f0c14b);
-color:#172a5d;
-font-size:1.3rem;
-font-weight:700;
-padding:10px 25px;
-border-radius:30px;
-box-shadow:0 4px 15px rgba(0,0,0,0.2);
-letter-spacing:0.5px;
 }
 
 .dashboard-grid{
