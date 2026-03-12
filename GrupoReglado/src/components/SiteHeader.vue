@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <header ref="headerRef" class="topbar" :class="{ 'topbar-scrolled': isScrolled }">
     <RouterLink class="brand-link" to="/" aria-label="Ir al inicio">
       <img :src="logoSrc" alt="Reglado Energy" class="brand-logo" />
@@ -18,14 +18,8 @@
           <img :src="adminUserIcon" alt="" class="admin-icon" />
         </RouterLink>
         <div class="user-menu-wrap">
-          <button
-            class="user-pill user-menu-trigger"
-            @click="toggleUserMenu"
-            aria-haspopup="menu"
-            :aria-expanded="userMenuOpen ? 'true' : 'false'"
-            :title="displayUsername"
-            aria-label="Menu de usuario"
-          >
+          <button class="user-pill user-menu-trigger" @click="toggleUserMenu" aria-haspopup="menu"
+            :aria-expanded="userMenuOpen ? 'true' : 'false'" :title="displayUsername" aria-label="Menu de usuario">
             <span class="user-initial" aria-hidden="true">{{ userInitial }}</span>
           </button>
 
@@ -39,31 +33,22 @@
           </div>
         </div>
       </template>
-      <button v-else class="btn-primary" @click="$emit('open-login')">Iniciar sesión</button>
+      <button v-else class="login-btn" @click="$emit('open-login')">Iniciar sesión</button>
     </div>
 
     <div class="mobile-controls">
-      <RouterLink v-if="user && isAdmin" class="admin-pill mobile-admin-pill" to="/admin" aria-label="Panel de administracion">
+      <RouterLink v-if="user && isAdmin" class="admin-pill mobile-admin-pill" to="/admin"
+        aria-label="Panel de administracion">
         <img :src="adminUserIcon" alt="" class="admin-icon" />
       </RouterLink>
 
-      <RouterLink
-        v-if="user"
-        class="user-pill mobile-user-trigger"
-        to="/configuracion"
-        :title="displayUsername"
-        aria-label="Configuración de usuario"
-      >
+      <RouterLink v-if="user" class="user-pill mobile-user-trigger" to="/configuracion" :title="displayUsername"
+        aria-label="Configuración de usuario">
         <span class="user-initial" aria-hidden="true">{{ userInitial }}</span>
       </RouterLink>
 
-      <button
-        class="mobile-menu-toggle"
-        type="button"
-        :aria-expanded="mobileMenuOpen ? 'true' : 'false'"
-        aria-label="Abrir menu"
-        @click="toggleMobileMenu"
-      >
+      <button class="mobile-menu-toggle" type="button" :aria-expanded="mobileMenuOpen ? 'true' : 'false'"
+        aria-label="Abrir menu" @click="toggleMobileMenu">
         <img :src="menuIcon" alt="" class="mobile-menu-icon" />
       </button>
     </div>
@@ -179,7 +164,7 @@ function handlePointerDown(event) {
 }
 
 function handleScroll() {
-  isScrolled.value = window.scrollY > 4;
+  isScrolled.value = window.scrollY > 60;
 }
 
 onMounted(() => {
@@ -196,27 +181,46 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .topbar {
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  min-height: var(--topbar-height);
+  width: 100%;
   z-index: 40;
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: 1rem;
   padding: 0.9rem 1.35rem;
-  margin: 0;
   border-radius: 0;
-  background: linear-gradient(135deg, rgba(23, 39, 61, 0.95), rgba(39, 61, 92, 0.88));
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  box-shadow: 0 12px 25px rgba(16, 28, 47, 0.22);
-  backdrop-filter: blur(8px);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid transparent;
+  box-shadow: none;
   overflow: visible;
-  transition: margin 0.22s ease, border-radius 0.22s ease, box-shadow 0.22s ease;
+  transition: border-color 0.6s ease, box-shadow 0.6s ease;
+}
+
+.topbar::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(23, 39, 61, 0.95), rgba(39, 61, 92, 0.88));
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  pointer-events: none;
+}
+
+.topbar-scrolled::before {
+  opacity: 1;
 }
 
 .topbar-scrolled {
-  margin: 0.8rem 0.8rem 0;
-  border-radius: 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 0 12px 25px rgba(16, 28, 47, 0.22);
 }
 
 .brand-link {
@@ -263,6 +267,29 @@ onBeforeUnmount(() => {
 .menu a:hover {
   background: rgba(255, 255, 255, 0.17);
   color: #fff;
+}
+
+.login-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: rgba(241, 246, 255, 0.95);
+  font-size: 0.9rem;
+  font-weight: 500;
+  font-family: inherit;
+  padding: 0.45rem 1rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.login-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 4px 12px rgba(10, 20, 35, 0.15);
+  transform: translateY(-1px);
 }
 
 .session-box {
@@ -471,14 +498,16 @@ onBeforeUnmount(() => {
 
 @media (max-width: 640px) {
   .topbar {
-    margin: 0;
+    margin-top: 0;
+    margin-bottom: 0;
     border-radius: 0;
     padding: 0.75rem 0.9rem;
   }
 
   .topbar-scrolled {
-    margin: 0.6rem 0.6rem 0;
-    border-radius: 14px;
+    margin-top: 0;
+    margin-bottom: 0;
+    border-radius: 0;
   }
 
   .brand {

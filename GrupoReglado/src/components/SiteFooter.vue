@@ -1,23 +1,20 @@
-﻿<template>
+<template>
   <footer class="site-footer">
     <div class="container footer-layout">
-      <div class="footer-main">
-        <div class="footer-col">
-          <h3>Grupo Reglado</h3>
-          <p>Grupo empresarial en consultoria, energia, tecnologia, inmuebles e inversion.</p>
-          <a
-            class="social-link"
-            href="https://www.linkedin.com/in/reglado-abogados-y-consultores-90b7a0233/"
-            target="_blank"
-            rel="noreferrer"
-            aria-label="LinkedIn"
-          >
-            <img :src="linkedinIcon" alt="" />
-          </a>
+      <div class="footer-inner">
+        <div class="footer-col brand-col">
+          <div class="title-badge">Grupo Reglado</div>
+          <p class="small-text">Grupo empresarial en consultoria, energia, tecnologia, inmuebles e inversion.</p>
+          <div class="social-links" aria-label="Redes sociales">
+            <a class="social-link" href="https://www.linkedin.com/in/reglado-abogados-y-consultores-90b7a0233/"
+              target="_blank" rel="noreferrer" aria-label="LinkedIn">
+              <img :src="linkedinIcon" alt="LinkedIn" class="social-icon" />
+            </a>
+          </div>
         </div>
 
         <div class="footer-col">
-          <h3>Navegación</h3>
+          <div class="title-badge">Navegación</div>
           <div class="footer-links">
             <a href="https://regladoconsultores.com/" target="_blank" rel="noreferrer">Reglado Consultores</a>
             <a :href="energyUrl" target="_blank" rel="noreferrer">Energy</a>
@@ -27,17 +24,17 @@
         </div>
 
         <div class="footer-col">
-          <h3>Contacto</h3>
+          <div class="title-badge">Contacto</div>
           <div class="footer-contact">
             <div><strong>Teléfono:</strong> +34 911462674</div>
-            <div><strong>Email:</strong>info@regladoconsultores.com</div>
+            <div><strong>Email:</strong> info@regladoconsultores.com</div>
           </div>
         </div>
       </div>
 
       <div class="bottom">
-        <div class="small">&copy; {{ year }} Reglado Group. Todos los derechos reservados.</div>
-        <div class="small">Transparencia &middot; Rigor t&eacute;cnico &middot; Acompa&ntilde;amiento</div>
+        <div class="bottom-text">&copy; {{ year }} Reglado Group. Todos los derechos reservados.</div>
+        <div class="bottom-text">Transparencia &middot; Rigor t&eacute;cnico &middot; Acompa&ntilde;amiento</div>
       </div>
     </div>
   </footer>
@@ -53,82 +50,113 @@ const year = new Date().getFullYear();
 
 <style scoped>
 .site-footer {
-  border-top: 1px solid rgba(255, 255, 255, 0.16);
-  background: linear-gradient(135deg, rgba(23, 39, 61, 0.95), rgba(39, 61, 92, 0.88));
-  min-height: 170px;
-  display: flex;
-  align-items: stretch;
-  padding-inline: clamp(1rem, 2.5vw, 2rem);
+  position: relative;
+  z-index: 2;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(135deg, rgba(23, 39, 61, 0.98), rgba(39, 61, 92, 0.95));
+  padding: 60px 0 30px;
+  color: #fff;
 }
 
 .container {
-  width: min(1160px, 100%);
+  max-width: min(1160px, 92%);
   margin: 0 auto;
 }
 
 .footer-layout {
-  width: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: 1.4rem 0 1rem;
-  gap: 1rem;
+  gap: 0;
 }
 
-.footer-main {
+.footer-inner {
   display: grid;
-  grid-template-columns: 1.35fr 1fr 1fr;
-  gap: 1.25rem;
+  grid-template-columns: 1.5fr 1fr 1fr;
+  gap: 40px;
+  align-items: start;
+  padding-bottom: 40px;
+}
+
+.brand-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .footer-col {
-  display: grid;
-  align-content: start;
-  gap: 0.6rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
 }
 
-.footer-main h3 {
-  margin: 0;
-  color: #f6f8fc;
-  font-size: 1.2rem;
+.title-badge {
+  font-weight: 800;
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+  letter-spacing: 1px;
+  display: inline-block;
+  padding: 8px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  text-transform: uppercase;
+  color: #fff;
 }
 
-.footer-main p {
-  margin: 0.35rem 0 0;
-  color: rgba(241, 246, 255, 0.82);
-  line-height: 1.5;
+.small-text {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.6;
+  margin: 0 0 25px;
+  max-width: 350px;
+}
+
+.social-links {
+  display: flex;
+  gap: 15px;
+  margin-top: 0;
+  position: relative;
+  top: 25px;
 }
 
 .social-link {
-  width: fit-content;
-  height: fit-content;
-  margin-top: 0.8rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.2s ease, opacity 0.2s ease;
+  transition: transform 0.3s ease;
+  text-decoration: none;
 }
 
 .social-link:hover {
-  transform: translateY(-1px);
-  opacity: 0.82;
+  transform: translateY(-3px);
 }
 
-.social-link img {
+.social-icon {
   width: 26px;
   height: 26px;
   display: block;
+  opacity: 0.75;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.social-link:hover .social-icon {
+  opacity: 1;
+  transform: scale(1.05);
 }
 
 .footer-links {
-  display: grid;
-  gap: 0.45rem;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .footer-links a {
-  width: fit-content;
-  color: rgba(241, 246, 255, 0.82);
+  color: rgba(255, 255, 255, 0.7);
   text-decoration: none;
+  font-size: 1rem;
+  transition: color 0.3s ease;
+  width: fit-content;
 }
 
 .footer-links a:hover {
@@ -136,28 +164,36 @@ const year = new Date().getFullYear();
 }
 
 .footer-contact {
-  display: grid;
-  gap: 0.45rem;
-  color: rgba(241, 246, 255, 0.82);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1rem;
+}
+
+.footer-contact strong {
+  color: #fff;
 }
 
 .bottom {
+  margin-top: 20px;
+  padding-top: 25px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   justify-content: space-between;
-  gap: 1rem;
-  width: 100%;
-  padding-top: 0.9rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  gap: 15px;
+  flex-wrap: wrap;
 }
 
-.small {
-  font-size: 0.9rem;
-  color: rgba(241, 246, 255, 0.72);
+.bottom-text {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.5);
 }
 
-@media (max-width: 760px) {
-  .footer-main {
+@media (max-width: 992px) {
+  .footer-inner {
     grid-template-columns: 1fr;
+    gap: 40px;
   }
 
   .bottom {
