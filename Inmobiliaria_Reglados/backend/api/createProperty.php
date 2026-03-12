@@ -16,18 +16,41 @@ if (!isset($_SESSION["user"])) {
 
 $data = json_decode(file_get_contents("php://input"), true);
 
-$nombre = $data["nombre"];
-$ubicacion = $data["ubicacion"];
-$precio = $data["precio"];
-$tipo = $data["tipo"];
+$nombre = trim((string) ($data["nombre"] ?? ""));
+$ubicacion = trim((string) ($data["ubicacion"] ?? ""));
+$precio = (float) ($data["precio"] ?? 0);
+$tipo = trim((string) ($data["tipo"] ?? ""));
 
-$userId = $_SESSION["user"]["id"];
+if ($nombre === "" || $ubicacion === "" || $tipo === "") {
+    echo json_encode(["error" => "Datos incompletos"]);
+    exit;
+}
+
+$userId = (int) $_SESSION["user"]["id"];
 
 $stmt = $pdo->prepare("
-INSERT INTO propiedades (nombre, ubicacion, precio, tipo, userId)
-VALUES (?, ?, ?, ?, ?)
+    INSERT INTO propiedades (
+        categoria,
+        titulo,
+        ubicacion_general,
+        precio,
+        metros_cuadrados,
+        imagen_principal,
+        caracteristicas_json,
+        owner_user_id
+    )
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 ");
 
-$stmt->execute([$nombre, $ubicacion, $precio, $tipo, $userId]);
+$stmt->execute([
+    $tipo,
+    $nombre,
+    $ubicacion,
+    $precio,
+    0,
+    null,
+    json_encode(new stdClass(), JSON_UNESCAPED_UNICODE),
+    $userId,
+]);
 
 echo json_encode(["success" => true]);

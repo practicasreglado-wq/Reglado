@@ -76,6 +76,17 @@ Cerrar sesión
 
 </div>
 
+<router-view
+v-if="isProfileHome"
+v-slot="{ Component, route }"
+>
+<transition name="profile-page-transition" mode="out-in">
+<div :key="route.fullPath" class="profile-route-shell profile-route-shell--top">
+<component :is="Component"></component>
+</div>
+</transition>
+</router-view>
+
 <div class="dashboard-grid">
 
 <router-link to="/profile/favorite-properties" class="dashboard-card">
@@ -142,7 +153,10 @@ No tienes preferencias guardadas todavía
 
 </div>
 
-<router-view v-slot="{ Component, route }">
+<router-view
+v-if="!isProfileHome"
+v-slot="{ Component, route }"
+>
 <transition name="profile-page-transition" mode="out-in">
 <div :key="route.fullPath" class="profile-route-shell">
 <component :is="Component"></component>
@@ -386,10 +400,7 @@ opacity:0.9;
 }
 
 .category-highlight{
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
+display:none;
 }
 
 .category-label{
@@ -414,6 +425,7 @@ display:grid;
 grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
 gap:20px;
 margin-bottom:40px;
+margin-top:36px;
 }
 
 .dashboard-card{

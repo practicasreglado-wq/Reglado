@@ -1,110 +1,126 @@
 <template>
+  <section class="favorites-view">
+    <div class="favorites-view__header" v-reveal="0">
+      <div>
+        <p class="eyebrow">Tu shortlist</p>
+        <h2>Mis propiedades favoritas</h2>
+      </div>
+      <span class="favorites-count">{{ favorites.length }} guardadas</span>
+    </div>
 
-<div>
+    <div v-if="loading" class="favorites-view__state" v-reveal="1">
+      Cargando favoritos...
+    </div>
 
-<h2>Mis propiedades favoritas</h2>
+    <div v-else-if="favorites.length === 0" class="favorites-view__state" v-reveal="1">
+      No tienes propiedades favoritas todavía.
+    </div>
 
-<div v-if="loading">
-Cargando favoritos...
-</div>
-
-<div v-else-if="favorites.length === 0">
-No tienes propiedades favoritas.
-</div>
-
-<div v-else class="properties">
-
-<div
-v-for="property in favorites"
-:key="property.id"
-class="property-card"
->
-
-<h3>{{ property.nombre }}</h3>
-
-<p>{{ property.ubicacion }}</p>
-
-<p><strong>Tipo:</strong> {{ property.tipo }}</p>
-
-<p><strong>Precio:</strong> {{ property.precio }} €</p>
-
-</div>
-
-</div>
-
-</div>
-
+    <div v-else class="favorites-view__grid">
+      <PropertyCard
+        v-for="(property, index) in favorites"
+        :key="property.id"
+        v-reveal="index + 1"
+        :property="property"
+        @toggle-favorite="toggleFavorite"
+      />
+    </div>
+  </section>
 </template>
 
 <script>
+import PropertyCard from "../components/PropertyCard.vue";
+import {
+  fetchFavoriteProperties,
+  removeFavorite,
+} from "../services/properties";
 
-import axios from "axios"
+export default {
+  name: "FavoriteProperties",
+  components: {
+    PropertyCard,
+  },
+  data() {
+    return {
+      favorites: [],
+      loading: true,
+    };
+  },
+  mounted() {
+    this.loadFavorites();
+  },
+  methods: {
+    async loadFavorites() {
+      this.loading = true;
 
-export default{
+      try {
+        this.favorites = await fetchFavoriteProperties();
+      } catch (error) {
+        console.error(error);
+        this.favorites = [];
+      } finally {
+        this.loading = false;
+      }
+    },
 
-name:"FavoriteProperties",
-
-data(){
-return{
-favorites:[],
-loading:true
-}
-},
-
-mounted(){
-this.getFavorites()
-},
-
-methods:{
-
-async getFavorites(){
-
-try{
-
-const res = await axios.get(
-"http://localhost/inmobiliaria/backend/api/get_favorite_properties.php",
-{withCredentials:true}
-)
-
-// asegurar array
-if(Array.isArray(res.data)){
-this.favorites = res.data
-}else{
-this.favorites = []
-}
-
-}catch(error){
-
-console.error(error)
-this.favorites = []
-
-}finally{
-
-this.loading = false
-
-}
-
-}
-
-}
-
-}
-
+    async toggleFavorite(property) {
+      try {
+        await removeFavorite(property.id);
+        this.favorites = this.favorites.filter((item) => item.id !== property.id);
+      } catch (error) {
+        console.error(error);
+      }
+    },
+  },
+};
 </script>
 
 <style scoped>
-
-.properties{
-display:grid;
-grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
-gap:16px;
+.favorites-view {
+  display: grid;
+  gap: 24px;
 }
 
-.property-card{
-background:white;
-padding:15px;
-border-radius:8px;
-box-shadow:0 2px 5px rgba(0,0,0,0.1);
+.favorites-view__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 20px;
 }
 
+.eyebrow {
+  margin: 0 0 8px;
+  color: #6f7f98;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.favorites-view__header h2 {
+  margin: 0;
+  color: #172a5d;
+}
+
+.favorites-count {
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(74, 114, 198, 0.12);
+  color: #214b8f;
+  font-weight: 700;
+}
+
+.favorites-view__state {
+  padding: 24px;
+  border-radius: 18px;
+  background: #fff;
+  color: #5a6880;
+  box-shadow: 0 12px 26px rgba(23, 42, 93, 0.08);
+}
+
+.favorites-view__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: 22px;
+}
 </style>

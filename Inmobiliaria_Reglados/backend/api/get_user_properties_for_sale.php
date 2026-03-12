@@ -14,9 +14,19 @@ if (!isset($_SESSION['user']['id'])) {
     exit;
 }
 
-$userId = $_SESSION['user']['id'];
+$userId = (int) $_SESSION['user']['id'];
 
-$stmt = $pdo->prepare("SELECT id, nombre, ubicacion, precio, tipo FROM propiedades WHERE userId = ?");
+$stmt = $pdo->prepare("
+    SELECT
+        id,
+        titulo AS nombre,
+        ubicacion_general AS ubicacion,
+        precio,
+        categoria AS tipo
+    FROM propiedades
+    WHERE owner_user_id = ?
+    ORDER BY created_at DESC, id DESC
+");
 $stmt->execute([$userId]);
 
 $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
