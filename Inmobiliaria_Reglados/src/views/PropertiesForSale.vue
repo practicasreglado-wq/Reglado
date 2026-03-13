@@ -40,87 +40,111 @@
 </template>
 
 <script>
-import { storeToRefs } from "pinia";
-import PropertyCard from "../components/PropertyCard.vue";
-import { useUserStore } from "../stores/user";
+import { storeToRefs } from "pinia"
+import PropertyCard from "../components/PropertyCard.vue"
+import { useUserStore } from "../stores/user"
 import {
   fetchProperties,
   removeFavorite,
   saveFavorite,
-} from "../services/properties";
+} from "../services/properties"
 
 export default {
   name: "PropertiesForSale",
+
   components: {
     PropertyCard,
   },
+
   data() {
     return {
       loading: true,
       properties: [],
       pendingFavorites: new Set(),
-    };
+    }
   },
+
   setup() {
-    const userStore = useUserStore();
-    const { selectedCategory } = storeToRefs(userStore);
-    return { selectedCategory };
+    const userStore = useUserStore()
+    const { selectedCategory, preferences } = storeToRefs(userStore)
+
+    return {
+      selectedCategory,
+      preferences
+    }
   },
+
   mounted() {
-    this.loadProperties();
+    this.loadProperties()
   },
+
   watch: {
     selectedCategory() {
-      this.loadProperties();
+      this.loadProperties()
     },
   },
+
   methods: {
     async loadProperties() {
       if (!this.selectedCategory) {
-        this.properties = [];
-        this.loading = false;
-        return;
+        this.properties = []
+        this.loading = false
+        return
       }
 
-      this.loading = true;
+      this.loading = true
 
       try {
-        this.properties = await fetchProperties(this.selectedCategory);
+        this.properties = await fetchProperties(this.selectedCategory)
       } catch (error) {
-        console.error(error);
-        this.properties = [];
+        console.error(error)
+        this.properties = []
       } finally {
-        this.loading = false;
+        this.loading = false
       }
     },
 
     async toggleFavorite(property) {
       if (this.pendingFavorites.has(property.id)) {
-        return;
+        return
       }
 
-      this.pendingFavorites.add(property.id);
+      this.pendingFavorites.add(property.id)
 
       try {
+
         if (property.is_favorite) {
-          await removeFavorite(property.id);
+
+          await removeFavorite(property.id)
+
         } else {
-          await saveFavorite(property.id);
+
+          await saveFavorite({
+            property_id: property.id,
+            categoria: property.categoria,
+            preferences: this.preferences
+          })
+
         }
 
         this.properties = this.properties.map((current) =>
           current.id === property.id
             ? { ...current, is_favorite: !current.is_favorite }
             : current
-        );
+        )
+
       } catch (error) {
-        console.error(error);
+
+        console.error(error)
+
       } finally {
-        this.pendingFavorites.delete(property.id);
+
+        this.pendingFavorites.delete(property.id)
+
       }
     },
   },
-};
+}
 </script>
 
 <style scoped>

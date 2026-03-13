@@ -14,43 +14,46 @@ function decodeJsonArray(?string $json): array
     return is_array($decoded) ? $decoded : [];
 }
 
-function calculatePropertyMatch(array $preferences, array $characteristics): array
+function calculatePropertyMatch(array $preferences, array $features): array
 {
-    $normalizedPreferences = [];
-
-    foreach ($preferences as $key => $value) {
-        if (is_string($value) && trim($value) !== '') {
-            $normalizedPreferences[(string) $key] = trim($value);
-        }
-    }
-
-    if ($normalizedPreferences === []) {
-        return [
-            'percentage' => 0,
-            'matches' => 0,
-            'total' => 0,
-        ];
-    }
-
+    $details = [];
     $matches = 0;
 
-    foreach ($normalizedPreferences as $key => $preferenceValue) {
-        $propertyValue = $characteristics[$key] ?? null;
-        if (!is_string($propertyValue)) {
-            continue;
+    foreach ($preferences as $key => $value) {
+
+        $match = false;
+
+        if (isset($features[$key])) {
+
+            if (is_array($value)) {
+                $match = in_array($features[$key], $value);
+            } else {
+                $match = $features[$key] == $value;
+            }
+
         }
 
-        if (mb_strtolower(trim($propertyValue)) === mb_strtolower($preferenceValue)) {
+        if ($match) {
             $matches++;
         }
+
+        $details[] = [
+    "label" => is_string($value) ? $value : ucfirst(str_replace("_"," ",$key)),
+    "match" => $match
+];
     }
 
-    $total = count($normalizedPreferences);
+    $total = count($preferences);
+
+    $percentage = $total > 0
+        ? round(($matches / $total) * 100)
+        : 0;
 
     return [
-        'percentage' => (int) round(($matches / max($total, 1)) * 100),
-        'matches' => $matches,
-        'total' => $total,
+        "percentage" => $percentage,
+        "matches" => $matches,
+        "total" => $total,
+        "details" => $details
     ];
 }
 

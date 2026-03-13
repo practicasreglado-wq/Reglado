@@ -42,7 +42,15 @@
 
       <div class="property-card__footer">
         <strong>{{ formatPrice(property.precio) }}</strong>
-        <small>{{ property.match_count }}/{{ property.match_total }} coincidencias</small>
+
+        <!-- BOTON MATCH DETAILS -->
+        <button
+          class="match-details-button"
+          @click.stop="$emit('show-match', $event)"
+        >
+          {{ property.match_count }}/{{ property.match_total }} coincidencias
+        </button>
+
       </div>
     </div>
   </article>
@@ -51,13 +59,19 @@
 <script>
 export default {
   name: "PropertyCard",
-  emits: ["toggle-favorite"],
+
+  emits: [
+    "toggle-favorite",
+    "show-match"
+  ],
+
   props: {
     property: {
       type: Object,
       required: true,
     },
   },
+
   data() {
     return {
       animatedMatch: 0,
@@ -166,6 +180,7 @@ export default {
 </script>
 
 <style scoped>
+
 .property-card {
   overflow: hidden;
   border-radius: 24px;
@@ -206,20 +221,15 @@ export default {
   display:flex;
   align-items:center;
   gap:6px;
-
   padding:6px 12px;
   border-radius:999px;
   border:none;
-
   background:rgba(255,255,255,0.95);
   backdrop-filter:blur(8px);
-
   font-size:0.9rem;
   font-weight:600;
-
   color:#c1a115;
   cursor:pointer;
-
   transition:all 0.2s ease;
 }
 
@@ -232,10 +242,6 @@ export default {
   background:#c1a115;
   transform:scale(1.05);
   color: white;
-}
-
-.favorite-button.active .favorite-text{
-  color:white;
 }
 
 .favorite-button.active{
@@ -256,6 +262,8 @@ export default {
 
 /* MATCH */
 
+/* MATCH */
+
 .match-pill{
   display:inline-flex;
   align-items:center;
@@ -266,17 +274,39 @@ export default {
   color:#17305e;
   font-weight:700;
   overflow:hidden;
-  transition:background 0.45s ease;
+
+  transition:
+    transform 0.25s ease,
+    background 0.45s ease,
+    box-shadow 0.25s ease;
 }
 
-.match-pill__icon{
-  color:#aa1132;
+/* HOVER DEL PILL */
+.match-pill:hover{
+  transform:scale(1.15);
+  box-shadow:0 6px 18px rgba(0,0,0,0.18);
 }
+
+.match-pill:hover .match-pill__icon{
+  transform:scale(1.15);
+}
+
+/* CORAZON */
+
+.match-pill__icon{ 
+  color:#aa1132;
+  display:inline-block;
+  transition:transform 0.25s ease;
+}
+
+/* VALOR */
 
 .match-pill__value{
   display:inline-block;
   transform-origin:center;
 }
+
+/* FOOTER */
 
 .property-card__body{
   padding:22px;
@@ -318,7 +348,22 @@ export default {
   font-size:1.1rem;
 }
 
-.property-card__footer small{
-  color:#73819b;
+/* BOTON MATCH DETAILS */
+
+.match-details-button{
+  border:none;
+  background:#172a5d;
+  cursor:pointer;
+  color:#ffffff;
+  font-weight:600;
+  padding:6px 12px;
+  border-radius:999px;
+  transition:all .2s ease;
 }
+
+.match-details-button:hover{
+  text-decoration:underline;
+}
+
 </style>
+

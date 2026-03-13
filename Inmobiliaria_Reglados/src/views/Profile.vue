@@ -35,12 +35,6 @@
 </li>
 
 <li>
-  <router-link to="/profile/search-history" @click="menuOpen = false">
-    Historial de búsquedas
-  </router-link>
-</li>
-
-<li>
   <router-link to="/profile/my-properties-for-sale" @click="menuOpen = false">
     Mis propiedades
   </router-link>

@@ -24,14 +24,14 @@ if ($selectedCategory === '') {
 }
 
 $favoriteStmt = $pdo->prepare('
-    SELECT propiedad_id
+    SELECT property_id
     FROM propiedades_favoritas
     WHERE user_id = :user_id
 ');
 $favoriteStmt->execute([
     'user_id' => (int) $local['iduser'],
 ]);
-$favoriteIds = array_map('intval', array_column($favoriteStmt->fetchAll(PDO::FETCH_ASSOC), 'propiedad_id'));
+$favoriteIds = array_map('intval', array_column($favoriteStmt->fetchAll(PDO::FETCH_ASSOC), 'property_id'));
 $favoriteLookup = array_fill_keys($favoriteIds, true);
 
 $stmt = $pdo->prepare('
@@ -49,6 +49,9 @@ $properties = [];
 foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
     $characteristics = decodeJsonArray($row['caracteristicas_json'] ?? null);
     $match = calculatePropertyMatch($preferences, $characteristics);
+    error_log("MATCH: " . json_encode($match));
+    error_log("PREF: " . json_encode($preferences));
+    error_log("CHAR: " . json_encode($characteristics));
 
     if ($match['percentage'] < 50) {
         continue;

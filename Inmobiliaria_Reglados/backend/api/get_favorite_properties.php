@@ -11,15 +11,25 @@ handlePreflight();
 
 $context = requireAuthenticatedUser($pdo);
 $local = $context['local'];
-$preferences = decodeJsonArray($local['preferencias'] ?? null);
 
 $stmt = $pdo->prepare('
-    SELECT p.id, p.categoria, p.titulo, p.ubicacion_general, p.precio, p.metros_cuadrados, p.imagen_principal, p.caracteristicas_json, p.created_at
+    SELECT 
+        p.id,
+        p.categoria,
+        p.titulo,
+        p.ubicacion_general,
+        p.precio,
+        p.metros_cuadrados,
+        p.imagen_principal,
+        p.caracteristicas_json,
+        p.created_at,
+        pf.preferencias
     FROM propiedades_favoritas pf
-    INNER JOIN propiedades p ON p.id = pf.propiedad_id
+    INNER JOIN propiedades p ON p.id = pf.property_id
     WHERE pf.user_id = :user_id
     ORDER BY pf.created_at DESC
 ');
+
 $stmt->execute([
     'user_id' => (int) $local['iduser'],
 ]);
@@ -27,7 +37,12 @@ $stmt->execute([
 $favorites = [];
 
 foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+
     $characteristics = decodeJsonArray($row['caracteristicas_json'] ?? null);
+
+    // ⚡ preferencias con las que se guardó el favorito
+    $preferences = decodeJsonArray($row['preferencias'] ?? null);
+
     $match = calculatePropertyMatch($preferences, $characteristics);
 
     $favorites[] = [
@@ -39,10 +54,15 @@ foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
         'metros_cuadrados' => (int) $row['metros_cuadrados'],
         'imagen_principal' => $row['imagen_principal'],
         'image_url' => propertyImageUrl($row['imagen_principal'] ?? null),
+
         'match_percentage' => $match['percentage'],
         'match_count' => $match['matches'],
         'match_total' => $match['total'],
-        'is_favorite' => true,
+
+        // 🔥 ESTO LO NECESITA EL POPPER
+        'match_details' => $match['details'] ?? [],
+
+        'is_favorite' => true
     ];
 }
 

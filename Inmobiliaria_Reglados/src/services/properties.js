@@ -36,11 +36,11 @@ export async function fetchFavoriteProperties() {
   return (payload.properties || []).map(normalizeProperty);
 }
 
-export async function saveFavorite(propertyId) {
+export async function saveFavorite(data) {
   return backendJson("api/save-favorite.php", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ propiedad_id: propertyId }),
+    body: JSON.stringify(data),
   });
 }
 
@@ -48,6 +48,7 @@ export async function removeFavorite(propertyId) {
   return backendJson("api/remove-favorite.php", {
     method: "DELETE",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ propiedad_id: propertyId }),
+    body: JSON.stringify({ property_id: propertyId }),
   });
 }
+

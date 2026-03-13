@@ -10,9 +10,12 @@ handlePreflight();
 
 $context = requireAuthenticatedUser($pdo);
 $local = $context['local'];
+
 $payload = json_decode(file_get_contents('php://input'), true);
 
-$propertyId = (int) ($payload['propiedad_id'] ?? 0);
+$propertyId = (int) ($payload['property_id'] ?? 0);
+$categoria = $payload['categoria'] ?? null;
+$preferences = $payload['preferences'] ?? null;
 
 if ($propertyId <= 0) {
     respondJson(422, ['success' => false, 'message' => 'Propiedad no válida.']);
@@ -26,13 +29,19 @@ if (!$existsStmt->fetch()) {
 }
 
 $stmt = $pdo->prepare('
-    INSERT INTO propiedades_favoritas (user_id, propiedad_id)
-    VALUES (:user_id, :propiedad_id)
-    ON DUPLICATE KEY UPDATE created_at = CURRENT_TIMESTAMP
+    INSERT INTO propiedades_favoritas (user_id, property_id, categoria, preferencias)
+    VALUES (:user_id, :property_id, :categoria, :preferencias)
+    ON DUPLICATE KEY UPDATE 
+        categoria = VALUES(categoria),
+        preferencias = VALUES(preferencias),
+        created_at = CURRENT_TIMESTAMP
 ');
+
 $stmt->execute([
     'user_id' => (int) $local['iduser'],
-    'propiedad_id' => $propertyId,
+    'property_id' => $propertyId,
+    'categoria' => $categoria,
+    'preferencias' => $preferences ? json_encode($preferences) : null,
 ]);
 
 respondJson(200, [
