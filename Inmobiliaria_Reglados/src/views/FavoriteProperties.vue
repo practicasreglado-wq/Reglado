@@ -179,11 +179,11 @@ export default {
   const rect = event.currentTarget.getBoundingClientRect()
 
   const popperWidth = 280
-  const popperHeight = 420
+  const popperHeight = 480
   const margin = 30
 
   let x = rect.left + rect.width / 2
-  let y = rect.top + window.scrollY - popperHeight + 7
+  let y = rect.top + window.scrollY - popperHeight
 
   const viewportWidth = window.innerWidth
 
@@ -281,7 +281,7 @@ export default {
 .match-popper{
 
   position:absolute;
-  transform:translateX(-50%);
+  transform:translateX(-210%);
   width:280px;
   max-height:420px;
 
