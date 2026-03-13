@@ -151,6 +151,8 @@ import { computed, ref } from "vue";
 
 import companyEnergy from "../assets/company-energy.png";
 import companyEnProceso from "../assets/company-enproceso.png";
+import companyProceso from "../assets/company-proceso.png";
+import companyConsultores from "../assets/company-consultores.png";
 import companyMapas from "../assets/company-mapas.webp";
 import companyRealstate from "../assets/company-realstate.png";
 import balanceIcon from "../assets/Balance.svg";
@@ -183,7 +185,7 @@ const companies = [
     tag: "Abogados",
     description: "Consultoria estrategica y legal para operaciones, crecimiento y desarrollo empresarial.",
     href: "https://regladoconsultores.com/",
-    image: companyRealstate,
+    image: companyConsultores,
     logo: balanceIcon,
   },
   {
@@ -215,7 +217,7 @@ const companies = [
     tag: "Ingeniería",
     description: "Servicios integrales de ingeniería para el desarrollo y optimización de proyectos.",
     href: "#",
-    image: companyEnProceso,
+    image: companyProceso,
     logo: engineeringIcon,
   },
   {
@@ -223,7 +225,7 @@ const companies = [
     tag: "Arquitectura",
     description: "Diseño arquitectónico, urbanismo y ejecución de proyectos de construcción.",
     href: "#",
-    image: companyEnProceso,
+    image: companyProceso,
     logo: apartamentoIcon,
   },
 ];
