@@ -1,4 +1,4 @@
-﻿import { reactive } from "vue";
+import { reactive } from "vue";
 
 const API_BASE = import.meta.env.VITE_AUTH_API_URL || "http://localhost:8000";
 const TOKEN_KEY = "auth_token";
@@ -221,6 +221,14 @@ async function adminUsers() {
   });
 }
 
+async function adminUpdateRole(userId, role) {
+  return request("/auth/admin/update-role", {
+    method: "POST",
+    headers: authHeaders(),
+    body: JSON.stringify({ user_id: userId, role }),
+  });
+}
+
 async function logout() {
   try {
     if (state.token) {
@@ -250,6 +258,7 @@ export const auth = {
   requestPasswordReset,
   resetPassword,
   adminUsers,
+  adminUpdateRole,
   logout,
   translateMessage: translateAuthMessage,
 };

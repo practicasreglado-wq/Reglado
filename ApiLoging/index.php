@@ -86,6 +86,10 @@ if ($uri === '/auth/admin/users' && $method === 'GET') {
     AuthController::adminUsers();
 }
 
+if ($uri === '/auth/admin/update-role' && $method === 'POST') {
+    AuthController::adminUpdateRole();
+}
+
 if ($uri === '/auth/logout' && $method === 'POST') {
     AuthController::logout();
 }
