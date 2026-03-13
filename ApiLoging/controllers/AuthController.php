@@ -535,6 +535,36 @@ class AuthController
         Response::json(['users' => $users]);
     }
 
+    public static function adminUpdateRole(): void
+    {
+        self::requireAdmin();
+
+        $data = self::getJsonInput();
+        $userId = (int) ($data['user_id'] ?? 0);
+        $role = trim((string) ($data['role'] ?? ''));
+
+        if ($userId <= 0 || $role === '') {
+            Response::json(['error' => 'user_id and role are required'], 422);
+        }
+
+        if (!in_array($role, ['user', 'real', 'admin'])) {
+            Response::json(['error' => 'invalid role'], 422);
+        }
+
+        $targetUser = User::findById($userId);
+        if (!$targetUser) {
+            Response::json(['error' => 'user not found'], 404);
+        }
+
+        try {
+            User::updateRole($userId, $role);
+            SecurityLogger::log('admin_updated_user_role', $userId, ['new_role' => $role]);
+            Response::json(['message' => 'role updated']);
+        } catch (Throwable $e) {
+            Response::json(['error' => 'could not update role'], 500);
+        }
+    }
+
     public static function logout(): void
     {
         $token = AuthMiddleware::extractBearerToken();

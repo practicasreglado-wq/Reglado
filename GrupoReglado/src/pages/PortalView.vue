@@ -112,7 +112,18 @@
         <h2>Empresas Reglado</h2>
       </div>
 
-      <div class="company-grid">
+      <div class="carousel-wrapper">
+        <button class="carousel-btn btn-left" type="button" aria-label="Anterior" @click="scrollCarousel('left')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+        <button class="carousel-btn btn-right" type="button" aria-label="Siguiente" @click="scrollCarousel('right')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+        <div class="company-grid" ref="carouselGrid">
         <article v-for="company in companies" :key="company.name" class="company-card">
           <div class="company-image-wrap">
             <img class="company-image" :src="company.image" :alt="company.name" loading="lazy" />
@@ -128,6 +139,7 @@
             <a class="company-link" :href="company.href" target="_blank" rel="noreferrer">Entrar</a>
           </div>
         </article>
+        </div>
       </div>
     </section>
 
@@ -135,7 +147,7 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { computed, ref } from "vue";
 
 import companyEnergy from "../assets/company-energy.png";
 import companyEnProceso from "../assets/company-enproceso.png";
@@ -146,6 +158,9 @@ import boltIcon from "../assets/Bolt.svg";
 import heroVideo from "../assets/Bissness.mp4";
 import mapIcon from "../assets/Map.svg";
 import apartmentIcon from "../assets/Apartment.svg";
+import addHomeIcon from "../assets/add_home.svg";
+import engineeringIcon from "../assets/Enginering.svg";
+import apartamentoIcon from "../assets/apartamento.svg";
 import corporateLogo from "../assets/reglado-energy-logo.svg";
 
 const heroSubtitle =
@@ -164,8 +179,8 @@ const enProcesoUrl = import.meta.env.VITE_REGLADO_ENPROCESO_URL || "#";
 
 const companies = [
   {
-    name: "Reglado Consultores",
-    tag: "Consultores",
+    name: "Reglado Abogados",
+    tag: "Abogados",
     description: "Consultoria estrategica y legal para operaciones, crecimiento y desarrollo empresarial.",
     href: "https://regladoconsultores.com/",
     image: companyRealstate,
@@ -188,14 +203,39 @@ const companies = [
     logo: mapIcon,
   },
   {
-    name: "Reglado Realstate",
-    tag: "Realstate",
+    name: "Reglado Real Estate",
+    tag: "Real Estate",
     description: "Consultoria estrategica y legal enfocada a operaciones inmobiliarias.",
     href: realstateUrl,
     image: companyEnProceso,
-    logo: apartmentIcon,
+    logo: addHomeIcon,
+  },
+  {
+    name: "Reglado Ingeniería",
+    tag: "Ingeniería",
+    description: "Servicios integrales de ingeniería para el desarrollo y optimización de proyectos.",
+    href: "#",
+    image: companyEnProceso,
+    logo: engineeringIcon,
+  },
+  {
+    name: "Reglado Arquitectura",
+    tag: "Arquitectura",
+    description: "Diseño arquitectónico, urbanismo y ejecución de proyectos de construcción.",
+    href: "#",
+    image: companyEnProceso,
+    logo: apartamentoIcon,
   },
 ];
+
+const carouselGrid = ref(null);
+
+function scrollCarousel(direction) {
+  if (!carouselGrid.value) return;
+  // Desplazamiento de unos 360px (ancho tarjeta + gap aprox)
+  const offset = direction === 'left' ? -380 : 380;
+  carouselGrid.value.scrollBy({ left: offset, behavior: 'smooth' });
+}
 
 function scrollToCompanies() {
   const target = document.getElementById("empresas");
@@ -351,7 +391,7 @@ function scrollToCompanies() {
   align-items: center;
   justify-content: center;
   padding: 0.78rem 1.2rem;
-  border-radius: 12px;
+  border-radius: 20px;
   text-decoration: none;
   font-weight: 700;
   color: #fff;
@@ -564,7 +604,7 @@ function scrollToCompanies() {
 }
 
 .section-head {
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .section-head h2 {
@@ -573,13 +613,69 @@ function scrollToCompanies() {
   font-size: clamp(1.4rem, 3.2vw, 2rem);
 }
 
-.company-grid {
+.carousel-wrapper {
+  position: relative;
+  margin: 0 calc(-1 * clamp(1.2rem, 3vw, 1.8rem));
+  padding: 0 clamp(1.2rem, 3vw, 1.8rem) 1.5rem;
+}
+
+.carousel-btn {
+  position: absolute;
+  top: calc(50% - 1.5rem);
+  transform: translateY(-50%);
+  z-index: 10;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid #d8e0ed;
+  background: #ffffff;
+  color: #273d5c;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.8rem;
+  place-items: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 10px rgba(15, 32, 57, 0.15);
+}
+
+.btn-left {
+  left: 5px;
+}
+
+.btn-right {
+  right: 5px;
+}
+
+.carousel-btn:hover {
+  background: #f1f5fb;
+  border-color: #bcc9dd;
+  transform: translateY(-50%) scale(1.05);
+  box-shadow: 0 6px 14px rgba(15, 32, 57, 0.2);
+}
+
+.carousel-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.company-grid {
+  display: flex;
+  gap: 1.2rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;  /* IE and Edge */
+  padding-bottom: 1rem;
+}
+
+.company-grid::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }
 
 .company-card {
+  flex: 0 0 min(100%, 350px);
+  scroll-snap-align: start;
+  border: 1px solid #d7e0ee;
   border: 1px solid #d7e0ee;
   border-radius: 14px;
   background: #fff;
@@ -753,10 +849,6 @@ function scrollToCompanies() {
   .group-icons {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
-
-  .company-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
 }
 
 @media (max-width: 760px) {
@@ -785,19 +877,11 @@ function scrollToCompanies() {
     padding: 0.65rem 0.45rem;
     text-align: center;
   }
-
-  .company-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 @media (max-width: 520px) {
   .group-icons {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .company-grid {
-    grid-template-columns: 1fr;
   }
 
   .group-card strong {

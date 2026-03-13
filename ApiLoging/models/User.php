@@ -204,6 +204,13 @@ class User
         $stmt->execute([$username, $userId]);
     }
 
+    public static function updateRole(int $userId, string $role): void
+    {
+        $db = Database::connect();
+        $stmt = $db->prepare('UPDATE users SET role = ? WHERE id = ?');
+        $stmt->execute([$role, $userId]);
+    }
+
     public static function updateName(int $userId, string $firstName, string $lastName): void
     {
         $db = Database::connect();

@@ -1,13 +1,15 @@
 <template>
-  <header ref="headerRef" class="topbar" :class="{ 'topbar-scrolled': isScrolled }">
+  <header ref="headerRef" class="topbar" :class="{ 'topbar-scrolled': isScrolled || isInternalRoute }">
     <RouterLink class="brand-link" to="/" aria-label="Ir al inicio">
       <img :src="logoSrc" alt="Reglado Energy" class="brand-logo" />
       <span class="brand">Grupo Reglado</span>
     </RouterLink>
 
     <nav class="menu desktop-menu">
-      <a href="https://regladoconsultores.com/">Consultores</a>
+      <a href="https://regladoconsultores.com/">Abogados</a>
       <a :href="energyUrl">Energy</a>
+      <a href="#">Ingeniería</a>
+      <a href="#">Arquitectura</a>
       <a href="#">Mapas</a>
       <a :href="realstateUrl">Real Estate</a>
     </nav>
@@ -55,8 +57,10 @@
 
     <div v-if="mobileMenuOpen" class="mobile-menu" role="menu" aria-label="Menu principal">
       <nav class="mobile-nav">
-        <a href="https://regladoconsultores.com/" @click="closeMobileMenu">Consultores</a>
+        <a href="https://regladoconsultores.com/" @click="closeMobileMenu">Abogados</a>
         <a :href="energyUrl" @click="closeMobileMenu">Energy</a>
+        <a href="#" @click="closeMobileMenu">Ingeniería</a>
+        <a href="#" @click="closeMobileMenu">Arquitectura</a>
         <a href="#" @click="closeMobileMenu">Mapas</a>
         <a :href="realstateUrl" @click="closeMobileMenu">Real Estate</a>
       </nav>
@@ -78,7 +82,7 @@
 
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
-import { RouterLink, useRouter } from "vue-router";
+import { RouterLink, useRouter, useRoute } from "vue-router";
 import adminUserIcon from "../assets/admin-user-icon.svg";
 import menuIcon from "../assets/menu.svg";
 import logoSrc from "../assets/reglado-energy-logo.svg";
@@ -92,6 +96,7 @@ const props = defineProps({
 
 const emit = defineEmits(["open-login", "logout"]);
 const router = useRouter();
+const route = useRoute();
 const realstateUrl = import.meta.env.VITE_REGLADO_REALSTATE_URL || "#";
 const energyUrl = import.meta.env.VITE_REGLADO_ENERGY_URL || "http://localhost:5174";
 
@@ -100,6 +105,7 @@ const mobileMenuOpen = ref(false);
 const headerRef = ref(null);
 const isScrolled = ref(false);
 const isAdmin = computed(() => props.user?.role === "admin");
+const isInternalRoute = computed(() => route.path !== '/');
 
 const displayUsername = computed(() => {
   const username = props.user?.username;
