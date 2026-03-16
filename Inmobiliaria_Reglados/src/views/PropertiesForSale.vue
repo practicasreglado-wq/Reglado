@@ -209,10 +209,60 @@ export default {
   gap: 22px;
 }
 
+/* =========================================
+   RESPONSIVE (1440px / 768px / 480px)
+   ========================================= */
+
+@media (max-width: 1440px) {
+  .properties-sale__hero {
+    padding: 24px;
+    gap: 16px;
+  }
+  .properties-sale__hero h2 {
+    font-size: 1.8rem;
+  }
+}
+
 @media (max-width: 768px) {
+  .properties-sale {
+    gap: 20px;
+  }
   .properties-sale__hero {
     flex-direction: column;
     padding: 22px;
+    align-items: flex-start;
+  }
+  .hero-badge span {
+    padding: 10px 18px;
+    font-size: 0.95rem;
+  }
+  .properties-sale__grid {
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .properties-sale__hero {
+    padding: 16px;
+  }
+  .properties-sale__hero h2 {
+    font-size: 1.5rem;
+  }
+  .properties-sale__hero p:last-child {
+    font-size: 0.9rem;
+  }
+  .hero-badge span {
+    padding: 8px 14px;
+    font-size: 0.85rem;
+  }
+  .properties-sale__state {
+    padding: 18px;
+    font-size: 0.9rem;
+  }
+  .properties-sale__grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
   }
 }
 </style>

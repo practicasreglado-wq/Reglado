@@ -16,7 +16,13 @@
 
         <li v-if="user">
           <button class="catalog-btn" @click="goToCatalog">
-            Búsqueda por catálogo
+            <span class="catalog-text">Búsqueda por catálogo</span>
+            <svg class="catalog-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="7"></rect>
+              <rect x="14" y="3" width="7" height="7"></rect>
+              <rect x="14" y="14" width="7" height="7"></rect>
+              <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
           </button>
         </li>
 
@@ -144,6 +150,14 @@ nav a:hover,
   cursor: pointer;
   padding: 10px 22px;
   color: var(--negro);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.catalog-icon {
+  display: block;
 }
 
 .bienvenido {
@@ -193,8 +207,12 @@ nav a.router-link-exact-active {
   }
 
   .catalog-btn {
-    padding: 8px 16px;
+    padding: 8px;
     font-size: 0.9rem;
+  }
+
+  .catalog-icon {
+    display: block;
   }
 
   .bienvenido {
@@ -225,10 +243,12 @@ nav a.router-link-exact-active {
   }
 
   .catalog-btn {
-    padding: 6px 10px;
-    font-size: 0.8rem;
+    padding: 6px;
   }
 
+  .catalog-text {
+    display: none;
+  }
   .bienvenido {
     font-size: 0.9rem;
   }

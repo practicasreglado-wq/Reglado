@@ -194,17 +194,76 @@ export default {
 }
 
 @media (max-width: 768px) {
-  .panel-header,
+  .preference-panel {
+    padding: 20px;
+  }
+
+  .panel-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .panel-header h3 {
+    font-size: 1.4rem;
+  }
+
   .preference-item {
     flex-direction: column;
+    gap: 4px;
+    padding: 12px;
   }
 
   .preference-value {
     text-align: left;
+    font-size: 0.95rem;
   }
 
   .preference-item:hover {
     transform: translateY(-2px);
+  }
+}
+
+@media (max-width: 480px) {
+  .preference-panel {
+    padding: 16px;
+    border-radius: 16px;
+  }
+
+  .panel-kicker {
+    font-size: 0.8rem;
+  }
+
+  .panel-header h3 {
+    font-size: 1.2rem;
+  }
+
+  .panel-count {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+  }
+
+  .preference-list {
+    gap: 10px;
+  }
+
+  .preference-item {
+    padding: 10px;
+    border-radius: 12px;
+  }
+
+  .preference-label {
+    font-size: 0.85rem;
+  }
+
+  .preference-value {
+    font-size: 0.9rem;
+  }
+
+  .toggle-button {
+    width: 100%;
+    font-size: 0.9rem;
+    padding: 8px 14px;
   }
 }
 </style>

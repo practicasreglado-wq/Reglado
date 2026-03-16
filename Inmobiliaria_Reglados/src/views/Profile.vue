@@ -10,7 +10,6 @@
 
 <div class="hero-left">
 <h2>Hola {{ user.nombre_usuario }}</h2>
-<p>Bienvenido a tu panel de perfil</p>
 </div>
 </div>
 <h3>Menú de perfil</h3>
@@ -81,8 +80,10 @@ stroke-width="1.8"
 stroke-linejoin="round"/>
 </svg>
 </div>
+<div class="dashboard-card-info">
 <h4>Favoritos</h4>
 <p>Propiedades que has guardado</p>
+</div>
 </router-link>
 
 <router-link to="/profile/my-properties-for-sale" class="dashboard-card">
@@ -92,8 +93,24 @@ stroke-linejoin="round"/>
 <path d="M5 10V20H19V10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
 </svg>
 </div>
+<div class="dashboard-card-info">
 <h4>Mis propiedades</h4>
 <p>Gestiona tus anuncios</p>
+</div>
+</router-link>
+
+<router-link to="/profile/search-history" class="dashboard-card">
+<div class="card-icon">
+<svg viewBox="0 0 24 24" width="28" height="28" fill="none">
+<circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8" />
+<path d="M20 20l-4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+<path d="M11 8v3l2.5 2.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+</svg>
+</div>
+<div class="dashboard-card-info">
+<h4>Historial de búsquedas</h4>
+<p>Revisa tus búsquedas anteriores</p>
+</div>
 </router-link>
 
 </div>
@@ -353,8 +370,7 @@ display:flex;
 justify-content:space-between;
 align-items:center;
 color:white;
-padding:30px;
-border-radius:15px;
+padding:30px 30px 0px;
 }
 
 .hero-left h2{
@@ -507,24 +523,48 @@ flex-direction:column;
 }
 
 .profile-content{
-padding-top:80px;
+padding-top:50px;
+}
+
+.dashboard-grid {
+grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+gap: 16px;
+}
+
+.dashboard-card {
+padding: 20px;
+}
+
+.dashboard-card h4 {
+font-size: 1.2rem;
+}
+
+.save-search-btn {
+padding: 10px 18px;
+font-size: 0.95rem;
+}
+
+.no-pref {
+padding: 20px;
 }
 
 }
 
-@media (max-width: 400px){
+@media (max-width: 480px){
 
 .profile-content{
-margin-top: 70px;
+margin-top: 65px;
 padding:15px;
 }
 
 .menu-toggle{
+top: 65px;
 font-size: 1rem;
 padding: 8px 12px;
 }
 
 .sidebar{
+margin-top: 65px;
 width: 200px;
 padding: 15px;
 }
@@ -545,7 +585,7 @@ padding: 6px;
 }
 
 .profile-content{
-padding: 15px;
+padding: 40px 15px;
 }
 
 .profile-hero{
@@ -553,5 +593,63 @@ flex-direction:column;
 text-align:center;
 gap: 15px;
 }
+
+.dashboard-grid {
+grid-template-columns: 1fr;
+gap: 10px;
+margin-bottom: 24px;
+margin-top: 24px;
+}
+
+.dashboard-card {
+padding: 16px;
+display: flex;
+align-items: center;
+gap: 14px;
+}
+
+.card-icon {
+width: 30px;
+height: 30px;
+margin-bottom: 0;
+flex-shrink: 0;
+}
+
+.card-icon svg {
+width: 22px;
+height: 22px;
+}
+
+.dashboard-card h4 {
+font-size: 1.05rem;
+margin: 0;
+}
+
+.dashboard-card p {
+font-size: 0.8rem;
+margin: 2px 0 0;
+}
+
+.dashboard-card-info {
+display: flex;
+flex-direction: column;
+}
+
+.save-search-btn {
+padding: 9px 16px;
+font-size: 0.9rem;
+width: 100%;
+text-align: center;
+}
+
+.save-search-message {
+font-size: 0.85rem;
+}
+
+.no-pref {
+padding: 15px;
+font-size: 0.9rem;
+}
+
 }
 </style>

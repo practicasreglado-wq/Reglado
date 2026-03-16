@@ -69,10 +69,10 @@ export default {
     );
 
     const visibleEntries = computed(() =>
-      expanded.value ? entries.value : entries.value.slice(0, 5)
+      expanded.value ? entries.value : entries.value.slice(0, 3)
     );
 
-    const hiddenEntries = computed(() => entries.value.slice(5));
+    const hiddenEntries = computed(() => entries.value.slice(3));
 
     const formattedDate = computed(() => {
       if (!props.item.created_at) {

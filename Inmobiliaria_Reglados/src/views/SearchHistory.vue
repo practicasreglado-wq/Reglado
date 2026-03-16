@@ -165,9 +165,55 @@ export default {
   color: #9f2d2d;
 }
 
+/* =========================================
+   RESPONSIVE (1440px / 768px / 480px)
+   ========================================= */
+
+@media (max-width: 1440px) {
+  .history-header {
+    gap: 16px;
+    padding: 22px 24px;
+  }
+  .history-header h2 {
+    font-size: 1.8rem;
+  }
+}
+
 @media (max-width: 768px) {
+  .history-view {
+    gap: 20px;
+  }
   .history-header {
     flex-direction: column;
+    align-items: flex-start;
+    padding: 20px;
+  }
+  .history-header h2 {
+    font-size: 1.6rem;
+  }
+  .history-counter {
+    padding: 8px 14px;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .history-header {
+    padding: 16px;
+  }
+  .history-header h2 {
+    font-size: 1.5rem;
+  }
+  .history-kicker {
+    font-size: 0.72rem;
+  }
+  .history-counter {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+  }
+  .history-state {
+    padding: 18px;
+    font-size: 0.9rem;
   }
 }
 </style>

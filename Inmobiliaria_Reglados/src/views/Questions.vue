@@ -34,9 +34,9 @@
 <script>
 import { useUserStore } from "../stores/user";
 import { useRouter, useRoute } from "vue-router";
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import { backendJson } from "../services/backend";
-import { sanitizePreferences } from "../data/preferenceSchemas";
+import { getPreferenceSchema, sanitizePreferences } from "../data/preferenceSchemas";
 import HotelesForm from "../components/HotelesForm.vue";
 import ParkingForm from "../components/ParkingForm.vue";
 import EdificiosForm from "../components/EdificiosForm.vue";
@@ -46,19 +46,25 @@ import ActivosForm from "../components/ActivosForm.vue";
 export default {
 
 setup(){
+const userStore = useUserStore();
+const router = useRouter();
+const route = useRoute();
 
-const userStore = useUserStore()
-const router = useRouter()
-const route = useRoute()
+const rawCategory = route.query.category || userStore.selectedCategory;
+const schemaKeys = ["Hoteles", "Fincas", "Parking", "Edificios", "Activos"];
+const foundKey = schemaKeys.find(k => k.toLowerCase() === (rawCategory || "").toLowerCase());
+const category = ref(foundKey || rawCategory);
 
-const category = ref(route.query.category || userStore.selectedCategory)
+// Initialize form with ALL keys from schema as empty strings
+const schema = getPreferenceSchema(category.value);
+const initialData = sanitizePreferences(category.value, userStore.preferences || {});
+const form = ref({});
 
-const form = ref(
-sanitizePreferences(
-  category.value,
-  userStore.preferences ? { ...userStore.preferences } : {}
-)
-)
+if (schema) {
+  schema.questions.forEach(q => {
+    form.value[q.key] = initialData[q.key] || "";
+  });
+}
 
 const forms={
 Hoteles:HotelesForm,
@@ -73,9 +79,21 @@ return forms[category.value]
 })
 
 const submit = async()=>{
-const cleanedPreferences = sanitizePreferences(category.value, form.value)
+  const currentSchema = getPreferenceSchema(category.value);
+  if (!currentSchema) return;
 
-await backendJson("save_preferences.php", {
+  // Use the form value object Directly for the check
+  const answers = Object.entries(form.value)
+    .filter(([key, val]) => key.startsWith('q') && val !== "")
+    .length;
+
+  if (answers < currentSchema.questions.length) {
+    alert("Por favor, asegúrese de responder todas las preguntas.");
+    return;
+  }
+
+  const cleanedPreferences = sanitizePreferences(category.value, form.value);
+  await backendJson("save_preferences.php", {
 method:"POST",
 headers:{ "Content-Type":"application/json"},
 body:JSON.stringify({
@@ -115,7 +133,7 @@ return{category,form,currentForm,submit}
   background-position: center;
   display: flex;
   align-items: center;
-  padding: 80px;
+  padding: 40px 60px;
   color: white;
 }
 
@@ -160,18 +178,16 @@ return{category,form,currentForm,submit}
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 60px;
+  padding: 40px 60px;
 }
 
 .category-form {
   background: rgba(255, 255, 255, 0.95);
-  padding: 30px 50px;
+  padding: 30px 40px;
   border-radius: 15px;
   width: 100%;
   max-width: 650px;
   box-shadow: 0 10px 40px rgba(0,0,0,0.35);
-  max-height: 85vh;
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
 }
@@ -184,8 +200,29 @@ return{category,form,currentForm,submit}
 
 /* 👇 ESTOS SON LOS QUE VIENEN DE LOS COMPONENTES HIJOS */
 
+/* Estilos para el scrollbar interno heredados del diseño global */
 .category-form :deep(.section) {
   margin-bottom: 25px;
+  max-height: 580px;
+  overflow-y: auto;
+  padding-right: 15px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--azul-principal) transparent;
+}
+
+.category-form :deep(.section)::-webkit-scrollbar {
+  width: 10px;
+}
+
+.category-form :deep(.section)::-webkit-scrollbar-track {
+  background: rgba(232, 232, 232, 0.1);
+  border-radius: 10px;
+}
+
+.category-form :deep(.section)::-webkit-scrollbar-thumb {
+  background-color: var(--azul-principal);
+  border-radius: 10px;
+  border: 2px solid var(--gris-claro);
 }
 
 .category-form :deep(.options) {
@@ -371,16 +408,44 @@ QUESTIONS - LAPTOPS
 }
 
 .right-side{
-  padding: 20px;
+  padding: 8px;
 }
 
 .category-form{
-  padding: 22px;
+  padding: 4px;
+  scrollbar-width: none; /* Firefox */
+}
+
+.category-form::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Edge */
 }
 
 .category-form :deep(.options){
   flex-direction: column;
   gap: 10px;
+}
+
+.category-form :deep(.section) {
+  max-height: 450px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--azul-principal) transparent;
+}
+
+.category-form :deep(.section)::-webkit-scrollbar {
+  display: block;
+  width: 6px;
+}
+
+.category-form :deep(.section)::-webkit-scrollbar-track {
+  background: rgba(232, 232, 232, 0.1);
+  border-radius: 10px;
+}
+
+.category-form :deep(.section)::-webkit-scrollbar-thumb {
+  background-color: var(--azul-principal);
+  border-radius: 10px;
+  border: 1px solid var(--gris-claro);
 }
 
 .submit-btn{

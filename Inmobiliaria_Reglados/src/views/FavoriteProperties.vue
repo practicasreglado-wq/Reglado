@@ -168,6 +168,61 @@ export default {
   gap:22px;
 }
 
+/* =========================================
+   RESPONSIVE (1440px / 768px / 480px)
+   ========================================= */
+
+@media (max-width: 1440px) {
+  .favorites-view__header {
+    gap: 16px;
+  }
+  .favorites-view__header h2 {
+    font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .favorites-view {
+    gap: 20px;
+  }
+  .favorites-view__header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .favorites-view__header h2 {
+    font-size: 1.6rem;
+  }
+  .favorites-count {
+    padding: 8px 14px;
+    font-size: 0.95rem;
+  }
+  .favorites-view__grid {
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .favorites-view__header h2 {
+    font-size: 1.5rem;
+  }
+  .eyebrow {
+    font-size: 0.72rem;
+  }
+  .favorites-count {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+  }
+  .favorites-view__state {
+    padding: 18px;
+    font-size: 0.9rem;
+  }
+  .favorites-view__grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+}
+
 </style>
 
 
