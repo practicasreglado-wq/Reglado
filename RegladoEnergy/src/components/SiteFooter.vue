@@ -29,8 +29,8 @@
         <div class="title">Contacto</div>
         <div class="small">
           <br>
-          <div><strong>Tel:</strong> +34 XXX XXX XXX</div>
-          <div><strong>Email:</strong> contacto@regladoenergy.com</div>
+          <div><strong>Teléfono:</strong> +34 911462674</div>
+          <div><strong>Email:</strong> info@regladoconsultores.com</div>
         </div>
       </div>
     </div>
