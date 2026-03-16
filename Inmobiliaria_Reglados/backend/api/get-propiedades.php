@@ -70,6 +70,7 @@ foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
         'match_percentage' => $match['percentage'],
         'match_count' => $match['matches'],
         'match_total' => $match['total'],
+        'match_details' => $match['details'] ?? [],
         'is_favorite' => isset($favoriteLookup[(int) $row['id']]),
         'created_at' => $row['created_at'],
     ];
