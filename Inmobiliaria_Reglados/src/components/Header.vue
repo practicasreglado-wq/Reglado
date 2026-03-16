@@ -28,11 +28,16 @@
 
         <li v-if="user" class="profile-nav-item">
           <!-- Icono especial para ADMIN -->
-          <div v-if="isAdmin" class="admin-badge" title="Administrador">
+          <router-link 
+            v-if="isAdmin" 
+            to="/admin/properties" 
+            class="admin-badge" 
+            title="Panel de administración"
+          >
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5">
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-          </div>
+          </router-link>
           <router-link to="/profile" class="bienvenido">
             <div class="user-avatar">
               <span>{{ getInitials() }}</span>
@@ -138,6 +143,19 @@ header .logo h1 {
   border: 1px solid rgba(189, 155, 44, 0.3);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   margin-right: 15px;
+  transition: all 0.3s ease;
+}
+
+.admin-badge:hover,
+.admin-badge.router-link-active {
+  color: var(--azul-secundario);
+  border-color: var(--azul-secundario);
+  background: rgba(74, 114, 198, 0.08);
+  box-shadow: 0 0 18px rgba(74, 114, 198, 0.4), 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.admin-badge:hover {
+  transform: translateY(-2px);
 }
 
 .admin-badge svg {

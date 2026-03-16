@@ -51,6 +51,12 @@ const routes = [
   { path: "/give-info", component: GiveInfo },
   { path: "/contribute-assets", component: ContributeAssets, meta: { requiresAuth: true, requiresReal: true } },
   { path: "/restricted", component: RestrictedAccessView, meta: { requiresAuth: true } },
+  { 
+    path: "/admin/properties", 
+    component: () => import("../views/AdminPropertiesView.vue"), 
+    meta: { requiresAuth: true, requiresAdmin: true } 
+  },
+  { path: "/admin/restricted", component: () => import("../views/RestrictedAdminView.vue"), meta: { requiresAuth: true } },
 ];
 
 const router = createRouter({
@@ -77,6 +83,12 @@ router.beforeEach((to, from, next) => {
 
   if (to.meta.requiresAuth && !userStore.isLoggedIn) {
     next("/login");
+    return;
+  }
+
+  // Admin based protection
+  if (to.meta.requiresAdmin && !userStore.isAdmin) {
+    next("/admin/restricted");
     return;
   }
 
