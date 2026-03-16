@@ -5,9 +5,17 @@
         <p class="admin-kicker">Administración</p>
         <h1>Usuarios registrados</h1>
       </div>
-      <button class="btn-primary" type="button" @click="loadUsers" :disabled="loading">
-        {{ loading ? "Cargando..." : "Actualizar" }}
-      </button>
+      <div class="admin-actions">
+        <input 
+          type="text" 
+          v-model="searchQuery" 
+          placeholder="Buscar por ID, usuario o email..." 
+          class="admin-search input"
+        />
+        <button class="btn-primary" type="button" @click="loadUsers" :disabled="loading">
+          {{ loading ? "Cargando..." : "Actualizar" }}
+        </button>
+      </div>
     </div>
 
     <p v-if="error" class="feedback error">{{ error }}</p>
@@ -27,7 +35,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="user in users" :key="user.id">
+          <tr v-for="user in filteredUsers" :key="user.id">
             <td>{{ user.id }}</td>
             <td>{{ user.username || "-" }}</td>
             <td>{{ formatName(user) }}</td>
@@ -47,8 +55,10 @@
             <td>{{ user.is_email_verified ? "Sí" : "No" }}</td>
             <td>{{ formatDate(user.created_at) }}</td>
           </tr>
-          <tr v-if="!loading && users.length === 0">
-            <td colspan="8" class="empty-state">No hay usuarios para mostrar.</td>
+          <tr v-if="!loading && filteredUsers.length === 0">
+            <td colspan="8" class="empty-state">
+              {{ searchQuery ? "No se encontraron usuarios para tu búsqueda." : "No hay usuarios para mostrar." }}
+            </td>
           </tr>
         </tbody>
       </table>
@@ -66,17 +76,29 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, ref, nextTick } from "vue";
+import { computed, onMounted, onUnmounted, ref, nextTick } from "vue";
 import { useRouter } from "vue-router";
 import { auth } from "../services/auth";
 
 const router = useRouter();
 const users = ref([]);
+const searchQuery = ref("");
 const loading = ref(false);
 const error = ref("");
 const openDropdownId = ref(null);
 const activeRole = ref("");
 const dropdownStyle = ref({});
+
+const filteredUsers = computed(() => {
+  const query = searchQuery.value.toLowerCase().trim();
+  if (!query) return users.value;
+  return users.value.filter(user => {
+    const idMatch = String(user.id).includes(query);
+    const usernameMatch = user.username && user.username.toLowerCase().includes(query);
+    const emailMatch = user.email && user.email.toLowerCase().includes(query);
+    return idMatch || usernameMatch || emailMatch;
+  });
+});
 
 function getRoleName(role) {
   if (role === "admin") return "Administrador";
@@ -248,6 +270,36 @@ onUnmounted(() => {
   align-items: end;
   justify-content: space-between;
   gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.admin-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.admin-search {
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #d8e0ed;
+  background: #fff;
+  color: #273d5c;
+  font-family: inherit;
+  font-size: 0.9rem;
+  width: 250px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.admin-search:focus {
+  border-color: #7b96b9;
+  box-shadow: 0 0 0 3px rgba(123, 150, 185, 0.15);
+}
+
+.admin-search::placeholder {
+  color: #8fa0b5;
 }
 
 .admin-kicker {

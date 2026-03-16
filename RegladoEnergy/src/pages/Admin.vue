@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <section class="section">
     <div class="container">
       <div class="card soft glow">
@@ -11,13 +11,21 @@
             </p>
           </div>
 
-          <div class="actions">
-            <button class="btn ghost" @click="loadRows" :disabled="loading">
-              {{ loading ? "Cargando..." : "Actualizar" }}
-            </button>
-            <button class="btn primary" @click="downloadSelected" :disabled="downloading || selectedIds.length === 0">
-              {{ downloading ? "Preparando ZIP..." : `Descargar seleccionados (${selectedIds.length})` }}
-            </button>
+          <div class="header-actions">
+            <!-- Izquierda: Botón de descargas -->
+            <div class="actions-left">
+              <button class="btn primary" @click="downloadSelected" :disabled="downloading || selectedIds.length === 0">
+                {{ downloading ? "Preparando ZIP..." : `Descargar seleccionados (${selectedIds.length})` }}
+              </button>
+            </div>
+
+            <!-- Derecha: Buscador y Actualizar -->
+            <div class="actions-right">
+              <input type="text" v-model="searchQuery" placeholder="Buscar por nombre o email..." class="search-input" />
+              <button class="btn ghost" @click="loadRows" :disabled="loading">
+                {{ loading ? "Cargando..." : "Actualizar" }}
+              </button>
+            </div>
           </div>
         </div>
 
@@ -34,12 +42,8 @@
             <thead>
               <tr>
                 <th class="col-check">
-                  <input
-                    type="checkbox"
-                    :checked="isAllSelected"
-                    :disabled="rows.length === 0"
-                    @change="toggleSelectAll($event.target.checked)"
-                  />
+                  <input type="checkbox" :checked="isAllSelected" :disabled="filteredRows.length === 0"
+                    @change="toggleSelectAll($event.target.checked)" />
                 </th>
                 <th>Fecha</th>
                 <th>Nombre</th>
@@ -50,10 +54,12 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-if="!loading && rows.length === 0">
-                <td colspan="7" class="empty">No hay solicitudes todavía.</td>
+              <tr v-if="!loading && filteredRows.length === 0">
+                <td colspan="7" class="empty">
+                  {{ searchQuery ? "No se encontraron resultados para tu búsqueda." : "No hay solicitudes todavía." }}
+                </td>
               </tr>
-              <tr v-for="row in rows" :key="row.id">
+              <tr v-for="row in filteredRows" :key="row.id">
                 <td class="col-check">
                   <input type="checkbox" :value="row.id" v-model="selectedIds" />
                 </td>
@@ -91,9 +97,20 @@ const loading = ref(false);
 const downloading = ref(false);
 const errorMsg = ref("");
 const successMsg = ref("");
+const searchQuery = ref("");
 const isAdmin = computed(() => auth.state.user?.role === "admin");
 
-const isAllSelected = computed(() => rows.value.length > 0 && rows.value.every((row) => selectedIds.value.includes(row.id)));
+const filteredRows = computed(() => {
+  const query = searchQuery.value.toLowerCase().trim();
+  if (!query) return rows.value;
+  return rows.value.filter(row => {
+    const nameMatch = row.nombre && row.nombre.toLowerCase().includes(query);
+    const emailMatch = row.email && row.email.toLowerCase().includes(query);
+    return nameMatch || emailMatch;
+  });
+});
+
+const isAllSelected = computed(() => filteredRows.value.length > 0 && filteredRows.value.every((row) => selectedIds.value.includes(row.id)));
 
 function formatDate(value) {
   const date = new Date(value);
@@ -139,7 +156,7 @@ async function loadRows() {
 
 function toggleSelectAll(checked) {
   if (checked) {
-    selectedIds.value = rows.value.map((row) => row.id);
+    selectedIds.value = filteredRows.value.map((row) => row.id);
   } else {
     selectedIds.value = [];
   }
@@ -232,10 +249,47 @@ onMounted(() => {
   font-weight: 700;
 }
 
-.actions {
+.header-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-top: 10px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.actions-left {
+  display: flex;
+}
+
+.actions-right {
   display: flex;
   gap: 10px;
-  flex-wrap: wrap;
+  align-items: center;
+  margin-left: auto;
+}
+
+.search-input {
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.2);
+  color: var(--text-base);
+  font-family: inherit;
+  font-size: 14px;
+  width: 250px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.search-input:focus {
+  border-color: rgba(91, 192, 110, 0.5);
+  box-shadow: 0 0 0 2px rgba(91, 192, 110, 0.2);
+}
+
+.search-input::placeholder {
+  color: rgba(233, 238, 246, 0.4);
 }
 
 .table-wrap {
@@ -319,4 +373,3 @@ onMounted(() => {
   color: #ffd3d3;
 }
 </style>
-
