@@ -133,7 +133,6 @@ export default {
           isRouteLoading.value = false;
         });
       });
-
       try {
         await userStore.initializeSession();
       } catch (err) {

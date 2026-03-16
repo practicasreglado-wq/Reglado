@@ -14,7 +14,7 @@
           </button>
         </li>
 
-        <li v-if="user">
+        <li v-if="isReal">
           <button class="catalog-btn" @click="goToCatalog">
             <span class="catalog-text">Búsqueda por catálogo</span>
             <svg class="catalog-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -26,7 +26,13 @@
           </button>
         </li>
 
-        <li v-if="user">
+        <li v-if="user" class="profile-nav-item">
+          <!-- Icono especial para ADMIN -->
+          <div v-if="isAdmin" class="admin-badge" title="Administrador">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
           <router-link to="/profile" class="bienvenido">
             <div class="user-avatar">
               <span>{{ getInitials() }}</span>
@@ -49,7 +55,7 @@ export default {
   setup() {
     const userStore = useUserStore();
     const router = useRouter();
-    const { user } = storeToRefs(userStore);
+    const { user, isAdmin, isReal } = storeToRefs(userStore);
 
     const goToCatalog = () => {
       router.push("/dashboard");
@@ -67,6 +73,8 @@ export default {
 
     return {
       user,
+      isAdmin,
+      isReal,
       goToCatalog,
       goToLogin,
       getInitials,
@@ -110,6 +118,36 @@ header .logo h1 {
   background-clip: text;
   -webkit-text-fill-color: transparent;
   text-shadow: 0 2px 3px rgba(186, 129, 15, 0.532);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-badge {
+  color: #bd9b2c;
+  background: rgba(189, 155, 44, 0.1);
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(189, 155, 44, 0.3);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-right: 15px;
+}
+
+.admin-badge svg {
+  width: 26px;
+  height: 26px;
+}
+
+.profile-nav-item {
+  display: flex;
+  align-items: center;
 }
 
 .logo-text {

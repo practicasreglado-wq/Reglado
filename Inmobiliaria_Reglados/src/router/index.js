@@ -20,6 +20,7 @@ import SearchHistory from "../views/SearchHistory.vue";
 import ForgotPassword from "../views/ForgotPassword.vue";
 import ResetPassword from "../views/ResetPassword.vue";
 import AuthCallback from "../views/AuthCallback.vue";
+import RestrictedAccessView from "../views/RestrictedAccessView.vue";
 
 const routes = [
   { path: "/", component: Home },
@@ -28,27 +29,28 @@ const routes = [
   { path: "/auth/callback", component: AuthCallback },
   { path: "/forgot-password", component: ForgotPassword },
   { path: "/reset-password", component: ResetPassword },
-  { path: "/dashboard", component: Dashboard, meta: { requiresAuth: true } },
+  { path: "/dashboard", component: Dashboard, meta: { requiresAuth: true, requiresReal: true } },
   {
     path: "/profile",
     component: UserProfile,
     meta: { requiresAuth: true },
     children: [
       { path: "", redirect: "/profile/properties-for-sale" },
-      { path: "favorite-properties", component: FavoriteProperties },
       { path: "properties-for-sale", component: PropertiesForSale },
-      { path: "search-history", component: SearchHistory },
+      { path: "favorite-properties", component: FavoriteProperties, meta: { requiresReal: true } },
+      { path: "search-history", component: SearchHistory, meta: { requiresReal: true } },
       { path: "my-properties-for-sale", component: MyPropertiesForSale },
-      { path: "create-property", component: CreateProperty },
+      { path: "create-property", component: CreateProperty, meta: { requiresReal: true } },
     ],
   },
-  { path: "/questions", component: Questions, meta: { requiresAuth: true } },
+  { path: "/questions", component: Questions, meta: { requiresAuth: true, requiresReal: true } },
   { path: "/about-us", component: AboutUs },
   { path: "/contacto", component: Contacto },
   { path: "/metodologia", component: Metodologia },
   { path: "/team", component: Team },
   { path: "/give-info", component: GiveInfo },
-  { path: "/contribute-assets", component: ContributeAssets, meta: { requiresAuth: true } },
+  { path: "/contribute-assets", component: ContributeAssets, meta: { requiresAuth: true, requiresReal: true } },
+  { path: "/restricted", component: RestrictedAccessView, meta: { requiresAuth: true } },
 ];
 
 const router = createRouter({
@@ -75,6 +77,12 @@ router.beforeEach((to, from, next) => {
 
   if (to.meta.requiresAuth && !userStore.isLoggedIn) {
     next("/login");
+    return;
+  }
+
+  // Role based protection
+  if (to.meta.requiresReal && !userStore.isReal) {
+    next("/restricted");
     return;
   }
 

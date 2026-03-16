@@ -19,6 +19,7 @@ $user = [
     'telefono' => $auth['phone'] ?? '',
     'nombre_usuario' => $auth['username'] ?? '',
     'categoria' => $local['categoria'] ?? null,
+    'rol' => $auth['role'] ?? 'user',
     'preferencias' => !empty($local['preferencias']) ? json_decode((string) $local['preferencias'], true) : null,
 ];
 

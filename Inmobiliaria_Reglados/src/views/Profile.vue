@@ -15,35 +15,35 @@
 <h3>Menú de perfil</h3>
 
 <ul>
-<li>
-  <router-link to="/profile/properties-for-sale" @click="menuOpen = false">
-    Inicio
-  </router-link>
-</li>
+      <li>
+        <router-link to="/profile/properties-for-sale" @click="menuOpen = false">
+          Inicio
+        </router-link>
+      </li>
 
-<li>
-  <router-link to="/profile/favorite-properties" @click="menuOpen = false">
-    Mis propiedades favoritas
-  </router-link>
-</li>
+      <li v-if="isReal">
+        <router-link to="/profile/favorite-properties" @click="menuOpen = false">
+          Mis propiedades favoritas
+        </router-link>
+      </li>
 
-<li>
-  <router-link to="/profile/search-history" @click="menuOpen = false">
-    Historial de búsquedas
-  </router-link>
-</li>
+      <li v-if="isReal">
+        <router-link to="/profile/search-history" @click="menuOpen = false">
+          Historial de búsquedas
+        </router-link>
+      </li>
 
-<li>
-  <router-link to="/profile/my-properties-for-sale" @click="menuOpen = false">
-    Mis propiedades
-  </router-link>
-</li>
+      <li>
+        <router-link to="/profile/my-properties-for-sale" @click="menuOpen = false">
+          Mis propiedades
+        </router-link>
+      </li>
 
-<li>
-  <button class="sidebar-link" type="button" @click="goToSettings(); menuOpen = false">
-    Configuración
-  </button>
-</li>
+      <li>
+        <button class="sidebar-link" type="button" @click="goToSettings(); menuOpen = false">
+          Configuración
+        </button>
+      </li>
 </ul>
 
 <div v-if="user" class="logout-item">
@@ -69,7 +69,22 @@ v-slot="{ Component, route }"
 </transition>
 </router-view>
 
-<div class="dashboard-grid">
+      <div v-if="!isReal" class="restricted-notice">
+        <div class="notice-icon">
+          <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="notice-content">
+          <h4>Acceso Limitado</h4>
+          <p>Tu cuenta actualmente tiene acceso limitado.</p>
+          <p>Para acceder al catálogo completo de propiedades y a todas las herramientas de la plataforma necesitas una cuenta <strong>REAL</strong>.</p>
+          <p class="notice-footer">Ponte en contacto con nosotros para activar todos los servicios.</p>
+          <button class="contact-upgrade-btn" @click="$router.push('/contacto')">Contactar ahora</button>
+        </div>
+      </div>
+
+      <div v-if="isReal" class="dashboard-grid">
 
 <router-link to="/profile/favorite-properties" class="dashboard-card">
 <div class="card-icon">
@@ -113,9 +128,9 @@ stroke-linejoin="round"/>
 </div>
 </router-link>
 
-</div>
+      </div>
 
-<div v-if="preferenceEntries.length" class="preferences">
+      <div v-if="isReal && preferenceEntries.length" class="preferences">
 <PreferencePanel :category="category" :entries="preferenceEntries" />
 
 <div class="preferences-actions">
@@ -166,95 +181,89 @@ import { buildPreferenceEntries } from "../data/preferenceSchemas";
 import { backendJson } from "../services/backend";
 
 export default {
-components: {
-PreferencePanel,
-},
+  components: {
+    PreferencePanel,
+  },
 
-setup(){
+  setup() {
+    const menuOpen = ref(false);
+    const userStore = useUserStore();
+    const router = useRouter();
+    const route = useRoute();
 
-const menuOpen = ref(false)
-const userStore = useUserStore()
-const router = useRouter()
-const route = useRoute()
+    const { user, selectedCategory: category, preferences, isAdmin, isReal } = storeToRefs(userStore);
+    const savingSearch = ref(false);
+    const saveSearchMessage = ref("");
 
-const { user, selectedCategory: category, preferences } = storeToRefs(userStore)
-const savingSearch = ref(false)
-const saveSearchMessage = ref("")
+    function goToSettings() {
+      const base = import.meta.env.VITE_GRUPO_REGLADO_BASE_URL || "http://localhost:5173";
+      const settingsPath = import.meta.env.VITE_GRUPO_REGLADO_SETTINGS_PATH || "/configuracion";
+      window.location.href = new URL(settingsPath, base).toString();
+    }
 
-function goToSettings() {
-  const base = import.meta.env.VITE_GRUPO_REGLADO_BASE_URL || "http://localhost:5173"
-  const settingsPath = import.meta.env.VITE_GRUPO_REGLADO_SETTINGS_PATH || "/configuracion"
+    onMounted(() => {
+      const savedCategory = localStorage.getItem("selectedCategory");
+      if (savedCategory && userStore.selectedCategory !== savedCategory) {
+        userStore.setCategory(savedCategory);
+      }
+    });
 
-  window.location.href = new URL(settingsPath, base).toString()
-}
+    const logout = async () => {
+      await userStore.logout();
+      router.push("/");
+    };
 
-onMounted(()=>{
+    const preferenceEntries = computed(() =>
+      buildPreferenceEntries(category.value, preferences.value)
+    );
 
-const savedCategory = localStorage.getItem("selectedCategory")
+    const saveSearch = async () => {
+      if (!user.value?.iduser || !category.value || !preferenceEntries.value.length) {
+        saveSearchMessage.value = "No hay una búsqueda completa para guardar.";
+        return;
+      }
 
-if(savedCategory && userStore.selectedCategory !== savedCategory){
-userStore.setCategory(savedCategory)
-}
+      savingSearch.value = true;
+      saveSearchMessage.value = "";
 
-})
+      try {
+        const payload = await backendJson("api/save_search.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            user_id: user.value.iduser,
+            category: category.value,
+            preferences: preferences.value,
+          }),
+        });
+        saveSearchMessage.value = payload.message || "Búsqueda guardada correctamente.";
+      } catch (err) {
+        saveSearchMessage.value = err.message || "No se pudo guardar la búsqueda.";
+      } finally {
+        savingSearch.value = false;
+      }
+    };
 
-const logout = async ()=>{
-await userStore.logout()
-router.push("/")
-}
+    const isProfileHome = computed(() => {
+      return route.path === "/profile" || route.path === "/profile/properties-for-sale";
+    });
 
-const preferenceEntries = computed(() =>
-buildPreferenceEntries(category.value, preferences.value)
-)
-
-const saveSearch = async () => {
-  if (!user.value?.iduser || !category.value || !preferenceEntries.value.length) {
-    saveSearchMessage.value = "No hay una búsqueda completa para guardar."
-    return
-  }
-
-  savingSearch.value = true
-  saveSearchMessage.value = ""
-
-  try {
-    const payload = await backendJson("api/save_search.php", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        user_id: user.value.iduser,
-        category: category.value,
-        preferences: preferences.value,
-      }),
-    })
-
-    saveSearchMessage.value = payload.message || "Búsqueda guardada correctamente."
-  } catch (err) {
-    saveSearchMessage.value = err.message || "No se pudo guardar la búsqueda."
-  } finally {
-    savingSearch.value = false
-  }
-}
-
-const isProfileHome = computed(()=>{
-return route.path === "/profile/properties-for-sale"
-})
-
-return{
-user,
-category,
-preferenceEntries,
-logout,
-isProfileHome,
-menuOpen,
-goToSettings,
-saveSearch,
-savingSearch,
-saveSearchMessage
-}
-
-}
-
-}
+    return {
+      user,
+      category,
+      preferenceEntries,
+      logout,
+      isProfileHome,
+      menuOpen,
+      goToSettings,
+      saveSearch,
+      savingSearch,
+      saveSearchMessage,
+      isAdmin,
+      isReal,
+    };
+  },
+};
 </script>
 
 <style scoped>
@@ -424,6 +433,60 @@ font-size:1.4rem;
 .dashboard-card p{
 font-size:0.9rem;
 color:#666;
+}
+
+.restricted-notice {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  display: flex;
+  gap: 25px;
+  align-items: center;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  border-left: 5px solid #bd9b2c;
+  text-align: left;
+}
+
+.notice-icon {
+  color: #bd9b2c;
+  flex-shrink: 0;
+}
+
+.notice-content h4 {
+  margin: 0 0 10px;
+  font-size: 1.4rem;
+  color: #172a5d;
+}
+
+.notice-content p {
+  margin: 5px 0;
+  color: #51627f;
+  line-height: 1.5;
+}
+
+.notice-footer {
+  margin-top: 10px !important;
+  font-weight: 500;
+  color: #172a5d !important;
+}
+
+.contact-upgrade-btn {
+  margin-top: 15px;
+  padding: 10px 25px;
+  background: #bd9b2c;
+  color: white;
+  border: none;
+  border-radius: 30px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.contact-upgrade-btn:hover {
+  background: #a48424;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(189, 155, 44, 0.2);
 }
 
 .preferences{

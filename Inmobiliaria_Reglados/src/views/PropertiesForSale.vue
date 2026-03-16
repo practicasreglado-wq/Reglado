@@ -1,5 +1,5 @@
 <template>
-  <section class="properties-sale">
+  <section v-if="isReal" class="properties-sale">
     <div class="properties-sale__hero" v-reveal="0">
       <div>
         <p class="eyebrow">Matching inmobiliario</p>
@@ -66,11 +66,12 @@ export default {
 
   setup() {
     const userStore = useUserStore()
-    const { selectedCategory, preferences } = storeToRefs(userStore)
+    const { selectedCategory, preferences, isReal } = storeToRefs(userStore)
 
     return {
       selectedCategory,
-      preferences
+      preferences,
+      isReal
     }
   },
 

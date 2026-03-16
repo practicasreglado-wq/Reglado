@@ -86,14 +86,14 @@ export default {
     135deg,
     #5f4b08 0%,
     #bd9b2c 20%,
-    #f9d766 45%,
-    #c6aa46 55%,
-    #a48424 75%,
+    #c9a227 45%,
+    #d4b544 55%,
+    #c6a233 75%,
     #6e560c 100%
   );
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  text-shadow: 0 2px 3px rgba(253, 203, 2, 0.313);
+  text-shadow: 0 2px 3px rgba(186, 129, 15, 0.326);
 }
 
 .about-content p {

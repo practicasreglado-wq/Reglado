@@ -1,21 +1,27 @@
 <template>
   <section class="dashboard">
     <div class="dashboard-container">
-      <!-- Siempre mostramos el carrusel, sin importar si hay categoría seleccionada o no -->
-      <Carousel />
+      <!-- Show restricted access message if role is user -->
+      <RestrictedAccess v-if="userStore.userRole === 'user'" />
+      
+      <!-- Normal carousel for real/admin -->
+      <Carousel v-else />
     </div>
   </section>
 </template>
 
 <script>
 import Carousel from "../components/Carousel.vue";
+import RestrictedAccess from "../components/RestrictedAccess.vue";
+import { useUserStore } from "../stores/user";
 
 export default {
   name: "Dashboard",
-  components: { Carousel },
+  components: { Carousel, RestrictedAccess },
 
   setup() {
-    return {};
+    const userStore = useUserStore();
+    return { userStore };
   }
 };
 </script>
