@@ -1,6 +1,6 @@
 <template>
   <header ref="headerRef" class="header">
-    <div class="container header-inner">
+    <div class="header-inner">
       <router-link class="brand" to="/">
         <img class="logo" :src="logo" alt="Reglado Energy" />
         <div class="brand-text">
@@ -25,53 +25,53 @@
           </div>
         </div>
         <router-link to="/recursos" class="nav-link">Recursos</router-link>
-        <router-link to="/sobre-nosotros" class="nav-link">Sobre nosotros</router-link>
-
-        <div class="nav-actions">
-          <router-link to="/contacto" class="btn primary glow header-action" v-glow>
-            Solicitar analisis
-          </router-link>
-
-          <router-link
-            v-if="isAdmin"
-            to="/admin"
-            class="admin-pill"
-            title="Panel de administración"
-            aria-label="Panel de administración"
-          >
-            <img :src="adminUserIcon" alt="" class="admin-icon" />
-          </router-link>
-
-          <template v-if="user">
-            <div class="user-menu-wrap">
-              <button
-                class="user-pill user-menu-trigger"
-                @click="toggleUserMenu"
-                aria-haspopup="menu"
-                :aria-expanded="userMenuOpen ? 'true' : 'false'"
-                :title="displayUsername"
-                aria-label="Menu de usuario"
-              >
-                <span class="user-initial" aria-hidden="true">{{ userInitial }}</span>
-              </button>
-              <div v-if="userMenuOpen" class="user-menu" role="menu" aria-label="Menu de usuario">
-                <button class="user-menu-item" type="button" role="menuitem" @click="goToSettings">
-                  Configuración
-                </button>
-                <button class="user-menu-item danger" type="button" role="menuitem" @click="handleLogout">
-                  Cerrar sesión
-                </button>
-              </div>
-            </div>
-          </template>
-
-          <template v-else>
-            <button class="btn primary glow header-action" v-glow @click="goToLogin">
-              Iniciar sesión
-            </button>
-          </template>
-        </div>
+                <router-link to="/sobre-nosotros" class="nav-link">Sobre nosotros</router-link>
       </nav>
+
+      <div class="nav-actions">
+        <router-link to="/contacto" class="btn primary glow header-action" v-glow>
+          Solicitar analisis
+        </router-link>
+
+        <router-link
+          v-if="isAdmin"
+          to="/admin"
+          class="admin-pill"
+          title="Panel de administración"
+          aria-label="Panel de administración"
+        >
+          <img :src="adminUserIcon" alt="" class="admin-icon" />
+        </router-link>
+
+        <template v-if="user">
+          <div class="user-menu-wrap">
+            <button
+              class="user-pill user-menu-trigger"
+              @click="toggleUserMenu"
+              aria-haspopup="menu"
+              :aria-expanded="userMenuOpen ? 'true' : 'false'"
+              :title="displayUsername"
+              aria-label="Menu de usuario"
+            >
+              <span class="user-initial" aria-hidden="true">{{ userInitial }}</span>
+            </button>
+            <div v-if="userMenuOpen" class="user-menu" role="menu" aria-label="Menu de usuario">
+              <button class="user-menu-item" type="button" role="menuitem" @click="goToSettings">
+                Configuración
+              </button>
+              <button class="user-menu-item danger" type="button" role="menuitem" @click="handleLogout">
+                Cerrar sesión
+              </button>
+            </div>
+          </div>
+        </template>
+
+        <template v-else>
+          <button class="btn primary glow header-action" v-glow @click="goToLogin">
+            Iniciar sesión
+          </button>
+        </template>
+      </div>
 
       <div class="mobile-controls">
         <router-link
@@ -279,13 +279,13 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .header{ position: sticky; top:0; z-index: 50; backdrop-filter: blur(12px); background: rgba(11,13,16,.65); border-bottom: 1px solid rgba(255,255,255,.08); }
-.header-inner{ display:flex; align-items:center; justify-content:space-between; padding: 14px 0; gap: 14px; }
-.brand{ display:flex; align-items:center; gap: 12px; }
+.header-inner{ display:flex; align-items:center; justify-content:space-between; padding: 14px 20px; gap: 14px; position: relative; width: 100%; box-sizing: border-box; }
+.brand{ display:flex; align-items:center; gap: 12px; position: relative; z-index: 10; }
 .logo{ width: 44px; height: 44px; object-fit: contain; }
 .brand-name{ font-weight: 800; letter-spacing: .8px; }
 .brand-sub{ font-size: 12px; color: rgba(233,238,246,.70); }
-.nav{ display:flex; align-items:center; gap: 6px; }
-.nav-actions{ display: flex; align-items: center; gap: 10px; margin-left: 40px; }
+.nav{ display:flex; align-items:center; justify-content: center; gap: 6px; position: absolute; left: 50%; transform: translateX(-50%); z-index: 5; pointer-events: none; }
+.nav-actions{ display: flex; align-items: center; justify-content: flex-end; gap: 10px; position: relative; z-index: 10; margin-left: auto; pointer-events: auto; }
 .header-action{ min-width: 124px; min-height: 36px; padding: 0 12px; font-size: 12px; line-height: 1; white-space: nowrap; }
 .admin-pill{
   width: 38px;
@@ -359,9 +359,9 @@ onBeforeUnmount(() => {
 .user-menu-item.danger{
   color: #ffb7b7;
 }
-.nav-link{ color: rgba(233,238,246,.82); font-size: 14px; padding: 10px 10px; border-radius: 12px; border: 1px solid transparent; }
+.nav-link{ color: rgba(233,238,246,.82); font-size: 14px; padding: 10px 10px; border-radius: 12px; border: 1px solid transparent; pointer-events: auto; }
 .nav-link:hover{ border-color: rgba(242,197,61,.25); background: rgba(255,255,255,.03); }
-.nav-dropdown{ position: relative; }
+.nav-dropdown{ position: relative; pointer-events: auto; }
 .nav-drop-trigger{ display: inline-flex; align-items: center; gap: 7px; cursor: pointer; font-family: inherit; }
 .caret{ font-size: 12px; color: rgba(242,197,61,.85); transition: transform .18s ease; }
 .dropdown-menu{ position: absolute; top: 100%; left: 0; min-width: 235px; margin-top: 0; padding: 8px; border-radius: 14px; border: 1px solid rgba(242,197,61,.24); background: #0f1318; box-shadow: 0 20px 46px rgba(0,0,0,.42); opacity: 0; transform: translateY(8px) scale(.985); pointer-events: none; transition: opacity .16s ease, transform .16s ease; z-index: 60; }
@@ -391,8 +391,11 @@ onBeforeUnmount(() => {
 .m-link.router-link-active{ color: rgba(233,238,246,.9); border-color: rgba(242,197,61,.84); border-bottom-color: rgba(242,197,61,.84); background: rgba(242,197,61,.16); }
 .mobile-action{ width: 100%; min-height: 38px; padding: 8px 12px; font-size: 13px; border-radius: 12px; }
 @media (max-width: 980px){
-  .nav{ display:none; }
-  .mobile-controls{ display:flex; }
+  .header-inner{ padding: 12px 14px; gap: 8px; }
+  .brand{ gap: 8px; }
+  .nav, .nav-actions{ display:none; }
+  .brand-sub{ display:none; }
+  .mobile-controls{ display:flex; gap: 6px; }
   .burger{ display:block; }
   .mobile-admin-pill,
   .mobile-user-trigger{ display:grid; }
