@@ -67,10 +67,10 @@ export default {
 
   position:absolute;
 
-  width:280px;
+  width:235px;
   max-height:420px;
 
-  border:2px solid #172a5d;
+  border:1px solid #172a5d;
 
   background:rgba(255,255,255,0.9);
   backdrop-filter:blur(18px);

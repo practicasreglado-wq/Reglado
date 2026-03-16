@@ -1,5 +1,9 @@
 <template>
-  <article class="property-card">
+  <article 
+    class="property-card" 
+    :class="{ 'popper-open': popperVisible }"
+    @click="closePopper"
+  >
     <div class="property-card__media">
       <img :src="property.imageUrl" :alt="property.titulo" />
       <div class="property-card__overlay"></div>
@@ -43,13 +47,24 @@
       <div class="property-card__footer">
         <strong>{{ formatPrice(property.precio) }}</strong>
 
-        <!-- BOTON MATCH DETAILS -->
-        <button
-          class="match-details-button"
-          @click.stop="$emit('show-match', $event)"
-        >
-          {{ property.match_count }}/{{ property.match_total }} coincidencias
-        </button>
+        <!-- BOTON MATCH DETAILS CON POPPER INTEGRADO -->
+        <div class="match-details-wrapper">
+          <button
+            class="match-details-button"
+            @click.stop="togglePopper"
+          >
+            {{ property.match_count }}/{{ property.match_total }} coincidencias
+          </button>
+
+          <MatchDetailsPopper
+            v-if="property.match_details && property.match_details.length > 0"
+            :visible="popperVisible"
+            :details="property.match_details"
+            :matchCount="property.match_count"
+            :matchTotal="property.match_total"
+            @close="closePopper"
+          />
+        </div>
 
       </div>
     </div>
@@ -57,13 +72,18 @@
 </template>
 
 <script>
+import MatchDetailsPopper from "./MatchDetailsPopper.vue";
+
 export default {
   name: "PropertyCard",
 
   emits: [
-    "toggle-favorite",
-    "show-match"
+    "toggle-favorite"
   ],
+
+  components: {
+    MatchDetailsPopper
+  },
 
   props: {
     property: {
@@ -79,6 +99,7 @@ export default {
       matchScale: 1,
       favoritePopTimeout: null,
       isFavoritePopping: false,
+      popperVisible: false,
     };
   },
 
@@ -175,6 +196,14 @@ export default {
 
       this.$emit("toggle-favorite", this.property);
     },
+
+    togglePopper() {
+      this.popperVisible = !this.popperVisible;
+    },
+
+    closePopper() {
+      this.popperVisible = false;
+    }
   },
 };
 </script>
@@ -182,15 +211,24 @@ export default {
 <style scoped>
 
 .property-card {
-  overflow: hidden;
+  position: relative;
+  z-index: 1;
   border-radius: 24px;
   background: #fff;
   box-shadow: 0 18px 40px rgba(23, 42, 93, 0.12);
+  transition: z-index 0s, transform 0.28s ease, box-shadow 0.28s ease, filter 0.28s ease;
+}
+
+.property-card.popper-open,
+.property-card:hover {
+  z-index: 50;
 }
 
 .property-card__media {
   position: relative;
   height: 240px;
+  border-radius: 24px 24px 0 0;
+  overflow: hidden;
 }
 
 .property-card__media img {
@@ -363,6 +401,44 @@ export default {
 
 .match-details-button:hover{
   text-decoration:underline;
+}
+
+/* WRAPPER DEL BOTON Y POPPER */
+.match-details-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+/* Modificamos el popper para que se comporte como un menú contextual absoluto */
+:deep(.popper-overlay) {
+  position: absolute;
+  inset: auto;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 12px;
+  width: max-content;
+  z-index: 100;
+  pointer-events: none; /* Para no bloquear clics de alrededor si es muy grande */
+}
+
+:deep(.popper-card) {
+  position: relative;
+  bottom: auto !important;
+  left: auto !important;
+  transform: none;
+  pointer-events: auto; /* Reactivar puntero en la tarjeta */
+}
+
+:deep(.popper-card::after) {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 8px;
+  border-style: solid;
+  border-color: #172a5d transparent transparent transparent;
 }
 
 </style>

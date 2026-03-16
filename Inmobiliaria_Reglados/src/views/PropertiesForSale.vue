@@ -34,52 +34,8 @@
         v-reveal="index + 1"
         :property="property"
         @toggle-favorite="toggleFavorite"
-        @show-match="openDetails(property,$event)"
       />
     </div>
-    <!-- MATCH POPPER -->
-
-<div
-  v-if="popperVisible"
-  class="match-popper-overlay"
-  @click="closePopper"
->
-
-  <div
-    class="match-popper"
-    :style="{ top: popperY + 'px', left: popperX + 'px' }"
-    @click.stop
-  >
-
-    <h3>Coincidencias con tu búsqueda</h3>
-
-    <div class="match-summary">
-      {{ selectedProperty?.match_count }} /
-      {{ selectedProperty?.match_total }}
-      preferencias coinciden
-    </div>
-
-    <ul>
-
-      <li
-        v-for="item in selectedDetails"
-        :key="item.label"
-        :class="item.match ? 'ok' : 'fail'"
-      >
-
-        <span class="icon">
-          {{ item.match ? "✔" : "✘" }}
-        </span>
-
-        {{ item.label }}
-
-      </li>
-
-    </ul>
-
-  </div>
-
-</div>
   </section>
 </template>
 

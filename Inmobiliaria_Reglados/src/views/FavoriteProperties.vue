@@ -36,26 +36,17 @@
         <PropertyCard
           :property="property"
           @toggle-favorite="toggleFavorite"
-          @show-match="openDetails(property,$event)"
         />
 
       </div>
 
     </div>
- <MatchDetailsPopper
-  :visible="popperVisible"
-  :details="selectedDetails"
-  :x="popperX"
-  :y="popperY"
-  @close="closePopper"
-/>
   </section>
 </template>
 
 <script>
 
 import PropertyCard from "../components/PropertyCard.vue"
-import MatchDetailsPopper from "../components/MatchDetailsPopper.vue"
 import {
   fetchFavoriteProperties,
   removeFavorite
@@ -66,23 +57,13 @@ export default {
   name:"FavoriteProperties",
 
   components:{
-    PropertyCard,
-    MatchDetailsPopper
+    PropertyCard
   },
 
   data(){
     return{
-
       favorites:[],
-      loading:true,
-
-      popperVisible:false,
-      selectedDetails:[],
-      selectedProperty:null,
-
-      popperX:0,
-      popperY:0
-
+      loading:true
     }
   },
 
@@ -128,46 +109,6 @@ export default {
         console.error(error)
 
       }
-
-    },
-
-
-    openDetails(property,event){
-
-  const rect = event.currentTarget.getBoundingClientRect()
-
-  const popperWidth = 280
-  const popperHeight = 420
-  const margin = 30
-
-  let x = rect.left + rect.width / 2
-  let y = rect.top + window.scrollY - popperHeight
-
-  const viewportWidth = window.innerWidth
-
-  if (x + popperWidth/2 > viewportWidth - margin) {
-    x = viewportWidth - popperWidth/2 - margin
-  }
-
-  if (x - popperWidth/2 < margin) {
-    x = popperWidth/2 + margin
-  }
-
-  this.popperX = x
-  this.popperY = y
-
-  this.selectedProperty = property
-  this.selectedDetails = property.match_details || []
-
-  this.popperVisible = true
-},
-
-
-    closePopper(){
-
-      this.popperVisible = false
-      this.selectedDetails = []
-      this.selectedProperty = null
 
     }
 
