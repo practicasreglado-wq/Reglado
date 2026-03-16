@@ -42,63 +42,20 @@
       </div>
 
     </div>
-
-
-    <!-- POPPER -->
-
-    <div
-      v-if="popperVisible"
-      class="match-popper-overlay"
-      @click="closePopper"
-    >
-
-      <div
-        class="match-popper"
-        :style="{
-          top: popperY + 'px',
-          left: popperX + 'px'
-        }"
-        @click.stop
-      >
-
-        <h3>
-          Coincidencias con tu búsqueda
-        </h3>
-
-        <div class="match-summary">
-          {{ selectedProperty?.match_count }} /
-          {{ selectedProperty?.match_total }}
-          preferencias coinciden
-        </div>
-
-        <ul>
-
-          <li
-            v-for="item in selectedDetails"
-            :key="item.label"
-            :class="item.match ? 'ok' : 'fail'"
-          >
-
-            <span class="icon">
-              {{ item.match ? "✔" : "✘" }}
-            </span>
-
-            {{ item.label }}
-
-          </li>
-
-        </ul>
-
-      </div>
-
-    </div>
-
+ <MatchDetailsPopper
+  :visible="popperVisible"
+  :details="selectedDetails"
+  :x="popperX"
+  :y="popperY"
+  @close="closePopper"
+/>
   </section>
 </template>
 
 <script>
 
 import PropertyCard from "../components/PropertyCard.vue"
+import MatchDetailsPopper from "../components/MatchDetailsPopper.vue"
 import {
   fetchFavoriteProperties,
   removeFavorite
@@ -109,7 +66,8 @@ export default {
   name:"FavoriteProperties",
 
   components:{
-    PropertyCard
+    PropertyCard,
+    MatchDetailsPopper
   },
 
   data(){
@@ -179,7 +137,7 @@ export default {
   const rect = event.currentTarget.getBoundingClientRect()
 
   const popperWidth = 280
-  const popperHeight = 480
+  const popperHeight = 420
   const margin = 30
 
   let x = rect.left + rect.width / 2
@@ -267,78 +225,6 @@ export default {
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(290px,1fr));
   gap:22px;
-}
-
-
-/* POPPER */
-
-.match-popper-overlay{
-  position:fixed;
-  inset:0;
-  z-index:2000;
-}
-
-.match-popper{
-
-  position:absolute;
-  transform:translateX(-210%);
-  width:280px;
-  max-height:420px;
-
-  border:2px solid #172a5d;
-
-  background:rgba(255,255,255,0.85);
-  backdrop-filter:blur(18px);
-  -webkit-backdrop-filter:blur(18px);
-
-  border-radius:14px;
-
-  padding:18px 20px;
-
-  box-shadow:0 18px 40px rgba(0,0,0,0.18);
-
-  display:flex;
-  flex-direction:column;
-
-}
-
-.match-popper h3{
-  margin-bottom:12px;
-  color:#172a5d;
-}
-
-.match-summary{
-  font-weight:700;
-  color:#4a5c7a;
-  margin-bottom:18px;
-}
-
-.match-popper ul{
-  overflow-y:auto;
-  max-height:300px;
-  padding-right:6px;
-}
-
-.match-popper li{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  padding:4px 0;
-  font-size:0.9rem;
-  font-weight:600;
-}
-
-.ok{
-  color:#1f9d55;
-}
-
-.fail{
-  color:#e53e3e;
-}
-
-.icon{
-  width:16px;
-  font-size:0.9rem;
 }
 
 </style>

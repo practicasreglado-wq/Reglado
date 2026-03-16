@@ -16,7 +16,7 @@ if ($userId <= 0) {
 }
 
 $stmt = $pdo->prepare("
-    SELECT id, user_id, category, preferences_json, created_at
+    SELECT id, user_id, categoria, preferences, created_at
     FROM search_history
     WHERE user_id = :user_id
     ORDER BY created_at DESC, id DESC
@@ -30,8 +30,8 @@ $history = array_map(static function (array $row): array {
     return [
         "id" => (int) $row["id"],
         "user_id" => (int) $row["user_id"],
-        "category" => $row["category"],
-        "preferences" => json_decode((string) $row["preferences_json"], true) ?: [],
+        "category" => $row["categoria"],
+        "preferences" => json_decode((string) $row["preferences"], true) ?: [],
         "created_at" => $row["created_at"],
     ];
 }, $stmt->fetchAll(PDO::FETCH_ASSOC));
