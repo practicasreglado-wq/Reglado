@@ -559,6 +559,16 @@ class AuthController
         try {
             User::updateRole($userId, $role);
             SecurityLogger::log('admin_updated_user_role', $userId, ['new_role' => $role]);
+
+            $freshUser = User::findById($userId);
+            if ($freshUser) {
+                try {
+                    NotionService::syncUserUpdated($freshUser);
+                } catch (Throwable $syncError) {
+                    error_log('[AuthController] Notion sync for updated user failed: ' . $syncError->getMessage());
+                }
+            }
+
             Response::json(['message' => 'role updated']);
         } catch (Throwable $e) {
             Response::json(['error' => 'could not update role'], 500);

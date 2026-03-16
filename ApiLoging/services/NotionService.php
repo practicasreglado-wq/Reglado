@@ -38,6 +38,73 @@ class NotionService
         return true;
     }
 
+    public static function syncUserUpdated(array $user): bool
+    {
+        if (!self::isEnabled()) {
+            return false;
+        }
+
+        $schema = self::getDatabaseSchema();
+        if ($schema === null) {
+            self::log('notion schema unavailable for update');
+            return false;
+        }
+
+        $email = trim((string) ($user['email'] ?? ''));
+        if ($email === '') {
+            self::log('cannot update notion without email');
+            return false;
+        }
+
+        $emailProperty = self::findPropertyByNames($schema, ['email', 'correo', 'correo electronico']);
+        if ($emailProperty === null || ($schema[$emailProperty]['type'] ?? '') !== 'email') {
+            self::log('notion email property not found for update filtering');
+            return false;
+        }
+
+        $databaseId = trim((string) getenv('NOTION_DATABASE_ID'));
+        $queryPayload = [
+            'filter' => [
+                'property' => $emailProperty,
+                'email' => [
+                    'equals' => $email
+                ]
+            ]
+        ];
+
+        $queryResponse = self::request('POST', '/databases/' . $databaseId . '/query', $queryPayload);
+        $results = $queryResponse['results'] ?? [];
+        
+        if (empty($results)) {
+            self::log("notion user page not found for email: {$email}, falling back to create.");
+            return self::syncUserCreated($user);
+        }
+
+        $pageId = (string) ($results[0]['id'] ?? '');
+        if ($pageId === '') {
+             self::log('notion user page id missing in result');
+             return false;
+        }
+
+        $properties = self::buildProperties($schema, $user);
+        if ($properties === []) {
+            self::log('notion properties could not be mapped for update');
+            return false;
+        }
+
+        $payload = [
+            'properties' => $properties,
+        ];
+
+        $response = self::request('PATCH', '/pages/' . $pageId, $payload);
+        if ($response === null) {
+            self::log('notion page update failed');
+            return false;
+        }
+
+        return true;
+    }
+
     private static function buildProperties(array $schema, array $user): array
     {
         $result = [];
