@@ -83,6 +83,10 @@ export default {
     selectedCategory() {
       this.loadProperties()
     },
+    // Triggers reload when applying search from history
+    '$route.query.t'() {
+      this.loadProperties()
+    }
   },
 
   methods: {
