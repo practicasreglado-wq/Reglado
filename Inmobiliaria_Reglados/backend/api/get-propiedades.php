@@ -76,6 +76,11 @@ foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
     ];
 }
 
+// 🔥 Ordenar por porcentaje de match descendente
+usort($properties, function($a, $b) {
+    return $b['match_percentage'] <=> $a['match_percentage'];
+});
+
 respondJson(200, [
     'success' => true,
     'category' => $selectedCategory,

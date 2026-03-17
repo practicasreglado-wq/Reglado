@@ -77,25 +77,28 @@ watch(
   justify-content: center;
   width: 52px;
   height: 52px;
-  border: 0;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 999px;
-  background: linear-gradient(135deg, #163a76, #1d4f91);
+  background: rgba(11, 42, 95, 0.747);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   color: #fff;
-  box-shadow: 0 12px 28px rgba(22, 58, 118, 0.24);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
   cursor: pointer;
   transition:
-    transform 0.25s ease,
-    box-shadow 0.25s ease,
-    opacity 0.25s ease;
+    transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.3s ease,
+    background 0.3s ease;
 }
 
 .scroll-to-top:hover {
-  transform: translateY(-4px) scale(1.04);
-  box-shadow: 0 16px 34px rgba(22, 58, 118, 0.34);
+  transform: translateY(-6px) scale(1.1);
+  background: rgb(9, 39, 92);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
 }
 
 .scroll-to-top:focus-visible {
-  outline: 3px solid rgba(29, 79, 145, 0.35);
+  outline: 3px solid rgba(255, 255, 255, 0.4);
   outline-offset: 3px;
 }
 
@@ -120,10 +123,13 @@ watch(
 
 @media (max-width: 640px) {
   .scroll-to-top {
-    right: 20px;
-    bottom: 20px;
-    width: 48px;
-    height: 48px;
+    right: 15px;
+    bottom: 15px;
+    width: 40px;
+    height: 40px;
+  }
+  .scroll-to-top__icon {
+    font-size: 1.1rem;
   }
 }
 </style>

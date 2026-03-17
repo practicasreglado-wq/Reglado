@@ -213,6 +213,8 @@ export default {
 .property-card {
   position: relative;
   z-index: 1;
+  width: 100%;
+  min-width: 0;
   border-radius: 24px;
   background: #fff;
   box-shadow: 0 18px 40px rgba(23, 42, 93, 0.12);
@@ -363,6 +365,7 @@ export default {
   margin:0 0 12px;
   color:#172a5d;
   font-size:1.35rem;
+  overflow-wrap:anywhere;
 }
 
 .property-card__meta,
@@ -446,6 +449,9 @@ export default {
    ========================================= */
 
 @media (max-width: 768px) {
+  .property-card {
+    border-radius: 20px;
+  }
   .property-card__media {
     height: 200px;
   }
@@ -463,7 +469,13 @@ export default {
   .property-card__footer {
     gap: 8px;
   }
+  .property-card__footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
   .property-card__meta {
+    flex-direction: column;
+    align-items: flex-start;
     font-size: 0.9rem;
     margin-bottom: 14px;
   }
@@ -494,6 +506,9 @@ export default {
 }
 
 @media (max-width: 480px) {
+  .property-card {
+    border-radius: 18px;
+  }
   .property-card__media {
     height: 180px;
   }
@@ -514,10 +529,15 @@ export default {
   .property-card__footer strong {
     font-size: 0.95rem;
   }
+  .property-card__actions {
+    top: 12px;
+    right: 12px;
+    left: 12px;
+  }
   .match-pill,
   .favorite-button {
-    padding: 6px 10px;
-    font-size: 0.70rem;
+    padding: 3px 6px;
+    font-size: 0.65rem;
   }
   .favorite-icon {
     font-size: 0.75rem;
@@ -525,7 +545,9 @@ export default {
   }
   .match-details-button {
     padding: 4px 10px;
-    font-size: 0.55rem;
+    font-size: 0.7rem;
+    white-space: normal;
+    text-align: left;
   }
 
   /* Force Popper scaling */

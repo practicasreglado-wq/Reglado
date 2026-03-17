@@ -9,9 +9,11 @@
         class="btn-login">
         Login
       </router-link>
-      <h1>
+      <div class="t_hero">
+        <h1>
         <span class="highlight">Reglado</span> Real State
       </h1>
+      </div>
       <p class="description">
         Encuentra el inmueble que se adapta a tus necesidades.
         Registra tu búsqueda, explora nuestras opciones y recibe alertas
@@ -99,8 +101,23 @@ export default {
   align-self: flex-start;
 }
 
+.t_hero {
+  position: relative;
+  isolation: isolate;
+  display: inline-block;
+  align-self: flex-start;
+  padding: 15px 35px;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+  margin-bottom: 30px;
+}
+
 .hero h1{
-  font-size:7rem;
+  font-size: clamp(2.5rem, 7vw, 7rem);
   background: linear-gradient(
     140deg,
     #ffffff 0%,
@@ -112,35 +129,35 @@ export default {
   );
   background-clip:text;
   -webkit-text-fill-color:transparent;
-  margin-bottom:20px;
-  text-shadow: 0 2px 3px rgba(218, 214, 214, 0.292);
+  margin:0;
+  text-shadow: 0 4px 10px rgba(255, 255, 255, 0.215);
 }
 
 .highlight {
 
   background: linear-gradient(
     135deg,
-    #5f4b08 0%,
+    #785f0b 0%,
     #bd9b2c 20%,
     #c9a227 45%,
     #f2d46b 55%,
     #c6a233 75%,
-    #6e560c 100%
+    #9c7b17 100%
   );
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  text-shadow: 0 2px 3px rgba(186, 129, 15, 0.326);
+  text-shadow: 0 4px 15px rgba(186, 154, 40, 0.6);
 }
 
 .description {
-  font-size: 2.75rem;
+  font-size: clamp(0.9rem, 2.5vw, 2.75rem);
   text-shadow: 0 2px 3px rgba(0, 0, 0, 0.605);
   line-height: 1.6;
   margin-bottom: 20px;
 }
 
 .subtext {
-  font-size: 1.5rem;
+  font-size: clamp(0.8rem, 1.5vw, 1.5rem);
   text-shadow: 0 2px 3px rgba(0, 0, 0, 0.605);
   opacity: 0.85;
 }
@@ -150,7 +167,7 @@ export default {
 .btn-login{
   margin-top: 120px;
   margin-right: 14%;
-  font-size: 2.3rem;
+  font-size: clamp(0.95rem, 2vw, 2.3rem);
   background-color: var(--azul-principal);
   box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.443);
   text-shadow: 0 2px 3px rgba(0, 200, 255, 0.274);
@@ -184,7 +201,7 @@ TABLETS
   }
 
   .hero h1{
-    font-size:5rem;
+    font-size: clamp(2.2rem, 6vw, 5rem);
   }
 
   .description{
@@ -219,19 +236,19 @@ TABLETS PEQUEÑAS
   }
 
   .hero h1{
-    font-size:4rem;
+    font-size: clamp(2rem, 5vw, 3.5rem);
   }
 
   .description{
-    font-size:1.7rem;
+    font-size:1.5rem;
   }
 
   .subtext{
-    font-size:1.2rem;
+    font-size:1.1rem;
   }
 
   .btn-login{
-    font-size:1.6rem;
+    font-size:1.4rem;
     margin: 0;
   }
 
@@ -248,6 +265,10 @@ MOVIL
     justify-content:center;
   }
 
+  .t_hero{
+    align-self: center;
+  }
+
   .hero-content{
     align-items:center;
     text-align:center;
@@ -259,20 +280,20 @@ MOVIL
   }
 
   .hero h1{
-    font-size:2.7rem;
+    font-size: clamp(1.6rem, 8vw, 2.2rem);
   }
 
   .description{
-    font-size:1.3rem;
+    font-size:0.9rem;
   }
 
   .subtext{
-    font-size:1rem;
+    font-size:0.8rem;
   }
 
   .btn-login{
-    font-size:1.2rem;
-    padding:10px 25px;
+    font-size:0.95rem;
+    padding:6px 18px;
     margin: 0;
   }
 

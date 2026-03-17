@@ -787,6 +787,14 @@ export default {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 40px;
+  /* Hide scrollbar for IE, Edge and Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.modal-body::-webkit-scrollbar {
+  display: none;
 }
 
 .modal-section {
@@ -867,6 +875,9 @@ export default {
 }
 
 @media (max-width: 1024px) {
+  .admin-properties {
+    padding: 40px 60px;
+  }
   .admin-header {
     padding: 35px 40px;
   }
@@ -882,45 +893,264 @@ export default {
   }
   .admin-header {
     flex-direction: column;
-    align-items: flex-start;
-    gap: 30px;
-    padding: 30px;
+    align-items: center;
     text-align: center;
-    width: 100%;
+    gap: 25px;
+    padding: 30px 20px;
   }
-  .admin-header__content {
-    width: 100%;
+  .admin-header h1 {
+    font-size: 2rem;
   }
-  .admin-stats {
-    width: 100%;
+  .admin-header p {
+    font-size: 1rem;
   }
   .admin-controls {
     flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
   }
-  .prop-meta-summary {
-    display: none;
+  .search-box input {
+    padding: 12px 15px 12px 45px;
+    font-size: 0.95rem;
   }
+  .search-box svg {
+    left: 15px;
+    width: 18px;
+    height: 18px;
+  }
+  .filter-group select {
+    padding: 0 35px 0 15px;
+    font-size: 0.95rem;
+    height: 48px;
+    min-width: 100%;
+    background-position: right 15px center;
+  }
+  
   .prop-item__header {
-    padding: 20px;
-  }
-  .modal-overlay {
-    padding: 10px;
-  }
-  .modal-header {
-    padding: 25px;
     flex-direction: column;
     align-items: flex-start;
     gap: 15px;
+    padding: 20px;
+  }
+  .prop-info-main {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .prop-meta-summary {
+    width: 100%;
+    justify-content: space-between;
+    gap: 10px;
+    border-top: 1px solid rgba(0,0,0,0.05);
+    padding-top: 12px;
+  }
+  
+  .modal-overlay {
+    padding: 10px;
+  }
+  .modal-content {
+    max-height: 96vh;
+    width: 98vw;
+    border-radius: 12px;
+  }
+  .modal-header {
+    padding: 15px;
+    gap: 8px;
+  }
+  .modal-header h2 {
+    font-size: 1.15rem;
+  }
+  .modal-header-price {
+    font-size: 1.15rem;
   }
   .modal-body {
-    padding: 20px;
-    grid-template-columns: 1fr;
+    padding: 12px;
+    gap: 10px;
+  }
+  .modal-section {
+    padding: 12px;
   }
   .modal-section.full-width {
     grid-column: span 1;
   }
-  .modal-header h2 {
+}
+
+@media (max-width: 480px) {
+  .admin-properties {
+    padding: 15px 10px;
+  }
+  .admin-header h1 {
     font-size: 1.6rem;
+  }
+  .admin-header p {
+    font-size: 0.85rem;
+  }
+  .stat-card {
+    padding: 12px 20px;
+  }
+  .stat-value {
+    font-size: 1.8rem;
+  }
+
+  .search-box input {
+    padding: 10px 10px 10px 40px;
+    font-size: 0.9rem;
+  }
+
+  .prop-item__header {
+    padding: 12px 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    position: relative;
+    padding-bottom: 45px; /* Espacio para el botón abajo */
+  }
+
+  .prop-title {
+    font-size: 0.95rem;
+    line-height: 1.3;
+    font-weight: 600;
+  }
+  .prop-id {
+    font-size: 0.7rem;
+    padding: 2px 5px;
+  }
+  .prop-category-badge {
+    font-size: 0.6rem;
+    padding: 2px 6px;
+  }
+  
+  .prop-meta-summary {
+    border-top: 1px solid rgba(0,0,0,0.05);
+    padding-top: 8px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .prop-price {
+    font-size: 0.9rem;
+  }
+  .prop-location {
+    font-size: 0.8rem;
+    max-width: 60%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .expand-btn {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 32px;
+    height: 32px;
+    background: #f1f5f9;
+  }
+
+  .is-expanded .expand-btn {
+    transform: translateX(-50%) rotate(180deg);
+  }
+  
+  .prop-item__details {
+    padding: 0 15px 15px 15px;
+  }
+  
+  .details-grid {
+    grid-template-columns: 1fr !important;
+    padding: 15px 0;
+    gap: 15px;
+  }
+  .details-block h4 {
+    font-size: 0.75rem;
+    margin-bottom: 15px;
+    gap: 8px;
+  }
+  .details-block li {
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+  }
+  .details-actions {
+    padding-top: 15px;
+  }
+  .action-btn--ficha {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+    width: 100%;
+  }
+
+  .modal-header {
+    padding: 15px;
+  }
+  .modal-badge-id {
+    font-size: 0.65rem;
+    padding: 2px 6px;
+    margin-bottom: 5px;
+  }
+  .modal-header-info h2 {
+    font-size: 0.9rem;
+    line-height: 1.1;
+  }
+  .modal-header-info p {
+    font-size: 0.7rem;
+  }
+  .modal-header-price {
+    font-size: 1rem;
+  }
+  .modal-body {
+    grid-template-columns: 1fr !important;
+    padding: 10px;
+    gap: 15px;
+  }
+  .modal-section {
+    padding: 10px;
+    border-radius: 8px;
+  }
+  .modal-section h3 {
+    font-size: 0.75rem;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    gap: 6px;
+  }
+  .modal-section h3 svg {
+    width: 14px;
+    height: 14px;
+  }
+  .modal-grid,
+  .modal-grid--detailed {
+    grid-template-columns: 1fr !important;
+    gap: 8px;
+  }
+  .modal-field {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 6px;
+  }
+  .modal-field label {
+    font-size: 0.65rem;
+    margin-bottom: 0;
+  }
+  .modal-field span {
+    font-size: 0.85rem;
+    text-align: left;
+    width: 100%;
+  }
+  .modal-description {
+    font-size: 0.8rem;
+    line-height: 1.4;
+  }
+  .close-modal-btn {
+    top: 5px;
+    right: 5px;
+    width: 28px;
+    height: 28px;
+  }
+  .close-modal-btn svg {
+    width: 16px;
+    height: 16px;
   }
 }
 </style>

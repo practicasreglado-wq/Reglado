@@ -1,57 +1,63 @@
 <template>
 <section class="profile">
 
-<button class="menu-toggle" @click="menuOpen = !menuOpen">
-☰
-</button>
+<button
+  v-if="isProfileMenuOpen"
+  class="sidebar-overlay"
+  type="button"
+  aria-label="Cerrar menu de perfil"
+  @click="closeProfileMenu"
+></button>
 
-<div class="sidebar" :class="{ open: menuOpen }">
+<div class="sidebar" :class="{ open: isProfileMenuOpen }">
+<div class="sidebar-panel">
 <div class="profile-hero">
 
 <div class="hero-left">
 <h2>Hola {{ user.nombre_usuario }}</h2>
 </div>
 </div>
-<h3>Menú de perfil</h3>
+<h3>Menu de perfil</h3>
 
 <ul>
       <li>
-        <router-link to="/profile/properties-for-sale" @click="menuOpen = false">
+        <router-link to="/profile/properties-for-sale" @click="closeProfileMenu">
           Inicio
         </router-link>
       </li>
 
       <li v-if="isReal">
-        <router-link to="/profile/favorite-properties" @click="menuOpen = false">
+        <router-link to="/profile/favorite-properties" @click="closeProfileMenu">
           Mis propiedades favoritas
         </router-link>
       </li>
 
       <li v-if="isReal">
-        <router-link to="/profile/search-history" @click="menuOpen = false">
-          Historial de búsquedas
+        <router-link to="/profile/search-history" @click="closeProfileMenu">
+          Historial de busquedas
         </router-link>
       </li>
 
       <li>
-        <router-link to="/profile/my-properties-for-sale" @click="menuOpen = false">
+        <router-link to="/profile/my-properties-for-sale" @click="closeProfileMenu">
           Mis propiedades
         </router-link>
       </li>
 
       <li>
-        <button class="sidebar-link" type="button" @click="goToSettings(); menuOpen = false">
-          Configuración
+        <button class="sidebar-link" type="button" @click="goToSettings(); closeProfileMenu()">
+          Configuracion
         </button>
       </li>
 </ul>
 
 <div v-if="user" class="logout-item">
 <button class="logout-btn" @click="logout">
-Cerrar sesión
+Cerrar sesion
 </button>
 </div>
 
+</div>
 </div>
 
 <div class="profile-content">
@@ -78,7 +84,7 @@ v-slot="{ Component, route }"
         <div class="notice-content">
           <h4>Acceso Limitado</h4>
           <p>Tu cuenta actualmente tiene acceso limitado.</p>
-          <p>Para acceder al catálogo completo de propiedades y a todas las herramientas de la plataforma necesitas una cuenta <strong>REAL</strong>.</p>
+          <p>Para acceder al catalogo completo de propiedades y a todas las herramientas de la plataforma necesitas una cuenta <strong>REAL</strong>.</p>
           <p class="notice-footer">Ponte en contacto con nosotros para activar todos los servicios.</p>
           <button class="contact-upgrade-btn" @click="$router.push('/contacto')">Contactar ahora</button>
         </div>
@@ -123,8 +129,8 @@ stroke-linejoin="round"/>
 </svg>
 </div>
 <div class="dashboard-card-info">
-<h4>Historial de búsquedas</h4>
-<p>Revisa tus búsquedas anteriores</p>
+<h4>Historial de busquedas</h4>
+<p>Revisa tus busquedas anteriores</p>
 </div>
 </router-link>
 
@@ -140,7 +146,7 @@ stroke-linejoin="round"/>
   :disabled="savingSearch"
   @click="saveSearch"
 >
-  {{ savingSearch ? "Guardando..." : "Guardar búsqueda" }}
+  {{ savingSearch ? "Guardando..." : "Guardar busqueda" }}
 </button>
 
 <p v-if="saveSearchMessage" class="save-search-message">
@@ -150,7 +156,7 @@ stroke-linejoin="round"/>
 </div>
 
 <div v-else class="no-pref">
-No tienes preferencias guardadas todavía
+No tienes preferencias guardadas todavia
 </div>
 
 </div>
@@ -172,10 +178,11 @@ v-slot="{ Component, route }"
 </template>
 
 <script>
-import { useUserStore } from "../stores/user";
+import { computed, onMounted, ref, watch } from "vue";
 import { storeToRefs } from "pinia";
-import { ref, computed, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
+import { useUserStore } from "../stores/user";
+import { useProfileMenuStore } from "../stores/profileMenu";
 import PreferencePanel from "../components/PreferencePanel.vue";
 import { buildPreferenceEntries } from "../data/preferenceSchemas";
 import { backendJson } from "../services/backend";
@@ -186,12 +193,13 @@ export default {
   },
 
   setup() {
-    const menuOpen = ref(false);
     const userStore = useUserStore();
+    const profileMenuStore = useProfileMenuStore();
     const router = useRouter();
     const route = useRoute();
 
     const { user, selectedCategory: category, preferences, isAdmin, isReal } = storeToRefs(userStore);
+    const { isOpen: isProfileMenuOpen } = storeToRefs(profileMenuStore);
     const savingSearch = ref(false);
     const saveSearchMessage = ref("");
 
@@ -209,8 +217,13 @@ export default {
     });
 
     const logout = async () => {
+      profileMenuStore.close();
       await userStore.logout();
       router.push("/");
+    };
+
+    const closeProfileMenu = () => {
+      profileMenuStore.close();
     };
 
     const preferenceEntries = computed(() =>
@@ -219,7 +232,7 @@ export default {
 
     const saveSearch = async () => {
       if (!user.value?.iduser || !category.value || !preferenceEntries.value.length) {
-        saveSearchMessage.value = "No hay una búsqueda completa para guardar.";
+        saveSearchMessage.value = "No hay una busqueda completa para guardar.";
         return;
       }
 
@@ -236,9 +249,9 @@ export default {
             preferences: preferences.value,
           }),
         });
-        saveSearchMessage.value = payload.message || "Búsqueda guardada correctamente.";
+        saveSearchMessage.value = payload.message || "Busqueda guardada correctamente.";
       } catch (err) {
-        saveSearchMessage.value = err.message || "No se pudo guardar la búsqueda.";
+        saveSearchMessage.value = err.message || "No se pudo guardar la busqueda.";
       } finally {
         savingSearch.value = false;
       }
@@ -248,13 +261,21 @@ export default {
       return route.path === "/profile" || route.path === "/profile/properties-for-sale";
     });
 
+    watch(
+      () => route.fullPath,
+      () => {
+        profileMenuStore.close();
+      }
+    );
+
     return {
       user,
       category,
       preferenceEntries,
       logout,
       isProfileHome,
-      menuOpen,
+      isProfileMenuOpen,
+      closeProfileMenu,
       goToSettings,
       saveSearch,
       savingSearch,
@@ -269,39 +290,41 @@ export default {
 <style scoped>
 .profile{
 display:flex;
+align-items:stretch;
 min-height:100vh;
 background: linear-gradient(180deg, #b6c6d6, #eef2f7);
 }
 
-.menu-toggle{
+.sidebar-overlay{
 display:none;
-position:fixed;
-top:70px;
-background:#172a5d;
-color:white;
-border:none;
-border-radius:8px;
-padding:10px 12px;
-font-size:1rem;
-cursor:pointer;
-z-index:1000;
 }
 
 .sidebar{
-margin-top: 90px;
-width:300px;
+position:relative;
+width:clamp(220px, 24vw, 300px);
+margin-top:90px;
+min-height:calc(100vh - 90px);
 background:linear-gradient(to bottom,#2f3e69,#0a315e);
-padding:25px;
+box-shadow:3px 0 10px rgba(0,0,0,0.2);
+z-index:995;
+}
+
+.sidebar-panel{
+position:sticky;
+top:90px;
+height:100%;
+padding:clamp(16px, 1.2vw, 25px);
 display:flex;
 flex-direction:column;
-box-shadow:3px 0 10px rgba(0,0,0,0.2);
+overflow-y:auto;
+min-height:calc(100vh - 90px);
 }
 
 .sidebar h3{
 color:goldenrod;
-font-size:2rem;
+font-size:clamp(1.4rem, 1.1rem + 0.9vw, 2rem);
 text-align:center;
-margin-bottom:20px;
+margin-bottom:clamp(12px, 1vw, 20px);
 }
 
 .sidebar ul{
@@ -310,16 +333,16 @@ padding:0;
 }
 
 .sidebar li{
-margin:10px 0;
+margin:clamp(6px, 0.7vw, 10px) 0;
 }
 
 .sidebar a{
 display:block;
-padding:10px;
+padding:clamp(7px, 0.7vw, 10px);
 border-radius:6px;
 text-decoration:none;
 color:white;
-font-size:1.2rem;
+font-size:clamp(0.98rem, 0.88rem + 0.35vw, 1.2rem);
 }
 
 .sidebar a:hover{
@@ -335,11 +358,11 @@ background:#d6ab3e;
 font-family: inherit;
 display:block;
 width:100%;
-padding:10px;
+padding:clamp(7px, 0.7vw, 10px);
 border-radius:6px;
 text-decoration:none;
 color:white;
-font-size:1.2rem;
+font-size:clamp(0.98rem, 0.88rem + 0.35vw, 1.2rem);
 background:none;
 border:none;
 text-align:left;
@@ -353,6 +376,7 @@ font-weight:600;
 
 .profile-content{
 flex:1;
+min-width:0;
 margin-top: 90px;
 padding:40px;
 }
@@ -538,8 +562,8 @@ color:#51627f;
 }
 
 .logout-item{
-margin-top:80px;
-padding-top:20px;
+margin-top:clamp(36px, 4vw, 80px);
+padding-top:clamp(12px, 1.2vw, 20px);
 border-top:1px solid rgba(255,255,255,0.2);
 display:flex;
 justify-content:center;
@@ -547,13 +571,14 @@ justify-content:center;
 
 .logout-btn{
 width:80%;
-padding:10px;
+padding:clamp(8px, 0.7vw, 10px);
 border-radius:6px;
 border:1px solid rgba(255,255,255,0.3);
 background:transparent;
 color:white;
 cursor:pointer;
 transition:0.2s;
+font-size:clamp(0.92rem, 0.84rem + 0.2vw, 1rem);
 }
 
 .logout-btn:hover{
@@ -561,32 +586,60 @@ background:rgba(239, 68, 68, 0.747);
 }
 
 @media(max-width:768px){
-
-.menu-toggle{
-display:block;
-}
-
-.sidebar{
-position:fixed;
-top:0;
-margin-top: 70px;
-left:-260px;
-height:100vh;
-width:260px;
-transition:0.3s;
-z-index:999;
-}
-
-.sidebar.open{
-left:0;
-}
-
 .profile{
 flex-direction:column;
 }
 
+.sidebar-overlay{
+display:block;
+position:fixed;
+inset:90px 0 0 0;
+border:none;
+padding:0;
+margin:0;
+background:rgba(12,23,52,0.18);
+z-index:994;
+}
+
+.sidebar{
+position:fixed;
+top:90px;
+right:16px;
+left:auto;
+width:min(320px, calc(100vw - 32px));
+max-height:calc(100dvh - 106px);
+height:auto;
+min-height:0;
+margin-top:0;
+border-radius:22px;
+box-shadow:0 18px 40px rgba(12,23,52,0.24);
+overflow:hidden;
+transform:translateY(-12px) scale(0.98);
+opacity:0;
+pointer-events:none;
+transition:transform 0.22s ease, opacity 0.22s ease;
+z-index:995;
+background:linear-gradient(180deg,#243864,#102447);
+margin-top:0;
+}
+
+.sidebar.open{
+transform:translateY(0) scale(1);
+opacity:1;
+pointer-events:auto;
+}
+
+.sidebar-panel{
+top:0;
+height:auto;
+min-height:0;
+max-height:calc(100dvh - 106px);
+padding:18px;
+}
+
 .profile-content{
-padding-top:50px;
+margin-left:0;
+padding: 40px;
 }
 
 .dashboard-grid {
@@ -617,25 +670,30 @@ padding: 20px;
 
 .profile-content{
 margin-top: 65px;
+margin-left:0;
 padding:15px;
 }
 
-.menu-toggle{
-top: 65px;
-font-size: 1rem;
-padding: 8px 12px;
+.sidebar{
+top:65px;
+right:12px;
+width:calc(100vw - 24px);
+max-height:calc(100dvh - 81px);
+border-radius:18px;
 }
 
-.sidebar{
-margin-top: 65px;
-width: 200px;
-padding: 15px;
+.sidebar-overlay{
+inset:65px 0 0 0;
+}
+
+.sidebar-panel{
+max-height:calc(100dvh - 81px);
+padding:14px;
 }
 
 .sidebar h3{
-margin-top: 50px;
-font-size: 1.3rem;
-margin-bottom: 10px;
+font-size:1.2rem;
+margin-bottom:10px;
 }
 
 .sidebar ul{
@@ -645,10 +703,6 @@ gap: 6px;
 .sidebar a{
 font-size: 0.9rem;
 padding: 6px;
-}
-
-.profile-content{
-padding: 40px 15px;
 }
 
 .profile-hero{

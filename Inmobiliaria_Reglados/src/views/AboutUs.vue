@@ -10,20 +10,12 @@
 
     <!-- Lado derecho (texto) -->
     <div class="about-content">
-      <h2>Quiénes somos</h2>
+        <h2>Quiénes somos</h2>
       <div class="about-text">
-      <p>
-        En RS Inmobiliaria ayudamos a nuestros clientes a encontrar el hogar
-        ideal y las mejores oportunidades de inversión. Nuestro equipo combina
-        experiencia, cercanía y profesionalidad para ofrecer un servicio
-        inmobiliario transparente y personalizado.
-      </p>
-
-      <p>
-        Creemos en la confianza, la calidad y el compromiso como pilares
-        fundamentales de nuestro trabajo.
-      </p>
-    </div>
+        <p>
+          En RS Inmobiliaria ayudamos a encontrar el hogar ideal y las mejores inversiones. Con experiencia y cercanía, ofrecemos un servicio transparente basado en la confianza y el compromiso.
+        </p>
+      </div>
     </div>
 
   </section>
@@ -43,7 +35,7 @@ export default {
   justify-content: center;
   gap: 120px;
   min-height: 100vh;
-  background: rgba(0, 0, 0, 0.269);
+  background: rgba(0, 0, 0, 0.349);
   padding: 60px 40px;
 }
 
@@ -80,8 +72,8 @@ export default {
 }
 
 .about-content h2 {
-  font-size: 5rem;
-  margin-bottom: 25px;
+  font-size: clamp(2.2rem, 6vw, 5rem);
+  margin-bottom: 30px;
   background: linear-gradient(
     135deg,
     #5f4b08 0%,
@@ -93,11 +85,11 @@ export default {
   );
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  text-shadow: 0 2px 3px rgba(186, 129, 15, 0.326);
+  text-shadow: 0 4px 10px rgba(200, 153, 59, 0.518);
 }
 
 .about-content p {
-  font-size: 1.75rem;
+  font-size: clamp(0.85rem, 1.5vw, 1.75rem);
   text-shadow: 0 2px 3px rgba(0, 0, 0, 0.605);
   line-height: 1.7;
   margin-bottom: 20px;
@@ -105,10 +97,13 @@ export default {
 }
 
 .about-text {
-  background: rgba(0, 0, 0, 0.226);
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.475);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0px 15px 35px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 /* =========================
@@ -128,11 +123,11 @@ TABLET
   }
 
   .about-content h2{
-    font-size:3.5rem;
+    font-size: clamp(2rem, 5vw, 3.5rem);
   }
 
   .about-content p{
-    font-size:1.4rem;
+    font-size: clamp(1.1rem, 2vw, 1.4rem);
   }
 
 }
@@ -165,11 +160,11 @@ TABLET PEQUEÑA (CAMBIO DE LAYOUT)
   }
 
   .about-content h2{
-    font-size:2.8rem;
+    font-size: clamp(1.8rem, 4.5vw, 2.4rem);
   }
 
   .about-content p{
-    font-size:1.25rem;
+    font-size: clamp(0.95rem, 1.8vw, 1.1rem);
   }
 
 }
@@ -191,11 +186,11 @@ MÓVIL
   }
 
   .about-content h2{
-    font-size:2.2rem;
+    font-size: clamp(1.5rem, 8vw, 1.8rem);
   }
 
   .about-content p{
-    font-size:1.1rem;
+    font-size:0.85rem;
     line-height:1.6;
   }
 

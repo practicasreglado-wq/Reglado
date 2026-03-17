@@ -10,14 +10,24 @@
       <ul>
         <li v-if="!user">
           <button class="catalog-btn" @click="goToLogin">
-            Iniciar sesión
+            Iniciar sesion
           </button>
         </li>
 
         <li v-if="isReal">
           <button class="catalog-btn" @click="goToCatalog">
-            <span class="catalog-text">Búsqueda por catálogo</span>
-            <svg class="catalog-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <span class="catalog-text">Busqueda por catalogo</span>
+            <svg
+              class="catalog-icon"
+              viewBox="0 0 24 24"
+              width="32"
+              height="32"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
               <rect x="3" y="3" width="7" height="7"></rect>
               <rect x="14" y="3" width="7" height="7"></rect>
               <rect x="14" y="14" width="7" height="7"></rect>
@@ -26,23 +36,61 @@
           </button>
         </li>
 
-        <li v-if="user" class="profile-nav-item">
-          <!-- Icono especial para ADMIN -->
-          <router-link 
-            v-if="isAdmin" 
-            to="/admin/properties" 
-            class="admin-badge" 
-            title="Panel de administración"
+        <li v-if="user" class="profile-nav-item" :class="{ 'in-profile': isInProfile }">
+          <router-link
+            v-if="isAdmin"
+            to="/admin/properties"
+            class="admin-badge"
+            title="Panel de administracion"
           >
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke-linecap="round" stroke-linejoin="round"/>
+            <svg
+              viewBox="0 0 24 24"
+              width="20"
+              height="20"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+            >
+              <path
+                d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
             </svg>
           </router-link>
-          <router-link to="/profile" class="bienvenido">
-            <div class="user-avatar">
-              <span>{{ getInitials() }}</span>
-            </div>
-          </router-link>
+
+          <div class="user-menu-container">
+            <router-link
+              to="/profile"
+              class="bienvenido"
+              :class="{ 'hide-on-mobile-profile': isInProfile }"
+            >
+              <div class="user-avatar">
+                <span>{{ getInitials() }}</span>
+              </div>
+            </router-link>
+
+            <button
+              v-if="isInProfile"
+              class="profile-menu-trigger"
+              :class="{ active: isProfileMenuOpen }"
+              aria-label="Abrir menu de perfil"
+              @click="toggleProfileMenu"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                width="24"
+                height="24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+            </button>
+          </div>
         </li>
       </ul>
     </nav>
@@ -50,17 +98,24 @@
 </template>
 
 <script>
-import { useUserStore } from "../stores/user";
+import { computed, watch } from "vue";
 import { storeToRefs } from "pinia";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
+import { useUserStore } from "../stores/user";
+import { useProfileMenuStore } from "../stores/profileMenu";
 
 export default {
   name: "Header",
 
   setup() {
     const userStore = useUserStore();
+    const profileMenuStore = useProfileMenuStore();
     const router = useRouter();
+    const route = useRoute();
     const { user, isAdmin, isReal } = storeToRefs(userStore);
+    const { isOpen: isProfileMenuOpen } = storeToRefs(profileMenuStore);
+
+    const isInProfile = computed(() => route.path.startsWith("/profile"));
 
     const goToCatalog = () => {
       router.push("/dashboard");
@@ -69,6 +124,22 @@ export default {
     const goToLogin = () => {
       router.push("/login");
     };
+
+    const toggleProfileMenu = () => {
+      if (!isProfileMenuOpen.value && window.innerWidth <= 768) {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+      profileMenuStore.toggle();
+    };
+
+    watch(
+      () => route.path,
+      (path) => {
+        if (!path.startsWith("/profile")) {
+          profileMenuStore.close();
+        }
+      }
+    );
 
     const getInitials = () => {
       if (!user.value) return "U";
@@ -80,6 +151,9 @@ export default {
       user,
       isAdmin,
       isReal,
+      isInProfile,
+      isProfileMenuOpen,
+      toggleProfileMenu,
       goToCatalog,
       goToLogin,
       getInitials,
@@ -133,16 +207,15 @@ header .logo h1 {
 
 .admin-badge {
   color: #bd9b2c;
-  background: rgba(189, 155, 44, 0.1);
-  width: 50px;
-  height: 50px;
+  background: #ffffff;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   border: 1px solid rgba(189, 155, 44, 0.3);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  margin-right: 15px;
   transition: all 0.3s ease;
 }
 
@@ -166,6 +239,7 @@ header .logo h1 {
 .profile-nav-item {
   display: flex;
   align-items: center;
+  gap: 25px;
 }
 
 .logo-text {
@@ -182,7 +256,7 @@ nav ul {
   padding: 0;
   display: flex;
   align-items: center;
-  gap: 35px;
+  gap: 25px;
 }
 
 nav a,
@@ -204,16 +278,21 @@ nav a:hover,
   font-size: 1rem;
   border: none;
   cursor: pointer;
-  padding: 10px 22px;
+  padding: 5px;
   color: var(--negro);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 15px;
 }
 
 .catalog-icon {
   display: block;
+  transition: transform 1.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.catalog-btn:hover .catalog-icon {
+  transform: rotate(180deg) scale(1.1);
 }
 
 .bienvenido {
@@ -231,62 +310,89 @@ nav a:hover,
 
 .user-avatar {
   display: inline-block;
-  width: 50px;
-  height: 50px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   background-color: var(--azul-principal);
   text-align: center;
   color: white;
-  line-height: 50px;
+  line-height: 60px;
   font-weight: bold;
-  margin-right: 10px;
-  font-size: 1.3rem;
+  font-size: 1.5rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.bienvenido:hover .user-avatar {
+  transform: translateY(-3px);
+  box-shadow: 0 0 18px rgb(52, 145, 192), 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.profile-nav-item.in-profile .user-avatar {
+  box-shadow: 0 0 20px rgb(52, 145, 192), 0 6px 12px rgba(0, 0, 0, 0.15);
+  border: 2px solid rgb(29, 136, 218);
 }
 
 nav a.router-link-exact-active {
   color: var(--azul-secundario);
 }
 
+.user-menu-container {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+.profile-menu-trigger {
+  display: none;
+  background: rgba(23, 42, 93, 0.05);
+  border: 1px solid rgba(23, 42, 93, 0.1);
+  color: #172a5d;
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.profile-menu-trigger svg {
+  width: 28px;
+  height: 28px;
+}
+
+.profile-menu-trigger:hover,
+.profile-menu-trigger.active {
+  background: #172a5d;
+  color: white;
+}
+
 @media (max-width: 768px) {
-  header {
-    height: 70px;
-    padding: 0 30px;
+  .profile-menu-trigger {
+    display: flex;
   }
 
-  header .logo h1 {
-    font-size: 2rem;
-  }
-
-  nav ul {
-    gap: 20px;
-  }
-
-  .catalog-btn {
-    padding: 8px;
-    font-size: 0.9rem;
+  .catalog-text {
+    display: none;
   }
 
   .catalog-icon {
-    display: block;
+    width: 42px !important;
+    height: 42px !important;
   }
+}
 
-  .bienvenido {
-    font-size: 1rem;
-  }
-
-  .user-avatar {
-    width: 42px;
-    height: 42px;
-    line-height: 42px;
-    font-size: 1.1rem;
+@media (max-width: 768px) {
+  .bienvenido.hide-on-mobile-profile {
+    display: none;
   }
 }
 
 @media (max-width: 480px) {
   header {
     height: 65px;
-    padding: 0 18px;
+    padding: 0 15px;
   }
 
   header .logo h1 {
@@ -295,26 +401,56 @@ nav a.router-link-exact-active {
   }
 
   nav ul {
-    gap: 12px;
+    gap: 10px;
+  }
+
+  .profile-nav-item {
+    gap: 10px;
+  }
+
+  .user-menu-container {
+    gap: 10px;
   }
 
   .catalog-btn {
     padding: 6px;
   }
 
-  .catalog-text {
-    display: none;
-  }
   .bienvenido {
     font-size: 0.9rem;
   }
 
+  .admin-badge {
+    width: 36px;
+    height: 36px;
+  }
+
+  .admin-badge svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .catalog-icon {
+    width: 24px !important;
+    height: 24px !important;
+  }
+
   .user-avatar {
-    width: 34px;
-    height: 34px;
-    line-height: 34px;
-    font-size: 0.95rem;
+    width: 36px;
+    height: 36px;
+    line-height: 36px;
+    font-size: 1rem;
     margin-right: 0;
+  }
+
+  .profile-menu-trigger {
+    width: 36px;
+    height: 36px;
+  }
+
+  .profile-menu-trigger svg {
+    width: 18px;
+    height: 18px;
   }
 }
 </style>

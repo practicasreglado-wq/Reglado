@@ -23,6 +23,7 @@ $stmt = $pdo->prepare('
         p.imagen_principal,
         p.caracteristicas_json,
         p.created_at,
+        pf.created_at as favorited_at,
         pf.preferencias
     FROM propiedades_favoritas pf
     INNER JOIN propiedades p ON p.id = pf.property_id
@@ -61,10 +62,17 @@ foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
 
         // 🔥 ESTO LO NECESITA EL POPPER
         'match_details' => $match['details'] ?? [],
+        'created_at' => $row['created_at'],
+        'favorited_at' => $row['favorited_at'] ?? null,
 
         'is_favorite' => true
     ];
 }
+
+// 🔥 Ordenar por porcentaje de match descendente
+usort($favorites, function($a, $b) {
+    return $b['match_percentage'] <=> $a['match_percentage'];
+});
 
 respondJson(200, [
     'success' => true,
