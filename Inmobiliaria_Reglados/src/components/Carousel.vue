@@ -372,6 +372,10 @@ export default {
 .carousel{
   text-align:center;
   padding:80px 0;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 }
 
 /* TITULOS */

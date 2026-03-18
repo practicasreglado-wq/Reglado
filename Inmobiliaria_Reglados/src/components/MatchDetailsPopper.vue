@@ -72,7 +72,7 @@ export default {
 
   border:1px solid #172a5d;
 
-  background:rgba(255,255,255,0.9);
+  background:rgba(255, 255, 255, 0.815);
   backdrop-filter:blur(18px);
   -webkit-backdrop-filter:blur(18px);
 

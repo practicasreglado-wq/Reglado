@@ -3,10 +3,19 @@
     <button
       v-if="isVisible"
       class="scroll-to-top"
+      :class="{ 'is-active': isActive }"
       type="button"
       aria-label="Volver arriba"
-      @click="scrollToTop"
+      @click="handleScrollToTop"
     >
+      <!-- Efecto Viento -->
+      <div class="wind-effect">
+        <svg viewBox="0 0 100 100" class="wind-svg">
+          <line class="wind-line w1" x1="50" y1="20" x2="50" y2="0" />
+          <line class="wind-line w2" x1="30" y1="40" x2="30" y2="10" />
+          <line class="wind-line w3" x1="70" y1="40" x2="70" y2="10" />
+        </svg>
+      </div>
       <span class="scroll-to-top__icon" aria-hidden="true">&uarr;</span>
     </button>
   </transition>
@@ -19,6 +28,7 @@ import { useRoute } from "vue-router";
 const route = useRoute();
 const scrollY = ref(0);
 const isNearBottom = ref(false);
+const isActive = ref(false);
 
 const updateVisibility = () => {
   const currentScroll = window.scrollY || window.pageYOffset || 0;
@@ -31,18 +41,25 @@ const updateVisibility = () => {
 };
 
 const isVisible = computed(() => {
-  if (scrollY.value <= 0) {
-    return false;
-  }
-
+  if (isActive.value) return true; // Mantener visible durante la animación
+  if (scrollY.value <= 0) return false;
   return scrollY.value >= 300 || isNearBottom.value;
 });
 
-const scrollToTop = () => {
+const handleScrollToTop = () => {
+  if (isActive.value) return;
+  
+  isActive.value = true;
+  
   window.scrollTo({
     top: 0,
     behavior: "smooth",
   });
+
+  // Resetear estado después de la animación de viento
+  setTimeout(() => {
+    isActive.value = false;
+  }, 1000);
 };
 
 onMounted(() => {
@@ -89,6 +106,7 @@ watch(
     transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
     box-shadow 0.3s ease,
     background 0.3s ease;
+  overflow: visible;
 }
 
 .scroll-to-top:hover {
@@ -97,15 +115,74 @@ watch(
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
 }
 
-.scroll-to-top:focus-visible {
-  outline: 3px solid rgba(255, 255, 255, 0.4);
-  outline-offset: 3px;
+.scroll-to-top.is-active {
+  transform: translateY(-80px) scale(1.2);
+  opacity: 0;
+  transition: transform 0.7s ease-in, opacity 0.7s ease-in;
 }
+
+/* EFECTO VIENTO */
+.wind-effect {
+  position: absolute;
+  top: -20px;
+  left: 0;
+  width: 100%;
+  height: 40px;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.wind-svg {
+  width: 100%;
+  height: 100%;
+  stroke: rgba(255, 255, 255, 0.8);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+.scroll-to-top.is-active .wind-effect {
+  opacity: 1;
+}
+
+.scroll-to-top.is-active .wind-line {
+  animation: windFlow 0.5s ease-out forwards;
+}
+
+@keyframes windFlow {
+  0% {
+    stroke-dasharray: 0 100;
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  50% {
+    stroke-dasharray: 40 100;
+    stroke-dashoffset: -20;
+    opacity: 1;
+  }
+  100% {
+    stroke-dasharray: 0 100;
+    stroke-dashoffset: -80;
+    opacity: 0;
+  }
+}
+
+.w2 { animation-delay: 0.05s; }
+.w3 { animation-delay: 0.1s; }
 
 .scroll-to-top__icon {
   font-size: 1.35rem;
   font-weight: 700;
   line-height: 1;
+  transition: transform 0.3s ease;
+}
+
+.scroll-to-top.is-active .scroll-to-top__icon {
+  transform: translateY(-15px);
+}
+
+.scroll-to-top:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.4);
+  outline-offset: 3px;
 }
 
 .scroll-to-top-enter-active,

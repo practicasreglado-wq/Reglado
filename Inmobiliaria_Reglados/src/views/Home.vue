@@ -114,6 +114,7 @@ export default {
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
   margin-bottom: 30px;
+  margin-top: 20px;
 }
 
 .hero h1{
@@ -198,6 +199,7 @@ TABLETS
   .hero-content{
     align-items:center;
     text-align:center;
+    margin-top: 80px;
   }
 
   .hero h1{
@@ -214,7 +216,12 @@ TABLETS
 
   .btn-login{
     font-size:1.8rem;
-    margin: 0;
+    margin-top: 40px;
+    margin-bottom: 20px;
+  }
+
+  .t_hero {
+    margin-top: 10px;
   }
 
 }
@@ -233,6 +240,7 @@ TABLETS PEQUEÑAS
   .hero-content{
     align-items:center;
     text-align:center;
+    margin-top: 60px;
   }
 
   .hero h1{
@@ -249,7 +257,12 @@ TABLETS PEQUEÑAS
 
   .btn-login{
     font-size:1.4rem;
-    margin: 0;
+    margin-top: 30px;
+    margin-bottom: 20px;
+  }
+
+  .t_hero {
+    margin-top: 5px;
   }
 
 }
@@ -272,6 +285,7 @@ MOVIL
   .hero-content{
     align-items:center;
     text-align:center;
+    margin-top: 50px;
   }
 
   .hero-content h1,
@@ -294,7 +308,12 @@ MOVIL
   .btn-login{
     font-size:0.95rem;
     padding:6px 18px;
-    margin: 0;
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+
+  .t_hero {
+    margin-top: 5px;
   }
 
 }

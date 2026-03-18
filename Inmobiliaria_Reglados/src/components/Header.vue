@@ -1,8 +1,11 @@
 <template>
   <header>
     <div class="logo">
-      <router-link to="/" class="logo-text">
-        <h1>RS</h1>
+      <router-link to="/" class="logo-link">
+        <div class="logo-wrapper">
+          <img src="@/assets/reglado-RS-logo.svg" alt="Reglado Logo" class="brand-icon" />
+          <h1 class="brand-text">RS</h1>
+        </div>
       </router-link>
     </div>
 
@@ -173,18 +176,45 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 60px;
+  padding: 0 40px 0 30px; /* Reducido de 60px y ajustado izquierda */
   background: rgba(255, 255, 255, 0.639);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
   box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 }
 
-header .logo h1 {
-  font-size: 2.8rem;
-  font-weight: 700;
+header .logo .logo-link {
+  text-decoration: none;
+  display: block;
+}
+
+.logo-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 5px 0; /* Eliminado padding lateral para estar más pegado a la izq */
+  transition: transform 0.3s ease;
+}
+
+.brand-icon {
+  width: 45px;
+  height: 45px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 2px rgba(189, 155, 44, 0.6));
+  transition: transform 1.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.brand-text {
+  font-size: 2.2rem;
+  font-weight: 800;
   margin: 0;
-  letter-spacing: 2px;
+  letter-spacing: 1px;
   background: linear-gradient(
     135deg,
     #5f4b08 0%,
@@ -196,13 +226,22 @@ header .logo h1 {
   );
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  text-shadow: 0 2px 3px rgba(186, 129, 15, 0.532);
+  text-shadow: 0 1px 2px rgba(186, 129, 15, 0.4);
+}
+
+/* LOGO HOVER */
+.logo-link:hover .logo-wrapper {
+  transform: scale(1.02);
+}
+
+.logo-link:hover .brand-icon {
+  transform: rotate(180deg) scale(1.1);
 }
 
 .logo {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px; /* Reducido gap global */
 }
 
 .admin-badge {
@@ -228,7 +267,15 @@ header .logo h1 {
 }
 
 .admin-badge:hover {
-  transform: translateY(-2px);
+  animation: badgeWobble 0.6s ease-in-out;
+}
+
+@keyframes badgeWobble {
+  0% { transform: rotate(0deg) scale(1.05); }
+  25% { transform: rotate(-8deg) scale(1.1); }
+  50% { transform: rotate(8deg) scale(1.1); }
+  75% { transform: rotate(-4deg) scale(1.05); }
+  100% { transform: rotate(0deg) scale(1); }
 }
 
 .admin-badge svg {
@@ -392,24 +439,29 @@ nav a.router-link-exact-active {
 @media (max-width: 480px) {
   header {
     height: 65px;
-    padding: 0 15px;
+    padding: 0 10px; /* Aún más pegado en móviles */
   }
 
-  header .logo h1 {
-    font-size: 1.6rem;
-    letter-spacing: 1px;
+  .brand-icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .brand-text {
+    font-size: 1.3rem;
+    letter-spacing: 0px;
   }
 
   nav ul {
-    gap: 10px;
+    gap: 8px;
   }
 
   .profile-nav-item {
-    gap: 10px;
+    gap: 8px;
   }
 
   .user-menu-container {
-    gap: 10px;
+    gap: 8px;
   }
 
   .catalog-btn {

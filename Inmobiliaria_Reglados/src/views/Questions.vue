@@ -258,7 +258,11 @@ return{category,form,currentForm,submit}
 /* ------------------------
 QUESTIONS - LAPTOPS
 -------------------------*/
+
 @media (max-width: 1440px) {
+  .category-form :deep(.section) {
+    max-height: 290px !important;
+  }
 
   .questions-container{
     max-width:750px;

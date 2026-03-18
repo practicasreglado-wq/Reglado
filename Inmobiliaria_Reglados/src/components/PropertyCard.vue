@@ -237,12 +237,17 @@ export default {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  user-select: none;
 }
 
 .property-card__overlay {
   position: absolute;
   inset: 0;
   background: linear-gradient(180deg, rgba(10,21,46,0.08), rgba(10,21,46,0.42));
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 }
 
 .property-card__actions {
@@ -261,7 +266,7 @@ export default {
   display:flex;
   align-items:center;
   gap:6px;
-  padding:6px 12px;
+  padding:4px 10px;
   border-radius:999px;
   border:none;
   background:rgba(255,255,255,0.95);
@@ -271,6 +276,10 @@ export default {
   color:#c1a115;
   cursor:pointer;
   transition:all 0.2s ease;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 }
 
 .favorite-icon{
@@ -319,6 +328,10 @@ export default {
     transform 0.25s ease,
     background 0.45s ease,
     box-shadow 0.25s ease;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 }
 
 /* HOVER DEL PILL */
@@ -400,6 +413,7 @@ export default {
   padding:6px 12px;
   border-radius:999px;
   transition:all .2s ease;
+  user-select: none;
 }
 
 .match-details-button:hover{
