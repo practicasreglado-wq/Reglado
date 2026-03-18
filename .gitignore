@@ -1,2 +1,6 @@
 ApiLoging/.env
 ApiLoging/.env.local.bak
+Inmobiliaria_Reglados/backend/uploads/
+ApiLoging/vendor/
+Inmobiliaria_Reglados/backend/vendor/
+.env
