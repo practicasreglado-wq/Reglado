@@ -45,13 +45,10 @@
 
       <div class="info">
         <div class="item">
-          <span class="dot"></span> Teléfono
+          <span class="dot"></span><strong>Teléfono:</strong> +34 911 462 674
         </div>
         <div class="item">
-          <span class="dot"></span> Correo
-        </div>
-        <div class="item">
-          <span class="dot"></span> Ubicación
+          <span class="dot"></span><strong>Email:</strong> info@regladoconsultores.com
         </div>
       </div>
     </div>

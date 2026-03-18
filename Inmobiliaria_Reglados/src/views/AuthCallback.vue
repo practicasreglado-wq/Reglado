@@ -33,7 +33,11 @@ onMounted(async () => {
       throw new Error("No se pudo iniciar la sesión.");
     }
 
-    router.replace("/dashboard");
+    if (userStore.userRole === "user") {
+      router.replace("/profile");
+    } else {
+      router.replace("/dashboard");
+    }
   } catch (err) {
     auth.clearSession();
     userStore.logoutLocal();
