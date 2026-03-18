@@ -41,11 +41,29 @@
 </template>
 
 <script setup>
+import { computed } from "vue";
 import linkedinIcon from "../assets/linkedin.svg";
+import { auth } from "../services/auth";
 
 const realstateUrl = import.meta.env.VITE_REGLADO_REALSTATE_URL || "#";
-const energyUrl = import.meta.env.VITE_REGLADO_ENERGY_URL || "http://localhost:5174";
+const rawEnergyUrl = import.meta.env.VITE_REGLADO_ENERGY_URL || "http://localhost:5174";
+const energyUrl = computed(() => buildExternalProductUrl(rawEnergyUrl));
 const year = new Date().getFullYear();
+
+function buildExternalProductUrl(baseUrl) {
+  if (!baseUrl || baseUrl === "#") {
+    return "#";
+  }
+
+  const cleanBase = String(baseUrl).replace(/\/+$/, "");
+  const token = auth.state.token;
+
+  if (!token) {
+    return cleanBase;
+  }
+
+  return `${cleanBase}/#/auth/callback?token=${encodeURIComponent(token)}`;
+}
 </script>
 
 <style scoped>
@@ -202,3 +220,6 @@ const year = new Date().getFullYear();
   }
 }
 </style>
+
+
+

@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+require_once __DIR__ . '/bootstrap.php';
+
 // Crea y devuelve una conexión PDO reutilizable a la base de datos MySQL del proyecto.
 function getPdo(): PDO
 {

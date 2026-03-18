@@ -37,7 +37,7 @@
                 <label>Telefono *</label>
                 <input
                   v-model="f.phone"
-                  :disabled="isLoggedIn"
+                  :disabled="isPhoneLocked"
                   required
                   type="tel"
                   inputmode="numeric"
@@ -100,6 +100,13 @@ const sending = ref(false);
 const errorMsg = ref("");
 const successMsg = ref("");
 const isLoggedIn = computed(() => Boolean(auth.state.user));
+const isPhoneLocked = computed(() => {
+  if (!auth.state.user) {
+    return false;
+  }
+
+  return Boolean(String(auth.state.user.phone || "").replace(/\D/g, "").slice(0, 9));
+});
 
 function fillLockedFields() {
   const user = auth.state.user;
