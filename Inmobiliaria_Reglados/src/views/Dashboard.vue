@@ -42,4 +42,11 @@ export default {
 .dashboard-container {
   text-align: center;
 }
+
+@media (max-width: 480px) {
+  .dashboard {
+    padding-top: 40px;
+    align-items: center;
+  }
+}
 </style>

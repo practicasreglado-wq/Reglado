@@ -531,7 +531,7 @@ TABLETS / LAPTOPS
 @media (max-width: 480px) {
 
   .carousel{
-    padding:30px 0;
+    padding:20px 0 30px;
   }
 
   .mobile-title{
@@ -559,8 +559,8 @@ TABLETS / LAPTOPS
   }
 
   .card{
-    width:180px;
-    height:120px;
+    width:150px;
+    height:95px;
   }
 
   .center{
