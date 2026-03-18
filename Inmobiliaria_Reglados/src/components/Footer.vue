@@ -53,14 +53,16 @@
           <ul>
             <li><a href="#" @click.prevent="goWithoutLoader('/')">Inicio</a></li>
             <li><a href="#" @click.prevent="goWithoutLoader('/#about-us')">Quienes somos</a></li>
+            <li><a href="#" @click.prevent="goWithoutLoader('/contacto')">Contacto</a></li>
           </ul>
         </nav>
 
         <section class="footer-column">
           <div class="footer-pill">Contacto</div>
           <ul class="footer-contact">
-            <li><strong>Tel:</strong> +34 911 462 674</li>
-            <li><strong>Email:</strong> info@regladoconsultores.com</li>
+            <li><strong>Tel:</strong> +34 600 000 000</li>
+            <li><strong>Email:</strong> contacto@rsrealestate.com</li>
+            <li>Madrid · Barcelona · Costa del Sol</li>
           </ul>
         </section>
       </div>

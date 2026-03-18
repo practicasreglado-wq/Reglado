@@ -146,7 +146,7 @@ export default {
 
     const getInitials = () => {
       if (!user.value) return "U";
-      const first = user.value.nombre_usuario?.charAt(0).toUpperCase() || "";
+      const first = user.value.nombre?.charAt(0).toUpperCase() || "";
       return first || "U";
     };
 

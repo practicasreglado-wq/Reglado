@@ -48,15 +48,16 @@ body {
 .page-transition-enter-active,
 .page-transition-leave-active {
   transition:
-    opacity 0.22s ease,
-    transform 0.22s ease;
-  will-change: opacity, transform;
+    opacity 0.42s ease,
+    transform 0.42s ease,
+    filter 0.42s ease;
 }
 
 .page-transition-enter-from,
 .page-transition-leave-to {
   opacity: 0;
-  transform: translateY(8px);
+  transform: translateY(16px) scale(0.99);
+  filter: blur(6px);
 }
 
 .reveal-hidden {

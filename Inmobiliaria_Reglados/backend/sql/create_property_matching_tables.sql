@@ -1,8 +1,8 @@
-CREATE TABLE IF NOT EXISTS propiedades (
+﻿CREATE TABLE IF NOT EXISTS propiedades (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    categoria VARCHAR(50) NOT NULL,
-    titulo VARCHAR(255) NOT NULL,
-    ubicacion_general VARCHAR(255) NOT NULL,
+    categoria VARCHAR(50) NOT NULL DEFAULT 'Captada',
+    titulo VARCHAR(255) NOT NULL DEFAULT '',
+    ubicacion_general VARCHAR(255) NOT NULL DEFAULT '',
     precio DECIMAL(15,2) NOT NULL DEFAULT 0,
     metros_cuadrados INT NOT NULL DEFAULT 0,
     imagen_principal VARCHAR(255) DEFAULT NULL,
@@ -14,14 +14,47 @@ CREATE TABLE IF NOT EXISTS propiedades (
 );
 
 ALTER TABLE propiedades
-    ADD COLUMN IF NOT EXISTS categoria VARCHAR(50) NOT NULL DEFAULT 'Activos',
+    ADD COLUMN IF NOT EXISTS categoria VARCHAR(50) NOT NULL DEFAULT 'Captada',
     ADD COLUMN IF NOT EXISTS titulo VARCHAR(255) NOT NULL DEFAULT '',
     ADD COLUMN IF NOT EXISTS ubicacion_general VARCHAR(255) NOT NULL DEFAULT '',
+    ADD COLUMN IF NOT EXISTS precio DECIMAL(15,2) NOT NULL DEFAULT 0,
     ADD COLUMN IF NOT EXISTS metros_cuadrados INT NOT NULL DEFAULT 0,
     ADD COLUMN IF NOT EXISTS imagen_principal VARCHAR(255) DEFAULT NULL,
-    ADD COLUMN IF NOT EXISTS caracteristicas_json JSON NULL,
+    ADD COLUMN IF NOT EXISTS caracteristicas_json JSON NOT NULL,
     ADD COLUMN IF NOT EXISTS owner_user_id INT NULL,
-    ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+    ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    ADD COLUMN IF NOT EXISTS tipo_propiedad VARCHAR(150) DEFAULT NULL,
+    ADD COLUMN IF NOT EXISTS ciudad VARCHAR(150) DEFAULT NULL,
+    ADD COLUMN IF NOT EXISTS zona VARCHAR(150) DEFAULT NULL,
+    ADD COLUMN IF NOT EXISTS habitaciones INT NOT NULL DEFAULT 0,
+    ADD COLUMN IF NOT EXISTS rentabilidad VARCHAR(50) DEFAULT NULL,
+    ADD COLUMN IF NOT EXISTS dossier_file VARCHAR(255) DEFAULT NULL,
+    ADD COLUMN IF NOT EXISTS confidentiality_file VARCHAR(255) DEFAULT NULL,
+    ADD COLUMN IF NOT EXISTS intention_file VARCHAR(255) DEFAULT NULL,
+    ADD COLUMN IF NOT EXISTS captador_id INT NULL,
+    ADD INDEX IF NOT EXISTS idx_propiedades_captador (captador_id);
+
+CREATE TABLE IF NOT EXISTS captadores (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_captadores_email (email),
+    INDEX idx_captadores_email (email)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS activos_recibidos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    origen VARCHAR(100) NOT NULL,
+    email_remitente VARCHAR(255),
+    texto_recibido LONGTEXT NOT NULL,
+    metadata JSON NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'pendiente',
+    captador_id INT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    processed_at TIMESTAMP NULL DEFAULT NULL,
+    INDEX idx_activos_status (status),
+    INDEX idx_activos_captador (captador_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS propiedades_favoritas (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -43,3 +76,12 @@ ALTER TABLE propiedades_favoritas
 
 -- Despues de ejecutar este script, lanza:
 -- php backend/sql/seed_property_matching_data.php
+
+CREATE TABLE IF NOT EXISTS search_history (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    categoria VARCHAR(100) NOT NULL,
+    preferences JSON NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_search_history_user_created (user_id, created_at DESC)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

@@ -155,7 +155,7 @@ stroke-linejoin="round"/>
 </div>
 </div>
 
-<div v-else-if="isReal" class="no-pref">
+<div v-else class="no-pref">
 No tienes preferencias guardadas todavia
 </div>
 
