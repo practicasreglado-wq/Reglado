@@ -86,6 +86,7 @@ import { RouterLink, useRouter, useRoute } from "vue-router";
 import adminUserIcon from "../assets/admin-user-icon.svg";
 import menuIcon from "../assets/menu.svg";
 import logoSrc from "../assets/reglado-energy-logo.svg";
+import { auth } from "../services/auth";
 
 const props = defineProps({
   user: {
@@ -98,7 +99,8 @@ const emit = defineEmits(["open-login", "logout"]);
 const router = useRouter();
 const route = useRoute();
 const realstateUrl = import.meta.env.VITE_REGLADO_REALSTATE_URL || "#";
-const energyUrl = import.meta.env.VITE_REGLADO_ENERGY_URL || "http://localhost:5174";
+const rawEnergyUrl = import.meta.env.VITE_REGLADO_ENERGY_URL || "http://localhost:5174";
+const energyUrl = computed(() => buildExternalProductUrl(rawEnergyUrl));
 
 const userMenuOpen = ref(false);
 const mobileMenuOpen = ref(false);
@@ -183,6 +185,21 @@ onBeforeUnmount(() => {
   document.removeEventListener("pointerdown", handlePointerDown);
   window.removeEventListener("scroll", handleScroll);
 });
+
+function buildExternalProductUrl(baseUrl) {
+  if (!baseUrl || baseUrl === "#") {
+    return "#";
+  }
+
+  const cleanBase = String(baseUrl).replace(/\/+$/, "");
+  const token = auth.state.token;
+
+  if (!token) {
+    return cleanBase;
+  }
+
+  return `${cleanBase}/#/auth/callback?token=${encodeURIComponent(token)}`;
+}
 </script>
 
 <style scoped>
@@ -521,3 +538,5 @@ onBeforeUnmount(() => {
   }
 }
 </style>
+
+

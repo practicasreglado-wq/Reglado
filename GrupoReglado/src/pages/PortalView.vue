@@ -148,6 +148,7 @@
 
 <script setup>
 import { computed, ref } from "vue";
+import { auth } from "../services/auth";
 
 import companyEnergy from "../assets/company-energy.png";
 import companyEnProceso from "../assets/company-enproceso.png";
@@ -178,8 +179,9 @@ const realstateUrl = import.meta.env.VITE_REGLADO_REALSTATE_URL || "#";
 const energyUrl = import.meta.env.VITE_REGLADO_ENERGY_URL || "http://localhost:5174";
 const mapasUrl = import.meta.env.VITE_REGLADO_MAPAS_URL || "#";
 const enProcesoUrl = import.meta.env.VITE_REGLADO_ENPROCESO_URL || "#";
+const energyEntryUrl = computed(() => buildExternalProductUrl(energyUrl));
 
-const companies = [
+const companies = computed(() => [
   {
     name: "Reglado Abogados",
     tag: "Abogados",
@@ -192,7 +194,7 @@ const companies = [
     name: "Reglado Energy",
     tag: "Energy",
     description: "Optimizacion energetica, analisis de consumo y gestion de contratos.",
-    href: energyUrl,
+    href: energyEntryUrl.value,
     image: companyEnergy,
     logo: boltIcon,
   },
@@ -200,7 +202,7 @@ const companies = [
     name: "Reglado Mapas",
     tag: "Mapas",
     description: "Plataforma geografica y visualizacion avanzada para decisiones de negocio.",
-    href: enProcesoUrl,
+    href: mapasUrl,
     image: companyMapas,
     logo: mapIcon,
   },
@@ -228,7 +230,7 @@ const companies = [
     image: companyProceso,
     logo: apartamentoIcon,
   },
-];
+]);
 
 const carouselGrid = ref(null);
 
@@ -246,6 +248,21 @@ function scrollToCompanies() {
   }
 
   target.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function buildExternalProductUrl(baseUrl) {
+  if (!baseUrl || baseUrl === "#") {
+    return "#";
+  }
+
+  const cleanBase = String(baseUrl).replace(/\/+$/, "");
+  const token = auth.state.token;
+
+  if (!token) {
+    return cleanBase;
+  }
+
+  return `${cleanBase}/#/auth/callback?token=${encodeURIComponent(token)}`;
 }
 
 </script>
