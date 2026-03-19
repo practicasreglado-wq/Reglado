@@ -154,7 +154,7 @@ import companyEnergy from "../assets/company-energy.png";
 import companyEnProceso from "../assets/company-enproceso.png";
 import companyProceso from "../assets/company-proceso.png";
 import companyConsultores from "../assets/company-consultores.png";
-import companyMapas from "../assets/company-mapas.webp";
+import companyMapas from "../assets/company-mapas.png";
 import companyRealstate from "../assets/company-realstate.png";
 import balanceIcon from "../assets/Balance.svg";
 import boltIcon from "../assets/Bolt.svg";
@@ -164,7 +164,7 @@ import apartmentIcon from "../assets/Apartment.svg";
 import addHomeIcon from "../assets/add_home.svg";
 import engineeringIcon from "../assets/Enginering.svg";
 import apartamentoIcon from "../assets/apartamento.svg";
-import corporateLogo from "../assets/reglado-energy-logo.svg";
+import corporateLogo from "../assets/reglado-logo.svg";
 
 const heroSubtitle =
   "Grupo empresarial especializado en consultoria, inmuebles, energia, tecnologia, inversiones e innovacion.";
@@ -177,7 +177,7 @@ const heroStyle = computed(() => ({
 
 const realstateUrl = import.meta.env.VITE_REGLADO_REALSTATE_URL || "#";
 const energyUrl = import.meta.env.VITE_REGLADO_ENERGY_URL || "http://localhost:5174";
-const mapasUrl = import.meta.env.VITE_REGLADO_MAPAS_URL || "#";
+const mapasUrl = import.meta.env.VITE_REGLADO_MAPAS_URL || "https://teal-bat-675895.hostingersite.com/";
 const enProcesoUrl = import.meta.env.VITE_REGLADO_ENPROCESO_URL || "#";
 const energyEntryUrl = computed(() => buildExternalProductUrl(energyUrl));
 

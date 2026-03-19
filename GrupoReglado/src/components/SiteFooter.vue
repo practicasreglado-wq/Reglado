@@ -16,9 +16,11 @@
         <div class="footer-col">
           <div class="title-badge">Navegación</div>
           <div class="footer-links">
-            <a href="https://regladoconsultores.com/" target="_blank" rel="noreferrer">Reglado Consultores</a>
+            <a href="https://regladoconsultores.com/" target="_blank" rel="noreferrer">Abogados</a>
             <a :href="energyUrl" target="_blank" rel="noreferrer">Energy</a>
-            <a href="#">Mapas</a>
+            <a href="#" target="_blank" rel="noreferrer">Ingeniería</a>
+            <a href="#" target="_blank" rel="noreferrer">Arquitectura</a>
+            <a :href="mapasUrl" target="_blank" rel="noreferrer">Mapas</a>
             <a :href="realstateUrl" target="_blank" rel="noreferrer">Real Estate</a>
           </div>
         </div>
@@ -49,6 +51,7 @@ import linkedinIcon from "../assets/linkedin.svg";
 import { auth } from "../services/auth";
 
 const realstateUrl = import.meta.env.VITE_REGLADO_REALSTATE_URL || "#";
+const mapasUrl = import.meta.env.VITE_REGLADO_MAPAS_URL || "https://teal-bat-675895.hostingersite.com/";
 const rawEnergyUrl = import.meta.env.VITE_REGLADO_ENERGY_URL || "http://localhost:5174";
 const energyUrl = computed(() => buildExternalProductUrl(rawEnergyUrl));
 const year = new Date().getFullYear();
