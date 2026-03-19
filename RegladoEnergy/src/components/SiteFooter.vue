@@ -38,7 +38,10 @@
 
     <div class="container bottom">
       <div class="small">&copy; {{ year }} Reglado Energy. Todos los derechos reservados.</div>
-      <div class="small">Transparencia · Rigor tecnico · Acompanamiento</div>
+      <div class="small footer-legal-links">
+        <router-link to="/aviso-legal">Aviso legal</router-link> &middot; 
+        <router-link to="/politica-cookies">Política de cookies</router-link>
+      </div>
     </div>
   </footer>
 </template>
@@ -139,6 +142,16 @@ const year = new Date().getFullYear();
   justify-content: space-between;
   gap: 12px;
   flex-wrap: wrap;
+}
+
+.footer-legal-links a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.footer-legal-links a:hover {
+  color: #fff;
 }
 
 @media (max-width: 980px) {

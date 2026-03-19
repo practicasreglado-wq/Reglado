@@ -34,7 +34,10 @@
 
       <div class="bottom">
         <div class="bottom-text">&copy; {{ year }} Reglado Group. Todos los derechos reservados.</div>
-        <div class="bottom-text">Transparencia &middot; Rigor t&eacute;cnico &middot; Acompa&ntilde;amiento</div>
+        <div class="bottom-text footer-legal-links">
+          <router-link to="/aviso-legal">Aviso legal</router-link> &middot; 
+          <router-link to="/politica-cookies">Pol&iacute;tica de cookies</router-link>
+        </div>
       </div>
     </div>
   </footer>
@@ -206,6 +209,16 @@ function buildExternalProductUrl(baseUrl) {
 .bottom-text {
   font-size: 0.85rem;
   color: rgba(255, 255, 255, 0.5);
+}
+
+.footer-legal-links a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer-legal-links a:hover {
+  color: #fff;
 }
 
 @media (max-width: 992px) {
