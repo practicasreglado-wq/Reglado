@@ -17,6 +17,7 @@
       @close="showLogin = false"
       @success="showLogin = false"
     />
+    <CookieBanner />
   </div>
 </template>
 
@@ -26,6 +27,7 @@ import { RouterView } from "vue-router";
 import LoginModal from "./components/LoginModal.vue";
 import SiteFooter from "./components/SiteFooter.vue";
 import SiteHeader from "./components/SiteHeader.vue";
+import CookieBanner from "./components/CookieBanner.vue";
 import { auth } from "./services/auth";
 
 const showLogin = ref(false);

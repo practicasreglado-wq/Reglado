@@ -21,6 +21,7 @@
     <SiteFooter />
     <CTASticky @close="isCTAClosed = true" />
     <ScrollTopButton :isCTAClosed="isCTAClosed" />
+    <CookieBanner />
   </div>
 </template>
 
@@ -30,6 +31,7 @@ import SiteHeader from "./components/SiteHeader.vue";
 import SiteFooter from "./components/SiteFooter.vue";
 import CTASticky from "./components/CTASticky.vue";
 import ScrollTopButton from "./components/ScrollTopButton.vue";
+import CookieBanner from "./components/CookieBanner.vue";
 import { auth } from "./services/auth";
 
 const isCTAClosed = ref(false);

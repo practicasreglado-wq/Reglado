@@ -7,6 +7,8 @@ import SettingsView from "../pages/SettingsView.vue";
 import ForgotPasswordView from "../pages/ForgotPasswordView.vue";
 import ResetPasswordView from "../pages/ResetPasswordView.vue";
 import AdminView from "../pages/AdminView.vue";
+import AvisoLegalView from "../pages/AvisoLegalView.vue";
+import PoliticaCookiesView from "../pages/PoliticaCookiesView.vue";
 
 const routes = [
   { path: "/", name: "portal", component: PortalView },
@@ -16,6 +18,8 @@ const routes = [
   { path: "/restablecer-contrasena", name: "restablecer-contrasena", component: ResetPasswordView },
   { path: "/configuracion", name: "configuracion", component: SettingsView },
   { path: "/admin", name: "admin", component: AdminView },
+  { path: "/aviso-legal", name: "aviso-legal", component: AvisoLegalView },
+  { path: "/politica-cookies", name: "politica-cookies", component: PoliticaCookiesView },
   {
     path: "/verificacion-exitosa",
     name: "verificacion-exitosa",
