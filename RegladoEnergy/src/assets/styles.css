@@ -76,7 +76,7 @@ body::before {
   transform: translateY(-50%);
   width: min(54vw, 680px);
   aspect-ratio: 1 / 1;
-  background: url("./reglado-energy-logo.svg") center / contain no-repeat;
+  background: url("./reglado-logo.svg") center / contain no-repeat;
   opacity: 0.17;
   filter: blur(4px) saturate(0.9);
   pointer-events: none;
