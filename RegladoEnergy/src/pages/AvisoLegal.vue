@@ -15,7 +15,7 @@
             <li>CIF: B09662081</li>
             <li>Domicilio: AVDA. ISLA GRACIOSA, 7 PISO 1º DESPACHOS 5-6 28703 SAN SEBASTIÁN DE LOS REYES.</li>
             <li>Teléfono: +34 911462674 / 615-641-081</li>
-            <li>Dirección electrónica: info@regladoconsultores.com</li>
+            <li>Dirección electrónica: info@regladoenergy.com</li>
           </ul>
 
           <p><strong>3. OBJETO.</strong></p>
@@ -49,7 +49,7 @@
           <p>REGLADO ENERGY se reserva el derecho de modificar el presente Aviso Legal y/o las condiciones particulares.</p>
 
           <p><strong>13. COMUNICACIONES.</strong></p>
-          <p>Cualquier comunicación entre REGLADO ENERGY y el Usuario, deberá dirigirse a la Empresa a la dirección electrónica: info@regladoconsultores.com</p>
+          <p>Cualquier comunicación entre REGLADO ENERGY y el Usuario, deberá dirigirse a la Empresa a la dirección electrónica: info@regladoenergy.com</p>
 
           <p><strong>14. LEGISLACIÓN APLICABLE Y TRIBUNALES COMPETENTES.</strong></p>
           <p>El presente Aviso Legal y las relaciones establecidas entre la Empresa y el Usuario se regirán y resolverán de conformidad con lo establecido en la normativa española. Para los casos en los que la normativa prevea la posibilidad a las partes de someterse a un fuero, la Empresa y el Usuario, someterán cualesquiera controversias a los Juzgados y Tribunales competentes.</p>

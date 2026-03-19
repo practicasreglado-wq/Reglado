@@ -31,7 +31,7 @@
         <div class="small">
           <br />
           <div><strong>Telefono:</strong> +34 911462674</div>
-          <div><strong>Email:</strong> info@regladoconsultores.com</div>
+          <div><strong>Email:</strong> info@regladoenergy.com</div>
         </div>
       </div>
     </div>

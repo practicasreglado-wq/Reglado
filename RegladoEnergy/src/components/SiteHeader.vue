@@ -144,7 +144,7 @@
 
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
-import logo from "../assets/reglado-energy-logo.svg";
+import logo from "../assets/reglado-logo.svg";
 import adminUserIcon from "../assets/admin-user-icon.svg";
 import { auth } from "../services/auth";
 

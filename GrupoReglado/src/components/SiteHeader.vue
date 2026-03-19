@@ -10,7 +10,7 @@
       <a :href="energyUrl">Energy</a>
       <a href="#">Ingeniería</a>
       <a href="#">Arquitectura</a>
-      <a href="#">Mapas</a>
+      <a :href="mapasUrl">Mapas</a>
       <a :href="realstateUrl">Real Estate</a>
     </nav>
 
@@ -61,7 +61,7 @@
         <a :href="energyUrl" @click="closeMobileMenu">Energy</a>
         <a href="#" @click="closeMobileMenu">Ingeniería</a>
         <a href="#" @click="closeMobileMenu">Arquitectura</a>
-        <a href="#" @click="closeMobileMenu">Mapas</a>
+        <a :href="mapasUrl" @click="closeMobileMenu">Mapas</a>
         <a :href="realstateUrl" @click="closeMobileMenu">Real Estate</a>
       </nav>
 
@@ -85,7 +85,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import { RouterLink, useRouter, useRoute } from "vue-router";
 import adminUserIcon from "../assets/admin-user-icon.svg";
 import menuIcon from "../assets/menu.svg";
-import logoSrc from "../assets/reglado-energy-logo.svg";
+import logoSrc from "../assets/reglado-logo.svg";
 import { auth } from "../services/auth";
 
 const props = defineProps({
@@ -99,6 +99,7 @@ const emit = defineEmits(["open-login", "logout"]);
 const router = useRouter();
 const route = useRoute();
 const realstateUrl = import.meta.env.VITE_REGLADO_REALSTATE_URL || "#";
+const mapasUrl = import.meta.env.VITE_REGLADO_MAPAS_URL || "https://teal-bat-675895.hostingersite.com/";
 const rawEnergyUrl = import.meta.env.VITE_REGLADO_ENERGY_URL || "http://localhost:5174";
 const energyUrl = computed(() => buildExternalProductUrl(rawEnergyUrl));
 
