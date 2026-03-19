@@ -93,6 +93,7 @@
 
 <script>
 import { computed, reactive, ref } from "vue";
+import { useRouter } from "vue-router";
 import { storeToRefs } from "pinia";
 import { useUserStore } from "../stores/user";
 import { backendJson } from "../services/backend";
@@ -101,6 +102,7 @@ export default {
   name: "Contacto",
 
   setup() {
+    const router = useRouter();
     const userStore = useUserStore();
     const { user, isLoggedIn } = storeToRefs(userStore);
     const message = ref("");
@@ -174,6 +176,10 @@ export default {
           response.message || "Solicitud enviada correctamente"
         );
         message.value = "";
+
+        setTimeout(() => {
+          router.push("/profile");
+        }, 3000);
       } catch (error) {
         setFeedback(
           "error",

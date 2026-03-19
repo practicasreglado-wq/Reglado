@@ -119,6 +119,10 @@ export default {
       });
 
       removeAfterHook = router.afterEach((to, from) => {
+        if (userStore.isLoggedIn) {
+          userStore.initializeSession().catch(err => console.error("Error refreshing session:", err));
+        }
+
         nextTick(() => {
           refreshAnimations();
           skipNextTransition.value = false;
