@@ -158,7 +158,7 @@ export default {
   },
   computed: {
     isMapView() { return this.$route.path === '/mapa'; },
-    isAutohide() { return this.isMapView && !this.isMenuOpen && !this.userMenuOpen; },
+    isAutohide() { return false; }, // Desactivado temporalmente para mapa en recuadro
     user() { return auth.state.user; },
     displayUsername() {
       const username = this.user?.username;
@@ -282,7 +282,7 @@ export default {
 }
 
 .logo {
-  height: 2.5rem;
+  height: 3.2rem;
   width: auto;
 }
 
