@@ -56,7 +56,6 @@
         <transition name="slide-right">
           <div class="user-sidebar" v-if="userMenuOpen">
             <div class="user-sidebar-header">
-              <div class="user-sidebar-avatar">{{ userInitial }}</div>
               <div class="user-sidebar-info">
                 <h3>{{ displayUsername }}</h3>
                 <p v-if="user && user.email" class="user-email-text">{{ user.email }}</p>
@@ -409,15 +408,18 @@ export default {
 .user-pill {
   border: 1px solid rgba(255,255,255,.26);
   border-radius: 999px;
-  width: 38px;
-  height: 38px;
+  width: 39px;
+  height: 39px;
+  min-width: 39px;
+  min-height: 39px;
+  flex-shrink: 0;
+  aspect-ratio: 1 / 1;
   padding: 0;
   font-size: 15px;
   color: rgba(233,238,246,.9);
   background: rgba(255,255,255,.08);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  display: grid;
+  place-items: center;
   transition: all 0.18s ease;
 }
 .user-pill:hover {
@@ -429,9 +431,8 @@ export default {
   color: rgba(233,238,246,.95); 
   font-size: 1.1rem; 
   font-weight: 800; 
-  line-height: normal;
-  display: inline-flex;
-  margin-top: -1px; /* Micro-ajuste para letras mayúsculas */
+  line-height: 1;
+  display: block;
 }
 /* ===================================================
    USER SIDEBAR / OFFCANVAS

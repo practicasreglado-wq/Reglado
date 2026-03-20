@@ -1,4 +1,4 @@
-import { createRouter, createWebHashHistory } from "vue-router";
+import { createRouter, createWebHistory } from "vue-router";
 import Home from "../pages/Home.vue";
 import Services from "../pages/Services.vue";
 import Clients from "../pages/Clients.vue";
@@ -36,7 +36,7 @@ const routes = [
 ];
 
 export default createRouter({
-  history: createWebHashHistory(),
+  history: createWebHistory(),
   routes,
   scrollBehavior() { return { top: 0 }; },
 });
