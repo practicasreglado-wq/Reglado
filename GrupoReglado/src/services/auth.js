@@ -229,6 +229,13 @@ async function adminUpdateRole(userId, role) {
   });
 }
 
+async function adminSyncNotion() {
+  return request("/auth/admin/sync-notion", {
+    method: "POST",
+    headers: authHeaders(),
+  });
+}
+
 async function logout() {
   try {
     if (state.token) {
@@ -259,6 +266,7 @@ export const auth = {
   resetPassword,
   adminUsers,
   adminUpdateRole,
+  adminSyncNotion,
   logout,
   translateMessage: translateAuthMessage,
 };

@@ -12,8 +12,12 @@
           placeholder="Buscar por ID, usuario o email..." 
           class="admin-search input"
         />
-        <button class="btn-primary" type="button" @click="loadUsers" :disabled="loading">
+        <button class="btn-primary" type="button" @click="loadUsers" :disabled="loading || syncingNotion">
           {{ loading ? "Cargando..." : "Actualizar" }}
+        </button>
+        <button class="btn-primary" type="button" @click="handleSyncNotion" :disabled="loading || syncingNotion" style="background-color: #273d5c;">
+          <svg v-if="!syncingNotion" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; vertical-align: text-bottom;"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21v-5h5"/></svg>
+          {{ syncingNotion ? "Sincronizando..." : "Sincronizar Notion" }}
         </button>
       </div>
     </div>
@@ -84,6 +88,7 @@ const router = useRouter();
 const users = ref([]);
 const searchQuery = ref("");
 const loading = ref(false);
+const syncingNotion = ref(false);
 const error = ref("");
 const openDropdownId = ref(null);
 const activeRole = ref("");
@@ -181,6 +186,22 @@ async function loadUsers() {
     }
   } finally {
     loading.value = false;
+  }
+}
+
+async function handleSyncNotion() {
+  if (confirm("¿Estás seguro de que quieres archivar todos los registros en Notion y resincronizar la base de datos completa? Esta acción tardará un rato según la cantidad de usuarios.")) {
+    syncingNotion.value = true;
+    error.value = "";
+    try {
+      const response = await auth.adminSyncNotion();
+      alert(`Sincronización completada.\n\nUsuarios procesados correctamente: ${response.synced_count} de ${response.total_users}`);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Error desconocido durante la sincronización.";
+      error.value = message;
+    } finally {
+      syncingNotion.value = false;
+    }
   }
 }
 

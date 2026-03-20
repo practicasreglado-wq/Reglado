@@ -575,6 +575,38 @@ class AuthController
         }
     }
 
+    public static function adminSyncNotion(): void
+    {
+        self::requireAdmin();
+
+        $users = User::listAll();
+
+        try {
+            $clearError = NotionService::clearDatabase();
+            if ($clearError !== '') {
+                Response::json(['error' => 'Error al limpiar Notion: ' . $clearError], 500);
+            }
+
+            $syncedCount = 0;
+            foreach ($users as $user) {
+                if (NotionService::syncUserCreated($user)) {
+                    $syncedCount++;
+                }
+            }
+
+            SecurityLogger::log('admin_synced_notion', null, ['synced' => $syncedCount]);
+
+            Response::json([
+                'message' => 'Notion synchronized successfully',
+                'synced_count' => $syncedCount,
+                'total_users' => count($users)
+            ]);
+        } catch (Throwable $e) {
+            error_log('[AuthController] adminSyncNotion Error: ' . $e->getMessage());
+            Response::json(['error' => 'could not synchronize notion: ' . $e->getMessage()], 500);
+        }
+    }
+
     public static function logout(): void
     {
         $token = AuthMiddleware::extractBearerToken();

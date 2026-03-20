@@ -90,6 +90,10 @@ if ($uri === '/auth/admin/update-role' && $method === 'POST') {
     AuthController::adminUpdateRole();
 }
 
+if ($uri === '/auth/admin/sync-notion' && $method === 'POST') {
+    AuthController::adminSyncNotion();
+}
+
 if ($uri === '/auth/logout' && $method === 'POST') {
     AuthController::logout();
 }
