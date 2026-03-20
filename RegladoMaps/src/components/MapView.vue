@@ -1,5 +1,5 @@
 <template>
-  <div class="mapa-view-container">
+  <div class="mapa-view-container" :class="{ 'is-fullscreen': isFullscreen }">
     <div class="map-wrapper">
 
       <!-- Drawer estilo Side-Nav para Filtros -->
@@ -105,6 +105,8 @@
         </div>
       </div>
 
+      <!-- El botón Pantalla completa fue movido abajo por seguridad del ratón -->
+
       <div id="map"></div>
 
       <!-- Panel de Leyenda Desplegable Nativo -->
@@ -158,7 +160,12 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> <!-- /map-wrapper -->
+
+    <!-- Botón de Pantalla Completa aislado fuera del wrapper estructural -->
+    <button class="btn-fullscreen-toggle" @click.stop.prevent="toggleFullscreen" :title="isFullscreen ? 'Minimizar mapa' : 'Pantalla completa'">
+      <i class="fas" :class="isFullscreen ? 'fa-compress' : 'fa-expand'" style="pointer-events: none;"></i>
+    </button>
   </div>
 </template>
 
@@ -170,7 +177,8 @@ export default {
       scriptsCargados: false,
       scriptsGenerados: [],
       isFiltersOpen: true,
-      isLeyendaOpen: false
+      isLeyendaOpen: false,
+      isFullscreen: false
     }
   },
   mounted() {
@@ -184,6 +192,7 @@ export default {
     this.scriptsGenerados.forEach(s => {
       if (s && s.parentNode) s.parentNode.removeChild(s);
     });
+    document.body.style.overflow = '';
   },
   methods: {
     cargarScriptsMapa() {
@@ -233,6 +242,23 @@ export default {
         })
         .catch(err => console.error("Error al inyectar librerías del ApiMapa", err));
     },
+    toggleFullscreen() {
+      this.isFullscreen = !this.isFullscreen;
+      
+      if (this.isFullscreen) {
+        document.body.style.overflow = 'hidden';
+      } else {
+        document.body.style.overflow = '';
+      }
+
+      // Animar y luego invalidar el tamaño del mapa para que Leaflet recalcule tiles
+      setTimeout(() => {
+        if (typeof window.map !== 'undefined' && window.map) {
+          window.map.invalidateSize();
+          console.log("Leaflet resize refrescado tras toggle de pantalla completa");
+        }
+      }, 400); // 400ms da tiempo para que la animación CSS termine
+    },
     loadScript(src) {
       return new Promise((resolve, reject) => {
         if (document.querySelector(`script[src="${src}"]`)) { resolve(); return; }
@@ -258,25 +284,95 @@ export default {
 
 <style scoped>
 .mapa-view-container {
-  /* En vista de mapa completo el header se oculta, extendemos a pantalla total */
-  padding-top: 0px;
-  width: 100vw;
-  height: 100vh;
+  /* En vista normal (recuadro) */
+  padding-top: 125px; /* Para salvar el header de la LP con margen seguro */
+  padding-bottom: 24px;
+  width: 100%;
+  max-width: 1600px;
+  height: calc(100vh - 16px);
+  min-height: 950px;
+  margin: 0 auto;
   box-sizing: border-box;
+  background-color: transparent;
+  position: relative;
+  transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.mapa-view-container.is-fullscreen {
+  /* Modo Pantalla Completa */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  z-index: 999999; /* Sobre todo el contenido */
   background-color: #1a1a1a;
-  /* Fondo oscuro por defecto del mapa */
+  border-radius: 0;
 }
 
 .map-wrapper {
   position: relative;
   width: 100%;
   height: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+  transition: border-radius 0.4s ease;
+}
+
+.mapa-view-container.is-fullscreen .map-wrapper {
+  border-radius: 0;
+  box-shadow: none;
 }
 
 #map {
   width: 100% !important;
-  height: 100vh !important;
+  height: 100% !important; /* Adaptable a map-wrapper */
   z-index: 1;
+}
+
+/* 📺 Botón de Pantalla Completa */
+.btn-fullscreen-toggle {
+  position: absolute;
+  bottom: 50px; /* Margen simétrico para que no se corte */
+  right: 30px;  /* Esquina derecha */
+  z-index: 99999; /* Máxima prioridad sobre el canvas de Leaflet */
+  width: 44px;
+  height: 44px;
+  background: white;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  color: #333;
+  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.btn-fullscreen-toggle:hover {
+  background: #f8f9fa;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.btn-fullscreen-toggle:active {
+  background: #e9ecef;
+}
+
+/* Ajustes Responsive para el Recuadro */
+@media (max-width: 992px) {
+  .mapa-view-container {
+    padding-top: 115px;
+    height: calc(100vh - 16px);
+    padding-left: 15px;
+    padding-right: 15px;
+  }
 }
 
 /* Forzar sobreescrituras para evitar que Bootstrap rompa la estructura de Vue principal */
@@ -306,7 +402,7 @@ export default {
 /* Sobrescribir diseño del drawer estilo Side Nav */
 .filters-drawer-container {
   position: absolute;
-  top: 100px;
+  top: 30px;
   left: 0;
   z-index: 1000;
   transform: translateX(-100%);
@@ -379,8 +475,7 @@ export default {
 }
 
 :global(.panel-leyenda) {
-  top: 100px !important;
-  /* Misma altura que el de filtros */
+  top: 30px !important; /* Misma altura que el de filtros */
   border-radius: 16px 0 0 16px !important;
   box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15) !important;
   z-index: 1000 !important;
@@ -402,7 +497,7 @@ export default {
    =================================================== */
 .custom-leyenda-drawer {
   position: absolute !important;
-  top: 100px !important;
+  top: 30px !important;
   right: 0 !important;
   z-index: 1000 !important;
   transform: translateX(100%) !important;
