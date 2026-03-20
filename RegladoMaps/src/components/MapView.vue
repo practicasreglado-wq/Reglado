@@ -169,7 +169,7 @@ export default {
     return {
       scriptsCargados: false,
       scriptsGenerados: [],
-      isFiltersOpen: false,
+      isFiltersOpen: true,
       isLeyendaOpen: false
     }
   },
