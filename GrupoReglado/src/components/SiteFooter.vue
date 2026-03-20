@@ -51,7 +51,8 @@ import linkedinIcon from "../assets/linkedin.svg";
 import { auth } from "../services/auth";
 
 const realstateUrl = import.meta.env.VITE_REGLADO_REALSTATE_URL || "#";
-const mapasUrl = import.meta.env.VITE_REGLADO_MAPAS_URL || "https://teal-bat-675895.hostingersite.com/";
+const rawMapasUrl = import.meta.env.VITE_REGLADO_MAPAS_URL || "https://teal-bat-675895.hostingersite.com/";
+const mapasUrl = computed(() => buildExternalProductUrl(rawMapasUrl));
 const rawEnergyUrl = import.meta.env.VITE_REGLADO_ENERGY_URL || "http://localhost:5174";
 const energyUrl = computed(() => buildExternalProductUrl(rawEnergyUrl));
 const year = new Date().getFullYear();
@@ -68,7 +69,7 @@ function buildExternalProductUrl(baseUrl) {
     return cleanBase;
   }
 
-  return `${cleanBase}/#/auth/callback?token=${encodeURIComponent(token)}`;
+  return `${cleanBase}/auth/callback?token=${encodeURIComponent(token)}`;
 }
 </script>
 
