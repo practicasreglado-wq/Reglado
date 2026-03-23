@@ -73,18 +73,47 @@ export default {
   },
 
   beforeUnmount() {
-    if (this.favoritePopTimeout) {
-      clearTimeout(this.favoritePopTimeout);
-    }
+    if (this.animationFrame) cancelAnimationFrame(this.animationFrame);
+    if (this.favoritePopTimeout) clearTimeout(this.favoritePopTimeout);
+  },
+
+  watch: {
+    // Sistema de matching eliminado
   },
 
   methods: {
+    animateMatch() {
+      // Nota: Esta animación se mantiene con fines visuales usando el valor estático del objeto
+
+      const target = Number(this.property.match_percentage || 0);
+      const start = performance.now();
+      const duration = 1150;
+
+      const tick = (timestamp) => {
+        const progress = Math.min((timestamp - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+
+        this.animatedMatch = Math.round(target * eased);
+        this.matchScale = 1 + (1 - eased) * 0.18;
+
+        if (progress < 1) {
+          this.animationFrame = requestAnimationFrame(tick);
+        } else {
+          this.matchScale = 1;
+        }
+      };
+
+      this.animatedMatch = 0;
+      this.matchScale = 1.18;
+      this.animationFrame = requestAnimationFrame(tick);
+    },
+
     formatPrice(value) {
       return new Intl.NumberFormat("es-ES", {
         style: "currency",
         currency: "EUR",
         maximumFractionDigits: 0,
-      }).format(Number(value || 0));
+       }).format(Number(value || 0));
     },
 
     formatSurface(value) {
@@ -209,12 +238,12 @@ export default {
 .favorite-button:hover{
   background:#c1a115;
   transform:scale(1.05);
-  color:#172a5d;
+  color:#ffffff;
 }
 
 .favorite-button.active{
   background:linear-gradient(135deg, #f4d078, #bd9b2c);
-  color:#172a5d;
+  color:#ffffff;
   transform:scale(1.1);
 }
 

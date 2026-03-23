@@ -109,15 +109,17 @@ export default {
   display: inline-flex;
   align-items: center;
   width: max-content;
-  padding: 7px 12px;
+  padding: 10px 20px;
   border-radius: 999px;
-  background: rgba(189, 155, 44, 0.1);
-  border: 1px solid rgba(189, 155, 44, 0.18);
-  color: #8c6d14;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  background: linear-gradient(135deg, #172a5d 0%, #3654ae 100%);
+  border: 1px solid rgba(244, 208, 120, 0.4);
+  color: #f4d078;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
+  box-shadow: 0 8px 16px rgba(23, 42, 93, 0.15);
+  margin-bottom: 6px;
 }
 
 .about-content h2 {

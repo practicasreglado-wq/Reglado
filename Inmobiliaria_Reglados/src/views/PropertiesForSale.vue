@@ -1,16 +1,17 @@
 <template>
   <section v-if="isReal" class="properties-sale">
     <div class="properties-sale__hero" v-reveal="0">
-      <div>
-        <p class="eyebrow">Activos captados</p>
-        <h2>Propiedades disponibles</h2>
+      <div class="properties-sale__copy">
+        <p class="eyebrow">Catálogo Inmobiliario</p>
+        <h2>Propiedades en venta</h2>
         <p>
-          Revisa todas las propiedades registradas, con análisis de inversión y dossier completo cuando el activo proviene de un PDF.
+          Explora nuestra selección de oportunidades inmobiliarias exclusivas 
+          disponibles en nuestra plataforma.
         </p>
       </div>
 
-      <div class="hero-badge">
-        <span>{{ properties.length }} activos</span>
+      <div class="hero-badges">
+        <span class="hero-badge">{{ properties.length }} activos</span>
       </div>
     </div>
 
@@ -18,9 +19,13 @@
       Cargando propiedades...
     </div>
 
-    <div v-else-if="properties.length === 0" class="properties-sale__state" v-reveal="1">
-      Todavía no hay propiedades registradas.
-    </div>
+      <div v-else-if="!selectedCategory" key="empty-category" class="properties-sale__state" v-reveal="1">
+        Selecciona una categoría para explorar las propiedades disponibles.
+      </div>
+
+      <div v-else-if="properties.length === 0" key="empty-results" class="properties-sale__state" v-reveal="1">
+        Todavia no hay propiedades de ejemplo para {{ categoryLabel }}.
+      </div>
 
       <transition-group v-else key="results" name="stagger-list" tag="div" class="properties-sale__grid">
         <div
@@ -74,11 +79,16 @@ export default {
   },
 
   setup() {
-    const userStore = useUserStore()
-    const { preferences, isReal } = storeToRefs(userStore)
+    const userStore = useUserStore();
+    const { preferences, selectedCategory, isReal } = storeToRefs(userStore);
+
+    const categoryLabel = computed(
+      () => CATEGORY_LABELS[selectedCategory.value] || selectedCategory.value
+    );
 
     return {
       preferences,
+      selectedCategory,
       isReal,
     };
   },
@@ -187,6 +197,26 @@ export default {
 .properties-sale__hero > * {
   position: relative;
   z-index: 2;
+}
+ 
+.hero-badges {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 14px 26px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(14px);
+  font-weight: 800;
+  font-size: 1.35rem;
+  color: #fff;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .properties-sale__copy {
@@ -302,6 +332,11 @@ export default {
   .eyebrow {
     margin: 0 0 6px;
     font-size: 0.66rem;
+  }
+
+  .hero-badge {
+    padding: 10px 18px;
+    font-size: 1rem;
   }
 
   .properties-sale__copy {

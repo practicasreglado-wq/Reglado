@@ -67,7 +67,7 @@ function verifyJwt(string $token): array
 
     [$header, $payload, $signature] = $parts;
 
-    $secret = "TU_SECRET_AQUI"; // 🔥 mismo que login externo
+    $secret = "change-this-secret"; // 🔥 mismo que login externo
 
     $validSignature = base64UrlEncode(
         hash_hmac('sha256', "$header.$payload", $secret, true)
