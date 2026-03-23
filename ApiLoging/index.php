@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Punto de entrada principal (Front Controller) para ApiLoging.
+ * 
+ * Centraliza la carga de dependencias, configuración de entorno,
+ * inicialización de medidas de seguridad (CORS, headers) y funciona como
+ * un enrutador básico para todas las peticiones de autenticación.
+ */
+
 require_once __DIR__ . '/vendor/autoload.php';
 require_once __DIR__ . '/config/Env.php';
 require_once __DIR__ . '/config/Database.php';

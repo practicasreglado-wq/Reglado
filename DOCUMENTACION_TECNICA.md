@@ -294,7 +294,17 @@ Pasos recomendados:
 7. Guardar la relacion con el usuario central usando `iduser = sub`.
 8. Si existe backend propio, validar JWT en servidor.
 
-## 12. Problemas comunes
+## 12. Estructura de Código y Comentarios (DocBlocks)
+
+Los archivos principales de la lógica de negocio de este ecosistema están documentados funcionalmente dentro de su propio código fuente para facilitar su mantenimiento:
+
+- **ApiLoging:** Se documentaron los flujos de entrada (Front Controller en `index.php`) y todos los procesos de validación, registro, restablecimiento de accesos y consumo de perfil del backend ubicados en `AuthController.php`.
+- **GrupoReglado:** Cuenta con documentación interna en vistas transversales (como `LoginView.vue` y su gestión de redirección `returnTo`), y el servicio base de abstracción a la API (`auth.js`).
+- **RegladoEnergy / RegladoMaps:** Su código documenta estructuralmente cómo delegar el login a GrupoReglado y simplemente consumir la identidad inicializada por la cookie inter-proyecto (descrito detalladamente en sus `src/services/auth.js` y `App.vue`).
+
+---
+
+## 13. Problemas comunes
 
 ### El rol admin no funciona
 
@@ -320,7 +330,7 @@ Comprobar:
 - que el token se guarda bien
 - que el producto hidrata su store al arrancar
 
-## 13. Archivos de referencia rapida
+## 14. Archivos de referencia rapida
 
 - [ApiLoging/index.php](c:\xampp\htdocs\Reglado\ApiLoging\index.php)
 - [ApiLoging/controllers/AuthController.php](c:\xampp\htdocs\Reglado\ApiLoging\controllers\AuthController.php)

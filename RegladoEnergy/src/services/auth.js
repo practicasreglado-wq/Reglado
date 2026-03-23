@@ -1,3 +1,10 @@
+/**
+ * Servicio de Autenticación para el frontend corporativo (RegladoEnergy).
+ * 
+ * Este servicio no maneja el login explícito (que recae en GrupoReglado),
+ * sino que recupera la sesión a partir de una cookie compartida o token JWT
+ * y solicita el perfil del usuario a ApiLoging para hidratar el estado local.
+ */
 import { reactive } from "vue";
 
 const API_BASE = import.meta.env.VITE_AUTH_API_URL || "http://localhost:8000";
@@ -71,6 +78,11 @@ function clearSession() {
   state.user = null;
 }
 
+/**
+ * Inicializa el estado reactivo del usuario. 
+ * Busca un token en localStorage o en la cookie compartida (dejada por GrupoReglado),
+ * y obtiene el perfil del usuario verificando el JWT contra el backend.
+ */
 async function initialize() {
   if (!state.token) {
     const cookieToken = getCookie(COOKIE_TOKEN_KEY);
@@ -98,6 +110,10 @@ async function initialize() {
   }
 }
 
+/**
+ * Cierra la sesión activa revocando el token en el backend y borrando
+ * los datos locales. Tras ello, devuelve al usuario al portal principal.
+ */
 async function logout() {
   try {
     if (state.token) {

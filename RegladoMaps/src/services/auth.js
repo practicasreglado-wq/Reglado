@@ -1,3 +1,10 @@
+/**
+ * Servicio de Autenticación para el sistema cartográfico (RegladoMaps).
+ * 
+ * Actúa de consumidor Single Sign-On, reutilizando la cookie compartida
+ * generada en GrupoReglado. Permite unificar la identidad del usuario y 
+ * proteger las vistas del mapa utilizando la sesión global de la api.
+ */
 import { reactive } from "vue";
 
 const API_BASE = import.meta.env.VITE_AUTH_API_URL || "http://localhost:8000";
@@ -70,6 +77,10 @@ function clearSession() {
   state.user = null;
 }
 
+/**
+ * Recupera el inicio de sesión y sincroniza el estado local intentando
+ * obtener el perfil del usuario utilizando la cookie o el token existente.
+ */
 async function initialize() {
   if (!state.token) {
     const cookieToken = getCookie(COOKIE_TOKEN_KEY);
@@ -97,6 +108,10 @@ async function initialize() {
   }
 }
 
+/**
+ * Realiza el cierre de sesión destruyendo las credenciales almacenadas
+ * localmente y redirigiendo al portal corporativo raíz (GrupoReglado).
+ */
 async function logout() {
   try {
     if (state.token) {
