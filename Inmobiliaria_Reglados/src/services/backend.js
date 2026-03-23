@@ -2,8 +2,7 @@ import { auth } from "./auth";
 
 export const BACKEND_BASE =
   import.meta.env.VITE_INMOBILIARIA_BACKEND_BASE ||
-  "http://localhost/Reglado/inmobiliaria_reglados/backend";
-
+  "http://localhost/Reglado/Inmobiliaria_Reglados/backend"
 export const GROUP_BASE =
   import.meta.env.VITE_GRUPO_REGLADO_BASE_URL || "http://localhost:5173";
 
@@ -20,6 +19,14 @@ export function buildExternalAuthUrl(path) {
   // El proyecto origen siempre recibe el token en esta ruta unica de callback.
   url.searchParams.set("returnTo", getCallbackUrl());
   return url.toString();
+}
+
+export function buildUploadsUrl(fileName) {
+  if (!fileName) {
+    return null;
+  }
+
+  return new URL(`uploads/${fileName}`, `${BACKEND_BASE}/`).toString();
 }
 
 export async function backendJson(path, options = {}) {

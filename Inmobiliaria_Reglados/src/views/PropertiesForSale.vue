@@ -10,25 +10,21 @@
         </p>
       </div>
 
-      <div class="properties-sale__insights">
-        <article class="hero-insight-card">
-          <p class="hero-insight-label">Categoria</p>
-          <strong class="hero-insight-value">{{ categoryLabel }}</strong>
-        </article>
+      <div class="hero-badge">
+        <span>{{ properties.length }} activos</span>
       </div>
     </div>
 
-    <transition name="content-fade" mode="out-in">
-      <div v-if="loading" key="loading" class="properties-sale__state" v-reveal="1">
-        Cargando propiedades compatibles...
-      </div>
+    <div v-if="loading" class="properties-sale__state" v-reveal="1">
+      Cargando propiedades...
+    </div>
 
       <div v-else-if="!selectedCategory" key="empty-category" class="properties-sale__state" v-reveal="1">
         Selecciona una categoría para explorar las propiedades disponibles.
       </div>
 
       <div v-else-if="properties.length === 0" key="empty-results" class="properties-sale__state" v-reveal="1">
-        Todavia no hay propiedades de ejemplo para {{ selectedCategory }}.
+        Todavia no hay propiedades de ejemplo para {{ categoryLabel }}.
       </div>
 
       <transition-group v-else key="results" name="stagger-list" tag="div" class="properties-sale__grid">
@@ -45,7 +41,6 @@
           />
         </div>
       </transition-group>
-    </transition>
   </section>
 </template>
 
@@ -85,14 +80,15 @@ export default {
 
   setup() {
     const userStore = useUserStore();
-    const { selectedCategory, preferences, isReal } = storeToRefs(userStore);
-    const categoryLabel = computed(() =>
-      selectedCategory.value ? CATEGORY_LABELS[selectedCategory.value] || selectedCategory.value : "Sin definir"
+    const { preferences, selectedCategory, isReal } = storeToRefs(userStore);
+
+    const categoryLabel = computed(
+      () => CATEGORY_LABELS[selectedCategory.value] || selectedCategory.value
     );
 
     return {
-      selectedCategory,
       preferences,
+      selectedCategory,
       isReal,
       categoryLabel,
     };
@@ -102,27 +98,12 @@ export default {
     this.loadProperties();
   },
 
-  watch: {
-    selectedCategory() {
-      this.loadProperties();
-    },
-    "$route.query.t"() {
-      this.loadProperties();
-    },
-  },
-
   methods: {
     async loadProperties() {
-      if (!this.selectedCategory) {
-        this.properties = [];
-        this.loading = false;
-        return;
-      }
-
-      this.loading = true;
+      this.loading = true
 
       try {
-        this.properties = await fetchProperties(this.selectedCategory);
+        this.properties = await fetchProperties()
       } catch (error) {
         console.error(error);
         this.properties = [];

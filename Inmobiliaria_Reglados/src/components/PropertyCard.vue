@@ -1,9 +1,5 @@
 <template>
-  <article 
-    class="property-card" 
-    :class="{ 'popper-open': popperVisible }"
-    @click="closePopper"
-  >
+  <article class="property-card">
     <div class="property-card__media">
       <img :src="property.imageUrl" :alt="property.titulo" />
       <div class="property-card__overlay"></div>
@@ -26,12 +22,6 @@
           </span>
         </button>
 
-        <div class="match-pill" :style="matchBackgroundStyle">
-          <span class="match-pill__icon">❤</span>
-          <span class="match-pill__value" :style="matchValueStyle">
-            {{ animatedMatch }}%
-          </span>
-        </div>
       </div>
     </div>
 
@@ -44,46 +34,23 @@
         <span>{{ formatSurface(property.metros_cuadrados) }}</span>
       </div>
 
-      <div class="property-card__footer">
-        <strong>{{ formatPrice(property.precio) }}</strong>
+    <div class="property-card__footer">
+      <strong>{{ formatPrice(property.precio) }}</strong>
 
-        <!-- BOTON MATCH DETAILS CON POPPER INTEGRADO -->
-        <div class="match-details-wrapper">
-          <button
-            class="match-details-button"
-            @click.stop="togglePopper"
-          >
-            {{ property.match_count }}/{{ property.match_total }} coincidencias
-          </button>
+      <router-link :to="`/property/${property.id}`" class="detail-link">
+        Ver ficha
+      </router-link>
 
-          <MatchDetailsPopper
-            v-if="property.match_details && property.match_details.length > 0"
-            :visible="popperVisible"
-            :details="property.match_details"
-            :matchCount="property.match_count"
-            :matchTotal="property.match_total"
-            @close="closePopper"
-          />
-        </div>
-
-      </div>
     </div>
-  </article>
+  </div>
+</article>
 </template>
 
 <script>
-import MatchDetailsPopper from "./MatchDetailsPopper.vue";
-
 export default {
   name: "PropertyCard",
 
-  emits: [
-    "toggle-favorite"
-  ],
-
-  components: {
-    MatchDetailsPopper
-  },
+  emits: ["toggle-favorite"],
 
   props: {
     property: {
@@ -94,12 +61,8 @@ export default {
 
   data() {
     return {
-      animatedMatch: 0,
-      animationFrame: null,
-      matchScale: 1,
       favoritePopTimeout: null,
       isFavoritePopping: false,
-      popperVisible: false,
     };
   },
 
@@ -107,28 +70,6 @@ export default {
     localFavorite() {
       return !!this.property.is_favorite;
     },
-
-    matchValueStyle() {
-      return {
-        transform: `scale(${this.matchScale})`,
-      };
-    },
-
-    matchBackgroundStyle() {
-      const percentage = this.animatedMatch || 0;
-
-      return {
-        background: `linear-gradient(
-          90deg,
-          rgb(256, 60, 60,1) ${percentage}%,
-          rgba(255,255,255,0.75) ${percentage}%
-        )`,
-      };
-    },
-  },
-
-  mounted() {
-    this.animateMatch();
   },
 
   beforeUnmount() {
@@ -195,13 +136,6 @@ export default {
       this.$emit("toggle-favorite", this.property);
     },
 
-    togglePopper() {
-      this.popperVisible = !this.popperVisible;
-    },
-
-    closePopper() {
-      this.popperVisible = false;
-    }
   },
 };
 </script>
@@ -325,56 +259,6 @@ export default {
 
 /* MATCH */
 
-/* MATCH */
-
-.match-pill{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  padding:10px 14px;
-  border-radius:999px;
-  backdrop-filter:blur(10px);
-  color:#17305e;
-  font-weight:700;
-  overflow:hidden;
-  box-shadow:0 8px 18px rgba(10,21,46,0.18);
-  transition:
-    transform 0.25s ease,
-    background 0.45s ease,
-    box-shadow 0.25s ease;
-  user-select: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-}
-
-/* HOVER DEL PILL */
-.match-pill:hover{
-  transform:scale(1.15);
-  box-shadow:0 6px 18px rgba(0,0,0,0.18);
-}
-
-.match-pill:hover .match-pill__icon{
-  transform:scale(1.15);
-}
-
-/* CORAZON */
-
-.match-pill__icon{ 
-  color:#aa1132;
-  display:inline-block;
-  transition:transform 0.25s ease;
-}
-
-/* VALOR */
-
-.match-pill__value{
-  display:inline-block;
-  transform-origin:center;
-}
-
-/* FOOTER */
-
 .property-card__body{
   padding:22px;
   display:grid;
@@ -416,6 +300,7 @@ export default {
 .property-card__footer{
   align-items:end;
   color:#172a5d;
+  flex-wrap:wrap;
 }
 
 .property-card__footer strong{
@@ -425,61 +310,20 @@ export default {
   background:linear-gradient(135deg, rgba(54, 84, 174, 0.08), rgba(244, 208, 120, 0.12));
 }
 
-/* BOTON MATCH DETAILS */
-
-.match-details-button{
-  border:none;
-  background:linear-gradient(135deg, #172a5d, #3654ae);
-  cursor:pointer;
-  color:#ffffff;
-  font-weight:600;
-  padding:8px 14px;
+.detail-link{
+  margin-top:6px;
+  padding:6px 16px;
   border-radius:999px;
-  transition:transform .2s ease, box-shadow .2s ease;
-  user-select: none;
+  border:1px solid #172a5d;
+  color:#172a5d;
+  font-weight:600;
+  text-decoration:none;
+  transition:background 0.2s ease,color 0.2s ease;
 }
 
-.match-details-button:hover{
-  transform:translateY(-2px);
-  box-shadow:0 12px 24px rgba(23, 42, 93, 0.18);
-}
-
-/* WRAPPER DEL BOTON Y POPPER */
-.match-details-wrapper {
-  position: relative;
-  display: inline-block;
-}
-
-/* Modificamos el popper para que se comporte como un menú contextual absoluto */
-:deep(.popper-overlay) {
-  position: absolute;
-  inset: auto;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  margin-bottom: 12px;
-  width: max-content;
-  z-index: 100;
-  pointer-events: none; /* Para no bloquear clics de alrededor si es muy grande */
-}
-
-:deep(.popper-card) {
-  position: relative;
-  bottom: auto !important;
-  left: auto !important;
-  transform: none;
-  pointer-events: auto; /* Reactivar puntero en la tarjeta */
-}
-
-:deep(.popper-card::after) {
-  content: "";
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  border-width: 8px;
-  border-style: solid;
-  border-color: #172a5d transparent transparent transparent;
+.detail-link:hover{
+  background:#172a5d;
+  color:#fff;
 }
 
 /* =========================================
@@ -520,7 +364,6 @@ export default {
   .property-card__footer strong {
     font-size: 1rem;
   }
-  .match-pill,
   .favorite-button {
     padding: 8px 12px;
     font-size: 0.9rem;
@@ -530,17 +373,6 @@ export default {
     padding-bottom: 3px;
   }
 
-  /* Force Popper scaling */
-  :deep(.popper-card) {
-    width: 180px !important;
-    padding: 14px 16px !important;
-  }
-  :deep(.popper-card h3) {
-    font-size: 1.1rem !important;
-  }
-  :deep(.popper-card li) {
-    font-size: 0.85rem !important;
-  }
 }
 
 @media (max-width: 480px) {
@@ -572,7 +404,6 @@ export default {
     right: 12px;
     left: 12px;
   }
-  .match-pill,
   .favorite-button {
     padding: 3px 6px;
     font-size: 0.65rem;
@@ -581,39 +412,6 @@ export default {
     font-size: 0.75rem;
     padding-bottom: 2px;
   }
-  .match-details-button {
-    padding: 4px 10px;
-    font-size: 0.7rem;
-    white-space: normal;
-    text-align: left;
-  }
-
-  /* Force Popper scaling */
-  :deep(.popper-card) {
-    width: 120px !important;
-    padding: 12px 14px !important;
-  }
-  :deep(.popper-card h3) {
-    font-size: 0.75rem !important;
-  }
-  :deep(.popper-card li) {
-    font-size: 0.65rem !important;
-    padding: 2px 0 !important;
-  }
-  
-  /* Hide scrollbar in Popper list */
-  :deep(.popper-card ul) {
-    scrollbar-width: none; /* Firefox */
-  }
-  :deep(.popper-card ul::-webkit-scrollbar) {
-    display: none; /* WebKit/Chromium */
-  }
-
-  :deep(.popper-card .icon svg) {
-    width: 10px !important;
-    height: 10px !important;
-  }
-
 }
 
 </style>

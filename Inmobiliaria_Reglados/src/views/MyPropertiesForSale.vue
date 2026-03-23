@@ -62,7 +62,7 @@ export default {
       try {
 
         const res = await axios.get(
-          "http://localhost/inmobiliaria/backend/api/get_user_properties_for_sale.php",
+          "http://localhost/Reglado/Inmobiliaria_Reglados/backend/get_user_properties_for_sale.php",
           { withCredentials: true }
         );
 

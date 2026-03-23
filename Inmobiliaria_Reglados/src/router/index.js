@@ -21,6 +21,7 @@ import ForgotPassword from "../views/ForgotPassword.vue";
 import ResetPassword from "../views/ResetPassword.vue";
 import AuthCallback from "../views/AuthCallback.vue";
 import RestrictedAccessView from "../views/RestrictedAccessView.vue";
+import PropertyDetail from "../views/PropertyDetail.vue";
 
 const routes = [
   { path: "/", component: Home },
@@ -57,6 +58,7 @@ const routes = [
     meta: { requiresAuth: true, requiresAdmin: true } 
   },
   { path: "/admin/restricted", component: () => import("../views/RestrictedAdminView.vue"), meta: { requiresAuth: true } },
+  { path: "/property/:id", component: PropertyDetail, meta: { requiresAuth: true, requiresReal: true } },
 ];
 
 const router = createRouter({

@@ -2,8 +2,8 @@
 
 require_once dirname(__DIR__) . "/config/db.php";
 require_once dirname(__DIR__) . "/config/auth.php";
-
-applyAuthCors();
+require_once __DIR__ . '/../config/cors.php';
+applyCors();
 handlePreflight();
 
 $context = requireAuthenticatedUser($pdo);
