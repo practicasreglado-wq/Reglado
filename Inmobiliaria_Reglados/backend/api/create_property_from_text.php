@@ -61,8 +61,13 @@ try {
     $claudeClient = new ClaudeClient($claudeKey, $claudeEndpoint, $claudeModel);
     $pdfGenerator = new PdfGenerator(__DIR__ . '/../uploads');
     $dossierService = new DossierService(__DIR__ . '/../uploads');
-    $processor = new PropertyProcessor($repository, $claudeClient, $pdfGenerator, $dossierService);
-
+    $processor = new PropertyProcessor(
+        $repository,
+        $claudeClient,
+        $pdfGenerator,
+        $dossierService,
+        $auth['id'] ?? null 
+    );
     $propertyId = $processor->process($assetId);
 
     respondJson(200, [

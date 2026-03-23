@@ -70,7 +70,8 @@ class Repository
         string $tipoInput,
         ?string $analysisSummary,
         ?string $analysisJson,
-        ?int $captadorId
+        ?int $captadorId,
+        ?int $ownerUserId   // 👈 AÑADIR
     ): int {
         $tipo = $this->trimValue($claudeData['tipo_propiedad'] ?? '');
         $subtipo = $this->trimValue($claudeData['subtipo'] ?? '');
@@ -118,7 +119,8 @@ class Repository
                 analisis,
                 analisis_json,
                 captador_id,
-                caracteristicas_json
+                caracteristicas_json,
+                owner_user_id
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
         );
 
@@ -154,6 +156,7 @@ class Repository
             $analysisJson,
             $captadorId,
             json_encode($claudeData['caracteristicas'] ?? [], JSON_UNESCAPED_UNICODE),
+            $ownerUserId
         ]);
 
         $propertyId = (int) $this->pdo->lastInsertId();

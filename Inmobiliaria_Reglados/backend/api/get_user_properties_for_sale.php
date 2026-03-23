@@ -23,6 +23,8 @@ $stmt = $pdo->prepare("
         categoria AS tipo
     FROM propiedades
     WHERE owner_user_id = ?
+    AND titulo IS NOT NULL
+    AND titulo != ''
     ORDER BY created_at DESC, id DESC
 ");
 $stmt->execute([$userId]);

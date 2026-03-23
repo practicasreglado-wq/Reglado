@@ -23,12 +23,6 @@ class ClaudeClient
         return $this->requestWithPrompt($this->buildSimplePrompt($text));
     }
 
-    public function analyzeAdvancedDocument(string $text): array
-    {
-        $prompt = $this->buildAdvancedPrompt($text);
-        return $this->requestWithPrompt($prompt);
-    }
-
     private function requestWithPrompt(string $prompt): array
     {
         $payload = [
@@ -67,73 +61,6 @@ Devuelve un JSON válido con esos campos.
 No inventes datos. Si no aparece un campo, pon null.
 
 Texto:
-" . trim($text);
-    }
-
-    private function buildAdvancedPrompt(string $text): string
-    {
-        return "
-Actúa como un analista inmobiliario profesional especializado en inversiones.
-
-Analiza el siguiente dossier y genera un análisis completo de inversión.
-
-Extrae y calcula:
-
-DATOS DEL ACTIVO:
-* tipo_propiedad
-* subtipo
-* ciudad
-* zona
-* direccion (si aparece)
-* metros_cuadrados
-* habitaciones
-* estado_activo
-
-DATOS ECONÓMICOS:
-* precio
-* precio_m2
-* ingresos_actuales
-* ingresos_estimados
-* gastos_estimados
-* EBITDA
-* cash_flow
-
-MÉTRICAS:
-* rentabilidad_bruta
-* rentabilidad_neta
-* cap_rate
-* roi
-* payback
-
-MÉTRICAS ESPECÍFICAS (si aplica):
-* ocupacion
-* ADR
-* RevPAR
-
-ANÁLISIS:
-* resumen
-* puntos_fuertes
-* riesgos
-* oportunidades
-* perfil_inversor
-
-MERCADO:
-* analisis_zona
-* comparables
-* tendencia
-
-VALORACIÓN:
-* valor_estimado
-* margen
-* es_oportunidad (true/false)
-
-CONCLUSIÓN:
-* recomendacion_final
-
-Devuelve TODO en JSON y nada fuera del JSON.
-Si algo no aparece, pon null.
-
-Texto completo:
 " . trim($text);
     }
 

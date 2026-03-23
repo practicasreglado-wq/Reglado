@@ -36,7 +36,6 @@
           />
         </div>
       </transition-group>
-    </transition>
   </section>
 </template>
 
@@ -81,7 +80,6 @@ export default {
     return {
       preferences,
       isReal,
-      categoryLabel,
     };
   },
 

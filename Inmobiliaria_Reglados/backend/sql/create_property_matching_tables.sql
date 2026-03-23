@@ -141,3 +141,9 @@ CREATE TABLE IF NOT EXISTS documentos_firmados (
     KEY idx_documentos_user_property (user_id, propiedad_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+ALTER TABLE propiedades 
+MODIFY tipo_propiedad VARCHAR(150) NOT NULL,
+MODIFY ciudad VARCHAR(150) NOT NULL,
+MODIFY zona VARCHAR(150) NOT NULL,
+MODIFY metros_cuadrados INT NOT NULL,
+MODIFY precio DECIMAL(15,2) NOT NULL;

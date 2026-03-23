@@ -62,13 +62,14 @@ export default {
       try {
 
         const res = await axios.get(
-          "http://localhost/Reglado/Inmobiliaria_Reglados/backend/get_user_properties_for_sale.php",
+          "http://localhost/Reglado/Inmobiliaria_Reglados/backend/api/get_user_properties_for_sale.php",
           { withCredentials: true }
         );
 
         // Si el backend devuelve directamente el array
-        this.properties = res.data;
-
+this.properties = Array.isArray(res.data)
+  ? res.data.filter(p => p && p.nombre && p.precio)
+  : [];
       } catch (error) {
 
         console.error("Error cargando propiedades:", error);

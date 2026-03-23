@@ -7,18 +7,21 @@ class PropertyProcessor
     private ClaudeClient $claudeClient;
     private PdfGenerator $pdfGenerator;
     private DossierService $dossierService;
+    private ?int $ownerUserId;
 
     public function __construct(
-        Repository $repository,
-        ClaudeClient $claudeClient,
-        PdfGenerator $pdfGenerator,
-        DossierService $dossierService
-    ) {
-        $this->repository = $repository;
-        $this->claudeClient = $claudeClient;
-        $this->pdfGenerator = $pdfGenerator;
-        $this->dossierService = $dossierService;
-    }
+    Repository $repository,
+    ClaudeClient $claudeClient,
+    PdfGenerator $pdfGenerator,
+    DossierService $dossierService,
+    ?int $ownerUserId   // 👈 AÑADIR
+) {
+    $this->repository = $repository;
+    $this->claudeClient = $claudeClient;
+    $this->pdfGenerator = $pdfGenerator;
+    $this->dossierService = $dossierService;
+    $this->ownerUserId = $ownerUserId; // 👈 AÑADIR
+}
 
     public function process(int $assetId): int
     {
@@ -46,7 +49,8 @@ class PropertyProcessor
             $tipoInput,
             $analysisSummary,
             $analysisJson,
-            $captadorId
+            $captadorId,
+            $this->ownerUserId   // 👈 AÑADIR
         );
 
         $documents = $this->pdfGenerator->generateDocuments($claudeData, $propertyId);
