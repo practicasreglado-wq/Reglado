@@ -60,6 +60,18 @@ $safeUsername = htmlspecialchars($username, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'
 $safeEmail = htmlspecialchars($userEmail, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 $safeMessage = nl2br(htmlspecialchars($message, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'));
 
+$token = bin2hex(random_bytes(32));
+
+try {
+    $stmt = $pdo->prepare("INSERT INTO role_promotion_requests (user_email, token, status) VALUES (?, ?, 'pending')");
+    $stmt->execute([$userEmail, $token]);
+} catch (PDOException $e) {
+    respondJson(500, ['success' => false, 'message' => 'No se pudo registrar la solicitud: ' . $e->getMessage()]);
+}
+
+$approveUrl = "http://localhost/Reglado/Inmobiliaria_Reglados/backend/api/approve_real_role.php?email=" . urlencode($userEmail) . "&token=" . $token;
+$rejectUrl = "http://localhost/Reglado/Inmobiliaria_Reglados/backend/api/reject_user.php?email=" . urlencode($userEmail) . "&token=" . $token;
+
 $body = <<<HTML
 <h2>Solicitud de Usuario promocionar a Real</h2>
 <p><strong>El solicitante:</strong> {$safeFirstName} {$safeLastName}</p>
@@ -67,6 +79,11 @@ $body = <<<HTML
 <p><strong>Correo de cuenta:</strong> {$safeEmail}</p>
 <p>Esta interesado en ser usuario Real.</p>
 <p><strong>Motivo:</strong> {$safeMessage}</p>
+<br>
+<div style="display: flex; gap: 15px; margin-top: 10px;">
+    <a href="{$approveUrl}" style="display: inline-block; padding: 10px 20px; background-color: #0b3d91; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; font-family: sans-serif;">Aprobar y asignar rol Real</a>
+    <a href="{$rejectUrl}" style="display: inline-block; padding: 10px 20px; background-color: #d32f2f; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; font-family: sans-serif; margin-left: 15px;">Rechazar solicitud</a>
+</div>
 HTML;
 
 $altBody = trim(
@@ -74,7 +91,9 @@ $altBody = trim(
     "Username: {$username}\n" .
     "Correo de cuenta: {$userEmail}\n" .
     "Esta interesado en ser usuario Real.\n" .
-    "Motivo: {$message}"
+    "Motivo: {$message}\n\n" .
+    "Enlace para aprobar: {$approveUrl}\n" .
+    "Enlace para rechazar: {$rejectUrl}"
 );
 
 try {

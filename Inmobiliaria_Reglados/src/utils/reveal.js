@@ -13,6 +13,20 @@ const REVEAL_SELECTOR = [
   ".results-grid > *",
   ".search-results > *",
   ".favorites-grid > *",
+  ".favorites-view__grid > *",
+  ".history-grid > *",
+  ".properties-sale__grid > *",
+  ".favorites-controls",
+  ".favorites-view__header",
+  ".history-header",
+  ".history-state",
+  ".properties-sale__hero",
+  ".properties-sale__state",
+  ".preference-panel",
+  ".history-card",
+  ".favorites-view form",
+  ".properties-sale form",
+  ".history-view form",
   ".messages-list > *",
 ].join(", ");
 
@@ -37,8 +51,8 @@ const getObserver = () => {
         });
       },
       {
-        threshold: 0.06,
-        rootMargin: "0px 0px -2% 0px",
+        threshold: 0.08,
+        rootMargin: "0px 0px -8% 0px",
       }
     );
   }
@@ -52,6 +66,15 @@ const shouldReveal = (element) => {
   }
 
   if (element.closest("header, footer, .site-header, .site-footer")) {
+    return false;
+  }
+
+   // Exclude containers that host fixed UI, otherwise their transform
+   // changes the containing block and breaks fixed positioning.
+  if (
+    element.matches(".profile, .profile-content, .sidebar, .sidebar-panel") ||
+    element.closest(".sidebar")
+  ) {
     return false;
   }
 
@@ -74,7 +97,7 @@ export const observeReveal = (element, order = 0) => {
   }
 
   element.dataset.revealBound = "true";
-  element.style.setProperty("--reveal-delay", `${Math.min(order * 70, 280)}ms`);
+  element.style.setProperty("--reveal-delay", `${Math.min(order * 60, 360)}ms`);
   element.classList.add("reveal-hidden");
 
   const currentObserver = getObserver();

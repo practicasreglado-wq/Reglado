@@ -41,7 +41,7 @@ const routes = [
       { path: "favorite-properties", component: FavoriteProperties, meta: { requiresReal: true } },
       { path: "search-history", component: SearchHistory, meta: { requiresReal: true } },
       { path: "my-properties-for-sale", component: MyPropertiesForSale },
-      { path: "create-property", component: CreateProperty, meta: { requiresReal: true } },
+      { path: "create-property", component: CreateProperty },
     ],
   },
   { path: "/questions", component: Questions, meta: { requiresAuth: true, requiresReal: true } },

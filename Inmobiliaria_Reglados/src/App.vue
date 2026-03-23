@@ -119,6 +119,10 @@ export default {
       });
 
       removeAfterHook = router.afterEach((to, from) => {
+        if (userStore.isLoggedIn) {
+          userStore.initializeSession().catch(err => console.error("Error refreshing session:", err));
+        }
+
         nextTick(() => {
           refreshAnimations();
           skipNextTransition.value = false;
@@ -126,7 +130,7 @@ export default {
           if (!isProfileNavigation(to, from)) {
             window.setTimeout(() => {
               isRouteLoading.value = false;
-            }, 380);
+            }, 120);
             return;
           }
 
@@ -142,7 +146,7 @@ export default {
         window.setTimeout(() => {
           isBootLoading.value = false;
           refreshAnimations();
-        }, 520);
+        }, 180);
       }
     });
 
