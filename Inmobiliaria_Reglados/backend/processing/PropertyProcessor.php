@@ -6,65 +6,113 @@ class PropertyProcessor
     private Repository $repository;
     private ClaudeClient $claudeClient;
     private PdfGenerator $pdfGenerator;
+    private DossierService $dossierService;
 
-    public function __construct(Repository $repository, ClaudeClient $claudeClient, PdfGenerator $pdfGenerator)
-    {
+    public function __construct(
+        Repository $repository,
+        ClaudeClient $claudeClient,
+        PdfGenerator $pdfGenerator,
+        DossierService $dossierService
+    ) {
         $this->repository = $repository;
         $this->claudeClient = $claudeClient;
         $this->pdfGenerator = $pdfGenerator;
+        $this->dossierService = $dossierService;
     }
 
     public function process(int $assetId): int
     {
         $asset = $this->repository->getReceivedAsset($assetId);
-        error_log(sprintf('[PROCESSOR] asset cargado #%d', $assetId));
+        $metadata = $this->parseMetadata($asset['metadata'] ?? null);
+        $tipoInput = $metadata['tipo_input'] ?? 'text';
 
-        $claudeData = $this->claudeClient->analyzeText((string) $asset['texto_recibido']);
-        error_log(sprintf('[PROCESSOR] datos Claude %s', json_encode($claudeData, JSON_UNESCAPED_UNICODE)));
+        $text = trim((string) ($metadata['pdf_text'] ?? $asset['texto_recibido'] ?? ''));
 
-try {
-    $this->validateClaudeData($claudeData);
-} catch (Throwable $e) {
-    error_log('[WARNING] Claude incompleto: ' . $e->getMessage());
-}
-        $captadorId = null;
-        $emailRemitente = trim((string) ($asset['email_remitente'] ?? ''));
-        if ($emailRemitente !== '') {
-            $captadorId = $this->repository->getOrCreateCaptador($emailRemitente);
+        if ($text === '') {
+            throw new RuntimeException('Texto vacío para procesar');
         }
 
-        error_log(sprintf('[PROCESSOR] captadorId %s', $captadorId !== null ? (string) $captadorId : 'null'));
+        $claudeData = $tipoInput === 'pdf'
+            ? $this->claudeClient->analyzeAdvancedDocument($text)
+            : $this->claudeClient->analyzeSimpleDocument($text);
 
-        // ✅ CORREGIDO AQUÍ
-        $files = $this->pdfGenerator->generateDocuments($claudeData, $assetId);
+        $analysisJson = json_encode($claudeData, JSON_UNESCAPED_UNICODE);
+        $analysisSummary = $this->extractSummary($claudeData, $tipoInput);
+
+        $captadorId = $this->resolveCaptador(trim((string) ($asset['email_remitente'] ?? '')));
 
         $propertyId = $this->repository->insertPropertyRecord(
             $claudeData,
-            $files['dossier'],
-            $files['confidentiality'],
-            $files['intention'],
+            $tipoInput,
+            $analysisSummary,
+            $analysisJson,
             $captadorId
         );
 
+        $documents = $this->pdfGenerator->generateDocuments($claudeData, $propertyId);
+        $updatePayload = [
+            'confidentiality_file' => $documents['confidentiality_file'],
+            'intention_file' => $documents['intention_file'],
+        ];
+
+        if ($tipoInput === 'pdf') {
+            $dossierFile = $this->dossierService->generateDossierPDF($propertyId, $claudeData);
+            $updatePayload['dossier_file'] = $dossierFile;
+        }
+
+        $this->repository->updatePropertyDocuments($propertyId, $updatePayload);
         $this->repository->updateReceivedAssetStatus($assetId, 'procesado', $captadorId);
 
         return $propertyId;
     }
 
-    private function validateClaudeData(array $data): void
+    private function parseMetadata(?string $raw): array
     {
-        $required = ['tipo_propiedad', 'ciudad', 'zona', 'metros', 'habitaciones', 'precio'];
-
-        foreach ($required as $field) {
-            if (!isset($data[$field]) || trim((string) $data[$field]) === '') {
-                throw new RuntimeException(sprintf('Dato obligatorio ausente: %s', $field));
-            }
+        if ($raw === null || trim($raw) === '') {
+            return [];
         }
 
-        foreach (['metros', 'habitaciones', 'precio'] as $numericField) {
-            if (!is_numeric($data[$numericField])) {
-                throw new RuntimeException(sprintf('El campo %s debe ser numérico', $numericField));
-            }
+        $decoded = json_decode($raw, true);
+        return is_array($decoded) ? $decoded : [];
+    }
+
+    private function resolveCaptador(string $email): ?int
+    {
+        if ($email === '') {
+            return null;
         }
+
+        return $this->repository->getOrCreateCaptador($email);
+    }
+
+    private function extractSummary(array $data, string $tipoInput): ?string
+    {
+        if ($tipoInput === 'pdf' && !empty($data['analisis']['resumen'])) {
+            return trim((string) $data['analisis']['resumen']);
+        }
+
+        if ($tipoInput === 'text') {
+            return sprintf(
+                'Propiedad en %s (%s) por %s',
+                $data['ciudad'] ?? 'Ciudad no definida',
+                $data['zona'] ?? 'Zona no definida',
+                $this->value($data['precio'] ?? null)
+            );
+        }
+
+        return null;
+    }
+
+    private function value(mixed $value): string
+    {
+        if ($value === null || $value === '') {
+            return 'No disponible';
+        }
+
+        if (is_numeric($value)) {
+            return number_format((float) $value, 2, ',', '.') . ' €';
+        }
+
+        return (string) $value;
     }
 }

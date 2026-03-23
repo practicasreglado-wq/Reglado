@@ -2,15 +2,19 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/lib/env_loader.php';
 
 if (!class_exists(\Dompdf\Dompdf::class)) {
     die('ERROR: Dompdf no cargado');
 }
+
 require_once __DIR__ . '/config/db.php';
 require_once __DIR__ . '/processing/Repository.php';
+require_once __DIR__ . '/../processing/DossierService.php';
 require_once __DIR__ . '/processing/ClaudeClient.php';
-require_once __DIR__ . '/processing/PdfGenerator.php';
-require_once __DIR__ . '/processing/PropertyProcessor.php';
+require_once __DIR__ . '/../processing/PdfGenerator.php';
+require_once __DIR__ . '/../processing/PropertyProcessor.php';
+require_once __DIR__ . '/../lib/pdf_utils.php';
 
 header('Content-Type: application/json');
 
@@ -18,6 +22,7 @@ header('Content-Type: application/json');
  * 🔥 CARGAR .ENV
  */
 loadEnv(__DIR__ . '/.env');
+require_once __DIR__ . '/send_mail.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -42,7 +47,31 @@ if (empty($payload)) {
     exit;
 }
 
-$text = extractEmailText($payload);
+$plainText = extractEmailText($payload);
+$pdfText = null;
+$pdfFilename = null;
+$pdfRelativePath = null;
+$tipoInput = 'text';
+
+$pdfAttachment = findPdfAttachmentInPayload($payload);
+if ($pdfAttachment !== null) {
+    try {
+        $uploadDir = __DIR__ . '/uploads/pdf_inputs';
+        $saved = savePdfAttachment($pdfAttachment, $uploadDir);
+        $extracted = extractPdfText($saved['path']);
+
+        if (trim($extracted) !== '') {
+            $tipoInput = 'pdf';
+            $pdfText = $extracted;
+            $pdfFilename = $saved['name'];
+            $pdfRelativePath = str_replace('\\', '/', preg_replace('#^' . preg_quote(__DIR__, '#') . '#', '', $saved['path']));
+        }
+    } catch (Throwable $exception) {
+        error_log('[PDF] ' . $exception->getMessage());
+    }
+}
+
+$text = $pdfText !== null && trim($pdfText) !== '' ? $pdfText : $plainText;
 $sender = extractSenderEmail($payload);
 
 if ($sender === '') {
@@ -58,8 +87,29 @@ if ($text === '') {
     exit;
 }
 
+$messageId = extractMessageId($payload);
+ $normalizedInput = normalizeText($text);
+ $contentHash = hash('sha256', $normalizedInput);
+
+ if ($messageId !== null) {
+    $duplicateStmt = $pdo->prepare('SELECT id FROM activos_recibidos WHERE message_id = ? LIMIT 1');
+    $duplicateStmt->execute([$messageId]);
+    if ($duplicateStmt->fetch()) {
+        echo json_encode(['success' => true, 'duplicate' => true]);
+        exit;
+    }
+}
+
+$hashStmt = $pdo->prepare('SELECT id FROM activos_recibidos WHERE content_hash = ? LIMIT 1');
+$hashStmt->execute([$contentHash]);
+if ($hashStmt->fetch()) {
+    echo json_encode(['success' => true, 'duplicate' => true]);
+    exit;
+}
+
+
 /**
- * 🔥 EVITAR DUPLICADOS (Cloudmailin reintenta)
+ * 🔥 EVITAR DUPLICADOS
  */
 $stmt = $pdo->prepare("
     SELECT id, procesado FROM activos_recibidos 
@@ -81,24 +131,24 @@ if ($exists && $exists['procesado'] === 'procesado') {
 
 $repository = new Repository($pdo);
 
-$metadata = [
-    'raw_input' => $rawInput !== '' ? $rawInput : null,
-    'post' => $_POST ?? [],
-];
+ $metadata = [
+     'raw_input' => $rawInput !== '' ? $rawInput : null,
+     'post' => $_POST ?? [],
+     'message_id' => $messageId,
+     'content_hash' => $contentHash,
+     'tipo_input' => $tipoInput,
+     'original_email_text' => $plainText !== '' ? $plainText : null,
+     'pdf_text' => $pdfText,
+     'pdf_filename' => $pdfFilename,
+     'pdf_path' => $pdfRelativePath,
+ ];
 
 try {
-    $assetId = $repository->insertReceivedAsset('email', $sender, $text, $metadata);
-} catch (Throwable $exception) {
-    error_log("ERROR INSERT: " . $exception->getMessage());
-    http_response_code(500);
-    echo json_encode(['error' => $exception->getMessage()]);
-    exit;
-}
-
-try {
+    // 🔥 INSERTAR SOLO PARA PROCESAR (TEMPORAL)
+    $assetId = $repository->insertReceivedAsset('email', $sender, $text, $contentHash, $messageId, $metadata);
 
     /**
-     * 🔥 CLAUDE CONFIG CORRECTA
+     * 🔥 CLAUDE CONFIG
      */
     $claudeKey = getenv('ANTHROPIC_API_KEY') ?: '';
     $claudeModel = getenv('ANTHROPIC_MODEL') ?: 'claude-3-5-sonnet-20240620';
@@ -109,16 +159,18 @@ try {
     }
 
     $claudeClient = new ClaudeClient($claudeKey, $claudeEndpoint, $claudeModel);
-
     $pdfGenerator = new PdfGenerator(__DIR__ . '/uploads');
+    $dossierService = new DossierService(__DIR__ . '/uploads');
+    $processor = new PropertyProcessor($repository, $claudeClient, $pdfGenerator, $dossierService);
 
-    $processor = new PropertyProcessor($repository, $claudeClient, $pdfGenerator);
-
+    // 🔥 PROCESAR
     $propertyId = $processor->process($assetId);
+
+    // 🔥 EMAIL OK
+    notifySenderProcessingResult($sender, true);
 
     echo json_encode([
         'success' => true,
-        'assetId' => $assetId,
         'propertyId' => $propertyId,
     ]);
 
@@ -126,12 +178,20 @@ try {
 
     error_log('ERROR GLOBAL: ' . $exception->getMessage());
 
+    // 🔥 🔴 BORRAR TODO (CLAVE)
     if (isset($assetId)) {
-        $stmt = $pdo->prepare('UPDATE activos_recibidos SET procesado = ?, processed_at = CURRENT_TIMESTAMP WHERE id = ?');
-        $stmt->execute(['error', $assetId]);
+        try {
+            $stmt = $pdo->prepare("DELETE FROM activos_recibidos WHERE id = ?");
+            $stmt->execute([$assetId]);
+        } catch (Throwable $e) {
+            error_log('ERROR BORRANDO ACTIVO: ' . $e->getMessage());
+        }
     }
 
     http_response_code(500);
+
+    // 🔥 EMAIL ERROR
+    notifySenderProcessingResult($sender, false);
 
     echo json_encode([
         'error' => $exception->getMessage()
@@ -198,32 +258,66 @@ function normalizeEmail(string $email): string
     return trim((string) $clean);
 }
 
-/**
- * 🔥 CARGADOR .ENV
- */
-function loadEnv(string $path): void
+function extractMessageId(array $payload): ?string
 {
-    if (!file_exists($path)) {
+    $headers = [];
+    if (isset($payload['headers']) && is_array($payload['headers'])) {
+        $headers = $payload['headers'];
+    }
+
+    $candidates = [
+        $payload['message_id'] ?? null,
+        $payload['Message-ID'] ?? null,
+        $headers['message_id'] ?? null,
+        $headers['Message-ID'] ?? null,
+    ];
+
+    foreach ($candidates as $candidate) {
+        if (!is_string($candidate)) {
+            continue;
+        }
+
+        $trimmed = trim($candidate);
+        if ($trimmed === '') {
+            continue;
+        }
+
+        $clean = trim($trimmed, '<>');
+        if ($clean !== '') {
+            return $clean;
+        }
+    }
+
+    return null;
+}
+
+function normalizeText(string $text): string
+{
+    $clean = strtolower($text);
+    $clean = preg_replace('/[\r\n\t]+/', ' ', $clean);
+    $clean = preg_replace('/\\s+/', ' ', $clean);
+    return trim($clean);
+}
+
+function notifySenderProcessingResult(?string $sender, bool $success): void
+{
+    if (!is_string($sender) || trim($sender) === '') {
         return;
     }
 
-    $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    $sender = trim($sender);
 
-    foreach ($lines as $line) {
-        if (str_starts_with(trim($line), '#')) {
-            continue;
-        }
+    $subject = $success
+        ? 'Propiedad recibida correctamente'
+        : 'Tu propiedad no ha podido ser procesada porque faltan datos necesarios.';
 
-        if (!str_contains($line, '=')) {
-            continue;
-        }
+    $message = $success
+        ? 'Tu propiedad ha sido procesada correctamente y añadida al sistema.'
+        : 'Tu propiedad no ha podido ser procesada porque faltan datos necesarios.';
 
-        [$name, $value] = explode('=', $line, 2);
-
-        $name = trim($name);
-        $value = trim($value);
-
-        putenv("$name=$value");
-        $_ENV[$name] = $value;
+    try {
+        sendNotificationEmail($sender, $subject, "<p>{$message}</p>");
+    } catch (Throwable $mailException) {
+        error_log("ERROR EN ENVÍO DE EMAIL: " . $mailException->getMessage());
     }
 }

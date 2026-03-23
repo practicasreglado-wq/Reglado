@@ -37,8 +37,6 @@
           <option value="oldest">Más antiguos</option>
           <option value="price_asc">Precio: Menor al Mayor</option>
           <option value="price_desc">Precio: Mayor al Menor</option>
-          <option value="match_desc">Mejor Match %</option>
-          <option value="match_asc">Menor Match %</option>
         </select>
       </div>
     </div>
@@ -125,13 +123,6 @@ export default {
         if (this.sortBy === 'price_asc') return a.precio - b.precio;
         if (this.sortBy === 'price_desc') return b.precio - a.precio;
         
-        if (this.sortBy === 'match_desc') {
-          return (b.match_percentage || 0) - (a.match_percentage || 0);
-        }
-        if (this.sortBy === 'match_asc') {
-          return (a.match_percentage || 0) - (b.match_percentage || 0);
-        }
-
         // Ordenación cronológica (usamos favorited_at si está disponible, sino created_at)
         const dateA = new Date(a.favorited_at || a.created_at || 0).getTime();
         const dateB = new Date(b.favorited_at || b.created_at || 0).getTime();
@@ -417,7 +408,5 @@ export default {
 }
 
 </style>
-
-
 
 

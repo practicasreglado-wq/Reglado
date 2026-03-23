@@ -1,10 +1,12 @@
 <?php
+require_once __DIR__ . '/config/cors.php';
+applyCors();
+handlePreflight();
 
 require_once "config/db.php";
 require_once "config/auth.php";
 
-applyAuthCors();
-handlePreflight();
+
 
 $context = requireAuthenticatedUser($pdo);
 $local = $context['local'];

@@ -2,29 +2,24 @@
   <section v-if="isReal" class="properties-sale">
     <div class="properties-sale__hero" v-reveal="0">
       <div>
-        <p class="eyebrow">Matching inmobiliario</p>
-        <h2>Propiedades en venta</h2>
+        <p class="eyebrow">Activos captados</p>
+        <h2>Propiedades disponibles</h2>
         <p>
-          Seleccionamos oportunidades según tus preferencias guardadas y calculamos
-          el porcentaje de coincidencia en tiempo real.
+          Revisa todas las propiedades registradas, con análisis de inversión y dossier completo cuando el activo proviene de un PDF.
         </p>
       </div>
 
       <div class="hero-badge">
-        <span>{{ selectedCategory || "Sin categoría" }}</span>
+        <span>{{ properties.length }} activos</span>
       </div>
     </div>
 
     <div v-if="loading" class="properties-sale__state" v-reveal="1">
-      Cargando propiedades compatibles...
-    </div>
-
-    <div v-else-if="!selectedCategory" class="properties-sale__state" v-reveal="1">
-      Guarda primero tus preferencias para poder calcular matches.
+      Cargando propiedades...
     </div>
 
     <div v-else-if="properties.length === 0" class="properties-sale__state" v-reveal="1">
-      Todavía no hay propiedades de ejemplo para {{ selectedCategory }}.
+      Todavía no hay propiedades registradas.
     </div>
 
     <div v-else class="properties-sale__grid">
@@ -66,10 +61,9 @@ export default {
 
   setup() {
     const userStore = useUserStore()
-    const { selectedCategory, preferences, isReal } = storeToRefs(userStore)
+    const { preferences, isReal } = storeToRefs(userStore)
 
     return {
-      selectedCategory,
       preferences,
       isReal
     }
@@ -79,28 +73,12 @@ export default {
     this.loadProperties()
   },
 
-  watch: {
-    selectedCategory() {
-      this.loadProperties()
-    },
-    // Triggers reload when applying search from history
-    '$route.query.t'() {
-      this.loadProperties()
-    }
-  },
-
   methods: {
     async loadProperties() {
-      if (!this.selectedCategory) {
-        this.properties = []
-        this.loading = false
-        return
-      }
-
       this.loading = true
 
       try {
-        this.properties = await fetchProperties(this.selectedCategory)
+        this.properties = await fetchProperties()
       } catch (error) {
         console.error(error)
         this.properties = []
