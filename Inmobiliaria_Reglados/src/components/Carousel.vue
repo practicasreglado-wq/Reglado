@@ -378,7 +378,7 @@ export default {
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.4em; /* More spaced */
-  font-size: 1.1rem; /* Larger */
+  font-size: clamp(1.25rem, 1rem + 1vw, 2.1rem);
   text-shadow: 0 2px 10px rgba(212, 175, 55, 0.3);
 }
 
@@ -498,7 +498,7 @@ export default {
 }
 
 .center:hover {
-  transform: scale(1.12) translateY(-10px);
+  transform: scale(1.12) translateY(-5px);
   box-shadow: 
     0 40px 80px rgba(18, 36, 77, 0.4),
     0 15px 30px rgba(18, 36, 77, 0.2);
