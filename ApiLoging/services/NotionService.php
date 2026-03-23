@@ -105,6 +105,59 @@ class NotionService
         return true;
     }
 
+    public static function clearDatabase(): string
+    {
+        if (!self::isEnabled()) {
+            self::log('clearDatabase skipped: notion not enabled');
+            return 'Notion no está habilitado (NOTION_ENABLED)';
+        }
+
+        $databaseId = trim((string) getenv('NOTION_DATABASE_ID'));
+        if ($databaseId === '') {
+            return 'NOTION_DATABASE_ID no configurado';
+        }
+
+        $deletedCount = 0;
+        $hasMore = true;
+        $nextCursor = null;
+
+        while ($hasMore) {
+            // Pass null (no body) when no cursor — avoids sending [] instead of {} to Notion API
+            $payload = $nextCursor !== null ? ['start_cursor' => $nextCursor] : null;
+
+            $response = self::request('POST', '/databases/' . $databaseId . '/query', $payload);
+            if (!is_array($response) || !isset($response['results'])) {
+                $msg = 'Notion query failed (puede ser un problema de permisos de lectura en la integración). databaseId=' . $databaseId;
+                self::log($msg . ' response=' . json_encode($response));
+                return $msg;
+            }
+
+            foreach ($response['results'] as $page) {
+                $pageId = (string) ($page['id'] ?? '');
+                if ($pageId === '') {
+                    continue;
+                }
+                // 'archived' + 'in_trash' for max compatibility across Notion API versions
+                $result = self::request('PATCH', '/pages/' . $pageId, [
+                    'archived' => true,
+                    'in_trash' => true,
+                ]);
+                if ($result !== null) {
+                    $deletedCount++;
+                } else {
+                    self::log('notion clearDatabase: failed to archive page ' . $pageId);
+                }
+                usleep(150000); // 150ms pause to respect API rate limits
+            }
+
+            $hasMore = !empty($response['has_more']);
+            $nextCursor = $response['next_cursor'] ?? null;
+        }
+
+        self::log('notion clearDatabase: archived ' . $deletedCount . ' pages');
+        return '';
+    }
+
     private static function buildProperties(array $schema, array $user): array
     {
         $result = [];
@@ -359,7 +412,7 @@ class NotionService
 
         if ($status < 200 || $status >= 300) {
             $message = (string) ($decoded['message'] ?? 'unknown notion error');
-            self::log('notion http error ' . $status . ': ' . $message);
+            self::log('notion http error ' . $status . ' on ' . $method . ' ' . $path . ': ' . $message);
             return null;
         }
 

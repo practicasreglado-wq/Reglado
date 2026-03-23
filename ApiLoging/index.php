@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Punto de entrada principal (Front Controller) para ApiLoging.
+ * 
+ * Centraliza la carga de dependencias, configuración de entorno,
+ * inicialización de medidas de seguridad (CORS, headers) y funciona como
+ * un enrutador básico para todas las peticiones de autenticación.
+ */
+
 require_once __DIR__ . '/vendor/autoload.php';
 require_once __DIR__ . '/config/Env.php';
 require_once __DIR__ . '/config/Database.php';
@@ -88,6 +96,10 @@ if ($uri === '/auth/admin/users' && $method === 'GET') {
 
 if ($uri === '/auth/admin/update-role' && $method === 'POST') {
     AuthController::adminUpdateRole();
+}
+
+if ($uri === '/auth/admin/sync-notion' && $method === 'POST') {
+    AuthController::adminSyncNotion();
 }
 
 if ($uri === '/auth/logout' && $method === 'POST') {

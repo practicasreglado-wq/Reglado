@@ -1,7 +1,16 @@
 <?php
 
+/**
+ * Controlador principal que maneja toda la lógica de autenticación centralizada
+ * del ecosistema Reglado. Incluye registro, inicio de sesión, recuperación de 
+ * contraseña y actualización de perfiles.
+ */
 class AuthController
 {
+    /**
+     * Registra un nuevo usuario en estado pendiente.
+     * Valida los datos, crea el registro temporal y envía el email de verificación.
+     */
     public static function register(): void
     {
         $data = self::getJsonInput();
@@ -81,6 +90,10 @@ class AuthController
         }
     }
 
+    /**
+     * Inicia sesión verificando credenciales y estado del email.
+     * Si las credenciales son válidas, emite un token JWT con la identidad del usuario.
+     */
     public static function login(): void
     {
         $data = self::getJsonInput();
@@ -233,6 +246,10 @@ class AuthController
         Response::json(['message' => 'verification email sent']);
     }
 
+    /**
+     * Solicita el envío de un correo para recuperar la contraseña.
+     * Genera un token temporal y envía las instrucciones por email.
+     */
     public static function requestPasswordReset(): void
     {
         $data = self::getJsonInput();
@@ -267,6 +284,10 @@ class AuthController
         }
     }
 
+    /**
+     * Permite restablecer la contraseña validando el token enviado por correo.
+     * Si es válido, actualiza la contraseña del usuario.
+     */
     public static function resetPassword(): void
     {
         $data = self::getJsonInput();
@@ -496,6 +517,10 @@ class AuthController
         }
     }
 
+    /**
+     * Obtiene y devuelve los datos del perfil del usuario logueado
+     * mediante la información contenida en el token JWT.
+     */
     public static function me(): void
     {
         $session = AuthMiddleware::handle();
@@ -572,6 +597,38 @@ class AuthController
             Response::json(['message' => 'role updated']);
         } catch (Throwable $e) {
             Response::json(['error' => 'could not update role'], 500);
+        }
+    }
+
+    public static function adminSyncNotion(): void
+    {
+        self::requireAdmin();
+
+        $users = User::listAll();
+
+        try {
+            $clearError = NotionService::clearDatabase();
+            if ($clearError !== '') {
+                Response::json(['error' => 'Error al limpiar Notion: ' . $clearError], 500);
+            }
+
+            $syncedCount = 0;
+            foreach ($users as $user) {
+                if (NotionService::syncUserCreated($user)) {
+                    $syncedCount++;
+                }
+            }
+
+            SecurityLogger::log('admin_synced_notion', null, ['synced' => $syncedCount]);
+
+            Response::json([
+                'message' => 'Notion synchronized successfully',
+                'synced_count' => $syncedCount,
+                'total_users' => count($users)
+            ]);
+        } catch (Throwable $e) {
+            error_log('[AuthController] adminSyncNotion Error: ' . $e->getMessage());
+            Response::json(['error' => 'could not synchronize notion: ' . $e->getMessage()], 500);
         }
     }
 

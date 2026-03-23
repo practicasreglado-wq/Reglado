@@ -1,3 +1,9 @@
+/**
+ * Servicio central de Autenticación para el frontend (GrupoReglado).
+ * 
+ * Gestiona el estado reactivo del usuario, almacena el JWT (en LocalStorage y Cookies),
+ * y provee los métodos principales para interactuar de forma unificada con ApiLoging.
+ */
 import { reactive } from "vue";
 
 const API_BASE = import.meta.env.VITE_AUTH_API_URL || "http://localhost:8000";
@@ -83,6 +89,10 @@ function setSession(token, user = null) {
   state.user = user;
 }
 
+/**
+ * Comprueba si hay un token almacenado y solicita los datos del usuario
+ * actual a la API (endpoint /auth/me) para hidratar el estado reactivo.
+ */
 async function initialize() {
   if (!state.token) {
     const cookieToken = getCookie(COOKIE_TOKEN_KEY);
@@ -124,6 +134,12 @@ function applySessionPayload(payload) {
   return payload;
 }
 
+/**
+ * Envía las credenciales a la API de autenticación y, en caso de éxito,
+ * inicializa la sesión local guardando el token y los datos del usuario.
+ * @param {string} email 
+ * @param {string} password 
+ */
 async function login(email, password) {
   const payload = await request("/auth/login", {
     method: "POST",
@@ -229,6 +245,13 @@ async function adminUpdateRole(userId, role) {
   });
 }
 
+async function adminSyncNotion() {
+  return request("/auth/admin/sync-notion", {
+    method: "POST",
+    headers: authHeaders(),
+  });
+}
+
 async function logout() {
   try {
     if (state.token) {
@@ -259,6 +282,7 @@ export const auth = {
   resetPassword,
   adminUsers,
   adminUpdateRole,
+  adminSyncNotion,
   logout,
   translateMessage: translateAuthMessage,
 };

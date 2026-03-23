@@ -189,6 +189,13 @@
 </template>
 
 <script>
+/**
+ * Componente Raíz de RegladoMaps (App.vue)
+ * 
+ * Orquesta la estructura principal y la Landing Page interactiva del visor
+ * de mapas. Controla las animaciones al hacer scroll mediante IntersectionObserver,
+ * la navegación lateral y gatilla la inicialización global del servicio de autenticación.
+ */
 import LPHeader from './components/LPHeader.vue'
 import LandingPage from './components/LandingPage.vue'
 import LPFooter from './components/LPFooter.vue'

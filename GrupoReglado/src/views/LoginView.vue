@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <section class="form-page">
     <div class="form-card">
       <h1>Iniciar sesión</h1>
@@ -42,6 +42,14 @@
 </template>
 
 <script setup>
+/**
+ * LoginView
+ * 
+ * Vista principal de inicio de sesión corporativo (GrupoReglado).
+ * Permite a los usuarios acceder a su cuenta central de ApiLoging y
+ * soporta la lógica de redirección (query `returnTo`) transparente hacia
+ * otros productos del ecosistema Reglado tras un acceso exitoso.
+ */
 import { computed, onMounted, ref } from "vue";
 import { RouterLink, useRoute } from "vue-router";
 import { auth } from "../services/auth";
