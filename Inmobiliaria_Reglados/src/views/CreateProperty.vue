@@ -1,6 +1,14 @@
 <template>
   <section class="create-property">
     <div class="content">
+      <div class="header-actions">
+        <button class="back-link" @click="$router.back()">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Volver
+        </button>
+      </div>
       <p class="eyebrow">Gestión de activos</p>
       <h2>Procesar propiedad</h2>
       <p class="intro">
@@ -148,6 +156,30 @@ function handleFileChange(event) {
   padding: 32px;
   border-radius: 24px;
   box-shadow: 0 24px 60px rgba(23, 42, 93, 0.15);
+}
+
+.header-actions {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.back-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  color: #6b7b95;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.back-link:hover {
+  color: #172a5d;
+  transform: translateX(-3px);
 }
 
 .eyebrow {

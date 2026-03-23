@@ -10,8 +10,8 @@
         </p>
       </div>
 
-      <div class="hero-badge">
-        <span>{{ properties.length }} activos</span>
+      <div class="hero-badges">
+        <span class="hero-badge">{{ properties.length }} activos</span>
       </div>
     </div>
 
@@ -199,6 +199,26 @@ export default {
   position: relative;
   z-index: 2;
 }
+ 
+.hero-badges {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 14px 26px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(14px);
+  font-weight: 800;
+  font-size: 1.35rem;
+  color: #fff;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
 
 .properties-sale__copy {
   display: grid;
@@ -313,6 +333,11 @@ export default {
   .eyebrow {
     margin: 0 0 6px;
     font-size: 0.66rem;
+  }
+
+  .hero-badge {
+    padding: 10px 18px;
+    font-size: 1rem;
   }
 
   .properties-sale__copy {

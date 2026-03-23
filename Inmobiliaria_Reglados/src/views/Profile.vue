@@ -63,7 +63,7 @@
 </button>
 <span class="sidebar-kicker">Area privada</span>
 <div class="sidebar-profile-chip">
-<div class="sidebar-avatar">{{ userInitials }}</div>
+<div class="sidebar-avatar" :class="avatarClass">{{ userInitials }}</div>
 <div>
 <h2>Hola {{ user.nombre_usuario }}</h2>
 </div>
@@ -120,7 +120,7 @@ Cerrar sesion
 <section class="profile-home-hero">
 <div class="hero-copy">
 <div class="hero-title-row">
-<div class="hero-avatar">{{ userInitials }}</div>
+<div class="hero-avatar" :class="avatarClass">{{ userInitials }}</div>
 <div>
 <h1>Bienvenido, {{ user.nombre_usuario }}</h1>
 </div>
@@ -575,6 +575,11 @@ export default {
       saveSearchMessage,
       isAdmin,
       isReal,
+      avatarClass: computed(() => {
+        if (isAdmin.value) return 'avatar--gold';
+        if (isReal.value) return 'avatar--silver';
+        return 'avatar--bronze';
+      }),
     };
   },
 };
@@ -873,11 +878,26 @@ place-items:center;
 width:44px;
 height:44px;
 border-radius:14px;
-background:linear-gradient(135deg, #f4d078, #bd9b2c);
 color:#142856;
 font-weight:800;
 font-size:1rem;
 flex-shrink:0;
+box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.avatar--gold {
+  background: linear-gradient(135deg, #f4d078, #bd9b2c);
+  color: #172a5d;
+}
+
+.avatar--silver {
+  background: linear-gradient(135deg, #e2e8f0, #94a3b8);
+  color: #1e293b;
+}
+
+.avatar--bronze {
+  background: linear-gradient(135deg, #d9a066, #8c5a2b);
+  color: #3b240e;
 }
 
 .profile-home{
@@ -965,15 +985,15 @@ gap:18px;
 
 .hero-avatar{
 display:grid;
+animation: initialDraw 1.1s ease-out forwards;
+transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
 place-items:center;
 width:76px;
 height:76px;
 border-radius:24px;
-background:linear-gradient(135deg, #f4d078, #bd9b2c);
-color:#172a5d;
 font-size:1.5rem;
 font-weight:800;
-box-shadow:0 16px 30px rgba(0,0,0,0.2);
+box-shadow: 0 16px 30px rgba(0,0,0,0.22);
 flex-shrink:0;
 }
 
@@ -1379,6 +1399,27 @@ font-size:0.9rem;
 .logout-btn:hover{
 background:rgba(239, 68, 68, 0.747);
 }
+
+.card-icon svg path,
+.card-icon svg circle {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 0.5s ease;
+}
+
+/* Initially draw icons on load */
+.card-icon svg path,
+.card-icon svg circle {
+  animation: initialDraw 1.1s ease-out forwards;
+}
+
+@keyframes initialDraw {
+  from { stroke-dashoffset: 100; }
+  to { stroke-dashoffset: 0; }
+}
+
+.card-icon svg path:nth-child(2) { animation-delay: 0.15s; }
+.card-icon svg path:nth-child(3) { animation-delay: 0.3s; }
 
 @media (max-width: 1280px){
 .sidebar-panel{
