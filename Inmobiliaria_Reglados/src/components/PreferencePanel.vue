@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import { computed, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 
 export default {
   props: {
@@ -42,15 +42,36 @@ export default {
   },
   setup(props) {
     const expanded = ref(false);
+    const isMobile = ref(false);
+    let mobileQuery = null;
 
-    const hiddenEntries = computed(() => props.entries.slice(5));
+    const syncViewport = () => {
+      isMobile.value = window.innerWidth <= 480;
+    };
+
+    const collapsedCount = computed(() => (isMobile.value ? 3 : 5));
+    const hiddenEntries = computed(() => props.entries.slice(collapsedCount.value));
     const visibleEntries = computed(() =>
-      expanded.value ? props.entries : props.entries.slice(0, 5)
+      expanded.value ? props.entries : props.entries.slice(0, collapsedCount.value)
     );
+
+    onMounted(() => {
+      syncViewport();
+      mobileQuery = window.matchMedia("(max-width: 480px)");
+      mobileQuery.addEventListener("change", syncViewport);
+    });
+
+    onBeforeUnmount(() => {
+      if (mobileQuery) {
+        mobileQuery.removeEventListener("change", syncViewport);
+      }
+    });
 
     return {
       expanded,
+      collapsedCount,
       hiddenEntries,
+      isMobile,
       visibleEntries,
     };
   },

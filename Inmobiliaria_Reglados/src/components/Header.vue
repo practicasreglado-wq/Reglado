@@ -3,7 +3,7 @@
     <div class="logo">
       <router-link to="/" class="logo-link">
         <div class="logo-wrapper">
-          <img src="@/assets/reglado-RS-logo.svg" alt="Reglado Logo" class="brand-icon" />
+          <img src="@/assets/Logo_RegladoRS.svg" alt="Reglado Logo" class="brand-icon" />
           <h1 class="brand-text">RS</h1>
         </div>
       </router-link>
@@ -196,22 +196,22 @@ header .logo .logo-link {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   cursor: pointer;
   padding: 5px 0; /* Eliminado padding lateral para estar más pegado a la izq */
   transition: transform 0.3s ease;
 }
 
 .brand-icon {
-  width: 45px;
-  height: 45px;
+  width: 52px;
+  height: 52px;
   object-fit: contain;
-  filter: drop-shadow(0 0 2px rgba(189, 155, 44, 0.6));
+  filter: none;
   transition: transform 1.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .brand-text {
-  font-size: 2.2rem;
+  font-size: 2.5rem;
   font-weight: 800;
   margin: 0;
   letter-spacing: 1px;
@@ -226,7 +226,7 @@ header .logo .logo-link {
   );
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  text-shadow: 0 1px 2px rgba(186, 129, 15, 0.4);
+  text-shadow: none;
 }
 
 /* LOGO HOVER */

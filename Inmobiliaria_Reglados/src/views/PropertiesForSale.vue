@@ -1,17 +1,20 @@
 <template>
   <section v-if="isReal" class="properties-sale">
     <div class="properties-sale__hero" v-reveal="0">
-      <div>
+      <div class="properties-sale__copy">
         <p class="eyebrow">Matching inmobiliario</p>
         <h2>Propiedades en venta</h2>
         <p>
-          Seleccionamos oportunidades según tus preferencias guardadas y calculamos
+          Seleccionamos oportunidades segun tus preferencias guardadas y calculamos
           el porcentaje de coincidencia en tiempo real.
         </p>
       </div>
 
-      <div class="hero-badge">
-        <span>{{ selectedCategory || "Sin categoría" }}</span>
+      <div class="properties-sale__insights">
+        <article class="hero-insight-card">
+          <p class="hero-insight-label">Categoria</p>
+          <strong class="hero-insight-value">{{ categoryLabel }}</strong>
+        </article>
       </div>
     </div>
 
@@ -24,7 +27,7 @@
     </div>
 
     <div v-else-if="properties.length === 0" class="properties-sale__state" v-reveal="1">
-      Todavía no hay propiedades de ejemplo para {{ selectedCategory }}.
+      Todavia no hay propiedades de ejemplo para {{ selectedCategory }}.
     </div>
 
     <div v-else class="properties-sale__grid">
@@ -40,14 +43,23 @@
 </template>
 
 <script>
-import { storeToRefs } from "pinia"
-import PropertyCard from "../components/PropertyCard.vue"
-import { useUserStore } from "../stores/user"
+import { computed } from "vue";
+import { storeToRefs } from "pinia";
+import PropertyCard from "../components/PropertyCard.vue";
+import { useUserStore } from "../stores/user";
 import {
   fetchProperties,
   removeFavorite,
   saveFavorite,
-} from "../services/properties"
+} from "../services/properties";
+
+const CATEGORY_LABELS = {
+  activos: "Activos",
+  edificios: "Edificios",
+  fincas: "Fincas",
+  hoteles: "Hoteles",
+  parking: "Parking",
+};
 
 export default {
   name: "PropertiesForSale",
@@ -61,95 +73,88 @@ export default {
       loading: true,
       properties: [],
       pendingFavorites: new Set(),
-    }
+    };
   },
 
   setup() {
-    const userStore = useUserStore()
-    const { selectedCategory, preferences, isReal } = storeToRefs(userStore)
+    const userStore = useUserStore();
+    const { selectedCategory, preferences, isReal } = storeToRefs(userStore);
+    const categoryLabel = computed(() =>
+      selectedCategory.value ? CATEGORY_LABELS[selectedCategory.value] || selectedCategory.value : "Sin definir"
+    );
 
     return {
       selectedCategory,
       preferences,
-      isReal
-    }
+      isReal,
+      categoryLabel,
+    };
   },
 
   mounted() {
-    this.loadProperties()
+    this.loadProperties();
   },
 
   watch: {
     selectedCategory() {
-      this.loadProperties()
+      this.loadProperties();
     },
-    // Triggers reload when applying search from history
-    '$route.query.t'() {
-      this.loadProperties()
-    }
+    "$route.query.t"() {
+      this.loadProperties();
+    },
   },
 
   methods: {
     async loadProperties() {
       if (!this.selectedCategory) {
-        this.properties = []
-        this.loading = false
-        return
+        this.properties = [];
+        this.loading = false;
+        return;
       }
 
-      this.loading = true
+      this.loading = true;
 
       try {
-        this.properties = await fetchProperties(this.selectedCategory)
+        this.properties = await fetchProperties(this.selectedCategory);
       } catch (error) {
-        console.error(error)
-        this.properties = []
+        console.error(error);
+        this.properties = [];
       } finally {
-        this.loading = false
+        this.loading = false;
       }
     },
 
     async toggleFavorite(property) {
       if (this.pendingFavorites.has(property.id)) {
-        return
+        return;
       }
 
-      this.pendingFavorites.add(property.id)
+      this.pendingFavorites.add(property.id);
 
       try {
-
         if (property.is_favorite) {
-
-          await removeFavorite(property.id)
-
+          await removeFavorite(property.id);
         } else {
-
           await saveFavorite({
             property_id: property.id,
             categoria: property.categoria,
-            preferences: this.preferences
-          })
-
+            preferences: this.preferences,
+          });
         }
 
         this.properties = this.properties.map((current) =>
           current.id === property.id
             ? { ...current, is_favorite: !current.is_favorite }
             : current
-        )
-
+        );
       } catch (error) {
-
-        console.error(error)
-
+        console.error(error);
       } finally {
-
-        this.pendingFavorites.delete(property.id)
-
+        this.pendingFavorites.delete(property.id);
       }
     },
   },
-}
+};
 </script>
 
 <style scoped>
@@ -159,53 +164,117 @@ export default {
 }
 
 .properties-sale__hero {
-  display: flex;
-  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(220px, 0.7fr);
   gap: 20px;
   padding: 28px 30px;
-  border-radius: 24px;
-  background: linear-gradient(135deg, #172a5d, #3352a4);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 14% 80%, transparent 0 9px, transparent 10px),
+    radial-gradient(circle at 86% 16%, transparent 0 11px, transparent 12px),
+    radial-gradient(circle at top right, rgba(244, 208, 120, 0.24), transparent 30%),
+    linear-gradient(135deg, #12244d 0%, #20386b 55%, #3a5ca9 100%);
   color: #fff;
+  box-shadow: 0 22px 48px rgba(18, 36, 77, 0.22);
+  background-repeat: no-repeat;
+}
+
+.properties-sale__hero::before,
+.properties-sale__hero::after {
+  content: "";
+  position: absolute;
+  border-radius: 999px;
+  pointer-events: none;
+  opacity: 0.72;
+  transition: opacity 0.28s ease;
+}
+
+.properties-sale__hero::before {
+  width: 220px;
+  height: 220px;
+  right: -70px;
+  top: -90px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.properties-sale__hero::after {
+  width: 160px;
+  height: 160px;
+  left: -50px;
+  bottom: -90px;
+  background: rgba(255, 204, 84, 0.14);
+}
+
+.properties-sale__hero > * {
+  position: relative;
+  z-index: 2;
+}
+
+.properties-sale__copy {
+  display: grid;
+  align-content: center;
+}
+
+.properties-sale__insights {
+  display: grid;
+  gap: 14px;
+  align-content: center;
 }
 
 .eyebrow {
   margin: 0 0 10px;
-  opacity: 0.72;
+  opacity: 0.82;
   text-transform: uppercase;
   letter-spacing: 0.12em;
   font-size: 0.78rem;
+  font-weight: 700;
 }
 
 .properties-sale__hero h2 {
   margin: 0 0 10px;
-  font-size: 2rem;
+  font-size: 2.2rem;
+  line-height: 1.05;
 }
 
 .properties-sale__hero p:last-child {
   margin: 0;
   max-width: 62ch;
+  color: rgba(255, 255, 255, 0.82);
+  line-height: 1.6;
 }
 
-.hero-badge {
-  display: flex;
-  align-items: center;
+.hero-insight-card {
+  padding: 18px 20px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 24px rgba(7, 16, 36, 0.14);
 }
 
-.hero-badge span {
-  padding: 14px 24px;
-  border-radius: 999px;
-  background: linear-gradient(135deg, #f3c94b, #e5b62f);
-  color: #172a5d;
-  font-size: 1.05rem;
-  font-weight: 800;
+.hero-insight-label {
+  margin: 0 0 8px;
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.hero-insight-value {
+  display: block;
+  font-size: 1.55rem;
+  line-height: 1.1;
 }
 
 .properties-sale__state {
   padding: 28px;
-  border-radius: 20px;
-  background: #fff;
+  border-radius: 24px;
+  background: linear-gradient(180deg, #ffffff, #f8fafc);
+  border: 1px solid #dfe6f2;
   color: #5a6880;
-  box-shadow: 0 12px 26px rgba(23, 42, 93, 0.08);
+  box-shadow: 0 14px 32px rgba(23, 42, 93, 0.08);
 }
 
 .properties-sale__grid {
@@ -214,15 +283,12 @@ export default {
   gap: 22px;
 }
 
-/* =========================================
-   RESPONSIVE (1440px / 768px / 480px)
-   ========================================= */
-
 @media (max-width: 1440px) {
   .properties-sale__hero {
     padding: 24px;
     gap: 16px;
   }
+
   .properties-sale__hero h2 {
     font-size: 1.8rem;
   }
@@ -232,15 +298,12 @@ export default {
   .properties-sale {
     gap: 20px;
   }
+
   .properties-sale__hero {
-    flex-direction: column;
+    grid-template-columns: 1fr;
     padding: 22px;
-    align-items: flex-start;
   }
-  .hero-badge span {
-    padding: 10px 18px;
-    font-size: 0.95rem;
-  }
+
   .properties-sale__grid {
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: 16px;
@@ -249,22 +312,53 @@ export default {
 
 @media (max-width: 480px) {
   .properties-sale__hero {
-    padding: 16px;
+    gap: 12px;
+    padding: 14px;
+    border-radius: 20px;
   }
+
+  .eyebrow {
+    margin: 0 0 6px;
+    font-size: 0.66rem;
+  }
+
+  .properties-sale__copy {
+    gap: 0;
+  }
+
   .properties-sale__hero h2 {
-    font-size: 1.5rem;
+    margin: 0 0 6px;
+    font-size: 1.22rem;
   }
+
   .properties-sale__hero p:last-child {
-    font-size: 0.9rem;
+    font-size: 0.82rem;
+    line-height: 1.45;
   }
-  .hero-badge span {
-    padding: 8px 14px;
-    font-size: 0.85rem;
+
+  .properties-sale__insights {
+    gap: 10px;
   }
+
+  .hero-insight-card {
+    padding: 12px 14px;
+    border-radius: 16px;
+  }
+
+  .hero-insight-label {
+    margin: 0 0 4px;
+    font-size: 0.68rem;
+  }
+
+  .hero-insight-value {
+    font-size: 1.1rem;
+  }
+
   .properties-sale__state {
-    padding: 18px;
-    font-size: 0.9rem;
+    padding: 16px;
+    font-size: 0.84rem;
   }
+
   .properties-sale__grid {
     grid-template-columns: 1fr;
     gap: 14px;

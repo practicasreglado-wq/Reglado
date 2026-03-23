@@ -216,14 +216,19 @@ export default {
   width: 100%;
   min-width: 0;
   border-radius: 24px;
-  background: #fff;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), #f7faff);
+  border: 1px solid rgba(197, 212, 241, 0.82);
   box-shadow: 0 18px 40px rgba(23, 42, 93, 0.12);
-  transition: z-index 0s, transform 0.28s ease, box-shadow 0.28s ease, filter 0.28s ease;
+  transition: z-index 0s, transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease, filter 0.28s ease;
 }
 
 .property-card.popper-open,
 .property-card:hover {
   z-index: 50;
+  border-color: #bfd0f4;
+  box-shadow: 0 24px 46px rgba(23, 42, 93, 0.16);
+  transform: translateY(-6px);
 }
 
 .property-card__media {
@@ -243,7 +248,7 @@ export default {
 .property-card__overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(10,21,46,0.08), rgba(10,21,46,0.42));
+  background: linear-gradient(180deg, rgba(10,21,46,0.06), rgba(10,21,46,0.5));
   user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -269,17 +274,14 @@ export default {
   padding:4px 10px;
   border-radius:999px;
   border:none;
-  background:rgba(255,255,255,0.95);
+  background:rgba(255,255,255,0.18);
   backdrop-filter:blur(8px);
   font-size:0.9rem;
   font-weight:600;
-  color:#c1a115;
+  color:#fff;
   cursor:pointer;
   transition:all 0.2s ease;
   user-select: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
 }
 
 .favorite-icon{
@@ -290,12 +292,12 @@ export default {
 .favorite-button:hover{
   background:#c1a115;
   transform:scale(1.05);
-  color: white;
+  color:#172a5d;
 }
 
 .favorite-button.active{
-  background:#c1a115;
-  color:white;
+  background:linear-gradient(135deg, #f4d078, #bd9b2c);
+  color:#172a5d;
   transform:scale(1.1);
 }
 
@@ -323,7 +325,7 @@ export default {
   color:#17305e;
   font-weight:700;
   overflow:hidden;
-
+  box-shadow:0 8px 18px rgba(10,21,46,0.18);
   transition:
     transform 0.25s ease,
     background 0.45s ease,
@@ -363,10 +365,12 @@ export default {
 
 .property-card__body{
   padding:22px;
+  display:grid;
+  gap:14px;
 }
 
 .property-card__category{
-  margin-bottom:10px;
+  margin-bottom:0;
   color:#58709a;
   font-size:0.82rem;
   font-weight:700;
@@ -375,10 +379,11 @@ export default {
 }
 
 .property-card__body h3{
-  margin:0 0 12px;
+  margin:0;
   color:#172a5d;
   font-size:1.35rem;
   overflow-wrap:anywhere;
+  line-height:1.25;
 }
 
 .property-card__meta,
@@ -389,8 +394,11 @@ export default {
 }
 
 .property-card__meta{
-  margin-bottom:18px;
   color:#5c6980;
+  padding:12px 14px;
+  border-radius:16px;
+  background:#f3f7fd;
+  border:1px solid #e1eaf7;
 }
 
 .property-card__footer{
@@ -399,25 +407,29 @@ export default {
 }
 
 .property-card__footer strong{
-  font-size:1.1rem;
+  font-size:1.15rem;
+  padding:10px 14px;
+  border-radius:14px;
+  background:linear-gradient(135deg, rgba(54, 84, 174, 0.08), rgba(244, 208, 120, 0.12));
 }
 
 /* BOTON MATCH DETAILS */
 
 .match-details-button{
   border:none;
-  background:#172a5d;
+  background:linear-gradient(135deg, #172a5d, #3654ae);
   cursor:pointer;
   color:#ffffff;
   font-weight:600;
-  padding:6px 12px;
+  padding:8px 14px;
   border-radius:999px;
-  transition:all .2s ease;
+  transition:transform .2s ease, box-shadow .2s ease;
   user-select: none;
 }
 
 .match-details-button:hover{
-  text-decoration:underline;
+  transform:translateY(-2px);
+  box-shadow:0 12px 24px rgba(23, 42, 93, 0.18);
 }
 
 /* WRAPPER DEL BOTON Y POPPER */

@@ -3,7 +3,10 @@
     <button
       v-if="isVisible"
       class="scroll-to-top"
-      :class="{ 'is-active': isActive }"
+      :class="{ 
+        'is-active': isActive,
+        'at-footer': isNearBottom 
+      }"
       type="button"
       aria-label="Volver arriba"
       @click="handleScrollToTop"
@@ -33,11 +36,24 @@ const isActive = ref(false);
 const updateVisibility = () => {
   const currentScroll = window.scrollY || window.pageYOffset || 0;
   const viewportHeight = window.innerHeight || 0;
-  const documentHeight = document.documentElement.scrollHeight || 0;
-  const distanceToBottom = documentHeight - (currentScroll + viewportHeight);
+  
+  const footer = document.querySelector('.footer');
+  if (footer) {
+    const footerRect = footer.getBoundingClientRect();
+    const isMobile = window.innerWidth <= 640;
+    const buttonBottomMargin = isMobile ? 15 : 30;
+    const buttonHalfHeight = isMobile ? 20 : 26;
+    const buttonCenter = viewportHeight - (buttonBottomMargin + buttonHalfHeight);
+
+    // Trigger exactly when the button's midpoint hits the footer's top edge
+    isNearBottom.value = footerRect.top <= buttonCenter;
+  } else {
+    const documentHeight = document.documentElement.scrollHeight || 0;
+    const distanceToBottom = documentHeight - (currentScroll + viewportHeight);
+    isNearBottom.value = distanceToBottom <= 160;
+  }
 
   scrollY.value = currentScroll;
-  isNearBottom.value = distanceToBottom <= 160;
 };
 
 const isVisible = computed(() => {
@@ -119,6 +135,22 @@ watch(
   transform: translateY(-80px) scale(1.2);
   opacity: 0;
   transition: transform 0.7s ease-in, opacity 0.7s ease-in;
+}
+
+/* ESTILO EN EL FOOTER */
+.scroll-to-top.at-footer {
+  background: #ffffff;
+  color: #0b2a5f;
+  border-color: rgba(11, 42, 95, 0.2);
+  box-shadow: 0 12px 32px rgba(11, 42, 95, 0.2);
+}
+
+.scroll-to-top.at-footer:hover {
+  background: #f8faff;
+}
+
+.scroll-to-top.at-footer .wind-svg {
+  stroke: rgba(11, 42, 95, 0.6);
 }
 
 /* EFECTO VIENTO */

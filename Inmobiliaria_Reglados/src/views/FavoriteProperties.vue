@@ -2,14 +2,15 @@
   <section class="favorites-view">
 
     <div class="favorites-view__header" v-reveal="0">
-      <div>
-        <p class="eyebrow">Tu shortlist</p>
-        <h2>Mis propiedades favoritas</h2>
+      <div class="header-content">
+        <div class="header-main">
+          <p class="eyebrow">Tu shortlist</p>
+          <h2>Mis propiedades favoritas</h2>
+        </div>
+        <span class="favorites-count">
+          {{ filteredFavorites.length }} {{ filteredFavorites.length === 1 ? 'guardada' : 'guardadas' }}
+        </span>
       </div>
-
-      <span class="favorites-count">
-        {{ filteredFavorites.length }} {{ filteredFavorites.length === 1 ? 'guardada' : 'guardadas' }}
-      </span>
     </div>
 
     <!-- Controles de búsqueda y filtros -->
@@ -182,39 +183,103 @@ export default {
 
 <style scoped>
 
-.favorites-view{
-  display:grid;
-  gap:24px;
-  min-width:0;
+.favorites-view {
+  display: grid;
+  gap: 24px;
+  min-width: 0;
 }
 
-.favorites-view__header{
-  display:flex;
-  justify-content:space-between;
-  align-items:end;
-  gap:20px;
+.favorites-view__header {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 140px;
+  padding: 24px 34px;
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at top right, rgba(255, 215, 126, 0.28), transparent 34%),
+    linear-gradient(135deg, #12244d 0%, #20386b 55%, #3a5ca9 100%);
+  box-shadow: 0 22px 48px rgba(18, 36, 77, 0.24);
+  color: #fff;
 }
 
-.eyebrow{
-  margin:0 0 8px;
-  color:#6f7f98;
-  font-size:0.78rem;
-  font-weight:700;
-  letter-spacing:0.12em;
-  text-transform:uppercase;
+.favorites-view__header::before,
+.favorites-view__header::after {
+  content: "";
+  position: absolute;
+  border-radius: 999px;
+  pointer-events: none;
+  opacity: 0.72;
+  transition: opacity 0.28s ease;
 }
 
-.favorites-view__header h2{
-  margin:0;
-  color:#172a5d;
+.favorites-view__header::before {
+  width: 200px;
+  height: 200px;
+  right: -60px;
+  top: -80px;
+  background: rgba(255, 255, 255, 0.08);
 }
 
-.favorites-count{
-  padding:10px 14px;
-  border-radius:999px;
-  background:rgba(74,114,198,0.12);
-  color:#214b8f;
-  font-weight:700;
+.favorites-view__header::after {
+  width: 140px;
+  height: 140px;
+  left: -50px;
+  bottom: -80px;
+  background: rgba(255, 204, 84, 0.14);
+}
+
+.header-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.header-main {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  width: max-content;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 0;
+  color: #ffffff;
+}
+
+.favorites-view__header h2 {
+  margin: 0;
+  font-size: clamp(1.6rem, 1.2rem + 1vw, 2.2rem);
+  line-height: 1.1;
+  color: #ffffff;
+}
+
+.favorites-count {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(10px);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  white-space: nowrap;
 }
 
 /* Controles */
@@ -288,23 +353,23 @@ export default {
   border-color: #bd9b2c;
 }
 
-.favorites-view__state{
-  padding:24px;
-  border-radius:18px;
-  background:#fff;
-  color:#5a6880;
-  box-shadow:0 12px 26px rgba(23,42,93,0.08);
+.favorites-view__state {
+  padding: 24px;
+  border-radius: 18px;
+  background: #fff;
+  color: #5a6880;
+  box-shadow: 0 12px 26px rgba(23, 42, 93, 0.08);
 }
 
-.favorites-view__grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(290px,1fr));
-  gap:22px;
-  min-width:0;
+.favorites-view__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: 22px;
+  min-width: 0;
 }
 
-.favorite-card-wrapper{
-  min-width:0;
+.favorite-card-wrapper {
+  min-width: 0;
 }
 
 /* =========================================
@@ -313,10 +378,15 @@ export default {
 
 @media (max-width: 1440px) {
   .favorites-view__header {
-    gap: 16px;
+    padding: 22px 30px;
+    min-height: 120px;
   }
-  .favorites-view__header h2 {
-    font-size: 1.8rem;
+}
+
+@media (max-width: 980px) {
+  .favorites-view__header {
+    padding: 20px 24px;
+    min-height: 100px;
   }
 }
 
@@ -325,15 +395,17 @@ export default {
     gap: 20px;
   }
   .favorites-view__header {
+    padding: 24px;
+    border-radius: 22px;
+  }
+  .header-content {
     flex-direction: column;
     align-items: flex-start;
-  }
-  .favorites-view__header h2 {
-    font-size: 1.6rem;
+    gap: 16px;
   }
   .favorites-count {
     padding: 8px 14px;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
   }
   .favorites-view__grid {
     grid-template-columns: 1fr;
@@ -351,73 +423,22 @@ export default {
   .search-field input {
     width: 100%;
   }
-  .filter-select {
-    min-height: 44px;
-    font-size: 0.85rem;
-    padding: 10px 36px 10px 12px;
-    background-size: 18px;
-  }
-  .search-field input {
-    min-height: 44px;
-    padding-right: 14px;
-  }
 }
 
 @media (max-width: 480px) {
   .favorites-view {
     gap: 16px;
   }
+  .favorites-view__header {
+    padding: 20px;
+    min-height: auto;
+  }
   .favorites-view__header h2 {
     font-size: 1.5rem;
   }
   .eyebrow {
-    font-size: 0.72rem;
-  }
-  .favorites-count {
-    padding: 6px 12px;
-    font-size: 0.85rem;
-  }
-  .favorites-view__state {
-    padding: 18px;
-    font-size: 0.9rem;
-  }
-  .favorites-view__grid {
-    grid-template-columns: 1fr;
-    gap: 14px;
-  }
-  
-  /* Ajustes de filtros en móvil */
-  .filters-row {
-    flex-direction: column;
-  }
-  .favorites-controls {
-    padding: 15px;
-    border-radius: 14px;
-    gap: 12px;
-  }
-  .search-field input,
-  .filter-select {
-    font-size: 0.8rem;
-  }
-  .search-field input {
-    padding-left: 42px;
-    min-height: 42px;
-  }
-  .search-field svg {
-    left: 13px;
-    width: 18px;
-    height: 18px;
-  }
-  .filter-select {
-    min-height: 42px;
-    padding: 9px 34px 9px 10px;
-    background-position: right 10px center;
-    background-size: 14px;
+    font-size: 0.7rem;
+    padding: 5px 9px;
   }
 }
-
 </style>
-
-
-
-

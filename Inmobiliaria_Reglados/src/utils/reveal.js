@@ -55,6 +55,15 @@ const shouldReveal = (element) => {
     return false;
   }
 
+   // Exclude containers that host fixed UI, otherwise their transform
+   // changes the containing block and breaks fixed positioning.
+  if (
+    element.matches(".profile, .profile-content, .sidebar, .sidebar-panel") ||
+    element.closest(".sidebar")
+  ) {
+    return false;
+  }
+
   const rect = element.getBoundingClientRect();
   return rect.width >= 80 && rect.height >= 48;
 };
