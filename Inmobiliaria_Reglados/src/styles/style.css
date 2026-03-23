@@ -6,6 +6,10 @@
   --azul-secundario: #4a72c6;
   --blanco: #ffffff;
   --gris-claro: rgb(230, 249, 249);
+  --motion-duration-fast: 320ms;
+  --motion-duration-base: 460ms;
+  --motion-duration-slow: 580ms;
+  --motion-ease-premium: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 * {
@@ -49,30 +53,32 @@ body {
 .page-transition-enter-active,
 .page-transition-leave-active {
   transition:
-    opacity 0.22s ease,
-    transform 0.22s ease;
+    opacity var(--motion-duration-fast) ease-out,
+    transform var(--motion-duration-fast) var(--motion-ease-premium),
+    filter var(--motion-duration-fast) ease-out;
   will-change: opacity, transform;
 }
 
 .page-transition-enter-from,
 .page-transition-leave-to {
   opacity: 0;
-  transform: translateY(8px);
+  transform: translateY(14px);
+  filter: blur(4px);
 }
 
 .reveal-hidden {
   opacity: 0;
-  transform: translateY(28px) scale(0.985);
+  transform: translateY(18px);
   transition:
-    opacity 0.7s ease,
-    transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+    opacity var(--motion-duration-base) ease-out,
+    transform var(--motion-duration-base) var(--motion-ease-premium);
   transition-delay: var(--reveal-delay, 0ms);
   will-change: transform, opacity;
 }
 
 .reveal-visible {
   opacity: 1;
-  transform: translateY(0) scale(1);
+  transform: translateY(0);
 }
 
 button,
@@ -81,11 +87,12 @@ input,
 select,
 textarea {
   transition:
-    transform 0.22s ease,
-    box-shadow 0.22s ease,
-    background-color 0.22s ease,
-    border-color 0.22s ease,
-    opacity 0.22s ease;
+    transform var(--motion-duration-fast) ease,
+    box-shadow var(--motion-duration-fast) ease,
+    background-color var(--motion-duration-fast) ease,
+    border-color var(--motion-duration-fast) ease,
+    color var(--motion-duration-fast) ease,
+    opacity var(--motion-duration-fast) ease;
 }
 
 button:hover:not(:disabled),
@@ -102,16 +109,41 @@ textarea:focus-visible {
   outline-offset: 2px;
 }
 
+input,
+select,
+textarea {
+  transition:
+    transform var(--motion-duration-fast) ease,
+    box-shadow var(--motion-duration-fast) ease,
+    border-color var(--motion-duration-fast) ease,
+    background-color var(--motion-duration-fast) ease;
+}
+
+input:hover,
+select:hover,
+textarea:hover {
+  border-color: rgba(74, 114, 198, 0.28);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(23, 42, 93, 0.08);
+}
+
 .dashboard-card,
 .property-card,
 .search-history-item,
 .message-card,
 .favorite-card,
-.preference-panel {
+.preference-panel,
+.history-card {
   transition:
-    transform 0.28s ease,
-    box-shadow 0.28s ease,
-    filter 0.28s ease;
+    transform var(--motion-duration-fast) ease,
+    box-shadow var(--motion-duration-fast) ease,
+    filter var(--motion-duration-fast) ease,
+    border-color var(--motion-duration-fast) ease;
 }
 
 .dashboard-card:hover,
@@ -119,9 +151,41 @@ textarea:focus-visible {
 .search-history-item:hover,
 .message-card:hover,
 .favorite-card:hover,
-.preference-panel:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 16px 36px rgba(23, 42, 93, 0.14);
+.preference-panel:hover,
+.history-card:hover {
+  transform: translateY(-5px) scale(1.01);
+  box-shadow: 0 18px 38px rgba(23, 42, 93, 0.14);
+}
+
+.content-fade-enter-active,
+.content-fade-leave-active {
+  transition:
+    opacity var(--motion-duration-fast) ease-out,
+    transform var(--motion-duration-fast) var(--motion-ease-premium);
+}
+
+.content-fade-enter-from,
+.content-fade-leave-to {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+.stagger-list-move,
+.stagger-list-enter-active,
+.stagger-list-leave-active {
+  transition:
+    transform var(--motion-duration-base) var(--motion-ease-premium),
+    opacity var(--motion-duration-fast) ease-out;
+}
+
+.stagger-list-enter-from,
+.stagger-list-leave-to {
+  opacity: 0;
+  transform: translateY(18px) scale(0.985);
+}
+
+.stagger-list-leave-active {
+  pointer-events: none;
 }
 /* ===== Scrollbar personalizada ===== */
 

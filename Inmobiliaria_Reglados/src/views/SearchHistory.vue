@@ -10,27 +10,34 @@
       </div>
     </div>
 
-    <div v-if="loading" class="history-state">
+    <transition name="content-fade" mode="out-in">
+    <div v-if="loading" key="loading" class="history-state">
       Cargando historial...
     </div>
 
-    <div v-else-if="error" class="history-state history-state--error">
+    <div v-else-if="error" key="error" class="history-state history-state--error">
       {{ error }}
     </div>
 
-    <div v-else-if="!history.length" class="history-state">
+    <div v-else-if="!history.length" key="empty" class="history-state">
       Aún no has guardado búsquedas.
     </div>
 
-    <div v-else class="history-grid">
-      <SearchHistoryItem
-        v-for="item in history"
+    <transition-group v-else key="results" name="stagger-list" tag="div" class="history-grid">
+      <div
+        v-for="(item, index) in history"
         :key="item.id"
-        :item="item"
-        @apply="applySearch"
-        @delete="deleteSearch"
-      />
-    </div>
+        class="history-grid__item"
+        :style="{ transitionDelay: `${Math.min(index * 70, 420)}ms` }"
+      >
+        <SearchHistoryItem
+          :item="item"
+          @apply="applySearch"
+          @delete="deleteSearch"
+        />
+      </div>
+    </transition-group>
+    </transition>
   </section>
 </template>
 
@@ -230,6 +237,11 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 18px;
+  position: relative;
+}
+
+.history-grid__item {
+  min-width: 0;
 }
 
 .history-state {

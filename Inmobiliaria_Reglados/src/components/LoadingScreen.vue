@@ -55,7 +55,7 @@ defineProps({
 .loading-screen__logo {
   width: clamp(108px, 13vw, 148px);
   height: auto;
-  animation: app-loader-spin 1.2s linear infinite;
+  animation: app-loader-float 1.35s ease-in-out infinite;
   filter: drop-shadow(0 8px 18px rgba(23, 48, 94, 0.12));
   user-select: none;
   -webkit-user-select: none;
@@ -66,7 +66,7 @@ defineProps({
 
 .app-loader-enter-active,
 .app-loader-leave-active {
-  transition: opacity 0.22s ease;
+  transition: opacity 0.28s ease;
 }
 
 .app-loader-enter-from,
@@ -79,9 +79,15 @@ defineProps({
   transform: translateY(8px) scale(0.99);
 }
 
-@keyframes app-loader-spin {
-  to {
-    transform: rotate(360deg);
+@keyframes app-loader-float {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.96;
+  }
+  50% {
+    transform: translateY(-6px) scale(1.025);
+    opacity: 1;
   }
 }
 </style>

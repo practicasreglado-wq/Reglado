@@ -44,25 +44,28 @@
       </div>
     </div>
 
-    <div v-if="loading" class="favorites-view__state" v-reveal="1">
+    <transition name="content-fade" mode="out-in">
+    <div v-if="loading" key="loading" class="favorites-view__state" v-reveal="1">
       Cargando favoritos...
     </div>
 
     <div
       v-else-if="favorites.length === 0"
+      key="empty"
       class="favorites-view__state"
       v-reveal="1"
     >
       No tienes propiedades favoritas todavía.
     </div>
 
-    <div v-else class="favorites-view__grid">
+    <transition-group v-else key="results" name="stagger-list" tag="div" class="favorites-view__grid">
 
       <div
         v-for="(property,index) in filteredFavorites"
         :key="property.id"
         v-reveal="index+1"
         class="favorite-card-wrapper"
+        :style="{ transitionDelay: `${Math.min(index * 70, 420)}ms` }"
       >
 
         <PropertyCard
@@ -72,7 +75,8 @@
 
       </div>
 
-    </div>
+    </transition-group>
+    </transition>
   </section>
 </template>
 
@@ -366,6 +370,7 @@ export default {
   grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
   gap: 22px;
   min-width: 0;
+  position: relative;
 }
 
 .favorite-card-wrapper {

@@ -220,7 +220,8 @@ export default {
   background: linear-gradient(180deg, rgba(255,255,255,0.98), #f7faff);
   border: 1px solid rgba(197, 212, 241, 0.82);
   box-shadow: 0 18px 40px rgba(23, 42, 93, 0.12);
-  transition: z-index 0s, transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease, filter 0.28s ease;
+  transition: z-index 0s, transform 0.32s ease, box-shadow 0.32s ease, border-color 0.32s ease, filter 0.32s ease;
+  will-change: transform, box-shadow;
 }
 
 .property-card.popper-open,
@@ -228,7 +229,7 @@ export default {
   z-index: 50;
   border-color: #bfd0f4;
   box-shadow: 0 24px 46px rgba(23, 42, 93, 0.16);
-  transform: translateY(-6px);
+  transform: translateY(-5px) scale(1.01);
 }
 
 .property-card__media {
@@ -243,12 +244,15 @@ export default {
   height: 100%;
   object-fit: cover;
   user-select: none;
+  transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
 }
 
 .property-card__overlay {
   position: absolute;
   inset: 0;
   background: linear-gradient(180deg, rgba(10,21,46,0.06), rgba(10,21,46,0.5));
+  transition: opacity 0.32s ease;
   user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -282,6 +286,16 @@ export default {
   cursor:pointer;
   transition:all 0.2s ease;
   user-select: none;
+}
+
+.property-card:hover .property-card__media img,
+.property-card.popper-open .property-card__media img {
+  transform: scale(1.03);
+}
+
+.property-card:hover .property-card__overlay,
+.property-card.popper-open .property-card__overlay {
+  opacity: 0.88;
 }
 
 .favorite-icon{

@@ -130,7 +130,7 @@ export default {
           if (!isProfileNavigation(to, from)) {
             window.setTimeout(() => {
               isRouteLoading.value = false;
-            }, 180);
+            }, 120);
             return;
           }
 
@@ -146,7 +146,7 @@ export default {
         window.setTimeout(() => {
           isBootLoading.value = false;
           refreshAnimations();
-        }, 260);
+        }, 180);
       }
     });
 

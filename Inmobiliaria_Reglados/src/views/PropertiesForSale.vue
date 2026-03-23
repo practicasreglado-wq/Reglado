@@ -18,27 +18,34 @@
       </div>
     </div>
 
-    <div v-if="loading" class="properties-sale__state" v-reveal="1">
-      Cargando propiedades compatibles...
-    </div>
+    <transition name="content-fade" mode="out-in">
+      <div v-if="loading" key="loading" class="properties-sale__state" v-reveal="1">
+        Cargando propiedades compatibles...
+      </div>
 
-    <div v-else-if="!selectedCategory" class="properties-sale__state" v-reveal="1">
-      Guarda primero tus preferencias para poder calcular matches.
-    </div>
+      <div v-else-if="!selectedCategory" key="empty-category" class="properties-sale__state" v-reveal="1">
+        Guarda primero tus preferencias para poder calcular matches.
+      </div>
 
-    <div v-else-if="properties.length === 0" class="properties-sale__state" v-reveal="1">
-      Todavia no hay propiedades de ejemplo para {{ selectedCategory }}.
-    </div>
+      <div v-else-if="properties.length === 0" key="empty-results" class="properties-sale__state" v-reveal="1">
+        Todavia no hay propiedades de ejemplo para {{ selectedCategory }}.
+      </div>
 
-    <div v-else class="properties-sale__grid">
-      <PropertyCard
-        v-for="(property, index) in properties"
-        :key="property.id"
-        v-reveal="index + 1"
-        :property="property"
-        @toggle-favorite="toggleFavorite"
-      />
-    </div>
+      <transition-group v-else key="results" name="stagger-list" tag="div" class="properties-sale__grid">
+        <div
+          v-for="(property, index) in properties"
+          :key="property.id"
+          class="properties-sale__item"
+          v-reveal="index + 1"
+          :style="{ transitionDelay: `${Math.min(index * 70, 420)}ms` }"
+        >
+          <PropertyCard
+            :property="property"
+            @toggle-favorite="toggleFavorite"
+          />
+        </div>
+      </transition-group>
+    </transition>
   </section>
 </template>
 
@@ -281,6 +288,11 @@ export default {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
   gap: 22px;
+  position: relative;
+}
+
+.properties-sale__item {
+  min-width: 0;
 }
 
 @media (max-width: 1440px) {
