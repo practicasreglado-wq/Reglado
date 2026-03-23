@@ -2,11 +2,11 @@
   <section v-if="isReal" class="properties-sale">
     <div class="properties-sale__hero" v-reveal="0">
       <div class="properties-sale__copy">
-        <p class="eyebrow">Matching inmobiliario</p>
+        <p class="eyebrow">Catálogo Inmobiliario</p>
         <h2>Propiedades en venta</h2>
         <p>
-          Seleccionamos oportunidades segun tus preferencias guardadas y calculamos
-          el porcentaje de coincidencia en tiempo real.
+          Explora nuestra selección de oportunidades inmobiliarias exclusivas 
+          disponibles en nuestra plataforma.
         </p>
       </div>
 
@@ -24,7 +24,7 @@
       </div>
 
       <div v-else-if="!selectedCategory" key="empty-category" class="properties-sale__state" v-reveal="1">
-        Guarda primero tus preferencias para poder calcular matches.
+        Selecciona una categoría para explorar las propiedades disponibles.
       </div>
 
       <div v-else-if="properties.length === 0" key="empty-results" class="properties-sale__state" v-reveal="1">

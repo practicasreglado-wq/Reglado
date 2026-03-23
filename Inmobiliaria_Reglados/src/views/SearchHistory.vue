@@ -74,13 +74,13 @@ export default {
     };
 
     const applySearch = async (item) => {
-      // 1. Update Pinia Store
+      // 1. Actualizar el store de Pinia
       userStore.setCategory(item.category);
       userStore.setPreferences({ ...item.preferences });
 
-      // 2. Sync with Backend (Crucial for match calculations)
+      // 2. Sincronizar preferencias con el backend
       try {
-        await backendJson("save_preferences.php", {
+        await backendJson("api/save_preferences.php", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -92,13 +92,13 @@ export default {
         console.error("Error syncing preferences to backend:", err);
       }
 
-      // 3. Navigate with a unique ID to trigger refresh in target view
+      // 3. Navegar a la lista de propiedades con un timestamp para forzar actualización
       await router.push({
         path: "/profile/properties-for-sale",
         query: {
           category: item.category,
           restoredSearch: String(item.id),
-          t: Date.now() // Unique timestamp to force watch trigger
+          t: Date.now()
         },
       });
     };

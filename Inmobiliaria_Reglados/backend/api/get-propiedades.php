@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 require_once dirname(__DIR__) . '/config/db.php';
 require_once dirname(__DIR__) . '/config/auth.php';
-require_once dirname(__DIR__) . '/lib/property_matching.php';
+require_once dirname(__DIR__) . '/lib/utils.php';
 
 applyAuthCors();
 handlePreflight();
@@ -48,15 +48,7 @@ $properties = [];
 
 foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
     $characteristics = decodeJsonArray($row['caracteristicas_json'] ?? null);
-    $match = calculatePropertyMatch($preferences, $characteristics);
-    error_log("MATCH: " . json_encode($match));
-    error_log("PREF: " . json_encode($preferences));
-    error_log("CHAR: " . json_encode($characteristics));
-
-    if ($match['percentage'] < 50) {
-        continue;
-    }
-
+    
     $properties[] = [
         'id' => (int) $row['id'],
         'categoria' => $row['categoria'],
@@ -67,19 +59,17 @@ foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
         'imagen_principal' => $row['imagen_principal'],
         'image_url' => propertyImageUrl($row['imagen_principal'] ?? null),
         'caracteristicas' => $characteristics,
-        'match_percentage' => $match['percentage'],
-        'match_count' => $match['matches'],
-        'match_total' => $match['total'],
-        'match_details' => $match['details'] ?? [],
-        'is_favorite' => isset($favoriteLookup[(int) $row['id']]),
+
+        // Valores estáticos para la UI (Matching eliminado)
+        'match_percentage' => 100,
+        'match_count' => 0,
+        'match_total' => 0,
+        'match_details' => [],
+
+        'is_favorite' => isset($row['fav_id']) && $row['fav_id'] !== null,
         'created_at' => $row['created_at'],
     ];
 }
-
-// 🔥 Ordenar por porcentaje de match descendente
-usort($properties, function($a, $b) {
-    return $b['match_percentage'] <=> $a['match_percentage'];
-});
 
 respondJson(200, [
     'success' => true,

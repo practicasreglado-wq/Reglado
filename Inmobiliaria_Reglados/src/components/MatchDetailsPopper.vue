@@ -13,24 +13,15 @@
       }"
     >
 
-      <h3>Coincidencias con tu búsqueda</h3>
+      <h3>Coincidencias de Interés (Mock)</h3>
 
       <ul>
-
-        <li
-          v-for="item in details"
-          :key="item.label"
-          :class="item.match ? 'ok' : 'fail'"
-        >
-
-          <span class="icon">
-            {{ item.match ? "✔" : "✘" }}
-          </span>
-
-          {{ item.label }}
-
-        </li>
-
+        <!-- Datos de ejemplo estáticos para el desarrollo de la plantilla -->
+        <li class="ok"><span class="icon">✔</span> Ubicación estratégica</li>
+        <li class="ok"><span class="icon">✔</span> Precio de mercado optimizado</li>
+        <li class="ok"><span class="icon">✔</span> Superficie y distribución</li>
+        <li class="ok"><span class="icon">✔</span> Rentabilidad proyectada</li>
+        <li class="fail"><span class="icon">✘</span> Disponibilidad inmediata</li>
       </ul>
 
     </div>

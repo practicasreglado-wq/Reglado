@@ -2,7 +2,7 @@
   <div class="aportar-container">
     <div class="form-header">
       <h1>Publicar Nuevo Activo</h1>
-      <p>Complete los datos técnicos para ejecutar el motor de matching con nuestra base de inversores.</p>
+      <p>Complete los datos técnicos para publicar el activo en nuestra base de datos para inversores.</p>
     </div>
 
     <form @submit.prevent="handleSubmit" class="activo-form">
@@ -225,7 +225,7 @@
 
       <div class="form-actions">
         <button type="submit" :disabled="loading" class="submit-btn">
-          {{ loading ? 'Procesando...' : 'Publicar Activo y Buscar Matches' }}
+          {{ loading ? 'Procesando...' : 'Publicar Activo' }}
         </button>
       </div>
     </form>
@@ -270,7 +270,7 @@ const handleSubmit = async () => {
     const data = await response.json();
 
     if (data.success) {
-      alert("Activo publicado correctamente. Iniciando motor de matching...");
+      alert("Activo publicado correctamente. Procesando vinculación...");
       router.push('/dashboard');
     } else {
       alert("Error: " + data.message);

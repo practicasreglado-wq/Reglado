@@ -137,14 +137,12 @@ export default {
   },
 
   watch: {
-    "property.match_percentage"() {
-      this.animateMatch();
-    },
+    // Sistema de matching eliminado
   },
 
   methods: {
     animateMatch() {
-      if (this.animationFrame) cancelAnimationFrame(this.animationFrame);
+      // Nota: Esta animación se mantiene con fines visuales usando el valor estático del objeto
 
       const target = Number(this.property.match_percentage || 0);
       const start = performance.now();
@@ -174,7 +172,7 @@ export default {
         style: "currency",
         currency: "EUR",
         maximumFractionDigits: 0,
-      }).format(Number(value || 0));
+       }).format(Number(value || 0));
     },
 
     formatSurface(value) {
@@ -306,12 +304,12 @@ export default {
 .favorite-button:hover{
   background:#c1a115;
   transform:scale(1.05);
-  color:#172a5d;
+  color:#ffffff;
 }
 
 .favorite-button.active{
   background:linear-gradient(135deg, #f4d078, #bd9b2c);
-  color:#172a5d;
+  color:#ffffff;
   transform:scale(1.1);
 }
 
@@ -619,4 +617,3 @@ export default {
 }
 
 </style>
-
