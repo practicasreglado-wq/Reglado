@@ -10,9 +10,9 @@
 
           <p><strong>2. DATOS IDENTIFICATIVOS.</strong></p>
           <ul>
-            <li>Denominación social: REGLADO ENERGY</li>
+            <li>Denominación social: REGLADO ENERGY SL</li>
             <li>Nombre Comercial: REGLADO ENERGY</li>
-            <li>CIF: B09662081</li>
+            <li>CIF: B24887754</li>
             <li>Domicilio: AVDA. ISLA GRACIOSA, 7 PISO 1º DESPACHOS 5-6 28703 SAN SEBASTIÁN DE LOS REYES.</li>
             <li>Teléfono: +34 911462674 / 615-641-081</li>
             <li>Dirección electrónica: info@regladoenergy.com</li>
