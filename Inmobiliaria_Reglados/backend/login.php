@@ -69,6 +69,8 @@ $_SESSION["user"] = [
     "categoria" => $usuario["categoria_seleccionada"]
 ];
 
+error_log('[LOGIN SESSION] ' . json_encode($_SESSION));
+
 echo json_encode([
     "success" => true,
     "user" => [

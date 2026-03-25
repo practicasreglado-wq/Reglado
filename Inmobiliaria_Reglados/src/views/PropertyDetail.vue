@@ -83,6 +83,18 @@
           </button>
         </div>
 
+        <div class="document-status-grid">
+          <article v-for="step in documentSteps" :key="step.type">
+            <div>
+              <strong>{{ step.label }}</strong>
+              <p>{{ step.detail }}</p>
+            </div>
+            <span :class="['status-chip', `status-${step.state}`]">
+              {{ step.label }}
+            </span>
+          </article>
+        </div>
+
         <button
           class="dossier-download-btn"
           type="button"
@@ -221,22 +233,22 @@
       </p>
 
       <div class="download-links">
-        <a
+        <button
           v-if="property.confidentiality_file"
-          :href="uploadsUrl(property.confidentiality_file)"
-          target="_blank"
-          rel="noreferrer"
+          type="button"
+          class="download-link"
+          @click="downloadDocument(property.confidentiality_file)"
         >
           Descargar NDA
-        </a>
-        <a
+        </button>
+        <button
           v-if="property.intention_file"
-          :href="uploadsUrl(property.intention_file)"
-          target="_blank"
-          rel="noreferrer"
+          type="button"
+          class="download-link"
+          @click="downloadDocument(property.intention_file)"
         >
           Descargar LOI
-        </a>
+        </button>
       </div>
 
       <div class="upload-section">
@@ -285,10 +297,30 @@ const ndaFile = ref(null);
 const loiFile = ref(null);
 const uploadingDocuments = ref(false);
 const modalMessage = ref("");
-const accessGranted = ref(false);
 const defaultStatusDetail = "Documentos pendientes de firma.";
 const accessMessage = ref(defaultStatusDetail);
-const signatureStatus = ref("pendiente");
+const verifyingAccess = ref(false);
+const dossierLink = ref(null);
+const purchaseLoading = ref(false);
+const purchaseMessage = ref("");
+const documentsAccess = ref({
+  nda_uploaded: false,
+  loi_uploaded: false,
+  nda_approved: false,
+  loi_approved: false,
+  dossier_unlocked: false,
+});
+
+const signatureStatus = computed(() => {
+  if (documentsAccess.value.dossier_unlocked) {
+    return "validado";
+  }
+  if (documentsAccess.value.nda_uploaded || documentsAccess.value.loi_uploaded) {
+    return "firmado";
+  }
+  return "pendiente";
+});
+
 const signatureStatusLabel = computed(() => {
   switch (signatureStatus.value) {
     case "firmado":
@@ -299,11 +331,9 @@ const signatureStatusLabel = computed(() => {
       return "Pendiente";
   }
 });
+
 const statusChipClass = computed(() => `signature-status signature-status--${signatureStatus.value}`);
-const verifyingAccess = ref(false);
-const dossierLink = ref(null);
-const purchaseLoading = ref(false);
-const purchaseMessage = ref("");
+const accessGranted = computed(() => documentsAccess.value.dossier_unlocked);
 
 const tipoInputLabel = computed(() => {
   const tipo = property.value?.tipo_input ?? "";
@@ -376,7 +406,47 @@ const hasCharacteristics = computed(() => {
 });
 
 const canUpload = computed(() => {
-  return !!ndaFile.value && !!loiFile.value && !uploadingDocuments.value;
+  return !uploadingDocuments.value && (!!ndaFile.value || !!loiFile.value);
+});
+
+const documentSteps = computed(() => {
+  const access = documentsAccess.value;
+  const makeState = (uploaded, approved) => {
+    if (approved) {
+      return {
+        label: "Aprobado",
+        state: "approved",
+        detail: "Documento validado por la oficina.",
+      };
+    }
+
+    if (uploaded) {
+      return {
+        label: "Pendiente de validación",
+        state: "pending",
+        detail: "Documento recibido. Esperando revisión administrativa.",
+      };
+    }
+
+    return {
+      label: "Pendiente de envío",
+      state: "idle",
+      detail: "Descarga, firma y sube el documento.",
+    };
+  };
+
+  return [
+    {
+      type: "nda",
+      label: "NDA firmado",
+      ...makeState(access.nda_uploaded, access.nda_approved),
+    },
+    {
+      type: "loi",
+      label: "LOI firmado",
+      ...makeState(access.loi_uploaded, access.loi_approved),
+    },
+  ];
 });
 
 const uploadsUrl = (fileName) => buildUploadsUrl(fileName);
@@ -460,7 +530,7 @@ async function loadProperty() {
       errorMessage.value = "Propiedad no encontrada.";
     } else {
       property.value = payload;
-      dossierLink.value = buildUploadsUrl(payload.dossier_file);
+      dossierLink.value = "";
       await refreshAccessState();
     }
   } catch (err) {
@@ -494,7 +564,15 @@ function openDossier() {
     return;
   }
 
-  window.open(dossierLink.value, "_blank", "noopener,noreferrer");
+  window.location.assign(dossierLink.value);
+}
+
+function downloadDocument(fileName) {
+  const url = uploadsUrl(fileName);
+  if (!url) {
+    return;
+  }
+  window.location.assign(url);
 }
 
 async function refreshAccessState() {
@@ -507,17 +585,27 @@ async function refreshAccessState() {
 
   try {
     const response = await checkSignedAccess(propertyId.value);
-    const status = response.status || "pendiente";
-    signatureStatus.value = status;
+    documentsAccess.value = {
+      nda_uploaded: response.access?.nda_uploaded ?? 0,
+      loi_uploaded: response.access?.loi_uploaded ?? 0,
+      nda_approved: response.access?.nda_approved ?? 0,
+      loi_approved: response.access?.loi_approved ?? 0,
+      dossier_unlocked: response.access?.dossier_unlocked ?? 0,
+    };
     accessMessage.value = response.message || defaultStatusDetail;
-    accessGranted.value = status === "validado";
-    if (accessGranted.value) {
-      dossierLink.value =
-        dossierLink.value || buildUploadsUrl(property.value?.dossier_file);
+    if (documentsAccess.value.dossier_unlocked) {
+      dossierLink.value = buildUploadsUrl(property.value?.dossier_file);
+    } else {
+      dossierLink.value = "";
     }
   } catch (err) {
-    accessGranted.value = false;
-    signatureStatus.value = "pendiente";
+    documentsAccess.value = {
+      nda_uploaded: false,
+      loi_uploaded: false,
+      nda_approved: false,
+      loi_approved: false,
+      dossier_unlocked: false,
+    };
     accessMessage.value = err?.message || "No se pudo comprobar el acceso firmado.";
   } finally {
     verifyingAccess.value = false;
@@ -539,13 +627,18 @@ async function submitDocuments() {
       loiFile.value
     );
     modalMessage.value = response.message || "Documentos enviados correctamente.";
-    signatureStatus.value = response.status || "firmado";
+    documentsAccess.value = {
+      nda_uploaded: response.access?.nda_uploaded ?? 0,
+      loi_uploaded: response.access?.loi_uploaded ?? 0,
+      nda_approved: response.access?.nda_approved ?? 0,
+      loi_approved: response.access?.loi_approved ?? 0,
+      dossier_unlocked: response.access?.dossier_unlocked ?? 0,
+    };
     accessMessage.value =
       response.message || "Documentos firmados. Espera validación administrativa.";
     ndaFile.value = null;
     loiFile.value = null;
-    dossierLink.value =
-      response.dossier_url || buildUploadsUrl(property.value.dossier_file);
+    dossierLink.value = "";
     await refreshAccessState();
   } catch (err) {
     modalMessage.value = err?.message || "No se pudo validar los documentos.";
@@ -711,6 +804,54 @@ watch(
   flex-wrap: wrap;
   gap: 12px;
   margin-bottom: 12px;
+}
+
+.document-status-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.document-status-grid article {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 14px;
+  border: 1px solid #d6dfef;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.document-status-grid p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #475569;
+}
+
+.status-chip {
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.status-chip.status-approved {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-chip.status-pending {
+  background: #fef9c3;
+  color: #92400e;
+}
+
+.status-chip.status-idle {
+  background: #eceff5;
+  color: #24303f;
 }
 
 .dossier-download-btn {
@@ -947,15 +1088,16 @@ watch(
   flex-wrap: wrap;
 }
 
-.download-links a {
+.download-links .download-link {
   flex: 1;
-  text-decoration: none;
-  padding: 10px 14px;
   border-radius: 12px;
   border: 1px dashed #172a5d;
   text-align: center;
   color: #172a5d;
   font-weight: 600;
+  padding: 10px 14px;
+  background: none;
+  cursor: pointer;
 }
 
 .upload-section {

@@ -51,19 +51,25 @@ class Repository
     }
 
     public function updateReceivedAssetStatus(int $assetId, string $status, ?int $captadorId = null): void
-    {
-        $stmt = $this->pdo->prepare(
-            'UPDATE activos_recibidos 
-             SET procesado = ?, processed_at = CURRENT_TIMESTAMP, captador_id = ? 
-             WHERE id = ?'
-        );
+{
+    $stmt = $this->pdo->prepare(
+        'UPDATE activos_recibidos 
+         SET procesado = ?, processed_at = CURRENT_TIMESTAMP, captador_id = ? 
+         WHERE id = ?'
+    );
 
-        $stmt->bindValue(1, $status, PDO::PARAM_STR);
-        $stmt->bindValue(2, $captadorId, $captadorId !== null ? PDO::PARAM_INT : PDO::PARAM_NULL);
-        $stmt->bindValue(3, $assetId, PDO::PARAM_INT);
+    $result = $stmt->execute([
+        $status,
+        $captadorId,
+        $assetId
+    ]);
 
-        $stmt->execute();
+    error_log('[UPDATE ACTIVOS FIX] captador_id=' . json_encode($captadorId) . ' assetId=' . $assetId);
+
+    if (!$result) {
+        error_log('[UPDATE ERROR] ' . json_encode($stmt->errorInfo()));
     }
+}
 
     public function insertPropertyRecord(
         array $claudeData,
@@ -71,120 +77,125 @@ class Repository
         ?string $analysisSummary,
         ?string $analysisJson,
         ?int $captadorId,
-        ?int $ownerUserId   // 👈 AÑADIR
+        int $ownerUserId
     ): int {
-        $tipo = $this->trimValue($claudeData['tipo_propiedad'] ?? '');
-        $subtipo = $this->trimValue($claudeData['subtipo'] ?? '');
-        $ciudad = $this->trimValue($claudeData['ciudad'] ?? '');
-        $zona = $this->trimValue($claudeData['zona'] ?? '');
-        $direccion = $this->trimValue($claudeData['direccion'] ?? '');
-        $metros = $this->intValue($claudeData['metros_cuadrados'] ?? $claudeData['metros'] ?? null);
-        $habitaciones = $this->intValue($claudeData['habitaciones'] ?? null);
-        $estado = $this->trimValue($claudeData['estado_activo'] ?? null);
-        $precio = $this->floatValue($claudeData['precio'] ?? null);
 
-        $locationParts = array_filter([$zona, $ciudad]);
-        $ubicacionGeneral = $locationParts ? implode(', ', $locationParts) : 'Sin ubicación';
-        $titulo = $subtipo !== '' ? sprintf('%s - %s', $subtipo, $tipo ?: 'Activo') : ($tipo ?: 'Activo captado');
+        $ficha = $claudeData['ficha_web'] ?? [];
+        $dossier = $claudeData['dossier_inversion'] ?? [];
 
+        $tipo = $this->trimValue($ficha['tipo_propiedad'] ?? '');
+        $ciudad = $this->trimValue($ficha['ciudad'] ?? '');
+        $zona = $this->trimValue($ficha['zona'] ?? '');
+        $direccion = $this->trimValue($ficha['direccion'] ?? '');
+        $categoria = $this->trimValue($ficha['categoria'] ?? '');
+        $metros = $this->intValue($ficha['metros_cuadrados'] ?? null);
+        $precio = $this->floatValue($ficha['precio'] ?? null);
+
+        // 🔥 FALLBACK (CLAVE → evita NULL y errores SQL)
+        if ($tipo === '') $tipo = 'propiedad';
+        if ($ciudad === '') $ciudad = 'Madrid';
+        if ($zona === '') $zona = 'Centro';
+        if ($metros === 0) $metros = 1;
+        if ($precio === null) $precio = 0;
+
+        if ($ownerUserId === null) {
+            throw new RuntimeException('owner_user_id es obligatorio');
+        }
+
+        // 🔹 PREPARE
         $stmt = $this->pdo->prepare(
             'INSERT INTO propiedades (
-                categoria,
-                titulo,
-                ubicacion_general,
-                tipo_input,
                 tipo_propiedad,
-                subtipo,
                 ciudad,
                 zona,
-                direccion,
                 metros_cuadrados,
-                habitaciones,
-                estado_activo,
                 precio,
-                precio_m2,
-                ingresos_actuales,
-                ingresos_estimados,
-                gastos_estimados,
-                EBITDA,
-                cash_flow,
-                rentabilidad_bruta,
-                rentabilidad_neta,
-                cap_rate,
-                roi,
-                payback,
-                ocupacion,
-                ADR,
-                RevPAR,
-                analisis,
-                analisis_json,
+                direccion,
+                categoria,
                 captador_id,
                 caracteristicas_json,
                 owner_user_id
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+            ) VALUES (
+                :tipo_propiedad,
+                :ciudad,
+                :zona,
+                :metros_cuadrados,
+                :precio,
+                :direccion,
+                :categoria,
+                :captador_id,
+                :caracteristicas_json,
+                :owner_user_id
+            )'
         );
 
-        $stmt->execute([
-            $tipo ?: 'Captada',
-            $titulo,
-            $ubicacionGeneral,
-            $tipoInput,
-            $tipo,
-            $subtipo,
-            $ciudad,
-            $zona,
-            $direccion,
-            $metros,
-            $habitaciones,
-            $estado,
-            $precio,
-            $this->floatValue($claudeData['precio_m2'] ?? null),
-            $this->floatValue($claudeData['ingresos_actuales'] ?? null),
-            $this->floatValue($claudeData['ingresos_estimados'] ?? null),
-            $this->floatValue($claudeData['gastos_estimados'] ?? null),
-            $this->floatValue($claudeData['EBITDA'] ?? null),
-            $this->floatValue($claudeData['cash_flow'] ?? null),
-            $this->valueOrNull($claudeData['rentabilidad_bruta'] ?? null),
-            $this->valueOrNull($claudeData['rentabilidad_neta'] ?? null),
-            $this->valueOrNull($claudeData['cap_rate'] ?? null),
-            $this->valueOrNull($claudeData['roi'] ?? null),
-            $this->valueOrNull($claudeData['payback'] ?? null),
-            $this->valueOrNull($claudeData['ocupacion'] ?? null),
-            $this->valueOrNull($claudeData['ADR'] ?? null),
-            $this->valueOrNull($claudeData['RevPAR'] ?? null),
-            $analysisSummary,
-            $analysisJson,
-            $captadorId,
-            json_encode($claudeData['caracteristicas'] ?? [], JSON_UNESCAPED_UNICODE),
-            $ownerUserId
-        ]);
+        $params = [
+            'tipo_propiedad' => $tipo,
+            'ciudad' => $ciudad,
+            'zona' => $zona,
+            'metros_cuadrados' => $metros,
+            'precio' => $precio,
+            'direccion' => $direccion ?: null,
+            'categoria' => $categoria !== '' ? $categoria : 'Captada',
+            'captador_id' => $captadorId,
+            'caracteristicas_json' => json_encode($dossier, JSON_UNESCAPED_UNICODE),
+            'owner_user_id' => $ownerUserId,
+        ];
+
+        // 🔥 DEBUG REAL
+        error_log('[INSERT PARAMS] ' . json_encode($params, JSON_UNESCAPED_UNICODE));
+
+        try {
+            $result = $stmt->execute($params);
+
+            if ($result === false) {
+                $errorInfo = $stmt->errorInfo();
+                throw new RuntimeException('SQL ERROR: ' . implode(' | ', $errorInfo));
+            }
+
+        } catch (Throwable $e) {
+            error_log('[INSERT ERROR] ' . $e->getMessage());
+            throw $e;
+        }
 
         $propertyId = (int) $this->pdo->lastInsertId();
-        error_log(sprintf('[REPOSITORY] insert propiedad #%d', $propertyId));
+
+        if ($propertyId === 0) {
+            throw new RuntimeException('INSERT FALLÓ: lastInsertId = 0');
+        }
+
+        error_log('[INSERT OK] ID: ' . $propertyId);
 
         return $propertyId;
     }
 
     public function updatePropertyDocuments(int $propertyId, array $documents): void
-    {
-        $fields = [];
-        $params = ['id' => $propertyId];
+{
+    $fields = [];
+    $params = ['id' => $propertyId];
 
-        foreach (['dossier_file', 'confidentiality_file', 'intention_file'] as $field) {
-            if (!empty($documents[$field])) {
-                $fields[] = "$field = :$field";
-                $params[$field] = $documents[$field];
-            }
+    foreach (['dossier_file', 'confidentiality_file', 'intention_file'] as $field) {
+        if (array_key_exists($field, $documents) && $documents[$field] !== null) {
+            $fields[] = "$field = :$field";
+            $params[$field] = $documents[$field];
         }
-
-        if ($fields === []) {
-            return;
-        }
-
-        $sql = 'UPDATE propiedades SET ' . implode(', ', $fields) . ' WHERE id = :id';
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($params);
     }
+
+    if ($fields === []) {
+        error_log('[UPDATE DOCS] Nada que actualizar');
+        return;
+    }
+
+    $sql = 'UPDATE propiedades SET ' . implode(', ', $fields) . ' WHERE id = :id';
+
+    error_log('[UPDATE SQL] ' . $sql);
+    error_log('[UPDATE PARAMS] ' . json_encode($params));
+
+    $stmt = $this->pdo->prepare($sql);
+    $stmt->execute($params);
+
+    error_log('[UPDATE OK] propiedad ' . $propertyId);
+}
 
     public function getOrCreateCaptador(string $email): int
     {
@@ -207,19 +218,6 @@ class Repository
         return (int) $this->pdo->lastInsertId();
     }
 
-    private function normalizeCaracteristicas(mixed $raw): array
-    {
-        if (is_array($raw)) {
-            return $raw;
-        }
-
-        if ($raw instanceof stdClass) {
-            return (array) $raw;
-        }
-
-        return [];
-    }
-
     private function trimValue(mixed $value): string
     {
         return trim((string) ($value ?? ''));
@@ -227,37 +225,11 @@ class Repository
 
     private function intValue(mixed $value): int
     {
-        if ($this->isNumeric($value)) {
-            return (int) $value;
-        }
-
-        return 0;
+        return is_numeric($value) ? (int)$value : 0;
     }
 
     private function floatValue(mixed $value): ?float
     {
-        if ($this->isNumeric($value)) {
-            return (float) $value;
-        }
-
-        return null;
-    }
-
-    private function valueOrNull(mixed $value): ?string
-    {
-        if ($value === null || trim((string) $value) === '') {
-            return null;
-        }
-
-        return trim((string) $value);
-    }
-
-    private function isNumeric(mixed $value): bool
-    {
-        if ($value === null) {
-            return false;
-        }
-
-        return is_numeric($value);
+        return is_numeric($value) ? (float)$value : null;
     }
 }

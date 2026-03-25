@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+
 use Dompdf\Dompdf;
 
 class DossierService
@@ -18,13 +19,13 @@ class DossierService
         $this->ensureDirectory($this->workingDir . DIRECTORY_SEPARATOR . 'dossiers');
     }
 
-    public function generateDossierPDF(int $propertyId, array $data): string
+    public function generateDossierPDF(int $propertyId, array $dossier, array $ficha = []): string
     {
         $fileName = sprintf('dossier_%d.pdf', $propertyId);
         $path = $this->workingDir . DIRECTORY_SEPARATOR . 'dossiers' . DIRECTORY_SEPARATOR . $fileName;
 
         $dompdf = new Dompdf();
-        $dompdf->loadHtml($this->buildHtml($data));
+        $dompdf->loadHtml($this->buildHtml($dossier, $ficha));
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
 
@@ -36,80 +37,124 @@ class DossierService
         return 'dossiers/' . $fileName;
     }
 
-    private function buildHtml(array $data): string
+    private function buildHtml(array $dossier, array $ficha = []): string
     {
-        $v = fn($key) => $this->value($data[$key] ?? null);
-        $analysis = $data['analisis'] ?? null;
-        $analysisJson = is_string($data['analisis_json'] ?? '') ? json_decode($data['analisis_json'], true) : [];
-
-        $metrics = [
-            'rentabilidad_bruta',
-            'rentabilidad_neta',
-            'cap_rate',
-            'roi',
-            'payback',
-            'ocupacion',
-            'ADR',
-            'RevPAR',
-        ];
-
         $html = '<html><head><meta charset="utf-8"><style>
-            body { font-family: Arial, sans-serif; color: #111; line-height: 1.5; }
-            .page { padding: 40px; }
-            h1, h2, h3 { margin-bottom: 10px; }
-            .cover { text-align: center; margin-top: 120px; }
-            .section { margin-bottom: 32px; }
-            .section h2 { border-bottom: 2px solid #1f3c88; padding-bottom: 6px; color: #1f3c88; }
-            .grid { display: flex; flex-wrap: wrap; gap: 20px; }
-            .grid .card { flex: 1 1 250px; padding: 14px; border: 1px solid #e6e6e6; border-radius: 10px; background: #f9fbff; }
-            .card strong { display: block; font-size: 0.85rem; color: #4b5563; margin-bottom: 4px; }
-            .card span { font-size: 1.1rem; font-weight: 600; color: #111; }
-            .list ul { padding-left: 18px; margin: 6px 0 0; }
-            .status { font-weight: 700; color: #1f3c88; }
-            .footer-note { font-size: 0.8rem; color: #6b7280; margin-top: 40px; }
+            body { font-family: Arial, sans-serif; color: #111; line-height: 1.45; font-size: 13px; }
+            .page { padding: 34px; }
+            .cover { text-align: center; padding-top: 90px; padding-bottom: 70px; }
+            .cover h1 { font-size: 30px; margin-bottom: 10px; color: #1f3c88; }
+            .cover .subtitle { font-size: 18px; font-weight: bold; margin-bottom: 8px; }
+            .cover .location { font-size: 14px; color: #444; margin-bottom: 12px; }
+            .cover .price { font-size: 24px; font-weight: bold; margin-top: 20px; }
+            .section { margin-bottom: 28px; }
+            .section h2 {
+                font-size: 18px;
+                border-bottom: 2px solid #1f3c88;
+                padding-bottom: 6px;
+                color: #1f3c88;
+                margin-bottom: 14px;
+            }
+            .grid { width: 100%; }
+            .card {
+                border: 1px solid #d9e1f2;
+                background: #f8fbff;
+                padding: 12px;
+                margin-bottom: 10px;
+                border-radius: 6px;
+            }
+            .card strong {
+                display: block;
+                font-size: 11px;
+                text-transform: uppercase;
+                color: #5a6472;
+                margin-bottom: 4px;
+            }
+            .card span {
+                font-size: 14px;
+                font-weight: 600;
+                color: #111;
+            }
+            .text-block {
+                border: 1px solid #e5e7eb;
+                background: #fff;
+                padding: 12px;
+                border-radius: 6px;
+            }
+            ul { margin: 8px 0 0; padding-left: 20px; }
+            li { margin-bottom: 6px; }
+            .footer-note {
+                margin-top: 40px;
+                font-size: 11px;
+                color: #6b7280;
+                border-top: 1px solid #ddd;
+                padding-top: 12px;
+            }
         </style></head><body>';
 
         $html .= '<div class="page">';
+
         $html .= '<div class="cover">';
         $html .= '<h1>Dossier de Inversión</h1>';
-        $html .= '<p class="status">' . $this->value($data['tipo_propiedad'] ?? 'Activo Captado') . '</p>';
-        $html .= '<p>' . $this->value($data['zona'] ?? 'Zona desconocida') . ' · ' . $this->value($data['ciudad'] ?? 'Ciudad desconocida') . '</p>';
-        $html .= '<p style="font-size:1.5rem;font-weight:700;">' . $this->formatCurrency($data['precio'] ?? null) . '</p>';
+        $html .= '<div class="subtitle">' . $this->value($ficha['tipo_propiedad'] ?? 'Activo inmobiliario') . '</div>';
+        $html .= '<div class="location">' . $this->value($ficha['direccion'] ?? $dossier['ubicacion_completa'] ?? 'Ubicación no disponible') . '</div>';
+        $html .= '<div class="location">' . $this->value($ficha['zona'] ?? 'Zona no disponible') . ' · ' . $this->value($ficha['ciudad'] ?? 'Ciudad no disponible') . '</div>';
+        $html .= '<div class="price">' . $this->formatCurrency($ficha['precio'] ?? $dossier['precio_inicial'] ?? null) . '</div>';
         $html .= '</div>';
 
-        $html .= $this->buildSection('Datos del activo', [
-            ['label' => 'Tipo de activo', 'value' => $v('tipo_propiedad')],
-            ['label' => 'Subtipo', 'value' => $v('subtipo')],
-            ['label' => 'Dirección', 'value' => $v('direccion')],
-            ['label' => 'Ciudad', 'value' => $v('ciudad')],
-            ['label' => 'Zona', 'value' => $v('zona')],
-            ['label' => 'Superficie', 'value' => $v('metros_cuadrados') . ' m²'],
-            ['label' => 'Habitaciones', 'value' => $v('habitaciones')],
-            ['label' => 'Estado', 'value' => $v('estado_activo')],
+        $html .= $this->buildTextSection('Resumen ejecutivo', $dossier['resumen_ejecutivo'] ?? null);
+
+        $html .= $this->buildSection('Identificación del activo', [
+            ['label' => 'Tipo de propiedad', 'value' => $ficha['tipo_propiedad'] ?? null],
+            ['label' => 'Categoría', 'value' => $ficha['categoria'] ?? null],
+            ['label' => 'Dirección', 'value' => $ficha['direccion'] ?? null],
+            ['label' => 'Ciudad', 'value' => $ficha['ciudad'] ?? null],
+            ['label' => 'Zona', 'value' => $ficha['zona'] ?? null],
+            ['label' => 'Metros construidos ficha', 'value' => $this->formatSurface($ficha['metros_cuadrados'] ?? null)],
+        ]);
+
+        $html .= $this->buildSection('Ubicación', [
+            ['label' => 'Ubicación completa', 'value' => $dossier['ubicacion_completa'] ?? null],
+            ['label' => 'Código postal', 'value' => $dossier['codigo_postal'] ?? null],
+        ]);
+
+        $html .= $this->buildSection('Superficies', [
+            ['label' => 'Superficie parcela', 'value' => $this->formatSurface($dossier['superficie_parcela'] ?? null)],
+            ['label' => 'Superficie construida', 'value' => $this->formatSurface($dossier['superficie_construida'] ?? null)],
+        ]);
+
+        $html .= $this->buildSection('Urbanismo', [
+            ['label' => 'Uso principal', 'value' => $dossier['uso_principal'] ?? null],
+            ['label' => 'Uso alternativo', 'value' => $dossier['uso_alternativo'] ?? null],
+            ['label' => 'Altura', 'value' => $dossier['altura'] ?? null],
+            ['label' => 'Norma zonal', 'value' => $dossier['norma_zonal'] ?? null],
         ]);
 
         $html .= $this->buildSection('Datos económicos', [
-            ['label' => 'Precio', 'value' => $this->formatCurrency($data['precio'] ?? null)],
-            ['label' => 'Precio por m²', 'value' => $this->formatCurrency($data['precio_m2'] ?? null)],
-            ['label' => 'Ingresos actuales', 'value' => $this->formatCurrency($data['ingresos_actuales'] ?? null)],
-            ['label' => 'Ingresos estimados', 'value' => $this->formatCurrency($data['ingresos_estimados'] ?? null)],
-            ['label' => 'Gastos estimados', 'value' => $this->formatCurrency($data['gastos_estimados'] ?? null)],
-            ['label' => 'EBITDA', 'value' => $this->formatCurrency($data['EBITDA'] ?? null)],
-            ['label' => 'Cash Flow', 'value' => $this->formatCurrency($data['cash_flow'] ?? null)],
+            ['label' => 'Precio inicial', 'value' => $this->formatCurrency($dossier['precio_inicial'] ?? null)],
+            ['label' => 'Precio mínimo de cierre', 'value' => $this->formatCurrency($dossier['precio_minimo_cierre'] ?? null)],
+            ['label' => 'Repercusión techo', 'value' => $this->formatCurrencyPerSquareMeter($dossier['repercusion_techo'] ?? null)],
+            ['label' => 'Honorarios comprador', 'value' => $this->formatPercent($dossier['honorarios_comprador_pct'] ?? null)],
         ]);
 
-        $html .= $this->buildMetricsSection($metrics, $data);
+        $html .= $this->buildSection('Situación jurídica y estado', [
+            ['label' => 'Tipo de propiedad jurídica', 'value' => $dossier['propiedad_tipo'] ?? null],
+            ['label' => 'Se entrega vacío', 'value' => $this->formatBoolean($dossier['se_entrega_vacio'] ?? null)],
+        ]);
 
-        if (!empty($analysisJson)) {
-            $html .= $this->buildAnalysisSection($analysisJson);
-        } else {
-            $html .= $this->buildTextSection('Análisis', $analysis ?? 'Análisis no disponible.');
-        }
+        $html .= $this->buildSection('Mercado', [
+            ['label' => 'Precio obra nueva zona mínimo', 'value' => $this->formatCurrencyPerSquareMeter($dossier['precio_obra_nueva_zona_min'] ?? null)],
+            ['label' => 'Precio obra nueva zona máximo', 'value' => $this->formatCurrencyPerSquareMeter($dossier['precio_obra_nueva_zona_max'] ?? null)],
+        ]);
 
-        $html .= $this->buildMarketSection($analysisJson);
-        $html .= $this->buildValuationSection($analysisJson);
+        $html .= $this->buildListSection('Riesgos', $dossier['riesgos'] ?? []);
+        $html .= $this->buildListSection('Oportunidades', $dossier['oportunidades'] ?? []);
+        $html .= $this->buildListSection('Observaciones', $dossier['observaciones'] ?? []);
 
-        $html .= '<p class="footer-note">Documento generado automáticamente. Valida los datos antes de tomar decisiones.</p>';
+        $html .= '<div class="footer-note">';
+        $html .= 'Documento generado automáticamente a partir de información recibida y estructurada mediante IA. ';
+        $html .= 'Debe validarse jurídica, urbanística, técnica y económicamente antes de adoptar decisiones de inversión.';
+        $html .= '</div>';
 
         $html .= '</div></body></html>';
 
@@ -120,93 +165,49 @@ class DossierService
     {
         $content = '<div class="section"><h2>' . $title . '</h2><div class="grid">';
         foreach ($rows as $row) {
-            if (trim((string) $row['value']) === '') {
+            $value = $row['value'] ?? null;
+            if ($value === null || $value === '') {
                 continue;
             }
-            $content .= '<div class="card"><strong>' . $row['label'] . '</strong><span>' . $row['value'] . '</span></div>';
+
+            $content .= '<div class="card">';
+            $content .= '<strong>' . $row['label'] . '</strong>';
+            $content .= '<span>' . $this->value($value) . '</span>';
+            $content .= '</div>';
         }
         $content .= '</div></div>';
+
         return $content;
     }
 
-    private function buildMetricsSection(array $keys, array $data): string
+    private function buildTextSection(string $title, mixed $text): string
     {
-        $content = '<div class="section"><h2>Métricas clave</h2><div class="grid">';
-        foreach ($keys as $metric) {
-            $value = $this->value($data[$metric] ?? null);
-            $content .= '<div class="card"><strong>' . ucfirst(str_replace('_', ' ', $metric)) . '</strong><span>' . $value . '</span></div>';
+        if ($text === null || trim((string) $text) === '') {
+            return '';
         }
-        $content .= '</div></div>';
-        return $content;
+
+        return '<div class="section"><h2>' . $title . '</h2><div class="text-block">' . nl2br(htmlspecialchars((string) $text)) . '</div></div>';
     }
 
-    private function buildAnalysisSection(array $analysisJson): string
+    private function buildListSection(string $title, array $items): string
     {
-        $analysis = $analysisJson['analisis'] ?? [];
-        $items = [
-            'Resumen' => $analysis['resumen'] ?? null,
-            'Puntos fuertes' => $analysis['puntos_fuertes'] ?? null,
-            'Riesgos' => $analysis['riesgos'] ?? null,
-            'Oportunidades' => $analysis['oportunidades'] ?? null,
-            'Perfil inversor' => $analysis['perfil_inversor'] ?? null,
-        ];
+        $filtered = array_values(array_filter(array_map(function ($item) {
+            return is_string($item) ? trim($item) : $item;
+        }, $items), function ($item) {
+            return $item !== null && $item !== '';
+        }));
 
-        $html = '<div class="section"><h2>Análisis</h2>';
-        foreach ($items as $label => $value) {
-            if (empty($value)) {
-                continue;
-            }
-            $html .= '<div class="list"><strong>' . $label . '</strong>';
-            if (is_array($value)) {
-                $html .= '<ul>';
-                foreach ($value as $bullet) {
-                    $html .= '<li>' . $this->value($bullet) . '</li>';
-                }
-                $html .= '</ul>';
-            } else {
-                $html .= '<p>' . $this->value($value) . '</p>';
-            }
-            $html .= '</div>';
+        if ($filtered === []) {
+            return '';
         }
-        $html .= '</div>';
+
+        $html = '<div class="section"><h2>' . $title . '</h2><div class="text-block"><ul>';
+        foreach ($filtered as $item) {
+            $html .= '<li>' . htmlspecialchars((string) $item) . '</li>';
+        }
+        $html .= '</ul></div></div>';
+
         return $html;
-    }
-
-    private function buildTextSection(string $title, string $contentText): string
-    {
-        return '<div class="section"><h2>' . $title . '</h2><p>' . $this->value($contentText) . '</p></div>';
-    }
-
-    private function buildMarketSection(array $analysisJson): string
-    {
-        $market = $analysisJson['mercado'] ?? [];
-        if (empty($market)) {
-            return '';
-        }
-
-        $rows = [
-            ['label' => 'Análisis zona', 'value' => $market['analisis_zona'] ?? null],
-            ['label' => 'Comparables', 'value' => $market['comparables'] ?? null],
-            ['label' => 'Tendencia', 'value' => $market['tendencia'] ?? null],
-        ];
-
-        return $this->buildSection('Mercado', $rows);
-    }
-
-    private function buildValuationSection(array $analysisJson): string
-    {
-        $valuation = $analysisJson['valoracion'] ?? [];
-        if (empty($valuation)) {
-            return '';
-        }
-
-        $rows = [
-            ['label' => 'Valor estimado', 'value' => $this->formatCurrency($valuation['valor_estimado'] ?? null)],
-            ['label' => 'Margen', 'value' => $this->value($valuation['margen'] ?? null)],
-            ['label' => 'Oportunidad', 'value' => $this->value($valuation['es_oportunidad'] ?? null)],
-        ];
-
-        return $this->buildSection('Valoración', $rows);
     }
 
     private function ensureDirectory(string $dir): void
@@ -223,5 +224,54 @@ class DossierService
         }
 
         return number_format((float) $value, 2, ',', '.') . ' €';
+    }
+
+    private function formatSurface(mixed $value): string
+    {
+        if ($value === null || $value === '') {
+            return 'No disponible';
+        }
+
+        return number_format((float) $value, 0, ',', '.') . ' m²';
+    }
+
+    private function formatCurrencyPerSquareMeter(mixed $value): string
+    {
+        if ($value === null || $value === '') {
+            return 'No disponible';
+        }
+
+        return number_format((float) $value, 2, ',', '.') . ' €/m²';
+    }
+
+    private function formatPercent(mixed $value): string
+    {
+        if ($value === null || $value === '') {
+            return 'No disponible';
+        }
+
+        return number_format((float) $value, 2, ',', '.') . ' %';
+    }
+
+    private function formatBoolean(mixed $value): string
+    {
+        if ($value === null || $value === '') {
+            return 'No disponible';
+        }
+
+        return (bool) $value ? 'Sí' : 'No';
+    }
+
+    private function value(mixed $value): string
+    {
+        if ($value === null || $value === '') {
+            return 'No disponible';
+        }
+
+        if (is_array($value)) {
+            return implode(', ', $value);
+        }
+
+        return htmlspecialchars((string) $value);
     }
 }

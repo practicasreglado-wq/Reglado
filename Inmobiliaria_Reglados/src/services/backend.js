@@ -2,7 +2,8 @@ import { auth } from "./auth";
 
 export const BACKEND_BASE =
   import.meta.env.VITE_INMOBILIARIA_BACKEND_BASE ||
-  "http://localhost/Reglado/Inmobiliaria_Reglados/backend"
+  "http://localhost/Reglado/Inmobiliaria_Reglados/backend";
+
 export const GROUP_BASE =
   import.meta.env.VITE_GRUPO_REGLADO_BASE_URL || "http://localhost:5173";
 
@@ -16,7 +17,6 @@ export function getCallbackUrl() {
 
 export function buildExternalAuthUrl(path) {
   const url = new URL(path, GROUP_BASE);
-  // El proyecto origen siempre recibe el token en esta ruta unica de callback.
   url.searchParams.set("returnTo", getCallbackUrl());
   return url.toString();
 }
@@ -30,11 +30,20 @@ export function buildUploadsUrl(fileName) {
 }
 
 export async function backendJson(path, options = {}) {
+
   const response = await fetch(buildBackendUrl(path), {
     ...options,
+
+    // 🔥 CLAVE ABSOLUTA (ENVÍA COOKIES)
+    credentials: "include",
+
     headers: {
       ...(options.headers || {}),
-      ...(auth.state.token ? { Authorization: `Bearer ${auth.state.token}` } : {}),
+
+      // 🔥 JWT (tu sistema externo)
+      ...(auth.state.token
+        ? { Authorization: `Bearer ${auth.state.token}` }
+        : {}),
     },
   });
 
@@ -46,7 +55,13 @@ export async function backendJson(path, options = {}) {
   }
 
   if (!response.ok) {
-    throw new Error(payload.message || payload.error || "No se pudo completar la solicitud.");
+    console.error("BACKEND ERROR:", payload); // 🔥 VER ERROR REAL
+    throw new Error(
+      payload.message ||
+      payload.error ||
+      JSON.stringify(payload) ||
+      "Error desconocido"
+    );
   }
 
   return payload;

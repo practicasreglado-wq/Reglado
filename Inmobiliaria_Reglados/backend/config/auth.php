@@ -19,14 +19,6 @@ function applyAuthCors(): void
     header("Content-Type: application/json");
 }
 
-function handlePreflight(): void
-{
-    if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-        http_response_code(204);
-        exit;
-    }
-}
-
 function requireAuthenticatedUser(PDO $pdo): array
 {
     $token = extractBearerToken();

@@ -74,8 +74,12 @@ export async function uploadPropertyPdf(pdfFile) {
 export async function uploadSignedDocuments(propertyId, ndaFile, loiFile) {
   const formData = new FormData();
   formData.append("property_id", String(propertyId));
-  formData.append("nda", ndaFile);
-  formData.append("loi", loiFile);
+  if (ndaFile) {
+    formData.append("signed_nda", ndaFile);
+  }
+  if (loiFile) {
+    formData.append("signed_loi", loiFile);
+  }
 
   return backendJson("api/upload_signed_documents.php", {
     method: "POST",
@@ -84,10 +88,25 @@ export async function uploadSignedDocuments(propertyId, ndaFile, loiFile) {
 }
 
 export async function checkSignedAccess(propertyId) {
+  const formData = new FormData();
+  formData.append("property_id", String(propertyId));
+
   return backendJson("api/check_signed_access.php", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ property_id: propertyId }),
+    body: formData,
+  });
+}
+
+export async function reviewSignedDocuments(data) {
+  const formData = new FormData();
+  formData.append("property_id", String(data.property_id));
+  formData.append("buyer_user_id", String(data.buyer_user_id));
+  formData.append("document_type", data.document_type);
+  formData.append("action", data.action);
+
+  return backendJson("api/review_signed_documents.php", {
+    method: "POST",
+    body: formData,
   });
 }
 

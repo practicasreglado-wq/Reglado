@@ -6,6 +6,15 @@ class ClaudeClient
     private string $apiKey;
     private string $endpoint;
     private string $model;
+    private array $requiredFichaFields = [
+        'tipo_propiedad',
+        'categoria',
+        'ciudad',
+        'zona',
+        'direccion',
+        'metros_cuadrados',
+        'precio',
+    ];
 
     public function __construct(string $apiKey, string $endpoint, string $model)
     {
@@ -18,9 +27,9 @@ class ClaudeClient
         $this->model = $model;
     }
 
-    public function analyzeSimpleDocument(string $text): array
+    public function analyzeStructuredPropertyText(string $text): array
     {
-        return $this->requestWithPrompt($this->buildSimplePrompt($text));
+        return $this->requestWithPrompt($this->buildStructuredPrompt($text));
     }
 
     private function requestWithPrompt(string $prompt): array
@@ -44,24 +53,92 @@ class ClaudeClient
         }
 
         $textResponse = $response['content'][0]['text'];
-        return $this->extractJson($textResponse);
+        $decoded = $this->extractJson($textResponse);
+        return $this->validateResponse($decoded);
     }
 
-    private function buildSimplePrompt(string $text): string
+    private function validateResponse(array $decoded): array
     {
-        return "
-Analiza el siguiente texto inmobiliario y extrae únicamente:
-* tipo_propiedad
-* ciudad
-* zona
-* metros_cuadrados
-* precio
+        if (!isset($decoded['ficha_web']) || !is_array($decoded['ficha_web'])) {
+            throw new RuntimeException('Claude no devolvió el bloque ficha_web');
+        }
 
-Devuelve un JSON válido con esos campos.
-No inventes datos. Si no aparece un campo, pon null.
+        if (!isset($decoded['dossier_inversion']) || !is_array($decoded['dossier_inversion'])) {
+            $decoded['dossier_inversion'] = [];
+        }
 
-Texto:
-" . trim($text);
+        $ficha = array_map(function ($value) {
+            if (is_string($value)) {
+                return trim($value);
+            }
+            return $value;
+        }, $decoded['ficha_web']);
+
+        foreach ($this->requiredFichaFields as $field) {
+            if (!array_key_exists($field, $ficha) || $ficha[$field] === null || $ficha[$field] === '') {
+                throw new RuntimeException("Campo requerido faltante en ficha_web: {$field}");
+            }
+        }
+
+        $decoded['ficha_web'] = $ficha;
+        return $decoded;
+    }
+
+    private function buildStructuredPrompt(string $text): string
+    {
+            return <<<PROMPT
+        Analiza el siguiente texto inmobiliario y devuelve exclusivamente un JSON válido, sin explicaciones, sin markdown y sin texto adicional.
+
+        Debes extraer la información en esta estructura exacta:
+
+        {
+        "ficha_web": {
+            "tipo_propiedad": string|null,
+            "categoria": string|null,
+            "ciudad": string|null,
+            "zona": string|null,
+            "direccion": string|null,
+            "metros_cuadrados": number|null,
+            "precio": number|null
+        },
+        "dossier_inversion": {
+            "ubicacion_completa": string|null,
+            "codigo_postal": string|null,
+            "superficie_parcela": number|null,
+            "superficie_construida": number|null,
+            "uso_principal": string|null,
+            "uso_alternativo": string|null,
+            "altura": string|null,
+            "norma_zonal": string|null,
+            "precio_inicial": number|null,
+            "precio_minimo_cierre": number|null,
+            "repercusion_techo": number|null,
+            "propiedad_tipo": string|null,
+            "se_entrega_vacio": boolean|null,
+            "precio_obra_nueva_zona_min": number|null,
+            "precio_obra_nueva_zona_max": number|null,
+            "honorarios_comprador_pct": number|null,
+            "resumen_ejecutivo": string|null,
+            "riesgos": [],
+            "oportunidades": [],
+            "observaciones": []
+        }
+        }
+
+        Reglas obligatorias:
+        - No inventes datos.
+        - Si un dato no aparece claramente, usa null.
+        - Los arrays deben existir siempre, aunque estén vacíos.
+        - "precio", "precio_inicial", "precio_minimo_cierre", "repercusion_techo", "metros_cuadrados", "superficie_parcela", "superficie_construida", "precio_obra_nueva_zona_min", "precio_obra_nueva_zona_max", "honorarios_comprador_pct" deben ser números sin símbolos.
+        - "se_entrega_vacio" debe ser true, false o null.
+        - "categoria" debe ser una categoría apta para la web, por ejemplo: "edificios", "hoteles", "fincas", "parking", "activos".
+        - "direccion" debe ser corta para la ficha web.
+        - "ubicacion_completa" debe ser la dirección completa de dossier.
+        - "resumen_ejecutivo" debe ser breve, profesional y útil para inversión.
+
+        Texto a analizar:
+        PROMPT
+            . "\n" . trim($text);
     }
 
     private function performRequest(array $payload): array

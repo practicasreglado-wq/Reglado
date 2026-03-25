@@ -108,9 +108,9 @@ export default {
         );
 
         // Si el backend devuelve directamente el array
-this.properties = Array.isArray(res.data)
-  ? res.data.filter(p => p && p.nombre && p.precio)
-  : [];
+      this.properties = Array.isArray(res.data)
+        ? res.data.filter(p => p && p.nombre)
+        : [];
       } catch (error) {
         console.error(error);
       } finally {

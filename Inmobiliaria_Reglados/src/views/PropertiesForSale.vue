@@ -1,51 +1,106 @@
 <template>
-  <section v-if="isReal" class="properties-sale">
+  <section class="properties-sale">
     <div class="properties-sale__hero" v-reveal="0">
       <div class="properties-sale__copy">
         <p class="eyebrow">Catálogo Inmobiliario</p>
         <h2>Propiedades en venta</h2>
         <p>
-          Explora nuestra selección de oportunidades inmobiliarias exclusivas 
+          Explora nuestra selección de oportunidades inmobiliarias exclusivas
           disponibles en nuestra plataforma.
         </p>
       </div>
 
       <div class="hero-badges">
-        <span class="hero-badge">{{ properties.length }} activos</span>
+        <span class="hero-badge">{{ filteredProperties.length }} activos</span>
       </div>
     </div>
 
-    <div v-if="loading" class="properties-sale__state" v-reveal="1">
+    <div class="properties-sale__filters" v-reveal="1">
+      <button
+        type="button"
+        :class="['filter-btn', { active: effectiveCategory === '' }]"
+        @click="localCategory = ''"
+      >
+        Todas
+      </button>
+
+      <button
+        type="button"
+        :class="['filter-btn', { active: effectiveCategory === 'hoteles' }]"
+        @click="localCategory = 'hoteles'"
+      >
+        Hoteles
+      </button>
+
+      <button
+        type="button"
+        :class="['filter-btn', { active: effectiveCategory === 'fincas' }]"
+        @click="localCategory = 'fincas'"
+      >
+        Fincas
+      </button>
+
+      <button
+        type="button"
+        :class="['filter-btn', { active: effectiveCategory === 'parking' }]"
+        @click="localCategory = 'parking'"
+      >
+        Parking
+      </button>
+
+      <button
+        type="button"
+        :class="['filter-btn', { active: effectiveCategory === 'edificios' }]"
+        @click="localCategory = 'edificios'"
+      >
+        Edificios
+      </button>
+
+      <button
+        type="button"
+        :class="['filter-btn', { active: effectiveCategory === 'activos' }]"
+        @click="localCategory = 'activos'"
+      >
+        Activos
+      </button>
+    </div>
+
+    <div class="properties-sale__state">
+      DEBUG → isReal: {{ isReal }} | selectedCategory: {{ selectedCategory }} |
+      localCategory: {{ localCategory }} | total properties: {{ properties.length }} |
+      filtered: {{ filteredProperties.length }}
+    </div>
+
+    <div v-if="loading" class="properties-sale__state" v-reveal="2">
       Cargando propiedades...
     </div>
 
-      <div v-else-if="!selectedCategory" key="empty-category" class="properties-sale__state" v-reveal="1">
-        Selecciona una categoría para explorar las propiedades disponibles.
-      </div>
+    <div
+      v-else-if="!filteredProperties.length"
+      class="properties-sale__state"
+      v-reveal="2"
+    >
+      No hay propiedades disponibles para esta categoría.
+    </div>
 
-      <div v-else-if="properties.length === 0" key="empty-results" class="properties-sale__state" v-reveal="1">
-        Todavia no hay propiedades de ejemplo para {{ categoryLabel }}.
+    <div v-else class="properties-sale__grid">
+      <div
+        v-for="(property, index) in filteredProperties"
+        :key="property.id"
+        class="properties-sale__item"
+        v-reveal="index + 3"
+        :style="{ transitionDelay: `${Math.min(index * 70, 420)}ms` }"
+      >
+        <PropertyCard
+          :property="property"
+          @toggle-favorite="toggleFavorite"
+        />
       </div>
-
-      <transition-group v-else key="results" name="stagger-list" tag="div" class="properties-sale__grid">
-        <div
-          v-for="(property, index) in properties"
-          :key="property.id"
-          class="properties-sale__item"
-          v-reveal="index + 1"
-          :style="{ transitionDelay: `${Math.min(index * 70, 420)}ms` }"
-        >
-          <PropertyCard
-            :property="property"
-            @toggle-favorite="toggleFavorite"
-          />
-        </div>
-      </transition-group>
+    </div>
   </section>
 </template>
 
 <script>
-import { computed } from "vue";
 import { storeToRefs } from "pinia";
 import PropertyCard from "../components/PropertyCard.vue";
 import { useUserStore } from "../stores/user";
@@ -54,14 +109,6 @@ import {
   removeFavorite,
   saveFavorite,
 } from "../services/properties";
-
-const CATEGORY_LABELS = {
-  activos: "Activos",
-  edificios: "Edificios",
-  fincas: "Fincas",
-  hoteles: "Hoteles",
-  parking: "Parking",
-};
 
 export default {
   name: "PropertiesForSale",
@@ -75,16 +122,13 @@ export default {
       loading: true,
       properties: [],
       pendingFavorites: new Set(),
+      localCategory: "",
     };
   },
 
   setup() {
     const userStore = useUserStore();
     const { preferences, selectedCategory, isReal } = storeToRefs(userStore);
-
-    const categoryLabel = computed(
-      () => CATEGORY_LABELS[selectedCategory.value] || selectedCategory.value
-    );
 
     return {
       preferences,
@@ -97,14 +141,43 @@ export default {
     this.loadProperties();
   },
 
+  computed: {
+    effectiveCategory() {
+      return (
+        (this.selectedCategory || "").trim() ||
+        (this.localCategory || "").trim()
+      );
+    },
+
+    filteredProperties() {
+      const selected = this.effectiveCategory.toLowerCase();
+
+      if (!selected) {
+        return this.properties;
+      }
+
+      return this.properties.filter((property) => {
+        const categoria = String(
+          property.categoria || property.tipo_propiedad || ""
+        )
+          .trim()
+          .toLowerCase();
+
+        return categoria === selected;
+      });
+    },
+  },
+
   methods: {
     async loadProperties() {
-      this.loading = true
+      this.loading = true;
 
       try {
-        this.properties = await fetchProperties()
+        const response = await fetchProperties();
+        console.log("Propiedades cargadas:", response);
+        this.properties = response || [];
       } catch (error) {
-        console.error(error);
+        console.error("Error cargando propiedades:", error);
         this.properties = [];
       } finally {
         this.loading = false;
@@ -198,7 +271,7 @@ export default {
   position: relative;
   z-index: 2;
 }
- 
+
 .hero-badges {
   display: flex;
   justify-content: flex-end;
@@ -224,10 +297,31 @@ export default {
   align-content: center;
 }
 
-.properties-sale__insights {
-  display: grid;
-  gap: 14px;
-  align-content: center;
+.properties-sale__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.filter-btn {
+  border: 1px solid #d6dfef;
+  background: #fff;
+  color: #172a5d;
+  border-radius: 999px;
+  padding: 10px 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-btn:hover {
+  transform: translateY(-1px);
+}
+
+.filter-btn.active {
+  background: #172a5d;
+  color: #fff;
+  border-color: #172a5d;
 }
 
 .eyebrow {
@@ -250,29 +344,6 @@ export default {
   max-width: 62ch;
   color: rgba(255, 255, 255, 0.82);
   line-height: 1.6;
-}
-
-.hero-insight-card {
-  padding: 18px 20px;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  backdrop-filter: blur(12px);
-  box-shadow: 0 10px 24px rgba(7, 16, 36, 0.14);
-}
-
-.hero-insight-label {
-  margin: 0 0 8px;
-  font-size: 0.82rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.65);
-}
-
-.hero-insight-value {
-  display: block;
-  font-size: 1.55rem;
-  line-height: 1.1;
 }
 
 .properties-sale__state {
@@ -353,24 +424,6 @@ export default {
     line-height: 1.45;
   }
 
-  .properties-sale__insights {
-    gap: 10px;
-  }
-
-  .hero-insight-card {
-    padding: 12px 14px;
-    border-radius: 16px;
-  }
-
-  .hero-insight-label {
-    margin: 0 0 4px;
-    font-size: 0.68rem;
-  }
-
-  .hero-insight-value {
-    font-size: 1.1rem;
-  }
-
   .properties-sale__state {
     padding: 16px;
     font-size: 0.84rem;
@@ -379,6 +432,15 @@ export default {
   .properties-sale__grid {
     grid-template-columns: 1fr;
     gap: 14px;
+  }
+
+  .properties-sale__filters {
+    gap: 8px;
+  }
+
+  .filter-btn {
+    padding: 8px 14px;
+    font-size: 0.82rem;
   }
 }
 </style>

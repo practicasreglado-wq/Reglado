@@ -10,7 +10,7 @@ if (!class_exists(\Dompdf\Dompdf::class)) {
 
 require_once __DIR__ . '/config/db.php';
 require_once __DIR__ . '/processing/Repository.php';
-require_once __DIR__ . '/../processing/DossierService.php';
+require_once __DIR__ . '/processing/DossierService.php';
 require_once __DIR__ . '/processing/ClaudeClient.php';
 require_once __DIR__ . '/../processing/PdfGenerator.php';
 require_once __DIR__ . '/../processing/PropertyProcessor.php';
