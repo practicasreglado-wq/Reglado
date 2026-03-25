@@ -57,6 +57,9 @@ const updateVisibility = () => {
 };
 
 const isVisible = computed(() => {
+  // Ocultar la flecha en Home y Dashboard
+  if (route.path === '/' || route.path === '/dashboard') return false;
+
   if (isActive.value) return true; // Mantener visible durante la animación
   if (scrollY.value <= 0) return false;
   return scrollY.value >= 300 || isNearBottom.value;
