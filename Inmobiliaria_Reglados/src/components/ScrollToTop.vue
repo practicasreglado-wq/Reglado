@@ -103,7 +103,7 @@ watch(
 .scroll-to-top {
   position: fixed;
   right: 30px;
-  bottom: 30px;
+  bottom: 80px; /* Raised to avoid overlapping footer text */
   z-index: 1200;
   display: inline-flex;
   align-items: center;
@@ -112,7 +112,7 @@ watch(
   height: 52px;
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 999px;
-  background: rgba(11, 42, 95, 0.747);
+  background: rgba(11, 42, 95, 0.4);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   color: #fff;
@@ -127,7 +127,7 @@ watch(
 
 .scroll-to-top:hover {
   transform: translateY(-6px) scale(1.1);
-  background: rgb(9, 39, 92);
+  background: rgba(9, 39, 92, 1);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
 }
 
@@ -139,14 +139,14 @@ watch(
 
 /* ESTILO EN EL FOOTER */
 .scroll-to-top.at-footer {
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.4);
   color: #0b2a5f;
   border-color: rgba(11, 42, 95, 0.2);
   box-shadow: 0 12px 32px rgba(11, 42, 95, 0.2);
 }
 
 .scroll-to-top.at-footer:hover {
-  background: #f8faff;
+  background: rgba(248, 250, 255, 1);
 }
 
 .scroll-to-top.at-footer .wind-svg {
@@ -233,7 +233,7 @@ watch(
 @media (max-width: 640px) {
   .scroll-to-top {
     right: 15px;
-    bottom: 15px;
+    bottom: 75px; /* Raised for mobile */
     width: 40px;
     height: 40px;
   }

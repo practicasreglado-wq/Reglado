@@ -93,7 +93,7 @@ export default {
   position: relative;
   min-height: 100vh;
   display: flex;
-  align-items: center; /* Centered content */
+  /* Removed align-items: center to let container padding handle verticality */
   overflow: hidden;
   background-color: #0b0c10;
 }
@@ -155,8 +155,9 @@ export default {
   display: none !important; /* Force hide on mobile/tablet */
   flex-direction: column;
   align-items: center;
+  align-items: center;
   gap: 1.5rem;
-  padding: 12rem 0; /* Increased to avoid header overlap */
+  padding: 8vh 0; /* More room for vertical text */
   z-index: 5;
 }
 
@@ -187,12 +188,17 @@ export default {
   position: relative;
   z-index: 10;
   width: 100%;
-  padding: 0 var(--spacing-md);
+  padding: 100px var(--spacing-md) 60px; /* Reduced top/bottom to handle short screens better */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start; /* Forced left alignment */
+  min-height: 100vh;
 }
 
 @media (min-width: 1024px) {
   .hero-container {
-    padding-left: 10rem;
+    padding-left: 10rem; /* Consistent grid with header and sidebar space */
     padding-right: 4rem;
   }
 }
@@ -246,6 +252,38 @@ export default {
   color: rgba(255, 255, 255, 0.6);
   max-width: 38rem;
   margin: 0 0 3.5rem 0;
+}
+
+/* Reduced spacing for short screens */
+@media (max-height: 650px) {
+  .hero-container {
+    padding-top: 90px;
+    padding-bottom: 30px;
+  }
+  .hero-label-wrapper {
+    margin-bottom: 0.8rem;
+  }
+  .hero-title {
+    margin: 0 0 1rem 0;
+    font-size: clamp(2rem, 8vw, 4rem); /* Smaller title on short screens */
+  }
+  .hero-subtitle {
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+  }
+  .hero-actions {
+    gap: 1rem;
+  }
+}
+
+@media (max-height: 450px) {
+  .hero-container {
+    padding-top: 80px;
+    padding-bottom: 20px;
+  }
+  .hero-subtitle {
+    display: none; /* Hide subtitle on ultra-short screens to keep buttons visible */
+  }
 }
 
 /* Actions & Buttons */

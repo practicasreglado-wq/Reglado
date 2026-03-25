@@ -217,6 +217,7 @@ header.at-top-home {
   -webkit-backdrop-filter: none;
   box-shadow: none;
   border-bottom: 1px solid transparent;
+  padding-left: 10rem;
 }
 
 header.is-scrolled {
@@ -473,6 +474,9 @@ header:not(.at-top-home) .profile-menu-trigger {
   header {
     height: 75px; /* Fixed undefined variable and added space */
     padding: 0 var(--spacing-md);
+  }
+  header.at-top-home {
+    padding-left: var(--spacing-md);
   }
 }
 
