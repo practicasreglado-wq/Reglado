@@ -6,20 +6,56 @@ import activosImage from "../assets/activos.png";
 import { backendJson } from "./backend";
 
 const categoryImageMap = {
-  Hoteles: hotelImage,
-  Fincas: fincaImage,
-  Parking: parkingImage,
-  Edificios: edificiosImage,
-  Activos: activosImage,
+  hoteles: hotelImage,
+  fincas: fincaImage,
+  parking: parkingImage,
+  edificios: edificiosImage,
+  activos: activosImage,
 };
 
+function normalizeCategory(value) {
+  return String(value ?? "").trim().toLowerCase();
+}
+
+function parseCharacteristics(property) {
+  const raw =
+    property?.caracteristicas ??
+    property?.caracteristicas_json ??
+    null;
+
+  if (!raw) {
+    return {};
+  }
+
+  if (typeof raw === "object") {
+    return raw;
+  }
+
+  try {
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
 export function normalizeProperty(property) {
+  const categoria = property?.categoria ?? "activos";
+  const normalizedCategory = normalizeCategory(categoria);
+
   return {
     ...property,
+    categoria: categoria,
+    caracteristicas: parseCharacteristics(property),
     imageUrl:
       property.image_url ||
-      categoryImageMap[property.categoria] ||
-      hotelImage,
+      categoryImageMap[normalizedCategory] ||
+      activosImage,
+    titulo:
+      property.titulo ||
+      property.nombre ||
+      property.tipo_propiedad ||
+      "Activo inmobiliario",
   };
 }
 
@@ -43,9 +79,11 @@ export async function fetchPropertyDetail(propertyId) {
   if (!propertyId) {
     return null;
   }
+
   const payload = await backendJson(
     `api/get_properties.php?id=${encodeURIComponent(propertyId)}`
   );
+
   return payload.property ? normalizeProperty(payload.property) : null;
 }
 
@@ -57,26 +95,14 @@ export async function processPropertyFromText(description) {
   });
 }
 
-export async function uploadPropertyPdf(pdfFile) {
-  if (!pdfFile) {
-    throw new Error("Debes seleccionar un PDF.");
-  }
-
-  const formData = new FormData();
-  formData.append("pdf", pdfFile);
-
-  return backendJson("api/upload_property_pdf.php", {
-    method: "POST",
-    body: formData,
-  });
-}
-
 export async function uploadSignedDocuments(propertyId, ndaFile, loiFile) {
   const formData = new FormData();
   formData.append("property_id", String(propertyId));
+
   if (ndaFile) {
     formData.append("signed_nda", ndaFile);
   }
+
   if (loiFile) {
     formData.append("signed_loi", loiFile);
   }
@@ -137,4 +163,18 @@ export async function removeFavorite(propertyId) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ property_id: propertyId }),
   });
+}
+
+export async function fetchUserPropertiesForSale() {
+  const payload = await backendJson("api/get_user_properties_for_sale.php");
+  const list = Array.isArray(payload) ? payload : payload?.properties || [];
+
+  return list.map((p) =>
+    normalizeProperty({
+      ...p,
+      titulo: p.titulo || p.nombre || p.tipo_propiedad,
+      categoria: p.categoria || p.tipo || "activos",
+      ubicacion_general: p.ubicacion || p.direccion || "",
+    })
+  );
 }

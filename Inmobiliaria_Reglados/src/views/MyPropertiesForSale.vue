@@ -5,7 +5,7 @@
         <p class="eyebrow">Gestión Personal</p>
         <h2>Mis propiedades</h2>
         <p>
-          Administra y supervisa tus activos inmobiliarios publicados. 
+          Administra y supervisa tus activos inmobiliarios publicados.
           Aquí puedes ver el estado de tus anuncios y gestionar tus propiedades.
         </p>
       </div>
@@ -41,9 +41,13 @@
 </template>
 
 <script>
-import { backendJson } from "../services/backend";
 import PropertyCard from "../components/PropertyCard.vue";
-import { normalizeProperty, removeFavorite, saveFavorite } from "../services/properties";
+import {
+  fetchUserPropertiesForSale,
+  normalizeProperty,
+  removeFavorite,
+  saveFavorite,
+} from "../services/properties";
 
 export default {
   name: "MyPropertiesForSale",
@@ -70,26 +74,23 @@ export default {
     },
 
     async getProperties() {
+      this.loading = true;
+
       try {
-        const payload = await backendJson("api/get_user_properties_for_sale.php");
-        
-        // El backend devuelve: id, nombre, ubicacion, precio, tipo
-        // Normalizamos para PropertyCard (titulo, categoria, ubicacion_general)
-        this.properties = (payload || []).map(p => normalizeProperty({
-          ...p,
-          titulo: p.nombre,
-          categoria: p.tipo,
-          ubicacion_general: p.ubicacion
-        }));
+        this.properties = await fetchUserPropertiesForSale();
       } catch (error) {
         console.error("Error cargando propiedades:", error);
+        this.properties = [];
       } finally {
         this.loading = false;
       }
     },
 
     async toggleFavorite(property) {
-      if (this.pendingFavorites.has(property.id)) return;
+      if (!property?.id || this.pendingFavorites.has(property.id)) {
+        return;
+      }
+
       this.pendingFavorites.add(property.id);
 
       try {
@@ -98,21 +99,14 @@ export default {
         } else {
           await saveFavorite({
             property_id: property.id,
-            categoria: property.categoria
+            categoria: property.categoria,
           });
         }
 
-        const res = await axios.get(
-          "http://localhost/Reglado/Inmobiliaria_Reglados/backend/api/get_user_properties_for_sale.php",
-          { withCredentials: true }
-        );
-
-        // Si el backend devuelve directamente el array
-      this.properties = Array.isArray(res.data)
-        ? res.data.filter(p => p && p.nombre)
-        : [];
+        const updated = await fetchUserPropertiesForSale();
+        this.properties = updated.map(normalizeProperty);
       } catch (error) {
-        console.error(error);
+        console.error("Error actualizando favorito:", error);
       } finally {
         this.pendingFavorites.delete(property.id);
       }
@@ -254,7 +248,7 @@ export default {
     grid-template-columns: 1fr;
     padding: 22px;
   }
-  
+
   .hero-actions {
     justify-content: flex-start;
   }

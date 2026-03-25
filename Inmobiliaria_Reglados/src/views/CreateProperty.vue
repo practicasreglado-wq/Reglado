@@ -4,42 +4,24 @@
       <div class="header-actions">
         <button class="back-link" @click="$router.back()">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5">
-            <path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
           Volver
         </button>
       </div>
+
       <p class="eyebrow">Gestión de activos</p>
       <h2>Procesar propiedad</h2>
       <p class="intro">
-        Describe la propiedad o adjunta un PDF con el dossier completo. El sistema detectará
-        automáticamente el origen del texto, extraerá los datos obligatorios y generará un activo editable con su análisis.
+        Describe la propiedad en texto libre. Debes incluir datos obligatorios como, tipo de propiedad, ciudad, zona, metros cuadrados, precio y direccion.
       </p>
 
-      <div class="mode-switch">
-        <button
-          class="mode-btn"
-          :class="{ active: activeMode === 'text' }"
-          type="button"
-          @click="activeMode = 'text'"
-        >
-          Texto
-        </button>
-        <button
-          class="mode-btn"
-          :class="{ active: activeMode === 'pdf' }"
-          type="button"
-          @click="activeMode = 'pdf'"
-        >
-          PDF
-        </button>
-      </div>
-
-      <div v-if="activeMode === 'text'" class="panel panel-text">
+      <div class="panel panel-text">
         <textarea
           v-model="description"
-          placeholder="Por ejemplo: Piso de 120m² en Madrid, 3 habitaciones, 650.000€"
+          placeholder="Por ejemplo: Tengo un edificio residencial en Madrid centro, 4.395 m² construidos, precio 20.000.000 €, en calle..."
         ></textarea>
+
         <button
           class="primary-btn"
           :disabled="textProcessing"
@@ -49,50 +31,29 @@
         </button>
       </div>
 
-      <div v-else class="panel panel-pdf">
-        <label class="file-upload">
-          <input type="file" accept=".pdf" @change="handleFileChange" :disabled="pdfProcessing" />
-          <div class="upload-prompt">
-            <strong>Adjunta un PDF</strong>
-            <span>Extraeremos el texto completo, generaremos el análisis avanzado y el dossier profesional.</span>
-          </div>
-          <p class="file-name">{{ pdfLabel }}</p>
-        </label>
-        <button
-          class="primary-btn"
-          :disabled="pdfProcessing"
-          @click="handleUploadPdf"
-        >
-          {{ pdfProcessing ? "Procesando PDF..." : "Procesar PDF" }}
-        </button>
-      </div>
-
       <p v-if="feedbackMessage" class="feedback">{{ feedbackMessage }}</p>
     </div>
   </section>
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
-import {
-  processPropertyFromText,
-  uploadPropertyPdf,
-} from "../services/properties";
+import { ref } from "vue";
+import { processPropertyFromText } from "../services/properties";
 
 const description = ref("");
-const activeMode = ref("text");
 const textProcessing = ref(false);
-const pdfProcessing = ref(false);
-const pdfFile = ref(null);
 const feedbackMessage = ref("");
 
-const pdfLabel = computed(() =>
-  pdfFile.value ? pdfFile.value.name : "Ningún archivo seleccionado"
-);
-
 async function handleProcessText() {
-  if (!description.value.trim()) {
+  const clean = description.value.trim();
+
+  if (!clean) {
     feedbackMessage.value = "Escribe una descripción antes de procesar.";
+    return;
+  }
+
+  if (clean.length < 20) {
+    feedbackMessage.value = "La descripción es demasiado corta. Añade más detalles del activo.";
     return;
   }
 
@@ -100,7 +61,7 @@ async function handleProcessText() {
   feedbackMessage.value = "";
 
   try {
-    const payload = await processPropertyFromText(description.value.trim());
+    const payload = await processPropertyFromText(clean);
     feedbackMessage.value =
       payload.message ||
       `Propiedad procesada correctamente (ID ${payload.propertyId ?? "?"}).`;
@@ -111,33 +72,6 @@ async function handleProcessText() {
   } finally {
     textProcessing.value = false;
   }
-}
-
-async function handleUploadPdf() {
-  if (!pdfFile.value) {
-    feedbackMessage.value = "Selecciona un PDF antes de enviarlo.";
-    return;
-  }
-
-  pdfProcessing.value = true;
-  feedbackMessage.value = "";
-
-  try {
-    const payload = await uploadPropertyPdf(pdfFile.value);
-    feedbackMessage.value =
-      payload.message ||
-      `PDF procesado. Verifica la propiedad ID ${payload.propertyId ?? "?"}.`;
-    pdfFile.value = null;
-  } catch (error) {
-    feedbackMessage.value =
-      error?.message || "No se pudo procesar el PDF. Inténtalo de nuevo.";
-  } finally {
-    pdfProcessing.value = false;
-  }
-}
-
-function handleFileChange(event) {
-  pdfFile.value = event.target.files?.[0] ?? null;
 }
 </script>
 
@@ -198,72 +132,16 @@ function handleFileChange(event) {
 .intro {
   margin: 0 0 24px;
   color: #4c566a;
-  line-height: 1.4;
-}
-
-.mode-switch {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.mode-btn {
-  flex: 1;
-  padding: 10px 0;
-  border-radius: 999px;
-  border: 1px solid #d0d7f1;
-  background: #f9fafb;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.mode-btn.active {
-  border-color: #172a5d;
-  background: linear-gradient(135deg, #172a5d, #3654ae);
-  color: white;
+  line-height: 1.5;
 }
 
 .panel {
   margin-bottom: 20px;
 }
 
-.file-upload {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 18px;
-  border-radius: 16px;
-  border: 2px dashed #cfd7f4;
-  width: 100%;
-  cursor: pointer;
-}
-
-.file-upload input {
-  display: none;
-}
-
-.upload-prompt strong {
-  display: block;
-  font-size: 1rem;
-  color: #172a5d;
-}
-
-.upload-prompt span {
-  color: #5b6480;
-  font-size: 0.9rem;
-}
-
-.file-name {
-  font-size: 0.9rem;
-  color: #172a5d;
-  font-weight: 600;
-}
-
 textarea {
   width: 100%;
-  min-height: 200px;
+  min-height: 220px;
   border-radius: 18px;
   border: 1px solid #d6dbf0;
   padding: 18px;
@@ -271,12 +149,13 @@ textarea {
   font-family: inherit;
   resize: vertical;
   margin-bottom: 20px;
-  transition: border-color 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 textarea:focus {
   border-color: #3654ae;
   outline: none;
+  box-shadow: 0 0 0 4px rgba(54, 84, 174, 0.08);
 }
 
 .primary-btn {
@@ -313,7 +192,7 @@ textarea:focus {
   }
 
   textarea {
-    min-height: 160px;
+    min-height: 180px;
   }
 }
 </style>
