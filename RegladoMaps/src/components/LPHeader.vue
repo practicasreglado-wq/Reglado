@@ -284,6 +284,12 @@ export default {
 .logo {
   height: 3.2rem;
   width: auto;
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), filter 0.4s ease;
+}
+
+.header-brand:hover .logo {
+  transform: rotate(180deg) scale(1.05);
+  filter: drop-shadow(0 0.35rem 0.8rem rgba(255, 255, 255, 0.15));
 }
 
 .nav-links {

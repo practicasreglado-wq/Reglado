@@ -150,12 +150,12 @@
 import { computed, ref } from "vue";
 import { auth } from "../services/auth";
 
-import companyEnergy from "../assets/company-energy.png";
 import companyEnProceso from "../assets/company-enproceso.png";
 import companyProceso from "../assets/company-proceso.png";
-import companyConsultores from "../assets/company-consultores.png";
-import companyMapas from "../assets/company-mapas.png";
-import companyRealstate from "../assets/company-realstate.png";
+import RegladoConsultoresCard from "../assets/RegladoConsultoresCard.png";
+import RegladoEnergyCard from "../assets/RegladoEnergyCard.png";
+import RegladoMapsCard from "../assets/RegladoMapsCard.png";
+import RegladoRealStateCard from "../assets/RegladoRealStateCard.png";
 import balanceIcon from "../assets/Balance.svg";
 import boltIcon from "../assets/Bolt.svg";
 import heroVideo from "../assets/Bissness.mp4";
@@ -188,7 +188,7 @@ const companies = computed(() => [
     tag: "Abogados",
     description: "Consultoria estrategica y legal para operaciones, crecimiento y desarrollo empresarial.",
     href: "https://regladoconsultores.com/",
-    image: companyConsultores,
+    image: RegladoConsultoresCard,
     logo: balanceIcon,
   },
   {
@@ -196,7 +196,7 @@ const companies = computed(() => [
     tag: "Energy",
     description: "Optimizacion energetica, analisis de consumo y gestion de contratos.",
     href: energyEntryUrl.value,
-    image: companyEnergy,
+    image: RegladoEnergyCard,
     logo: boltIcon,
   },
   {
@@ -204,7 +204,7 @@ const companies = computed(() => [
     tag: "Mapas",
     description: "Plataforma geografica y visualizacion avanzada para decisiones de negocio.",
     href: mapasEntryUrl.value,
-    image: companyMapas,
+    image: RegladoMapsCard,
     logo: mapIcon,
   },
   {
@@ -212,7 +212,7 @@ const companies = computed(() => [
     tag: "Real Estate",
     description: "Consultoria estrategica y legal enfocada a operaciones inmobiliarias.",
     href: realstateUrl,
-    image: companyEnProceso,
+    image: RegladoRealStateCard,
     logo: addHomeIcon,
   },
   {
@@ -733,7 +733,7 @@ function buildExternalProductUrl(baseUrl) {
   position: absolute;
   z-index: 2;
   top: 0.7rem;
-  left: 0.7rem;
+  right: 0.7rem;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.52);
   padding: 0.28rem 0.52rem;

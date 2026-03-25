@@ -284,7 +284,17 @@ onBeforeUnmount(() => {
 .header{ position: sticky; top:0; z-index: 50; backdrop-filter: blur(12px); background: rgba(11,13,16,.65); border-bottom: 1px solid rgba(255,255,255,.08); }
 .header-inner{ display:flex; align-items:center; justify-content:space-between; padding: 14px 20px; gap: 14px; position: relative; width: 100%; box-sizing: border-box; }
 .brand{ display:flex; align-items:center; gap: 12px; position: relative; z-index: 10; }
-.logo{ width: 44px; height: 44px; object-fit: contain; }
+.logo{ 
+  width: 44px; 
+  height: 44px; 
+  object-fit: contain; 
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), filter 0.4s ease;
+}
+
+.brand:hover .logo {
+  transform: rotate(180deg) scale(1.05);
+  filter: drop-shadow(0 0.35rem 0.8rem rgba(255, 255, 255, 0.15));
+}
 .brand-name{ font-weight: 800; letter-spacing: .8px; }
 .brand-sub{ font-size: 12px; color: rgba(233,238,246,.70); }
 .nav{ display:flex; align-items:center; justify-content: center; gap: 6px; flex: 1; z-index: 5; pointer-events: none; }
