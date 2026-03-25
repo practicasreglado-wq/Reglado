@@ -1,6 +1,5 @@
 <template>
   <div id="app">
-    <LoadingScreen :visible="showLoader" />
     <Header />
     <main class="main-content">
       <router-view v-slot="{ Component, route }">
@@ -26,7 +25,6 @@ import { useRoute, useRouter } from "vue-router";
 import Header from "./components/Header.vue";
 import Footer from "./components/Footer.vue";
 import ScrollToTop from "./components/ScrollToTop.vue";
-import LoadingScreen from "./components/LoadingScreen.vue";
 import { useUserStore } from "./stores/user";
 import {
   initRevealSystem,
@@ -39,15 +37,12 @@ export default {
     Header,
     Footer,
     ScrollToTop,
-    LoadingScreen,
   },
 
   setup() {
     const userStore = useUserStore();
     const router = useRouter();
     const route = useRoute();
-    const isBootLoading = ref(true);
-    const isRouteLoading = ref(false);
     const skipNextTransition = ref(false);
     let removeBeforeHook;
     let removeAfterHook;
@@ -64,20 +59,6 @@ export default {
 
     const isProfileNavigation = (to, from) =>
       to.path.startsWith("/profile") && from.path.startsWith("/profile");
-
-    const consumeSkipNextLoader = () => {
-      if (typeof window === "undefined") {
-        return false;
-      }
-
-      const shouldSkip = window.sessionStorage.getItem("skip-next-loader") === "true";
-
-      if (shouldSkip) {
-        window.sessionStorage.removeItem("skip-next-loader");
-      }
-
-      return shouldSkip;
-    };
 
     const consumeSkipNextTransition = () => {
       if (typeof window === "undefined") {
@@ -104,17 +85,7 @@ export default {
       initRevealSystem();
 
       removeBeforeHook = router.beforeEach((to, from, next) => {
-        const skipLoader = consumeSkipNextLoader();
         skipNextTransition.value = consumeSkipNextTransition();
-
-        if (
-          to.fullPath !== from.fullPath &&
-          !isProfileNavigation(to, from) &&
-          !skipLoader
-        ) {
-          isRouteLoading.value = true;
-        }
-
         next();
       });
 
@@ -126,27 +97,15 @@ export default {
         nextTick(() => {
           refreshAnimations();
           skipNextTransition.value = false;
-
-          if (!isProfileNavigation(to, from)) {
-            window.setTimeout(() => {
-              isRouteLoading.value = false;
-            }, 120);
-            return;
-          }
-
-          isRouteLoading.value = false;
         });
       });
+
       try {
         await userStore.initializeSession();
       } catch (err) {
         console.error("Error cargando sesion:", err);
       } finally {
-        await nextTick();
-        window.setTimeout(() => {
-          isBootLoading.value = false;
-          refreshAnimations();
-        }, 180);
+        refreshAnimations();
       }
     });
 
@@ -156,19 +115,10 @@ export default {
       teardownRevealSystem();
     });
 
-    const showLoader = computed(() => {
-      if (route.path.startsWith("/profile")) {
-        return false;
-      }
-
-      return isBootLoading.value || isRouteLoading.value;
-    });
-
     return {
       handleRouteEntered,
       pageTransitionKey,
       pageTransitionName,
-      showLoader,
     };
   },
 };
