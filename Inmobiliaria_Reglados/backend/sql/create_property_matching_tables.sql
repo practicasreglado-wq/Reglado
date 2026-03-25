@@ -108,29 +108,28 @@ CREATE TABLE IF NOT EXISTS search_history (
 -- =========================
 -- DOCUMENTOS FIRMADOS
 -- =========================
-CREATE TABLE IF NOT EXISTS documentos_firmados (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    propiedad_id INT NOT NULL,
+CREATE TABLE documentos_firmados (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id INT UNSIGNED NOT NULL,
+    propiedad_id INT UNSIGNED NOT NULL,
 
-    tipo_documento ENUM('nda', 'loi') NOT NULL,
-    file_path VARCHAR(255) NOT NULL,
+    nda_file_path VARCHAR(500) DEFAULT NULL,
+    loi_file_path VARCHAR(500) DEFAULT NULL,
 
-    firmado_valido BOOLEAN NOT NULL DEFAULT 0,
+    nda_subido_at DATETIME DEFAULT NULL,
+    loi_subido_at DATETIME DEFAULT NULL,
+
+    nda_valido TINYINT(1) NOT NULL DEFAULT 0,
+    loi_valido TINYINT(1) NOT NULL DEFAULT 0,
+
     validado_admin TINYINT(1) NOT NULL DEFAULT 0,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
-    ip VARCHAR(45),
-    user_agent TEXT,
+    UNIQUE KEY uniq_user_propiedad (user_id, propiedad_id)
+);
 
-    validation_token CHAR(64),
-    validation_token_expires_at DATETIME,
-
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-    UNIQUE KEY idx_documentos_token (validation_token),
-    INDEX idx_documentos_user_prop (user_id, propiedad_id)
-
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 ALTER TABLE activos_recibidos 
 ADD COLUMN content_hash VARCHAR(64) NULL,
@@ -138,3 +137,19 @@ ADD INDEX idx_content_hash (content_hash);
 
 ALTER TABLE activos_recibidos 
 ADD COLUMN message_id VARCHAR(255) NULL;
+
+CREATE TABLE IF NOT EXISTS buyer_property_access (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    property_id INT NOT NULL,
+    buyer_user_id INT NOT NULL,
+    nda_uploaded TINYINT(1) NOT NULL DEFAULT 0,
+    loi_uploaded TINYINT(1) NOT NULL DEFAULT 0,
+    nda_approved TINYINT(1) NOT NULL DEFAULT 0,
+    loi_approved TINYINT(1) NOT NULL DEFAULT 0,
+    dossier_unlocked TINYINT(1) NOT NULL DEFAULT 0,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uniq_buyer_property (property_id, buyer_user_id),
+    INDEX idx_access_property (property_id),
+    INDEX idx_access_buyer (buyer_user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

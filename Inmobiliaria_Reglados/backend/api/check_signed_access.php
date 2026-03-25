@@ -3,10 +3,10 @@ declare(strict_types=1);
 require_once __DIR__ . '/../config/cors.php';
 applyCors();
 handlePreflight();
-require_once dirname(__DIR__) . '/../config/db.php';
-require_once dirname(__DIR__) . '/../config/auth.php';
-require_once dirname(__DIR__) . '/../lib/env_loader.php';
-require_once dirname(__DIR__) . '/../lib/document_access.php';
+require_once __DIR__. '/../config/db.php';
+require_once __DIR__ . '/../config/auth.php';
+require_once __DIR__ . '/../lib/env_loader.php';
+require_once __DIR__ . '/../lib/document_access.php';
 
 loadEnv(dirname(__DIR__) . '/../.env');
 

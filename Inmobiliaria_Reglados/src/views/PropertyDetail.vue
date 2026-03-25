@@ -287,7 +287,13 @@ const canUpload = computed(() => {
   return !uploadingDocuments.value && (!!ndaFile.value || !!loiFile.value);
 });
 
-const uploadsUrl = (fileName) => buildUploadsUrl(fileName);
+function buildDownloadUrl(fileName) {
+  if (!fileName) return "";
+
+  return `http://localhost/Reglado/Inmobiliaria_Reglados/backend/api/download_document.php?file=${encodeURIComponent(fileName)}`;
+}
+
+const uploadsUrl = (fileName) => buildDownloadUrl(fileName);
 
 function formatCurrency(value) {
   if (value === null || value === undefined || value === "") {
@@ -376,8 +382,6 @@ function triggerDownload(url, fileName) {
     const link = document.createElement("a");
     link.href = url;
     link.setAttribute("download", fileName || "archivo.pdf");
-    link.setAttribute("target", "_self");
-    link.style.display = "none";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
