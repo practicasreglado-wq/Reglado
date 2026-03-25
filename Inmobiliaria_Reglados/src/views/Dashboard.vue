@@ -30,10 +30,10 @@ export default {
     const userStore = useUserStore();
     const particles = ref([]);
     const particleBudget = ref({
-      initial: 15,
-      max: 282,
+      initial: 10,
+      max: 80,
       delay: 15000, 
-      growthDuration: 20000, 
+      growthDuration: 30000, 
     });
 
     let nextParticleId = 0;
@@ -48,10 +48,10 @@ export default {
       const isMobile = viewportWidth <= 768;
       const isLowPower = cores <= 4;
 
-      let initial = isMobile ? 12 : 15;
-      let max = isMobile ? 140 : 282;
-      let growthDuration = isMobile ? 25000 : 20000;
-      let delay = 15000; // 15 segundos constantes
+      let initial = isMobile ? 8 : 10;
+      let max = isMobile ? 40 : 80;
+      let growthDuration = isMobile ? 40000 : 30000;
+      let delay = 15000; // 15 seconds constant
 
       if (isLowPower) {
         max = isMobile ? 48 : 110;
@@ -182,7 +182,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(180deg, #ffffff 0%, #d9e8ff 100%);
+  background: #e9e9e9; /* Same as AboutUs for visual consistency */
   padding-top: 90px;
 }
 

@@ -22,6 +22,7 @@ import ResetPassword from "../views/ResetPassword.vue";
 import AuthCallback from "../views/AuthCallback.vue";
 import RestrictedAccessView from "../views/RestrictedAccessView.vue";
 import PropertyDetail from "../views/PropertyDetail.vue";
+import Legal from "../views/Legal.vue";
 
 const routes = [
   { path: "/", component: Home },
@@ -59,6 +60,7 @@ const routes = [
   },
   { path: "/admin/restricted", component: () => import("../views/RestrictedAdminView.vue"), meta: { requiresAuth: true } },
   { path: "/property/:id", component: PropertyDetail, meta: { requiresAuth: true, requiresReal: true } },
+  { path: "/legal", component: Legal },
 ];
 
 const router = createRouter({
@@ -70,10 +72,15 @@ const router = createRouter({
     }
 
     if (to.hash) {
-      return {
-        el: to.hash,
-        behavior: "smooth",
-      };
+      return new Promise((resolve) => {
+        // Small delay to ensure the component is mounted & rendered
+        setTimeout(() => {
+          resolve({
+            el: to.hash,
+            behavior: "smooth",
+          });
+        }, 500); // 500ms allows for component mounting and initial transitions
+      });
     }
 
     return { top: 0 };

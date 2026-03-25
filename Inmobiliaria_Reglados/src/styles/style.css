@@ -6,6 +6,21 @@
   --azul-secundario: #4a72c6;
   --blanco: #ffffff;
   --gris-claro: rgb(230, 249, 249);
+  
+  /* Typography Scale */
+  --font-size-h1: clamp(2.5rem, 8vw, 5.5rem);
+  --font-size-h2: clamp(2rem, 6vw, 4rem);
+  --font-size-h3: clamp(1.5rem, 4vw, 2.2rem);
+  --font-size-base: clamp(0.95rem, 1.1vw, 1.15rem);
+  --font-size-sm: clamp(0.85rem, 0.95vw, 0.95rem);
+
+  /* Spacing Scale */
+  --spacing-xs: clamp(0.5rem, 1vw, 0.75rem);
+  --spacing-sm: clamp(0.75rem, 1.5vw, 1rem);
+  --spacing-md: clamp(1.25rem, 2.5vw, 2rem);
+  --spacing-lg: clamp(2.5rem, 5vw, 4.5rem);
+  --spacing-xl: clamp(4rem, 8vw, 8rem);
+
   --motion-duration-fast: 320ms;
   --motion-duration-base: 460ms;
   --motion-duration-slow: 580ms;

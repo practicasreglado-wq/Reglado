@@ -1,5 +1,5 @@
 <template>
-  <header>
+  <header :class="{ 'is-scrolled': scrolled && !isInProfile, 'at-top-home': isHome && !scrolled }">
     <div class="logo">
       <router-link to="/" class="logo-link">
         <div class="logo-wrapper">
@@ -69,7 +69,7 @@
               :class="{ 'hide-on-mobile-profile': isInProfile }"
             >
               <div class="user-avatar">
-                <span>{{ getInitials() }}</span>
+                {{ getInitials() }}
               </div>
             </router-link>
 
@@ -101,7 +101,7 @@
 </template>
 
 <script>
-import { computed, watch } from "vue";
+import { computed, watch, onMounted, onUnmounted, ref } from "vue";
 import { storeToRefs } from "pinia";
 import { useRouter, useRoute } from "vue-router";
 import { useUserStore } from "../stores/user";
@@ -150,12 +150,33 @@ export default {
       return first || "U";
     };
 
+    const isHome = computed(() => route.path === "/");
+    const scrolled = ref(false);
+
+    const handleScroll = () => {
+      // Threshold: 20px for non-home pages
+      // For Home: Scroll threshold is roughly 90% of the viewport height (100vh hero)
+      const threshold = isHome.value ? window.innerHeight * 0.9 : 20;
+      scrolled.value = window.scrollY > threshold;
+    };
+
+    onMounted(() => {
+      window.addEventListener("scroll", handleScroll);
+      handleScroll(); // Initial check
+    });
+
+    onUnmounted(() => {
+      window.removeEventListener("scroll", handleScroll);
+    });
+
     return {
       user,
       isAdmin,
       isReal,
       isInProfile,
       isProfileMenuOpen,
+      isHome,
+      scrolled,
       toggleProfileMenu,
       goToCatalog,
       goToLogin,
@@ -171,50 +192,53 @@ header {
   top: 0;
   left: 0;
   width: 100%;
-  height: 90px;
+  height: clamp(70px, 8vw, 90px);
   z-index: 1000;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 40px 0 30px; /* Reducido de 60px y ajustado izquierda */
-  background: rgba(255, 255, 255, 0.639);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  padding: 0 var(--spacing-md);
   box-sizing: border-box;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   user-select: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
+  
+  /* DEFAULT STATE: Greyish-White Glassmorphism (Other pages / Scrolled Home) */
+  background: rgba(233, 233, 233, 0.7); /* Sync with #e9e9e9 but semi-transparent */
+  backdrop-filter: blur(30px); /* Much stronger blur for premium glass effect */
+  -webkit-backdrop-filter: blur(30px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06); 
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
 }
 
-header .logo .logo-link {
-  text-decoration: none;
-  display: block;
+/* TRANSPARENT HOME STATE */
+header.at-top-home {
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+  border-bottom: 1px solid transparent;
 }
 
-.logo-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-  padding: 5px 0; /* Eliminado padding lateral para estar más pegado a la izq */
-  transition: transform 0.3s ease;
+header.is-scrolled {
+  height: clamp(65px, 7vw, 75px);
+  background: rgba(255, 255, 255, 0.75); /* Opaque enough but still glassmorphic */
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08); /* More subtle than 15px/40px */
+  border-bottom: 1px solid rgba(74, 114, 198, 0.1);
 }
 
-.brand-icon {
-  width: 52px;
-  height: 52px;
-  object-fit: contain;
-  filter: none;
-  transition: transform 1.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+/* LOGO & NAVIGATION COLORS */
+
+header.at-top-home .brand-text,
+header.at-top-home nav a,
+header.at-top-home .catalog-btn {
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
-.brand-text {
-  font-size: 2.5rem;
-  font-weight: 800;
-  margin: 0;
-  letter-spacing: 1px;
+/* Restored Gold Gradient for Standard Mode */
+header:not(.at-top-home) .brand-text {
   background: linear-gradient(
     135deg,
     #5f4b08 0%,
@@ -225,11 +249,99 @@ header .logo .logo-link {
     #6e560c 100%
   );
   background-clip: text;
+  -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  color: #bd9b2c; /* Fallback */
+}
+
+/* Forced reset for all links to avoid purple/visited styles */
+header a, 
+header a:visited,
+header a:active,
+header a:hover {
+  text-decoration: none !important;
+  outline: none;
+}
+
+header:not(.at-top-home) nav a,
+header:not(.at-top-home) .catalog-btn {
+  color: #1a2545;
   text-shadow: none;
 }
 
-/* LOGO HOVER */
+/* CATALOG BUTTON ALIGNMENT */
+.catalog-btn {
+  padding: 8px 22px;
+  border-radius: 99px;
+  border: 1px solid transparent;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center; /* Center vertically */
+  justify-content: center;
+  gap: 12px; /* Increased gap */
+  line-height: 1; /* Ensure text isn't pushed down */
+}
+
+.catalog-text {
+  display: inline-block;
+  transform: translateY(-1px); /* Subtle nudge for visual alignment */
+}
+
+header.at-top-home .catalog-btn {
+  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+header:not(.at-top-home) .catalog-btn {
+  background: var(--azul-secundario);
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(74, 114, 198, 0.2);
+}
+
+.catalog-btn:hover .catalog-icon {
+  transform: rotate(180deg) scale(1.1);
+}
+
+/* PROFILE ICON */
+.user-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  transition: all 0.4s ease;
+  font-weight: 700;
+}
+
+/* Video Mode Profile Icon */
+header.at-top-home .user-avatar {
+  background: #ffffff;
+  color: #1a2545;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Standard Mode Profile Icon */
+header:not(.at-top-home) .user-avatar {
+  background: #1a2545;
+  color: #ffffff;
+}
+
+/* REST OF STYLES */
+
+.logo-wrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.logo-link, .logo-link:visited {
+  color: inherit;
+  text-decoration: none;
+}
+
 .logo-link:hover .logo-wrapper {
   transform: scale(1.02);
 }
@@ -238,63 +350,51 @@ header .logo .logo-link {
   transform: rotate(180deg) scale(1.1);
 }
 
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 8px; /* Reducido gap global */
-}
-
 .admin-badge {
-  color: #bd9b2c;
-  background: #ffffff;
-  width: 60px;
-  height: 60px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(189, 155, 44, 0.3);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
+  border: 1px solid transparent;
 }
 
-.admin-badge:hover,
-.admin-badge.router-link-active {
-  color: var(--azul-secundario);
-  border-color: var(--azul-secundario);
-  background: rgba(74, 114, 198, 0.08);
-  box-shadow: 0 0 18px rgba(74, 114, 198, 0.4), 0 4px 8px rgba(0, 0, 0, 0.1);
+header.at-top-home .admin-badge {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+header:not(.at-top-home) .admin-badge {
+  background: rgba(26, 37, 69, 0.05);
+  color: #1a2545;
+  border-color: rgba(26, 37, 69, 0.1);
 }
 
 .admin-badge:hover {
-  animation: badgeWobble 0.6s ease-in-out;
+  transform: translateY(-2px);
+  background: var(--azul-secundario) !important;
+  color: #ffffff !important;
 }
 
-@keyframes badgeWobble {
-  0% { transform: rotate(0deg) scale(1.05); }
-  25% { transform: rotate(-8deg) scale(1.1); }
-  50% { transform: rotate(8deg) scale(1.1); }
-  75% { transform: rotate(-4deg) scale(1.05); }
-  100% { transform: rotate(0deg) scale(1); }
+.brand-icon {
+  width: clamp(35px, 5vw, 52px);
+  height: clamp(35px, 5vw, 52px);
+  object-fit: contain;
+  transition: transform 1.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.admin-badge svg {
-  width: 26px;
-  height: 26px;
+header.at-top-home .brand-icon {
+  filter: brightness(0) invert(1);
 }
 
-.profile-nav-item {
-  display: flex;
-  align-items: center;
-  gap: 25px;
-}
-
-.logo-text {
-  text-decoration: none;
-}
-
-.logo-text:hover {
-  text-decoration: none;
+.brand-text {
+  font-size: clamp(1.4rem, 3vw, 2.5rem);
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  margin: 0;
 }
 
 nav ul {
@@ -303,130 +403,52 @@ nav ul {
   padding: 0;
   display: flex;
   align-items: center;
-  gap: 25px;
+  gap: var(--spacing-md);
 }
 
-nav a,
-.catalog-btn {
-  text-decoration: none;
-  color: var(--negro);
-  font-size: 1.1rem;
-  font-weight: 600;
-  transition: 0.3s ease;
-}
-
-nav a:hover,
-.catalog-btn:hover {
-  color: var(--azul-secundario);
-}
-
-.catalog-btn {
-  background: rgba(255, 255, 255, 0);
-  font-size: 1rem;
-  border: none;
-  cursor: pointer;
-  padding: 5px;
-  color: var(--negro);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 15px;
+nav a {
+  font-size: 0.95rem;
+  font-weight: 700;
 }
 
 .catalog-icon {
-  display: block;
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
   transition: transform 1.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.catalog-btn:hover .catalog-icon {
-  transform: rotate(180deg) scale(1.1);
-}
-
-.bienvenido {
-  color: #d4af37;
-  font-weight: bold;
-  font-size: 1.1rem;
-  text-decoration: none;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.bienvenido:hover {
-  color: var(--azul-secundario);
-}
-
-.user-avatar {
-  display: inline-block;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background-color: var(--azul-principal);
-  text-align: center;
-  color: white;
-  line-height: 60px;
-  font-weight: bold;
-  font-size: 1.5rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-}
-
-.bienvenido:hover .user-avatar {
-  transform: translateY(-3px);
-  box-shadow: 0 0 18px rgb(52, 145, 192), 0 6px 12px rgba(0, 0, 0, 0.15);
-}
-
-.profile-nav-item.in-profile .user-avatar {
-  box-shadow: 0 0 20px rgb(52, 145, 192), 0 6px 12px rgba(0, 0, 0, 0.15);
-  border: 2px solid rgb(29, 136, 218);
-}
-
-nav a.router-link-exact-active {
-  color: var(--azul-secundario);
-}
-
-.user-menu-container {
-  display: flex;
-  align-items: center;
-  gap: 25px;
 }
 
 .profile-menu-trigger {
   display: none;
-  background: rgba(23, 42, 93, 0.05);
-  border: 1px solid rgba(23, 42, 93, 0.1);
-  color: #172a5d;
-  width: 50px;
-  height: 50px;
+  width: 44px;
+  height: 44px;
   border-radius: 12px;
   cursor: pointer;
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
+  border: 1px solid transparent;
 }
 
-.profile-menu-trigger svg {
-  width: 28px;
-  height: 28px;
+header.at-top-home .profile-menu-trigger {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
-.profile-menu-trigger:hover,
-.profile-menu-trigger.active {
-  background: #172a5d;
-  color: white;
+header:not(.at-top-home) .profile-menu-trigger {
+  background: rgba(26, 37, 69, 0.05);
+  color: #1a2545;
+  border-color: rgba(26, 37, 69, 0.1);
 }
 
 @media (max-width: 768px) {
-  .profile-menu-trigger {
-    display: flex;
-  }
-
   .catalog-text {
     display: none;
   }
-
-  .catalog-icon {
-    width: 42px !important;
-    height: 42px !important;
+  
+  .profile-menu-trigger {
+    display: flex;
   }
 }
 
@@ -434,17 +456,30 @@ nav a.router-link-exact-active {
   .bienvenido.hide-on-mobile-profile {
     display: none;
   }
+
+  .user-avatar {
+    width: 36px; /* Matching the catalog icon button size */
+    height: 36px;
+    font-size: 0.8rem; /* Smaller font for smaller avatar */
+  }
+
+  .admin-badge {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+@media (max-width: 768px) {
+  header {
+    height: 75px; /* Fixed undefined variable and added space */
+    padding: 0 var(--spacing-md);
+  }
 }
 
 @media (max-width: 480px) {
   header {
-    height: 65px;
-    padding: 0 10px; /* Aún más pegado en móviles */
-  }
-
-  .brand-icon {
-    width: 28px;
-    height: 28px;
+    height: 70px; /* Slightly taller for better icon centering */
+    padding: 0 15px;
   }
 
   .brand-text {
@@ -472,37 +507,10 @@ nav a.router-link-exact-active {
     font-size: 0.9rem;
   }
 
-  .admin-badge {
-    width: 36px;
-    height: 36px;
-  }
-
-  .admin-badge svg {
-    width: 18px;
-    height: 18px;
-  }
-
   .catalog-icon {
     width: 24px !important;
     height: 24px !important;
   }
 
-  .user-avatar {
-    width: 36px;
-    height: 36px;
-    line-height: 36px;
-    font-size: 1rem;
-    margin-right: 0;
-  }
-
-  .profile-menu-trigger {
-    width: 36px;
-    height: 36px;
-  }
-
-  .profile-menu-trigger svg {
-    width: 18px;
-    height: 18px;
-  }
 }
 </style>
