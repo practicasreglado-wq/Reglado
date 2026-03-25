@@ -128,7 +128,8 @@
         <router-link @click="closeMobileMenu" to="/sobre-nosotros" class="m-link">Sobre nosotros</router-link>
         <router-link @click="closeMobileMenu" to="/contacto" class="btn primary glow mobile-action" v-glow>
           Solicitar analisis
-        </router-link>        <template v-if="user">
+        </router-link>
+        <template v-if="user">
           <button @click="handleMobileLogout" class="btn mobile-action">Salir</button>
         </template>
 
@@ -216,7 +217,9 @@ function handleMediaChange(event) {
 }
 
 function getCallbackUrl() {
-  return `${window.location.origin}${window.location.pathname}#/auth/callback`;
+  const base = `${window.location.origin}${window.location.pathname}`;
+  const sep = base.endsWith("/") ? "" : "/";
+  return `${base}${sep}auth/callback`;
 }
 
 function buildExternalAuthUrl(path) {
@@ -284,8 +287,8 @@ onBeforeUnmount(() => {
 .logo{ width: 44px; height: 44px; object-fit: contain; }
 .brand-name{ font-weight: 800; letter-spacing: .8px; }
 .brand-sub{ font-size: 12px; color: rgba(233,238,246,.70); }
-.nav{ display:flex; align-items:center; justify-content: center; gap: 6px; position: absolute; left: 50%; transform: translateX(-50%); z-index: 5; pointer-events: none; }
-.nav-actions{ display: flex; align-items: center; justify-content: flex-end; gap: 10px; position: relative; z-index: 10; margin-left: auto; pointer-events: auto; }
+.nav{ display:flex; align-items:center; justify-content: center; gap: 6px; flex: 1; z-index: 5; pointer-events: none; }
+.nav-actions{ display: flex; align-items: center; justify-content: flex-end; gap: 10px; position: relative; z-index: 10; pointer-events: auto; }
 .header-action{ min-width: 124px; min-height: 36px; padding: 0 12px; font-size: 12px; line-height: 1; white-space: nowrap; }
 .admin-pill{
   width: 38px;
@@ -389,7 +392,8 @@ onBeforeUnmount(() => {
 .m-sublink.router-link-active{ color: rgba(233,238,246,.9); border-color: rgba(242,197,61,.52); border-bottom-color: rgba(242,197,61,.52); background: rgba(242,197,61,.16); }
 .m-link{ padding: 12px 12px; border-radius: 14px; border: 1px solid rgba(242,197,61,.84); border-bottom: 1px solid rgba(242,197,61,.84); background: transparent; }
 .m-link.router-link-active{ color: rgba(233,238,246,.9); border-color: rgba(242,197,61,.84); border-bottom-color: rgba(242,197,61,.84); background: rgba(242,197,61,.16); }
-.mobile-action{ width: 100%; min-height: 38px; padding: 8px 12px; font-size: 13px; border-radius: 12px; }
+.mobile-action{ width: 100%; min-height: 38px; padding: 8px 12px; font-size: 13px; border-radius: 12px; }
+
 @media (max-width: 980px){
   .header-inner{ padding: 12px 14px; gap: 8px; }
   .brand{ gap: 8px; }
