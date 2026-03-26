@@ -4,10 +4,12 @@
 
 El ecosistema esta dividido en cuatro proyectos principales:
 
-- [ApiLoging](c:\xampp\htdocs\Reglado\ApiLoging): API central de autenticacion.
-- [GrupoReglado](c:\xampp\htdocs\Reglado\GrupoReglado): portal principal y punto comun de login, registro y configuracion.
-- [RegladoEnergy](c:\xampp\htdocs\Reglado\RegladoEnergy): web corporativa de energy con backend PHP propio.
-- [Inmobiliaria_Reglados](c:\xampp\htdocs\Reglado\Inmobiliaria_Reglados): producto inmobiliario con backend PHP propio.
+- [ApiLoging](file:///c:/xampp/htdocs/Reglado/ApiLoging): API central de autenticacion.
+- [GrupoReglado](file:///c:/xampp/htdocs/Reglado/GrupoReglado): portal principal y punto comun de login, registro y configuracion.
+- [RegladoEnergy](file:///c:/xampp/htdocs/Reglado/RegladoEnergy): web corporativa de energy con backend PHP propio.
+- [Inmobiliaria_Reglados](file:///c:/xampp/htdocs/Reglado/Inmobiliaria_Reglados): producto inmobiliario con backend PHP propio.
+- [RegladoMaps](file:///c:/xampp/htdocs/Reglado/RegladoMaps): visualización interactiva de activos y recursos en mapa.
+- [n8nJson](file:///c:/xampp/htdocs/Reglado/n8nJson): flujos de automatización y bots (WhatsApp, Email, etc.).
 
 La regla principal es esta:
 
@@ -158,6 +160,15 @@ Uso esperado:
 - `preferencias`
 - relaciones con propiedades o favoritos
 
+### 6.4 Base de Mapas
+
+Proyecto:
+- [RegladoMaps](file:///c:/xampp/htdocs/Reglado/RegladoMaps)
+
+Uso:
+- Coordenadas y metadatos de activos.
+- Integración con APIs de mapas externas (ApiMapa).
+
 Regla de integracion:
 
 - `iduser` debe guardar el `id` real del usuario de `ApiLoging`
@@ -203,6 +214,14 @@ Responsable de:
 - vistas y logica de producto inmobiliario
 - preferencias del usuario
 - datos y procesos locales del producto
+
+### 7.5 RegladoMaps
+
+Responsable de:
+
+- Visualización cartográfica de activos.
+- Selección y filtrado de propiedades por ubicación.
+- Interfaz interactiva de mapas.
 
 ## 8. Variables de entorno por proyecto
 
