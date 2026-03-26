@@ -377,21 +377,41 @@ function closeSignatureModal() {
   showSignatureModal.value = false;
 }
 
-function triggerDownload(url, fileName) {
+async function triggerDownload(url, fileName) {
   try {
+    downloadError.value = "";
+
+    const response = await fetch(url, {
+      method: "GET",
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(text || "Error descargando archivo");
+    }
+
+    const blob = await response.blob();
+    const blobUrl = window.URL.createObjectURL(blob);
+
     const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", fileName || "archivo.pdf");
+    link.href = blobUrl;
+    link.download = fileName || "archivo.pdf";
     document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link);
+    link.remove();
+
+    setTimeout(() => {
+      window.URL.revokeObjectURL(blobUrl);
+    }, 1000);
   } catch (error) {
-    console.error(error);
-    downloadError.value = "No se pudo iniciar la descarga.";
+    console.error("Error descargando:", error);
+    downloadError.value =
+      error?.message || "No se pudo iniciar la descarga.";
   }
 }
 
-function openDossier() {
+async function openDossier() {
   if (!accessGranted.value || !dossierLink.value) {
     return;
   }
@@ -399,10 +419,10 @@ function openDossier() {
   const fileName =
     property.value?.dossier_file?.split("/").pop() || "dossier.pdf";
 
-  triggerDownload(dossierLink.value, fileName);
+  await triggerDownload(dossierLink.value, fileName);
 }
 
-function downloadDocument(fileName) {
+async function downloadDocument(fileName) {
   const url = uploadsUrl(fileName);
   if (!url) {
     downloadError.value = "No se encontró la URL del documento.";
@@ -410,7 +430,7 @@ function downloadDocument(fileName) {
   }
 
   const finalName = fileName.split("/").pop() || "documento.pdf";
-  triggerDownload(url, finalName);
+  await triggerDownload(url, finalName);
 }
 
 async function refreshAccessState() {
@@ -435,7 +455,7 @@ async function refreshAccessState() {
     accessMessage.value = response.message || defaultStatusDetail;
 
     if (documentsAccess.value.dossier_unlocked && property.value?.dossier_file) {
-      dossierLink.value = buildUploadsUrl(property.value.dossier_file);
+      dossierLink.value = buildDownloadUrl(property.value.dossier_file);
     } else {
       dossierLink.value = "";
     }

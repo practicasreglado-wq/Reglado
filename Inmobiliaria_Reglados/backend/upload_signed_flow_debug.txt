@@ -1,0 +1,46 @@
+[2026-03-26 13:58:49] HIT endpoint | {"post_keys":["property_id"],"files_keys":["signed_nda","signed_loi"],"auth_keys":["iss","iat","exp","sub","email","username","first_name","last_name","phone","name","role"],"local_keys":["iduser"]}
+[2026-03-26 13:58:49] Datos iniciales | {"buyerUserId":1,"propertyId":17}
+[2026-03-26 13:58:49] Validando archivo recibido | {"type":"nda","field":"signed_nda","exists":true,"error":0,"name":"nda_17.pdf","tmp_name":"C:\\xampp\\tmp\\phpC53F.tmp","size":5943}
+[2026-03-26 13:58:49] Validando archivo recibido | {"type":"loi","field":"signed_loi","exists":true,"error":0,"name":"loi_17.pdf","tmp_name":"C:\\xampp\\tmp\\phpC540.tmp","size":8095}
+[2026-03-26 13:58:49] Propiedad cargada | {"property_found":true,"property":{"id":17,"tipo_propiedad":"Edificio residencial plurifamiliar","ciudad":"Madrid","zona":"Lavapiés - Embajadores","confidentiality_file":"nda_17.pdf","intention_file":"loi_17.pdf"}}
+[2026-03-26 13:58:49] Directorio de subida listo | {"uploadDir":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend/uploads/signed_docs"}
+[2026-03-26 13:58:49] BEGIN TRANSACTION
+[2026-03-26 13:58:49] Antes de mover archivo | {"type":"nda","tmp_name":"C:\\xampp\\tmp\\phpC53F.tmp","targetPath":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend/uploads/signed_docs\\signed_nda_69c52d8986a737.96157553_nda_17.pdf","targetName":"signed_nda_69c52d8986a737.96157553_nda_17.pdf"}
+[2026-03-26 13:58:49] Archivo movido correctamente | {"type":"nda","targetPath":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend/uploads/signed_docs\\signed_nda_69c52d8986a737.96157553_nda_17.pdf","exists_after_move":true}
+[2026-03-26 13:58:49] Documento original resuelto | {"type":"nda","stored_relative":"nda_17.pdf","originalPath":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\uploads\\nda_17.pdf"}
+[2026-03-26 13:58:49] Resultado validación firma | {"type":"nda","accepted":false,"reason":"El documento es idéntico al original"}
+[2026-03-26 13:58:49] ROLLBACK ejecutado
+[2026-03-26 13:58:49] Error general | {"message":"El NDA no parece firmado: El documento es idéntico al original","file":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\api\\upload_signed_documents.php","line":238}
+[2026-03-26 14:21:26] HIT endpoint | {"post_keys":["property_id"],"files_keys":["signed_nda","signed_loi"],"auth_keys":["iss","iat","exp","sub","email","username","first_name","last_name","phone","name","role"],"local_keys":["iduser"]}
+[2026-03-26 14:21:26] Datos iniciales | {"buyerUserId":1,"propertyId":17}
+[2026-03-26 14:21:26] Validando archivo recibido | {"type":"nda","field":"signed_nda","exists":true,"error":0,"name":"nda_17 (1).pdf","tmp_name":"C:\\xampp\\tmp\\php79AB.tmp","size":5943}
+[2026-03-26 14:21:26] Validando archivo recibido | {"type":"loi","field":"signed_loi","exists":true,"error":0,"name":"loi_17 (2).pdf","tmp_name":"C:\\xampp\\tmp\\php79AC.tmp","size":8095}
+[2026-03-26 14:21:26] Propiedad cargada | {"property_found":true,"property":{"id":17,"tipo_propiedad":"Edificio residencial plurifamiliar","ciudad":"Madrid","zona":"Lavapiés - Embajadores","confidentiality_file":"nda_17.pdf","intention_file":"loi_17.pdf"}}
+[2026-03-26 14:21:26] Directorio de subida listo | {"uploadDir":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend/uploads/signed_docs"}
+[2026-03-26 14:21:26] BEGIN TRANSACTION
+[2026-03-26 14:21:26] Antes de mover archivo | {"type":"nda","tmp_name":"C:\\xampp\\tmp\\php79AB.tmp","targetPath":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend/uploads/signed_docs\\signed_nda_69c532d66e4968.09031106_nda_17__1_.pdf","targetName":"signed_nda_69c532d66e4968.09031106_nda_17__1_.pdf"}
+[2026-03-26 14:21:26] Archivo movido correctamente | {"type":"nda","targetPath":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend/uploads/signed_docs\\signed_nda_69c532d66e4968.09031106_nda_17__1_.pdf","exists_after_move":true}
+[2026-03-26 14:21:26] Documento original resuelto | {"type":"nda","stored_relative":"nda_17.pdf","originalPath":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\uploads\\nda_17.pdf"}
+[2026-03-26 14:21:26] Resultado validación firma | {"type":"nda","accepted":false,"reason":"El documento es idéntico al original"}
+[2026-03-26 14:21:26] ROLLBACK ejecutado
+[2026-03-26 14:21:26] Error general | {"message":"El NDA no parece firmado: El documento es idéntico al original","file":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\api\\upload_signed_documents.php","line":238}
+[2026-03-26 14:34:07] HIT endpoint | {"post_keys":["property_id"],"files_keys":["signed_nda","signed_loi"],"auth_keys":["iss","iat","exp","sub","email","username","first_name","last_name","phone","name","role"],"local_keys":["iduser"]}
+[2026-03-26 14:34:07] Datos iniciales | {"buyerUserId":1,"propertyId":17}
+[2026-03-26 14:34:07] Validando archivo recibido | {"type":"nda","field":"signed_nda","exists":true,"error":0,"name":"nda_17 (1).pdf","tmp_name":"C:\\xampp\\tmp\\php1617.tmp","size":5943}
+[2026-03-26 14:34:07] Validando archivo recibido | {"type":"loi","field":"signed_loi","exists":true,"error":0,"name":"loi_17 (2).pdf","tmp_name":"C:\\xampp\\tmp\\php1618.tmp","size":8095}
+[2026-03-26 14:34:07] Propiedad cargada | {"property_found":true,"property":{"id":17,"tipo_propiedad":"Edificio residencial plurifamiliar","ciudad":"Madrid","zona":"Lavapiés - Embajadores","confidentiality_file":"nda_17.pdf","intention_file":"loi_17.pdf"}}
+[2026-03-26 14:34:07] Directorio de subida listo | {"uploadDir":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend/uploads/signed_docs"}
+[2026-03-26 14:34:07] BEGIN TRANSACTION
+[2026-03-26 14:34:07] Antes de mover archivo | {"type":"nda","tmp_name":"C:\\xampp\\tmp\\php1617.tmp","targetPath":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend/uploads/signed_docs\\signed_nda_69c535cf633b72.94634843_nda_17__1_.pdf","targetName":"signed_nda_69c535cf633b72.94634843_nda_17__1_.pdf"}
+[2026-03-26 14:34:07] Archivo movido correctamente | {"type":"nda","targetPath":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend/uploads/signed_docs\\signed_nda_69c535cf633b72.94634843_nda_17__1_.pdf","exists_after_move":true}
+[2026-03-26 14:34:07] Documento original resuelto | {"type":"nda","stored_relative":"nda_17.pdf","originalPath":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\uploads\\nda_17.pdf"}
+[2026-03-26 14:34:07] Resultado validación firma | {"type":"nda","accepted":true,"reason":"Validación desactivada (modo debug)"}
+[2026-03-26 14:34:07] Antes de mover archivo | {"type":"loi","tmp_name":"C:\\xampp\\tmp\\php1618.tmp","targetPath":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend/uploads/signed_docs\\signed_loi_69c535cf640473.01798457_loi_17__2_.pdf","targetName":"signed_loi_69c535cf640473.01798457_loi_17__2_.pdf"}
+[2026-03-26 14:34:07] Archivo movido correctamente | {"type":"loi","targetPath":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend/uploads/signed_docs\\signed_loi_69c535cf640473.01798457_loi_17__2_.pdf","exists_after_move":true}
+[2026-03-26 14:34:07] Documento original resuelto | {"type":"loi","stored_relative":"loi_17.pdf","originalPath":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\uploads\\loi_17.pdf"}
+[2026-03-26 14:34:07] Resultado validación firma | {"type":"loi","accepted":true,"reason":"Validación desactivada (modo debug)"}
+[2026-03-26 14:34:07] documentos_firmados insertado | {"lastId":"11","params":{"user_id":1,"propiedad_id":17,"nda_file_path":"signed_docs/signed_nda_69c535cf633b72.94634843_nda_17__1_.pdf","loi_file_path":"signed_docs/signed_loi_69c535cf640473.01798457_loi_17__2_.pdf","nda_valido":1,"loi_valido":1}}
+[2026-03-26 14:34:07] buyer_property_access actualizado | {"access":{"id":13,"property_id":17,"buyer_user_id":1,"nda_uploaded":1,"loi_uploaded":1,"nda_approved":0,"loi_approved":0,"dossier_unlocked":0,"created_at":"2026-03-26 13:49:39","updated_at":"2026-03-26 14:34:07"}}
+[2026-03-26 14:34:07] Token de revisión creado | {"token":"6f50891036568bfe05efe2ff1b78ee4aee10d3af26831566"}
+[2026-03-26 14:34:07] COMMIT OK
+[2026-03-26 14:34:08] Correo de revisión enviado | {"approval_link":"http://localhost/Reglado/Inmobiliaria_Reglados/backend/api/approve_signed_documents.php?token=6f50891036568bfe05efe2ff1b78ee4aee10d3af26831566","attachments":[{"path":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend/uploads/signed_docs\\signed_nda_69c535cf633b72.94634843_nda_17__1_.pdf","name":"NDA_nda_17__1_.pdf"},{"path":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend/uploads/signed_docs\\signed_loi_69c535cf640473.01798457_loi_17__2_.pdf","name":"LOI_loi_17__2_.pdf"}]}

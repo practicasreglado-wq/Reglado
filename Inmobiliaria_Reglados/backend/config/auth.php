@@ -5,8 +5,8 @@ function applyAuthCors(): void
     $origin = $_SERVER['HTTP_ORIGIN'] ?? null;
 
     $allowed = [
-        'http://localhost:5173',
-        'http://127.0.0.1:5173'
+        'http://localhost:5175',
+        'http://127.0.0.1:5175'
     ];
 
     if ($origin && in_array($origin, $allowed, true)) {

@@ -1,6 +1,10 @@
 <?php
 declare(strict_types=1);
 
+require_once __DIR__ . '/../config/cors.php';
+applyCors();
+handlePreflight();
+
 $relative = $_GET['file'] ?? '';
 $relative = trim((string) $relative);
 
@@ -33,19 +37,13 @@ if (!str_starts_with($filePath, $baseDir)) {
 }
 
 $filename = basename($filePath);
-$extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
-
-$contentType = match ($extension) {
-    'pdf' => 'application/pdf',
-    default => 'application/octet-stream',
-};
 
 if (ob_get_level()) {
     ob_end_clean();
 }
 
 header('Content-Description: File Transfer');
-header('Content-Type: ' . $contentType);
+header('Content-Type: application/octet-stream');
 header('Content-Disposition: attachment; filename="' . $filename . '"');
 header('Content-Transfer-Encoding: binary');
 header('Cache-Control: no-store, no-cache, must-revalidate');
