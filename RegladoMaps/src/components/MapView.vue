@@ -4,7 +4,7 @@
 
       <!-- Drawer estilo Side-Nav para Filtros -->
       <div class="filters-drawer-container" :class="{ 'is-open': isFiltersOpen }">
-        <button class="filters-toggle-btn" @click="isFiltersOpen = !isFiltersOpen">
+        <button class="filters-toggle-btn" @click="toggleFilters">
           <i class="fas fa-filter"></i>
           <span class="filters-btn-label">Filtros</span>
         </button>
@@ -111,7 +111,7 @@
 
       <!-- Panel de Leyenda Desplegable Nativo -->
       <div class="panel-leyenda custom-leyenda-drawer" :class="{ 'is-open': isLeyendaOpen }">
-        <button class="leyenda-toggle-btn-vue" @click="isLeyendaOpen = !isLeyendaOpen">
+        <button class="leyenda-toggle-btn-vue" @click="toggleLeyenda">
           <span class="leyenda-btn-text">Leyenda</span>
           <i class="fas fa-layer-group"></i>
         </button>
@@ -163,7 +163,8 @@
     </div> <!-- /map-wrapper -->
 
     <!-- Botón de Pantalla Completa aislado fuera del wrapper estructural -->
-    <button class="btn-fullscreen-toggle" @click.stop.prevent="toggleFullscreen" :title="isFullscreen ? 'Minimizar mapa' : 'Pantalla completa'">
+    <button class="btn-fullscreen-toggle" @click.stop.prevent="toggleFullscreen"
+      :title="isFullscreen ? 'Minimizar mapa' : 'Pantalla completa'">
       <i class="fas" :class="isFullscreen ? 'fa-compress' : 'fa-expand'" style="pointer-events: none;"></i>
     </button>
   </div>
@@ -176,7 +177,7 @@ export default {
     return {
       scriptsCargados: false,
       scriptsGenerados: [],
-      isFiltersOpen: true,
+      isFiltersOpen: window.innerWidth > 992,
       isLeyendaOpen: false,
       isFullscreen: false
     }
@@ -195,7 +196,19 @@ export default {
     document.body.style.overflow = '';
   },
   methods: {
-    cargarScriptsMapa() {
+    toggleFilters() {
+      this.isFiltersOpen = !this.isFiltersOpen;
+      if (this.isFiltersOpen && window.innerWidth <= 992) {
+        this.isLeyendaOpen = false;
+      }
+    },
+    toggleLeyenda() {
+      this.isLeyendaOpen = !this.isLeyendaOpen;
+      if (this.isLeyendaOpen && window.innerWidth <= 992) {
+        this.isFiltersOpen = false;
+      }
+    },
+    async cargarScriptsMapa() {
       // Load CSS
       this.loadCSS('https://unpkg.com/leaflet@1.7.1/dist/leaflet.css');
       this.loadCSS('https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css');
@@ -244,7 +257,7 @@ export default {
     },
     toggleFullscreen() {
       this.isFullscreen = !this.isFullscreen;
-      
+
       if (this.isFullscreen) {
         document.body.style.overflow = 'hidden';
       } else {
@@ -285,7 +298,8 @@ export default {
 <style scoped>
 .mapa-view-container {
   /* En vista normal (recuadro) */
-  padding-top: 125px; /* Para salvar el header de la LP con margen seguro */
+  padding-top: 125px;
+  /* Para salvar el header de la LP con margen seguro */
   padding-bottom: 24px;
   width: 100%;
   max-width: 1600px;
@@ -308,7 +322,8 @@ export default {
   max-width: none !important;
   margin: 0 !important;
   padding: 0 !important;
-  z-index: 999999; /* Sobre todo el contenido */
+  z-index: 999999;
+  /* Sobre todo el contenido */
   background-color: #1a1a1a;
   border-radius: 0;
 }
@@ -319,7 +334,7 @@ export default {
   height: 100%;
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
   transition: border-radius 0.4s ease;
 }
 
@@ -330,16 +345,20 @@ export default {
 
 #map {
   width: 100% !important;
-  height: 100% !important; /* Adaptable a map-wrapper */
+  height: 100% !important;
+  /* Adaptable a map-wrapper */
   z-index: 1;
 }
 
 /* 📺 Botón de Pantalla Completa */
 .btn-fullscreen-toggle {
   position: absolute;
-  bottom: 50px; /* Margen simétrico para que no se corte */
-  right: 30px;  /* Esquina derecha */
-  z-index: 99999; /* Máxima prioridad sobre el canvas de Leaflet */
+  bottom: 50px;
+  /* Margen simétrico para que no se corte */
+  right: 30px;
+  /* Esquina derecha */
+  z-index: 99999;
+  /* Máxima prioridad sobre el canvas de Leaflet */
   width: 44px;
   height: 44px;
   background: white;
@@ -363,6 +382,20 @@ export default {
 
 .btn-fullscreen-toggle:active {
   background: #e9ecef;
+}
+
+@media (max-width: 768px) {
+  .btn-fullscreen-toggle {
+    bottom: 50px !important;
+    right: 20px !important;
+    width: 48px !important;
+    height: 48px !important;
+    font-size: 1.4rem !important;
+  }
+}
+
+.mapa-view-container.is-fullscreen .btn-fullscreen-toggle {
+  z-index: 1000001;
 }
 
 /* Ajustes Responsive para el Recuadro */
@@ -467,15 +500,67 @@ export default {
   transition-delay: 0.1s;
 }
 
-/* Ajustes Responsive Drawer */
-@media (max-width: 480px) {
+/* Ajustes Responsive Drawer (Simetría, Tamaño y Pestañas Simples) */
+@media (max-width: 768px) {
+  /* Establecer posiciones verticales escalonadas (offset) para evitar que choquen los botones al abrirse en pantallas estrechas */
   .filters-drawer-container {
-    top: 80px;
+    position: absolute !important;
+    top: 100px !important;
+  }
+  
+  .custom-leyenda-drawer {
+    position: absolute !important;
+    top: 40px !important;
+  }
+
+  /* Mantener forma simplificada (sin desplegar pestaña) */
+  .filters-toggle-btn,
+  .leyenda-toggle-btn-vue {
+    width: 64px !important;
+  }
+  
+  .filters-btn-label,
+  .leyenda-btn-text {
+    display: none !important;
+  }
+
+  /* Evitar que se desborde la pantalla y hacerlos más pequeños (260px) */
+  :global(.panel-filtros) {
+    width: 260px !important;
+    max-width: calc(100vw - 64px) !important;
+  }
+
+  .custom-leyenda-drawer {
+    width: 260px !important;
+    max-width: calc(100vw - 64px) !important;
+  }
+
+  :global(.leyenda-content) {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 12px !important;
+  }
+
+  /* Pasar a 2 columnas para que no se aplasten los iconos y permitir texto en 2 líneas */
+  :global(#iconos_filtros) {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  :global(.icon-option span) {
+    white-space: normal !important;
+    text-align: center !important;
+    font-size: 0.75rem !important;
+    line-height: 1.2 !important;
+  }
+
+  :global(.icon-option) {
+    padding: 6px 4px !important;
   }
 }
 
 :global(.panel-leyenda) {
-  top: 30px !important; /* Misma altura que el de filtros */
+  top: 30px !important;
+  /* Misma altura que el de filtros */
   border-radius: 16px 0 0 16px !important;
   box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15) !important;
   z-index: 1000 !important;
