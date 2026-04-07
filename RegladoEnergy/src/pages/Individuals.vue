@@ -1,11 +1,23 @@
 <!-- pagina Particulares en ruta /particulares -->
 <template>
-  <section class="section">
+<!-- botones link a 4 páginas de seccion clientes -->
+ <section class="section clients-subnav-section">
+   <div class="container" v-reveal="{ from: 'up', delay: 120 }">
+        <nav class="clients-subnav" aria-label="Submenu de clientes">
+          <router-link to="/particulares" class="clients-subnav-link">Particulares</router-link>
+          <router-link to="/empresas" class="clients-subnav-link">Empresas y PYMES</router-link>
+          <router-link to="/administradores-fincas" class="clients-subnav-link">Comunidades y fincas</router-link>
+          <router-link to="/sector-publico" class="clients-subnav-link">Organismos públicos</router-link>
+        </nav>
+      </div>
+    </section>
+
+  <section class="section clients-content-section">
     <div class="container">
       <div class="grid grid-2">
         <div class="card soft glow" v-glow v-reveal="{ from: 'left', delay: 50 }">
           <div class="badge" v-reveal="{ from: 'up', delay: 80 }">Particulares</div>
-          <h1 class="h1" v-reveal="{ from: 'up', delay: 120 }">Facturas elevadas, tarifas mal contratadas o sensación de que “te cobran de más”.</h1>
+          <h1 class="h1" v-reveal="{ from: 'up', delay: 120 }">Facturas elevadas, tarifas mal contratadas o sensación de que “te cobran de más”</h1>
           <p class="p" v-reveal="{ from: 'right', delay: 170 }">
             Analizamos tu caso, optimizamos tu contrato y te explicamos con claridad qué estás pagando y por qué.
           </p>
@@ -76,5 +88,75 @@ onMounted(() => {
   display: flex;
   justify-content: center;}
   .p2{ text-align: center;}
+
+  /* submenú clientes */
+  .cta-row{ display:flex; gap:12px; flex-wrap:wrap; margin-top: 14px; }
+.clients-subnav-wrap{ margin-top: 20px; }
+.clients-subnav{
+  display:grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+.clients-subnav-link{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height: 58px;
+  padding: 14px 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(242,197,61,.26);
+  background:
+    linear-gradient(180deg, rgba(242,197,61,.14), rgba(242,197,61,.06)),
+    rgba(255,255,255,.03);
+  color: rgba(242, 197, 61, .9);
+  font-weight: 800;
+  text-align: center;
+  text-decoration: none;
+  box-shadow: 0 14px 34px rgba(0,0,0,.18);
+  transition:
+    transform .16s ease,
+    border-color .16s ease,
+    box-shadow .16s ease,
+    background .16s ease;
+}
+.clients-subnav-link:hover{
+  transform: translateY(-1px);
+  border-color: rgba(242,197,61,.4);
+  background:
+    linear-gradient(180deg, rgba(242,197,61,.2), rgba(242,197,61,.09)),
+    rgba(255,255,255,.04);
+  color: #ffffff;
+  box-shadow: 0 18px 40px rgba(242,197,61,.12);
+}
+.clients-subnav-link.router-link-active{
+  color: #0b0d10;
+  background: linear-gradient(180deg, rgba(242,197,61,.96), rgba(242,197,61,.72));
+  border-color: rgba(242,197,61,.42);
+  box-shadow: 0 18px 44px rgba(242,197,61,.2);
+}
+.clients-cta-center{ display:flex; justify-content:center; margin-top: 14px; }
+.p_centrado{ text-align: center; }
+
+@media (max-width: 980px){
+  .clients-subnav{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 640px){
+  .clients-subnav{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .clients-subnav-link{
+    min-height: 58px;
+    padding: 12px 10px;
+    font-size: 14px;
+  }
+  .clients-subnav-section{
+    padding-bottom: 32px;
+  }
+  .clients-content-section{
+    padding-top: 32px;
+  }
+}
 
 </style>

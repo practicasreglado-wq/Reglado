@@ -4,9 +4,9 @@
     <div class="container">
       <div class="card soft glow" v-glow v-reveal="{ from: 'up', delay: 50 }">
         <div class="badge" v-reveal="{ from: 'left', delay: 80 }">Recursos</div>
-        <h1 class="h1" v-reveal="{ from: 'up', delay: 120 }">Análisis, guías y contenidos claros sobre mercado eléctrico, cambios regulatorios y estrategias de ahorro.</h1>
+        <h1 class="h1" v-reveal="{ from: 'up', delay: 120 }">Análisis, guías y contenidos claros sobre mercado eléctrico, cambios regulatorios y estrategias de ahorro</h1>
         <p class="p" v-reveal="{ from: 'right', delay: 170 }">
-          La factura eléctrica no se “lee”, se audita. Distinguir costes regulados de costes negociables es la base para detectar sobrecostes y optimizar la contratación.
+          La factura eléctrica no se "lee", se audita. Distinguir costes regulados de costes negociables es la base para detectar sobrecostes y optimizar la contratación.
         </p>
         <div class="cta-row" v-reveal="{ from: 'up', delay: 220 }">
           <router-link to="/contacto" class="btn primary glow" v-glow v-reveal="{ from: 'left', delay: 250 }">Quiero un análisis</router-link>
@@ -15,8 +15,8 @@
       </div>
 
       <div class="section-tight">
-        <div class="grid grid-2">
-          <div class="card glow" v-glow v-reveal="{ from: 'left', delay: 60 }">
+        <div class="resources-top-grid">
+          <div class="card glow resources-main-card" v-glow v-reveal="{ from: 'left', delay: 60 }">
             <h2 class="h2" v-reveal="{ from: 'up', delay: 100 }">Cómo entender la factura de la luz</h2>
             <p class="p" v-reveal="{ from: 'up', delay: 130 }">Desglose estructural</p>
             <ul class="bullets" v-reveal="{ from: 'up', delay: 160 }">
@@ -31,23 +31,25 @@
             </ul>
           </div>
 
-          <div class="card glow" v-glow v-reveal="{ from: 'right', delay: 80 }">
-            <h2 class="h2" v-reveal="{ from: 'up', delay: 110 }">Auditoría de sobrecostes</h2>
-            <ul class="bullets" v-reveal="{ from: 'up', delay: 150 }">
-              <li><strong>Excesos de potencia (maxímetro):</strong> ajustar potencia para evitar penalizaciones o capacidad ociosa.</li>
-              <li><strong>Energía reactiva:</strong> recargos por factor de potencia; batería de condensadores cuando procede.</li>
-              <li><strong>Revisión de precios y componentes:</strong> contratos antiguos o mal parametrizados pueden quedar fuera de mercado.</li>
-            </ul>
+          <div class="resources-side-stack">
+            <div class="card glow" v-glow v-reveal="{ from: 'up', delay: 80 }">
+              <h2 class="h2" v-reveal="{ from: 'up', delay: 110 }">Auditoría de sobrecostes</h2>
+              <ul class="bullets" v-reveal="{ from: 'up', delay: 150 }">
+                <li><strong>Excesos de potencia (maxímetro):</strong> ajustar potencia para evitar penalizaciones o capacidad ociosa.</li>
+                <li><strong>Energía reactiva:</strong> recargos por factor de potencia; batería de condensadores cuando procede.</li>
+                <li><strong>Revisión de precios y componentes:</strong> contratos antiguos o mal parametrizados pueden quedar fuera de mercado.</li>
+              </ul>
+            </div>
 
-            <div class="hr" v-reveal="{ from: 'up', delay: 180 }"></div>
-
-            <h2 class="h2" v-reveal="{ from: 'up', delay: 210 }">Marco normativo de referencia</h2>
-            <ul class="bullets" v-reveal="{ from: 'up', delay: 240 }">
-              <li>Ley 24/2013, del Sector Eléctrico.</li>
-              <li>Circular 3/2020, CNMC (peajes).</li>
-              <li>Real Decreto-ley 148/2021 (cargos del sistema).</li>
-              <li>Ley 38/1992, Impuestos Especiales.</li>
-            </ul>
+            <div class="card glow" v-glow v-reveal="{ from: 'right', delay: 100 }">
+              <h2 class="h2" v-reveal="{ from: 'up', delay: 130 }">Marco normativo de referencia</h2>
+              <ul class="bullets" v-reveal="{ from: 'up', delay: 170 }">
+                <li>Ley 24/2013, del Sector Eléctrico.</li>
+                <li>Circular 3/2020, CNMC (peajes).</li>
+                <li>Real Decreto-ley 148/2021 (cargos del sistema).</li>
+                <li>Ley 38/1992, Impuestos Especiales.</li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
@@ -112,10 +114,30 @@ import { setSeo } from "../seo.js";
 import FAQ from "../components/FAQ.vue";
 
 const faq = [
-  { q: "Potencia contratada", a: "Capacidad máxima disponible; más de lo necesario = pagas de más; menos = penalizaciones." },
-  { q: "Energía reactiva", a: "Asociada a cargas inductivas; puede generar recargos en ciertos suministros." },
-  { q: "¿Fijo o indexado?", a: "Depende de tu perfil y tolerancia al riesgo; se decide con escenarios y objetivos." },
-  { q: "¿El análisis gratuito tiene compromiso?", a: "No. Primero se explica el impacto económico y el porqué. Tú decides si ejecutar cambios." },
+  {
+    q: "¿Cómo saber si estoy pagando de más en mi factura de luz o gas?",
+    a: "La forma correcta de saberlo es revisar precios, potencia o caudal contratado, peajes, servicios añadidos y hábitos de consumo. Muchas veces el sobrecoste no está en un único concepto, sino en varios pequeños errores acumulados en contrato y facturación."
+  },
+  {
+    q: "¿Qué diferencia hay entre una tarifa fija y una indexada?",
+    a: "La tarifa fija mantiene un precio estable durante el periodo acordado, lo que aporta previsibilidad. La indexada sigue la evolución del mercado y puede ser interesante en determinados perfiles, pero exige más control y una estrategia clara para asumir la volatilidad."
+  },
+  {
+    q: "¿Qué documentos necesito para revisar mi contrato energético?",
+    a: "Normalmente basta con una o varias facturas recientes y, si se dispone de él, el contrato actual. Con esa información ya se puede analizar potencia, precios, peajes, histórico de consumo y detectar si las condiciones firmadas siguen siendo adecuadas."
+  },
+  {
+    q: "¿También revisáis facturas y contratos de gas?",
+    a: "Sí. En gas también aparecen oportunidades de mejora, por ejemplo en peajes, término fijo, precios de energía o adecuación del consumo al contrato. El enfoque es el mismo: entender qué estás pagando, por qué lo pagas y qué margen real de optimización existe."
+  },
+  {
+    q: "¿Qué es la energía reactiva y cuándo puede generar recargos?",
+    a: "La energía reactiva suele aparecer en suministros con determinados equipos eléctricos, sobre todo en entornos empresariales o industriales. Si no se controla, puede provocar penalizaciones en factura, por lo que conviene revisar si procede corregirla con medidas técnicas."
+  },
+  {
+    q: "¿El análisis gratuito tiene compromiso o implica cambiar de comercializadora?",
+    a: "No. El análisis sirve para darte una visión clara de la situación actual y del posible ahorro o mejora contractual. Primero se explican los resultados y las opciones disponibles, y después eres tú quien decide si quiere ejecutar cambios o no."
+  },
 ];
 
 onMounted(() => {
@@ -133,8 +155,29 @@ onMounted(() => {
   border:1px solid rgba(242,197,61,.26); background: rgba(242,197,61,.08); width: fit-content;
   margin-bottom: 10px;
 }
+.resources-top-grid{
+  display:grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 18px;
+  align-items: stretch;
+}
+.resources-main-card{
+  height: 100%;
+}
+.resources-side-stack{
+  display:grid;
+  gap: 18px;
+  grid-template-rows: 1fr 1fr;
+}
 .bullets{ margin:0; padding-left:18px; color: var(--muted); line-height:1.9; }
-.hr{ height:1px; background: linear-gradient(90deg, transparent, var(--line), transparent); margin: 18px 0; }
 .cta-row{ display:flex; gap:12px; flex-wrap:wrap; margin-top: 14px; }
 
+@media (max-width: 980px){
+  .resources-top-grid{
+    grid-template-columns: 1fr;
+  }
+  .resources-side-stack{
+    grid-template-rows: auto;
+  }
+}
 </style>
