@@ -4,7 +4,7 @@
     <div class="container">
       <div class="hero card soft glow" v-glow v-reveal="{ from: 'up' }">
         <div class="badge" v-reveal="{ from: 'left', delay: 40 }">REGLADO ENERGY</div>
-        <h1 class="h1" v-reveal="{ from: 'up', delay: 80 }">Optimizamos contratos de luz y gas, reducimos costes y te acompañamos en toda la gestión energética.</h1>
+        <h1 class="h1" v-reveal="{ from: 'up', delay: 80 }">Optimizamos contratos de luz y gas, reducimos costes y te acompañamos en toda la gestión energética</h1>
         <p class="p" v-reveal="{ from: 'right', delay: 140 }">
           Tomamos decisiones con criterio técnico y económico, explicando cada paso con transparencia y manteniendo el control del
           suministro con revisiones periódicas.

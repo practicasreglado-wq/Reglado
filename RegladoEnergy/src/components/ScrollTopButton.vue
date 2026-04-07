@@ -154,4 +154,10 @@ onBeforeUnmount(() => {
     transition: opacity .2s linear;
   }
 }
+
+@media (max-width: 768px) {
+  .scroll-top {
+    bottom: 35px; 
+  }
+}
 </style>

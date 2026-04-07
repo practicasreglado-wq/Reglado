@@ -12,23 +12,33 @@
       <nav class="nav">
         <router-link to="/" class="nav-link">Inicio</router-link>
         <router-link to="/servicios" class="nav-link">Servicios</router-link>
-        <div class="nav-dropdown">
+        <div class="nav-dropdown"> 
           <router-link to="/clientes" class="nav-link nav-drop-trigger" aria-haspopup="menu">
             Clientes
             <span class="caret" aria-hidden="true"></span>
           </router-link>
+          <!-- SUBMENU CLIENTES DESHABILITADO.
           <div class="dropdown-menu" role="menu" aria-label="Submenu clientes">
             <router-link to="/particulares" class="dropdown-link" role="menuitem">Particulares</router-link>
             <router-link to="/empresas" class="dropdown-link" role="menuitem">Empresas y Pymes</router-link>
             <router-link to="/administradores-fincas" class="dropdown-link" role="menuitem">Comunidades y Fincas</router-link>
-            <router-link to="/sector-publico" class="dropdown-link" role="menuitem">Organismos publicos</router-link>
-          </div>
-        </div>
+            <router-link to="/sector-publico" class="dropdown-link" role="menuitem">Organismos públicos</router-link>
+          </div> -->
+        </div> 
+
         <router-link to="/recursos" class="nav-link">Recursos</router-link>
                 <router-link to="/sobre-nosotros" class="nav-link">Sobre nosotros</router-link>
       </nav>
 
       <div class="nav-actions">
+        <a
+          href="https://regladogroup.com/"
+          class="group-link"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Reglado Group
+        </a>
         <router-link to="/contacto" class="btn primary glow header-action" v-glow>
           Solicitar analisis
         </router-link>
@@ -120,7 +130,7 @@
             <router-link @click="closeMobileMenu" to="/particulares" class="m-sublink">Particulares</router-link>
             <router-link @click="closeMobileMenu" to="/empresas" class="m-sublink">Empresas y Pymes</router-link>
             <router-link @click="closeMobileMenu" to="/administradores-fincas" class="m-sublink">Comunidades y Fincas</router-link>
-            <router-link @click="closeMobileMenu" to="/sector-publico" class="m-sublink">Organismos publicos</router-link>
+            <router-link @click="closeMobileMenu" to="/sector-publico" class="m-sublink">Organismos públicos</router-link>
           </div>
         </div>
 
@@ -299,6 +309,34 @@ onBeforeUnmount(() => {
 .brand-sub{ font-size: 12px; color: rgba(233,238,246,.70); }
 .nav{ display:flex; align-items:center; justify-content: center; gap: 6px; flex: 1; z-index: 5; pointer-events: none; }
 .nav-actions{ display: flex; align-items: center; justify-content: flex-end; gap: 10px; position: relative; z-index: 10; pointer-events: auto; }
+.group-link{
+  position: relative;
+  margin-right: 20px;
+  color: rgba(255,255,255,.9);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: color .18s ease;
+}
+.group-link::after{
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -4px;
+  height: 1px;
+  background: rgba(242,197,61,.95);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform .18s ease;
+}
+.group-link:hover{
+  color: rgba(242,197,61,.95);
+  text-shadow: 0 0 10px rgba(242,197,61,.2);
+}
+.group-link:hover::after{
+  transform: scaleX(1);
+}
 .header-action{ min-width: 124px; min-height: 36px; padding: 0 12px; font-size: 12px; line-height: 1; white-space: nowrap; }
 .admin-pill{
   width: 38px;
@@ -415,4 +453,3 @@ onBeforeUnmount(() => {
   .mobile-user-trigger{ display:grid; }
 }
 </style>
-

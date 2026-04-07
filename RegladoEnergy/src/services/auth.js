@@ -9,7 +9,7 @@ import { reactive } from "vue";
 
 const API_BASE = import.meta.env.VITE_AUTH_API_URL || "http://localhost:8000";
 const TOKEN_KEY = "energy_auth_token";
-const COOKIE_TOKEN_KEY = "reglado_auth_token"; // Nombre de la cookie compartida con GrupoReglado
+const COOKIE_TOKEN_KEY = "reglado_auth_token";
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 
 const state = reactive({

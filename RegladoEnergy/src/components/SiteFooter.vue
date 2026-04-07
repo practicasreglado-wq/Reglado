@@ -16,7 +16,7 @@
       </div>
 
       <div class="col">
-        <div class="title">Navegacion</div>
+        <div class="title">Navegacion</div><br><br>
         <div class="links">
           <router-link to="/servicios">Servicios</router-link>
           <router-link to="/clientes">Clientes</router-link>
@@ -59,7 +59,7 @@ const year = new Date().getFullYear();
   z-index: 2;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   background: #2b2716;
-  padding: 40px 0 140px;
+  padding: 60px 0 40px;
 }
 
 .footer-inner {
@@ -73,6 +73,7 @@ const year = new Date().getFullYear();
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  margin-right: 150px; /* Added margin to create separation from the navigation block */
 }
 
 .title {
@@ -135,7 +136,7 @@ const year = new Date().getFullYear();
 }
 
 .bottom {
-  margin-top: 22px;
+  margin-top: 60px;
   padding-top: 18px;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
@@ -150,6 +151,10 @@ const year = new Date().getFullYear();
   transition: color 0.2s ease;
 }
 
+.small {
+  font-size: 1rem; 
+}
+
 .footer-legal-links a:hover {
   color: #fff;
 }
@@ -157,6 +162,12 @@ const year = new Date().getFullYear();
 @media (max-width: 980px) {
   .footer-inner {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .brand-col {
+    margin-right: 0; /* Remove right margin for mobile view */
   }
 }
 </style>

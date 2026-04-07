@@ -1,11 +1,12 @@
-# Reglado Energy
+# RegladoEnergy
 
-Sitio corporativo del ecosistema Reglado para la gestión energética.
+Frontend corporativo de Reglado Energy con autenticacion delegada en `GrupoReglado` y `ApiLoging`.
 
-## Integración con el Ecosistema
-- **Autenticación Delegada**: Utiliza [GrupoReglado](file:///c:/xampp/htdocs/Reglado/GrupoReglado) para el inicio de sesión centralizado.
-- **Sesión Compartida**: Detecta automáticamente la identidad mediante la cookie `reglado_auth_token`.
-- **Backend Robusto**: Procesa formularios de contacto y mantiene un panel de administración para solicitudes de servicios energéticos.
+Incluye:
+- sitio corporativo
+- formulario de contacto con backend PHP
+- panel admin para solicitudes
+- boton de administracion visible solo para usuarios con rol `admin`
 
 ## Requisitos
 
@@ -70,12 +71,12 @@ Flujo:
 ## Backend PHP
 
 La carpeta `BACKEND/` contiene:
-- [contact.php](file:///c:/xampp/htdocs/Reglado/RegladoEnergy/BACKEND/contact.php): recibe formularios con adjuntos.
-- [admin_list.php](file:///c:/xampp/htdocs/Reglado/RegladoEnergy/BACKEND/admin_list.php): lista solicitudes.
-- [admin_download.php](file:///c:/xampp/htdocs/Reglado/RegladoEnergy/BACKEND/admin_download.php): descarga adjuntos.
-- [auth.php](file:///c:/xampp/htdocs/Reglado/RegladoEnergy/BACKEND/auth.php): validacion de JWT y rol admin.
-- [db.php](file:///c:/xampp/htdocs/Reglado/RegladoEnergy/BACKEND/db.php): conexion a base de datos.
-- [sql/facturas.sql](file:///c:/xampp/htdocs/Reglado/RegladoEnergy/BACKEND/sql/facturas.sql): script de tablas.
+- [contact.php](c:\xampp\htdocs\Reglado\RegladoEnergy\BACKEND\contact.php): recibe formularios con adjuntos.
+- [admin_list.php](c:\xampp\htdocs\Reglado\RegladoEnergy\BACKEND\admin_list.php): lista solicitudes.
+- [admin_download.php](c:\xampp\htdocs\Reglado\RegladoEnergy\BACKEND\admin_download.php): descarga adjuntos.
+- [auth.php](c:\xampp\htdocs\Reglado\RegladoEnergy\BACKEND\auth.php): validacion de JWT y rol admin.
+- [db.php](c:\xampp\htdocs\Reglado\RegladoEnergy\BACKEND\db.php): conexion a base de datos.
+- [sql/facturas.sql](c:\xampp\htdocs\Reglado\RegladoEnergy\BACKEND\sql\facturas.sql): script de tablas.
 
 ## Configuracion del backend
 
@@ -112,8 +113,8 @@ CONTACT_MAIL_FROM=no-reply@regladoenergy.com
 
 ## Archivos clave
 
-- [src/components/SiteHeader.vue](file:///c:/xampp/htdocs/Reglado/RegladoEnergy/src/components/SiteHeader.vue)
-- [src/pages/AuthCallback.vue](file:///c:/xampp/htdocs/Reglado/RegladoEnergy/src/pages/AuthCallback.vue)
-- [src/pages/Admin.vue](file:///c:/xampp/htdocs/Reglado/RegladoEnergy/src/pages/Admin.vue)
-- [src/services/auth.js](file:///c:/xampp/htdocs/Reglado/RegladoEnergy/src/services/auth.js)
-- [src/router/index.js](file:///c:/xampp/htdocs/Reglado/RegladoEnergy/src/router/index.js)
+- [src/components/SiteHeader.vue](c:\xampp\htdocs\Reglado\RegladoEnergy\src\components\SiteHeader.vue)
+- [src/pages/AuthCallback.vue](c:\xampp\htdocs\Reglado\RegladoEnergy\src\pages\AuthCallback.vue)
+- [src/pages/Admin.vue](c:\xampp\htdocs\Reglado\RegladoEnergy\src\pages\Admin.vue)
+- [src/services/auth.js](c:\xampp\htdocs\Reglado\RegladoEnergy\src\services\auth.js)
+- [src/router/index.js](c:\xampp\htdocs\Reglado\RegladoEnergy\src\router\index.js)
