@@ -163,7 +163,6 @@ import mapIcon from "../assets/Map.svg";
 import apartmentIcon from "../assets/Apartment.svg";
 import addHomeIcon from "../assets/add_home.svg";
 import engineeringIcon from "../assets/Enginering.svg";
-import apartamentoIcon from "../assets/apartamento.svg";
 import corporateLogo from "../assets/reglado-logo.svg";
 
 const heroSubtitle =
@@ -200,20 +199,20 @@ const companies = computed(() => [
     logo: boltIcon,
   },
   {
-    name: "Reglado Mapas",
-    tag: "Mapas",
-    description: "Plataforma geografica y visualizacion avanzada para decisiones de negocio.",
-    href: mapasEntryUrl.value,
-    image: RegladoMapsCard,
-    logo: mapIcon,
-  },
-  {
     name: "Reglado Real Estate",
     tag: "Real Estate",
     description: "Consultoria estrategica y legal enfocada a operaciones inmobiliarias.",
     href: realstateUrl,
     image: RegladoRealStateCard,
     logo: addHomeIcon,
+  },
+  {
+    name: "Reglado Mapas",
+    tag: "Mapas",
+    description: "Plataforma geografica y visualizacion avanzada para decisiones de negocio.",
+    href: mapasEntryUrl.value,
+    image: RegladoMapsCard,
+    logo: mapIcon,
   },
   {
     name: "Reglado Ingeniería",
@@ -224,12 +223,12 @@ const companies = computed(() => [
     logo: engineeringIcon,
   },
   {
-    name: "Reglado Arquitectura",
-    tag: "Arquitectura",
-    description: "Diseño arquitectónico, urbanismo y ejecución de proyectos de construcción.",
+    name: "Reglado RBR",
+    tag: "RBR",
+    description: "Servicios especializados de Recuperación de Bienes y Rentas (RBR).",
     href: "#",
     image: companyProceso,
-    logo: apartamentoIcon,
+    logo: apartmentIcon,
   },
 ]);
 
