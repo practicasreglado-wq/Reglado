@@ -1,11 +1,11 @@
-# Inmobiliaria_Reglados
+# Reglado Real Estate
 
-Frontend inmobiliario integrado con `GrupoReglado` y `ApiLoging`.
+Frontend inmobiliario del ecosistema Reglado. Gestiona activos, favoritos y preferencias de usuario en el sector inmobiliario.
 
-El proyecto usa autenticacion centralizada:
-- login y registro se hacen en `GrupoReglado`
-- el JWT lo emite `ApiLoging`
-- la base local de inmobiliaria solo guarda datos propios del producto
+## Integración y Seguridad
+- **SSO Centralizado**: El registro y login se delegan a [GrupoReglado](file:///c:/xampp/htdocs/Reglado/GrupoReglado).
+- **Identidad Global**: El JWT es emitido por [ApiLoging](file:///c:/xampp/htdocs/Reglado/ApiLoging) y validado localmente.
+- **Persistencia Híbrida**: Combina datos de perfil globales con preferencias locales ligadas por `iduser`.
 
 ## Requisitos
 

@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 const routes = [
-  // Ruta raíz: la Landing Page está integrada en App.vue
+  // Ruta raíz: La Landing Page principal está integrada en App.vue.
+  // Su lógica de scroll y animaciones depende del montaje de App.vue.
   { path: '/', component: { render: () => null } },
   
   // Rutas provisionales hasta crear los componentes finales en la carpeta views

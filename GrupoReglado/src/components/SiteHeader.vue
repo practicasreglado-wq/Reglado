@@ -8,10 +8,10 @@
     <nav class="menu desktop-menu">
       <a href="https://regladoconsultores.com/">Abogados</a>
       <a :href="energyUrl">Energy</a>
-      <a href="#">Ingeniería</a>
-      <a href="#">Arquitectura</a>
-      <a :href="mapasUrl">Mapas</a>
       <a :href="realstateUrl">Real Estate</a>
+      <a :href="mapasUrl">Mapas</a>
+      <a href="#">Ingeniería</a>
+      <a href="#">RBR</a>
     </nav>
 
     <div class="session-box desktop-session">
@@ -59,10 +59,10 @@
       <nav class="mobile-nav">
         <a href="https://regladoconsultores.com/" @click="closeMobileMenu">Abogados</a>
         <a :href="energyUrl" @click="closeMobileMenu">Energy</a>
-        <a href="#" @click="closeMobileMenu">Ingeniería</a>
-        <a href="#" @click="closeMobileMenu">Arquitectura</a>
-        <a :href="mapasUrl" @click="closeMobileMenu">Mapas</a>
         <a :href="realstateUrl" @click="closeMobileMenu">Real Estate</a>
+        <a :href="mapasUrl" @click="closeMobileMenu">Mapas</a>
+        <a href="#" @click="closeMobileMenu">Ingeniería</a>
+        <a href="#" @click="closeMobileMenu">RBR</a>
       </nav>
 
       <div class="mobile-session">

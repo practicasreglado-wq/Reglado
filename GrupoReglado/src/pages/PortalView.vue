@@ -1,8 +1,10 @@
 <template>
   <div class="landing">
     <section id="inicio" class="block block-hero" :style="heroStyle">
-      <video class="hero-video" autoplay muted loop playsinline preload="metadata">
-        <source :src="heroVideo" type="video/mp4" />
+      <video class="hero-video" autoplay="autoplay" muted="muted" loop playsinline preload="auto" poster="/hero-poster.png">
+        <source src="/Bissness.webm" type="video/webm" />
+        <source src="/Bissness.mp4" type="video/mp4" />
+        <source src="/HandShacke.mp4" type="video/mp4" />
       </video>
       <div class="hero-overlay"></div>
       <div class="hero-particles"></div>
@@ -158,12 +160,10 @@ import RegladoMapsCard from "../assets/RegladoMapsCard.png";
 import RegladoRealStateCard from "../assets/RegladoRealStateCard.png";
 import balanceIcon from "../assets/Balance.svg";
 import boltIcon from "../assets/Bolt.svg";
-import heroVideo from "../assets/Bissness.mp4";
 import mapIcon from "../assets/Map.svg";
 import apartmentIcon from "../assets/Apartment.svg";
 import addHomeIcon from "../assets/add_home.svg";
 import engineeringIcon from "../assets/Enginering.svg";
-import apartamentoIcon from "../assets/apartamento.svg";
 import corporateLogo from "../assets/reglado-logo.svg";
 
 const heroSubtitle =
@@ -200,20 +200,20 @@ const companies = computed(() => [
     logo: boltIcon,
   },
   {
-    name: "Reglado Mapas",
-    tag: "Mapas",
-    description: "Plataforma geografica y visualizacion avanzada para decisiones de negocio.",
-    href: mapasEntryUrl.value,
-    image: RegladoMapsCard,
-    logo: mapIcon,
-  },
-  {
     name: "Reglado Real Estate",
     tag: "Real Estate",
     description: "Consultoria estrategica y legal enfocada a operaciones inmobiliarias.",
     href: realstateUrl,
     image: RegladoRealStateCard,
     logo: addHomeIcon,
+  },
+  {
+    name: "Reglado Mapas",
+    tag: "Mapas",
+    description: "Plataforma geografica y visualizacion avanzada para decisiones de negocio.",
+    href: mapasEntryUrl.value,
+    image: RegladoMapsCard,
+    logo: mapIcon,
   },
   {
     name: "Reglado Ingeniería",
@@ -224,12 +224,12 @@ const companies = computed(() => [
     logo: engineeringIcon,
   },
   {
-    name: "Reglado Arquitectura",
-    tag: "Arquitectura",
-    description: "Diseño arquitectónico, urbanismo y ejecución de proyectos de construcción.",
+    name: "Reglado RBR",
+    tag: "RBR",
+    description: "Servicios especializados de Recuperación de Bienes y Rentas (RBR).",
     href: "#",
     image: companyProceso,
-    logo: apartamentoIcon,
+    logo: apartmentIcon,
   },
 ]);
 
@@ -354,6 +354,17 @@ function buildExternalProductUrl(baseUrl) {
   mask-size: contain;
   filter: blur(0.2px);
   pointer-events: none;
+  animation: rotateSlow 20s linear infinite;
+  transform-origin: center center;
+}
+
+@keyframes rotateSlow {
+  from {
+    transform: translateY(-50%) rotate(0deg);
+  }
+  to {
+    transform: translateY(-50%) rotate(360deg);
+  }
 }
 
 .hero-content {

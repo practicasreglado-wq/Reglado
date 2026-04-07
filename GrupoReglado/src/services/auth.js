@@ -22,7 +22,7 @@ const AUTH_MESSAGE_MAP = {
   "invalid token": "Tu sesión no es válida. Vuelve a iniciar sesión.",
   "token revoked": "Tu sesión ya no es válida. Vuelve a iniciar sesión.",
   unauthorized: "Debes iniciar sesión para continuar.",
-  forbidden: "No tienes permisos para realizar esta acción.",
+  forbidden: "No tienes permisos para realizar esta acción. (Requiere rol admin)",
   "too many requests, try again later": "Has realizado demasiados intentos. Inténtalo más tarde.",
   "email not verified": "Debes confirmar tu correo antes de iniciar sesión.",
   "invalid credentials": "Correo o contraseña incorrectos.",
@@ -79,6 +79,7 @@ function setToken(token) {
     localStorage.setItem(TOKEN_KEY, state.token);
     setCookie(COOKIE_TOKEN_KEY, state.token, COOKIE_MAX_AGE);
   } else {
+    // Si no hay token, se limpian ambos almacenamientos.
     localStorage.removeItem(TOKEN_KEY);
     clearCookie(COOKIE_TOKEN_KEY);
   }

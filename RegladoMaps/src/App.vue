@@ -284,6 +284,10 @@ export default {
     },
     handleMouseEnter(e) { e.currentTarget.style.setProperty('--mouse-opacity', '1') },
     handleMouseLeave(e) { e.currentTarget.style.setProperty('--mouse-opacity', '0') },
+    /**
+     * Navega a la vista de mapa filtrando opcionalmente por un tipo de energía.
+     * @param {string} [energia] Tipo de energía (eolica, solar, etc.)
+     */
     goToMap(energia) { 
       if(energia) {
         this.$router.push({ path: '/mapa', query: { energia } });
@@ -298,6 +302,8 @@ export default {
     hijos y ahorrar cálculo de scroll manual.
   */
   mounted() {
+    // Inicialización del estado de autenticación centralizado.
+    // Intenta recuperar el token de la cookie compartida 'reglado_auth_token'.
     auth.initialize().catch(err => console.warn('Auth INIT Error:', err));
 
     const observer = new IntersectionObserver((entries) => {
