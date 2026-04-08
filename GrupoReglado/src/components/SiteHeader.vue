@@ -7,8 +7,8 @@
 
     <nav class="menu desktop-menu">
       <a href="https://regladoconsultores.com/">Abogados</a>
-      <a :href="energyUrl">Energy</a>
-      <a :href="realstateUrl">Real Estate</a>
+      <a :href="energyUrl">Energía</a>
+      <a :href="realstateUrl">Inmobiliaria</a>
       <a :href="mapasUrl">Mapas</a>
       <a href="#">Ingeniería</a>
       <a href="#">RBR</a>
@@ -57,17 +57,36 @@
 
     <div v-if="mobileMenuOpen" class="mobile-menu" role="menu" aria-label="Menú principal">
       <nav class="mobile-nav">
-        <a href="https://regladoconsultores.com/" @click="closeMobileMenu">Abogados</a>
-        <a :href="energyUrl" @click="closeMobileMenu">Energy</a>
-        <a :href="realstateUrl" @click="closeMobileMenu">Real Estate</a>
-        <a :href="mapasUrl" @click="closeMobileMenu">Mapas</a>
-        <a href="#" @click="closeMobileMenu">Ingeniería</a>
-        <a href="#" @click="closeMobileMenu">RBR</a>
+        <a href="https://regladoconsultores.com/" @click="closeMobileMenu">
+          Abogados
+        </a>
+        <a :href="energyUrl" @click="closeMobileMenu">
+          Energía
+        </a>
+        <a :href="realstateUrl" @click="closeMobileMenu">
+          Inmobiliaria
+        </a>
+        <a :href="mapasUrl" @click="closeMobileMenu">
+          Mapas
+        </a>
+        <a href="#" @click="closeMobileMenu">
+          Ingeniería
+        </a>
+        <a href="#" @click="closeMobileMenu">
+          RBR
+        </a>
       </nav>
 
       <div class="mobile-session">
         <template v-if="user">
-          <button class="mobile-session-action" type="button" role="menuitem" @click="logoutAndCloseMobile">
+          <div class="menu-divider"></div>
+          <button class="mobile-session-action" type="button" role="menuitem" @click="goToSettings(); closeMobileMenu()">
+            Configuración
+          </button>
+          <button v-if="isAdmin" class="mobile-session-action" type="button" role="menuitem" @click="router.push('/admin'); closeMobileMenu()">
+            Administración
+          </button>
+          <button class="mobile-session-action danger" type="button" role="menuitem" @click="logoutAndCloseMobile">
             Cerrar sesión
           </button>
         </template>
@@ -524,6 +543,16 @@ function buildExternalProductUrl(baseUrl) {
 
   .mobile-login-btn {
     width: 100%;
+  }
+
+  .menu-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.12);
+    margin: 0.4rem 0.6rem;
+  }
+
+  .mobile-session-action.danger {
+    color: #ff8a8a;
   }
 }
 
