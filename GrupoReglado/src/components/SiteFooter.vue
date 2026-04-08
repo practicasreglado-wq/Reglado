@@ -16,8 +16,8 @@
         <div class="title">Navegación</div>
         <div class="links">
           <a href="https://regladoconsultores.com/" target="_blank" rel="noreferrer">Abogados</a>
-          <a :href="energyUrl" target="_blank" rel="noreferrer">Energy</a>
-          <a :href="realstateUrl" target="_blank" rel="noreferrer">Real Estate</a>
+          <a :href="energyUrl" target="_blank" rel="noreferrer">Energía</a>
+          <a :href="realstateUrl" target="_blank" rel="noreferrer">Inmobiliaria</a>
           <a :href="mapasUrl" target="_blank" rel="noreferrer">Mapas</a>
           <a href="#" target="_blank" rel="noreferrer">Ingeniería</a>
           <a href="#" target="_blank" rel="noreferrer">RBR</a>

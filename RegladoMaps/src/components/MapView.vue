@@ -160,13 +160,15 @@
           </div>
         </div>
       </div>
+
+      <!-- Botón de Pantalla Completa (dentro del wrapper para que siempre esté sobre el mapa) -->
+      <button class="btn-fullscreen-toggle" @click.stop.prevent="toggleFullscreen"
+        :title="isFullscreen ? 'Minimizar mapa' : 'Pantalla completa'">
+        <i class="fas" :class="isFullscreen ? 'fa-compress' : 'fa-expand'" style="pointer-events: none;"></i>
+      </button>
     </div> <!-- /map-wrapper -->
 
-    <!-- Botón de Pantalla Completa aislado fuera del wrapper estructural -->
-    <button class="btn-fullscreen-toggle" @click.stop.prevent="toggleFullscreen"
-      :title="isFullscreen ? 'Minimizar mapa' : 'Pantalla completa'">
-      <i class="fas" :class="isFullscreen ? 'fa-compress' : 'fa-expand'" style="pointer-events: none;"></i>
-    </button>
+
   </div>
 </template>
 
@@ -319,6 +321,7 @@ export default {
   left: 0;
   width: 100vw !important;
   height: 100vh !important;
+  height: 100dvh !important;
   max-width: none !important;
   margin: 0 !important;
   padding: 0 !important;
@@ -386,8 +389,10 @@ export default {
 
 @media (max-width: 768px) {
   .btn-fullscreen-toggle {
-    bottom: 50px !important;
-    right: 20px !important;
+    top: 20px !important;
+    left: 20px !important;
+    bottom: auto !important;
+    right: auto !important;
     width: 48px !important;
     height: 48px !important;
     font-size: 1.4rem !important;
