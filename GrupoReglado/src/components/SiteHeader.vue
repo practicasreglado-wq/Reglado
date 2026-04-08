@@ -16,16 +16,16 @@
 
     <div class="session-box desktop-session">
       <template v-if="user">
-        <RouterLink v-if="isAdmin" class="admin-pill" to="/admin" aria-label="Panel de administracion">
+        <RouterLink v-if="isAdmin" class="admin-pill" to="/admin" aria-label="Panel de administración">
           <img :src="adminUserIcon" alt="" class="admin-icon" />
         </RouterLink>
         <div class="user-menu-wrap">
           <button class="user-pill user-menu-trigger" @click="toggleUserMenu" aria-haspopup="menu"
-            :aria-expanded="userMenuOpen ? 'true' : 'false'" :title="displayUsername" aria-label="Menu de usuario">
+            :aria-expanded="userMenuOpen ? 'true' : 'false'" :title="displayUsername" aria-label="Menú de usuario">
             <span class="user-initial" aria-hidden="true">{{ userInitial }}</span>
           </button>
 
-          <div v-if="userMenuOpen" class="user-menu" role="menu" aria-label="Menu de usuario">
+          <div v-if="userMenuOpen" class="user-menu" role="menu" aria-label="Menú de usuario">
             <button class="user-menu-item" type="button" role="menuitem" @click="goToSettings">
               Configuración
             </button>
@@ -40,7 +40,7 @@
 
     <div class="mobile-controls">
       <RouterLink v-if="user && isAdmin" class="admin-pill mobile-admin-pill" to="/admin"
-        aria-label="Panel de administracion">
+        aria-label="Panel de administración">
         <img :src="adminUserIcon" alt="" class="admin-icon" />
       </RouterLink>
 
@@ -50,12 +50,12 @@
       </RouterLink>
 
       <button class="mobile-menu-toggle" type="button" :aria-expanded="mobileMenuOpen ? 'true' : 'false'"
-        aria-label="Abrir menu" @click="toggleMobileMenu">
+        aria-label="Abrir menú" @click="toggleMobileMenu">
         <img :src="menuIcon" alt="" class="mobile-menu-icon" />
       </button>
     </div>
 
-    <div v-if="mobileMenuOpen" class="mobile-menu" role="menu" aria-label="Menu principal">
+    <div v-if="mobileMenuOpen" class="mobile-menu" role="menu" aria-label="Menú principal">
       <nav class="mobile-nav">
         <a href="https://regladoconsultores.com/" @click="closeMobileMenu">Abogados</a>
         <a :href="energyUrl" @click="closeMobileMenu">Energy</a>

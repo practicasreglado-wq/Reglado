@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <section class="form-page">
     <div class="form-card">
       <h1>Recuperar contraseña</h1>
@@ -39,7 +39,7 @@ async function submitRequest() {
     const response = await auth.requestPasswordReset(email.value);
     success.value = response.message || "Si la cuenta existe, te hemos enviado un correo.";
   } catch (err) {
-    error.value = err instanceof Error ? err.message : "No fue posible solicitar la recuperacion.";
+    error.value = err instanceof Error ? err.message : "No fue posible solicitar la recuperación.";
   } finally {
     loading.value = false;
   }

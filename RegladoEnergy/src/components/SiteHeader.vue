@@ -5,7 +5,7 @@
         <img class="logo" :src="logo" alt="Reglado Energy" />
         <div class="brand-text">
           <div class="brand-name">REGLADO ENERGY</div>
-          <div class="brand-sub">Consultoria energetica independiente</div>
+          <div class="brand-sub">Consultoría energética independiente</div>
         </div>
       </router-link>
 
@@ -40,7 +40,7 @@
           Reglado Group
         </a>
         <router-link to="/contacto" class="btn primary glow header-action" v-glow>
-          Solicitar analisis
+          Solicitar análisis
         </router-link>
 
         <router-link
@@ -61,11 +61,11 @@
               aria-haspopup="menu"
               :aria-expanded="userMenuOpen ? 'true' : 'false'"
               :title="displayUsername"
-              aria-label="Menu de usuario"
+              aria-label="Menú de usuario"
             >
               <span class="user-initial" aria-hidden="true">{{ userInitial }}</span>
             </button>
-            <div v-if="userMenuOpen" class="user-menu" role="menu" aria-label="Menu de usuario">
+            <div v-if="userMenuOpen" class="user-menu" role="menu" aria-label="Menú de usuario">
               <button class="user-menu-item" type="button" role="menuitem" @click="goToSettings">
                 Configuración
               </button>
@@ -88,8 +88,8 @@
           v-if="isAdmin"
           to="/admin"
           class="admin-pill mobile-admin-pill"
-          title="Panel de administracion"
-          aria-label="Panel de administracion"
+          title="Panel de administración"
+          aria-label="Panel de administración"
         >
           <img :src="adminUserIcon" alt="" class="admin-icon" />
         </router-link>
@@ -98,13 +98,13 @@
           v-if="user"
           class="user-pill mobile-user-trigger"
           :title="displayUsername"
-          aria-label="Configuracion de usuario"
+          aria-label="Configuración de usuario"
           @click="handleMobileSettings"
         >
           <span class="user-initial" aria-hidden="true">{{ userInitial }}</span>
         </button>
 
-        <button class="burger" @click="toggleMobileMenu" aria-label="Abrir menu">
+        <button class="burger" @click="toggleMobileMenu" aria-label="Abrir menú">
           <span></span><span></span><span></span>
         </button>
       </div>
@@ -112,6 +112,25 @@
 
     <div v-if="open" class="mobile">
       <div class="container mobile-inner">
+        <a
+          href="https://regladogroup.com/"
+          class="m-link m-link-group-home"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <span class="m-link-group-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false">
+              <path
+                d="M12 3.2 4.5 9.4a1 1 0 0 0-.37.77V20a1 1 0 0 0 1 1h4.7a1 1 0 0 0 1-1v-4.6h2.34V20a1 1 0 0 0 1 1h4.7a1 1 0 0 0 1-1v-9.83a1 1 0 0 0-.36-.77L12 3.2Z"
+              />
+            </svg>
+          </span>
+          <span class="m-link-group-text">
+            <strong>Reglado Group</strong>
+            <small>Volver al grupo</small>
+          </span>
+        </a>
+        <div class="mobile-divider" aria-hidden="true"></div>
         <router-link @click="closeMobileMenu" to="/" class="m-link">Inicio</router-link>
         <router-link @click="closeMobileMenu" to="/servicios" class="m-link">Servicios</router-link>
 
@@ -136,8 +155,9 @@
 
         <router-link @click="closeMobileMenu" to="/recursos" class="m-link">Recursos</router-link>
         <router-link @click="closeMobileMenu" to="/sobre-nosotros" class="m-link">Sobre nosotros</router-link>
+        <div class="mobile-divider" aria-hidden="true"></div>
         <router-link @click="closeMobileMenu" to="/contacto" class="btn primary glow mobile-action" v-glow>
-          Solicitar analisis
+          Solicitar análisis
         </router-link>
         <template v-if="user">
           <button @click="handleMobileLogout" class="btn mobile-action">Salir</button>
@@ -247,7 +267,7 @@ function goToLogin() {
 function goToSettings() {
   userMenuOpen.value = false;
   const base = import.meta.env.VITE_GRUPO_REGLADO_BASE_URL || "http://localhost:5173";
-  const settingsPath = import.meta.env.VITE_GRUPO_REGLADO_SETTINGS_PATH || "/configuracion";
+  const settingsPath = import.meta.env.VITE_GRUPO_REGLADO_SETTINGS_PATH || "/configuración";
   window.location.href = new URL(settingsPath, base).toString();
 }
 
@@ -429,6 +449,62 @@ onBeforeUnmount(() => {
 .mobile-controls{ display:none; align-items:center; gap:10px; }
 .mobile{ position: absolute; top: 100%; left: 0; right: 0; z-index: 70; border-top: 1px solid rgba(255,255,255,.08); background: rgba(15, 16, 11, 0.95); box-shadow: 0 20px 40px rgba(0,0,0,.35); }
 .mobile-inner{ padding: 14px 0 18px; display:flex; flex-direction:column; gap: 10px; }
+.m-link-group-home{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-color: rgba(27,92,142,.72);
+  background:
+    linear-gradient(135deg, rgba(27,92,142,.24), rgba(242,197,61,.18)),
+    rgba(255,255,255,.03);
+  box-shadow: 0 16px 30px rgba(0,0,0,.22);
+}
+.m-link-group-home:hover{
+  border-color: rgba(242,197,61,.86);
+  background:
+    linear-gradient(135deg, rgba(27,92,142,.32), rgba(242,197,61,.24)),
+    rgba(255,255,255,.05);
+}
+.m-link-group-icon{
+  flex: 0 0 40px;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: rgba(11,13,16,.32);
+  border: 1px solid rgba(255,255,255,.14);
+  color: rgba(242,197,61,.98);
+}
+.m-link-group-icon svg{
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+.m-link-group-text{
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.m-link-group-text strong{
+  font-size: 14px;
+  line-height: 1.1;
+  color: rgba(255,255,255,.96);
+}
+.m-link-group-text small{
+  font-size: 11px;
+  line-height: 1.2;
+  color: rgba(233,238,246,.72);
+}
+.mobile-divider{
+  height: 1px;
+  width: 100%;
+  background: linear-gradient(90deg, rgba(27,92,142,0), rgba(242,197,61,.55), rgba(27,92,142,0));
+  opacity: .9;
+  margin: 2px 0 4px;
+}
 .m-group{ display:flex; flex-direction:column; gap: 8px; }
 .m-caret{ display:inline-block; transition: transform .18s ease; }
 .m-caret.open{ transform: rotate(180deg); }

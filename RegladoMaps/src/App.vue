@@ -11,7 +11,7 @@
   <div id="app">
     <LPHeader @scrollToTop="scrollToTop" @scrollTo="scrollToSection" />
 
-    <nav class="side-nav" :class="{ 'side-nav-visible': showBackToTop }" v-show="$route.path === '/'">
+    <nav class="side-nav" :class="{ 'side-nav-visible': showBackToTop && !isFooterVisible }" v-show="$route.path === '/'">
       <button v-for="energia in energyTypes" :key="energia.id" 
               class="side-nav-btn" 
               :class="['side-nav-' + energia.id, { 'active': activeSection === energia.id }]" 
@@ -176,7 +176,7 @@
     </div>
 
     <router-view v-show="$route.path !== '/'" />
-    <LPFooter @scrollTo="scrollToSection" />
+    <LPFooter ref="footer" @scrollTo="scrollToSection" />
 
     <button class="btn-volver-arriba" :class="{ 'btn-visible': showBackToTop, 'btn-light': isWhiteGlass }"
       @click="scrollToTop" aria-label="Volver arriba">
@@ -209,6 +209,7 @@ export default {
     return {
       showBackToTop: false, 
       isWhiteGlass: false,
+      isFooterVisible: false,
       activeSection: null,
       energyTypes: [
         { id: 'eolica', emoji: '<svg viewBox="0 0 24 24" width="1.2em" height="1.2em" fill="none" class="svg-eolica" style="vertical-align: middle;"><defs><linearGradient id="towerGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#CBD5E1"/><stop offset="40%" stop-color="#FFFFFF"/><stop offset="100%" stop-color="#E2E8F0"/></linearGradient><linearGradient id="bladeGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FFFFFF"/><stop offset="100%" stop-color="#CBD5E1"/></linearGradient></defs><path d="M8 22h8" stroke="#E2E8F0" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/><path d="M11.3 22 L11.7 10 L12.3 10 L12.7 22 Z" fill="url(#towerGrad)" /><rect x="11" y="9.2" width="2" height="1.6" rx="0.4" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="0.3" /><g class="molino-aspas"><path d="M12 10 L12.4 4 A 0.4 0.4 0 0 0 11.6 4 L12 10 Z" fill="url(#bladeGrad)" /><path d="M12 10 L12.4 4 A 0.4 0.4 0 0 0 11.6 4 L12 10 Z" fill="url(#bladeGrad)" transform="rotate(120, 12, 10)" /><path d="M12 10 L12.4 4 A 0.4 0.4 0 0 0 11.6 4 L12 10 Z" fill="url(#bladeGrad)" transform="rotate(240, 12, 10)" /></g><circle cx="12" cy="10" r="1.2" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="0.5" /></svg>', label: 'Eólica' },
@@ -319,6 +320,14 @@ export default {
     }, { threshold: 0.2 });
 
     [this.$refs.eolica, this.$refs.solar, this.$refs.hidrogeno, this.$refs.biometano, this.$refs.biodiesel, this.$refs.hidraulica].forEach(el => { if (el) observer.observe(el); });
+
+    // Observer para el footer para ocultar side-nav
+    const footerObserver = new IntersectionObserver((entries) => {
+      this.isFooterVisible = entries[0].isIntersecting;
+    }, { threshold: 0.1 });
+    if (this.$refs.footer && this.$refs.footer.$el) {
+      footerObserver.observe(this.$refs.footer.$el);
+    }
 
     window.addEventListener('scroll', this.handleScroll);
   },

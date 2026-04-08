@@ -40,7 +40,7 @@ const bannerRef = ref(null);
 
 const phoneRaw = "+34634165145";
 const whatsAppHref = computed(
-  () => `https://wa.me/${phoneRaw.replace(/\D/g, "")}?text=${encodeURIComponent("Hola, quiero informacion sobre Reglado Energy.")}`
+  () => `https://wa.me/${phoneRaw.replace(/\D/g, "")}?text=${encodeURIComponent("Hola, quiero información sobre Reglado Energy.")}`
 );
 
 function toggleCollapse() {

@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <section class="form-page">
     <div class="form-card">
       <h1>Configuración de cuenta</h1>
@@ -105,7 +105,7 @@
             <input type="text" :value="auth.state.user?.phone || ''" disabled />
           </label>
           <label>
-            Nuevo telefono
+            Nuevo teléfono
             <input v-model.trim="phoneForm.phone" type="tel" required />
           </label>
         </template>
@@ -160,7 +160,7 @@ const modalTitle = computed(() => {
   if (activeModal.value === "username") return "Cambiar nombre de usuario";
   if (activeModal.value === "name") return "Cambiar nombre y apellido";
   if (activeModal.value === "email") return "Cambiar correo";
-  if (activeModal.value === "phone") return "Cambiar telefono";
+  if (activeModal.value === "phone") return "Cambiar teléfono";
   if (activeModal.value === "password") return "Cambiar contraseña";
   return "Configuración";
 });

@@ -4,7 +4,7 @@
     <div class="container footer-inner">
       <div class="col brand-col">
         <div class="title">REGLADO ENERGY</div>
-        <p class="small">Optimizamos contratos de luz y gas, reducimos costes y te acompanamos en toda la gestion energetica.</p>
+        <p class="small">Optimizamos contratos de luz y gas, reducimos costes y te acompañamos en toda la gestión energética.</p>
         <div class="social-links" aria-label="Redes sociales">
           <a href="https://www.linkedin.com/in/reglado-abogados-y-consultores-90b7a0233/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
             <img :src="linkedinIcon" alt="" class="social-icon" />
@@ -16,7 +16,7 @@
       </div>
 
       <div class="col">
-        <div class="title">Navegacion</div><br><br>
+        <div class="title">NAVEGACIÓN</div><br><br>
         <div class="links">
           <router-link to="/servicios">Servicios</router-link>
           <router-link to="/clientes">Clientes</router-link>
@@ -27,10 +27,10 @@
       </div>
 
       <div class="col">
-        <div class="title">Contacto</div>
+        <div class="title">CONTACTO</div>
         <div class="small">
           <br />
-          <div><strong>Telefono:</strong> +34 911462674</div>
+          <div><strong>Teléfono:</strong> +34 911462674</div>
           <div><strong>Email:</strong> info@regladoenergy.com</div>
         </div>
       </div>

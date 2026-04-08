@@ -5,7 +5,7 @@
       <div class="grid grid-2">
         <div class="card soft glow" v-glow v-reveal="{ from: 'left', delay: 50 }">
           <div class="badge" v-reveal="{ from: 'up', delay: 80 }">Contacto</div>
-          <h1 class="h1" v-reveal="{ from: 'up', delay: 120 }">Realizamos un analisis gratuito de facturas.</h1>
+          <h1 class="h1" v-reveal="{ from: 'up', delay: 120 }">Realizamos un análisis gratuito de facturas.</h1>
           <p class="p" v-reveal="{ from: 'right', delay: 170 }">
             Completa el formulario o sube tu factura en PDF o imagen y te llamamos con los resultados.
           </p>
@@ -13,12 +13,12 @@
           <div class="card" style="margin-top:14px;" v-reveal="{ from: 'up', delay: 210 }">
             <h2 class="h2" style="margin-bottom:10px;" v-reveal="{ from: 'up', delay: 240 }">Estudios personalizados</h2>
             <p class="p" v-reveal="{ from: 'up', delay: 270 }">
-              Cada cliente tiene un consumo distinto. Realizamos estudios personalizados en funcion del perfil y las necesidades reales.
+              Cada cliente tiene un consumo distinto. Realizamos estudios personalizados en función del perfil y las necesidades reales.
             </p>
 
             <h2 class="h2" style="margin:14px 0 10px;" v-reveal="{ from: 'up', delay: 300 }">Subida de facturas</h2>
             <p class="p" v-reveal="{ from: 'up', delay: 330 }">
-              Sube tu factura en PDF o imagen. Realizaremos un analisis previo y te contactaremos para comentarte los resultados y las opciones de mejora.
+              Sube tu factura en PDF o imagen. Realizaremos un análisis previo y te contactaremos para comentarte los resultados y las opciones de mejora.
             </p>
           </div>
         </div>
@@ -34,7 +34,7 @@
                 <input v-model="f.name" :disabled="isLoggedIn" required placeholder="Tu nombre" />
               </div>
               <div class="field" v-reveal="{ from: 'right', delay: 220 }">
-                <label>Telefono *</label>
+                <label>Teléfono *</label>
                 <input
                   v-model="f.phone"
                   :disabled="isPhoneLocked"
@@ -44,7 +44,7 @@
                   pattern="[0-9]{9}"
                   minlength="9"
                   maxlength="9"
-                  title="Introduce un telefono de 9 digitos"
+                  title="Introduce un teléfono de 9 dígitos"
                   placeholder="Ej: 612345678"
                   @input="onPhoneInput"
                 />
@@ -58,7 +58,7 @@
 
             <div class="field" v-reveal="{ from: 'up', delay: 280 }">
               <label>Mensaje (opcional)</label>
-              <textarea v-model="f.msg" placeholder="Cuentanos tu caso (tarifa, potencia, incidencias, etc.)"></textarea>
+              <textarea v-model="f.msg" placeholder="Cuéntanos tu caso (tarifa, potencia, incidencias, etc.)"></textarea>
             </div>
 
             <div class="field" v-reveal="{ from: 'up', delay: 310 }">
@@ -161,7 +161,7 @@ function onFile(e) {
   }
 
   if (selectedFile.size > maxBytes) {
-    errorMsg.value = "El archivo supera el limite de 10 MB.";
+    errorMsg.value = "El archivo supera el límite de 10 MB.";
     e.target.value = "";
     f.file = null;
     return;
@@ -186,7 +186,7 @@ async function submit() {
 
   const phone = f.phone.trim();
   if (!/^\d{9}$/.test(phone)) {
-    errorMsg.value = "El telefono debe tener exactamente 9 digitos numericos.";
+    errorMsg.value = "El teléfono debe tener exactamente 9 dígitos numéricos.";
     sending.value = false;
     return;
   }
@@ -230,9 +230,9 @@ onMounted(() => {
   fillLockedFields();
 
   setSeo({
-    title: "Contacto | Analisis gratuito de facturas | Reglado Energy",
+    title: "Contacto | Análisis gratuito de facturas | Reglado Energy",
     description:
-      "Solicita un analisis gratuito de facturas. Completa el formulario o sube tu PDF o imagen y te llamamos con resultados y opciones de mejora.",
+      "Solicita un análisis gratuito de facturas. Completa el formulario o sube tu PDF o imagen y te llamamos con resultados y opciones de mejora.",
     canonical: "/#/contacto",
   });
 });

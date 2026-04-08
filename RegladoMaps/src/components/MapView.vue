@@ -44,8 +44,8 @@
                   <span>Biodiésel</span>
                 </div>
                 <div class="icon-option" data-value="hidraulica" id="hidraulica">
-                  <img src="/apimapa/assets/img/Hidraulica.png" alt="Hidraulica">
-                  <span>Hidraulica</span>
+                  <img src="/apimapa/assets/img/Hidraulica.png" alt="Hidráulica">
+                  <span>Hidráulica</span>
                 </div>
               </div>
               <select id="filtro-tipo" class="select2" multiple style="display:none;">
@@ -55,7 +55,7 @@
                 <option value="biometano">Biometano</option>
                 <option value="hidrogeno">Hidrógeno</option>
                 <option value="biodiesel">Biodiésel</option>
-                <option value="hidraulica">Hidraulica</option>
+                <option value="hidraulica">Hidráulica</option>
               </select>
             </div>
 
@@ -151,8 +151,8 @@
                   <span class="legend-count">0</span>
                 </div>
                 <div class="legend-item" data-type="hidraulica">
-                  <img src="/apimapa/assets/img/Hidraulica.png" alt="Hidraulica">
-                  <span>Hidraulica</span>
+                  <img src="/apimapa/assets/img/Hidraulica.png" alt="Hidráulica">
+                  <span>Hidráulica</span>
                   <span class="legend-count">0</span>
                 </div>
               </div>

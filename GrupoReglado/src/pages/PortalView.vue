@@ -35,8 +35,8 @@
       <div class="group-intro">
         <h2>Soluciones empresariales para crecimiento sostenible.</h2>
         <p>
-          Reglado Group combina experiencia sectorial, tecnologia y vision de negocio en seis
-          areas clave.
+          Reglado Group combina experiencia sectorial, tecnología y visión de negocio en seis
+          áreas clave.
         </p>
       </div>
 
@@ -50,7 +50,7 @@
               <path d="M22 19V3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
             </svg>
           </span>
-          <strong>Consultoria</strong>
+          <strong>Consultoría</strong>
         </li>
 
         <li class="group-card" tabindex="0">
@@ -71,7 +71,7 @@
                 stroke-linejoin="round" />
             </svg>
           </span>
-          <strong>Energia</strong>
+          <strong>Energía</strong>
         </li>
 
         <li class="group-card" tabindex="0">
@@ -82,7 +82,7 @@
               <path d="M12 9V15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
             </svg>
           </span>
-          <strong>Tecnologia</strong>
+          <strong>Tecnología</strong>
         </li>
 
         <li class="group-card" tabindex="0">
@@ -103,7 +103,7 @@
                 stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
             </svg>
           </span>
-          <strong>Innovacion</strong>
+          <strong>Innovación</strong>
         </li>
       </ul>
     </section>
@@ -167,7 +167,7 @@ import engineeringIcon from "../assets/Enginering.svg";
 import corporateLogo from "../assets/reglado-logo.svg";
 
 const heroSubtitle =
-  "Grupo empresarial especializado en consultoria, inmuebles, energia, tecnologia, inversiones e innovacion.";
+  "Grupo empresarial especializado en consultoría, inmuebles, energía, tecnología, inversiones e innovación.";
 
 const heroSubtitleChars = computed(() => Array.from(heroSubtitle));
 
@@ -186,7 +186,7 @@ const companies = computed(() => [
   {
     name: "Reglado Abogados",
     tag: "Abogados",
-    description: "Consultoria estrategica y legal para operaciones, crecimiento y desarrollo empresarial.",
+    description: "Consultoría estratégica y legal para operaciones, crecimiento y desarrollo empresarial.",
     href: "https://regladoconsultores.com/",
     image: RegladoConsultoresCard,
     logo: balanceIcon,
@@ -194,7 +194,7 @@ const companies = computed(() => [
   {
     name: "Reglado Energy",
     tag: "Energy",
-    description: "Optimizacion energetica, analisis de consumo y gestion de contratos.",
+    description: "Optimización energética, análisis de consumo y gestión de contratos.",
     href: energyEntryUrl.value,
     image: RegladoEnergyCard,
     logo: boltIcon,
@@ -202,7 +202,7 @@ const companies = computed(() => [
   {
     name: "Reglado Real Estate",
     tag: "Real Estate",
-    description: "Consultoria estrategica y legal enfocada a operaciones inmobiliarias.",
+    description: "Consultoría estratégica y legal enfocada a operaciones inmobiliarias.",
     href: realstateUrl,
     image: RegladoRealStateCard,
     logo: addHomeIcon,
@@ -210,7 +210,7 @@ const companies = computed(() => [
   {
     name: "Reglado Mapas",
     tag: "Mapas",
-    description: "Plataforma geografica y visualizacion avanzada para decisiones de negocio.",
+    description: "Plataforma geográfica y visualización avanzada para decisiones de negocio.",
     href: mapasEntryUrl.value,
     image: RegladoMapsCard,
     logo: mapIcon,
