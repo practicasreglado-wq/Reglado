@@ -1,7 +1,7 @@
 <template>
   <div class="landing">
     <section id="inicio" class="block block-hero" :style="heroStyle">
-      <video ref="heroVideoRef" class="hero-video" autoplay="autoplay" muted="muted" playsinline preload="auto" poster="/hero-poster.png" @ended="handleVideoEnded">
+      <video ref="heroVideoRef" class="hero-video" autoplay="autoplay" muted="muted" playsinline preload="auto" @ended="handleVideoEnded">
         <source src="/Bissness.webm" type="video/webm" />
         <source src="/Bissness.mp4" type="video/mp4" />
         <source src="/HandShacke.mp4" type="video/mp4" />
