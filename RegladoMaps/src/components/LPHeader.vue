@@ -38,7 +38,7 @@
       <template v-if="user">
         <!-- Controles de Escritorio -->
         <div class="user-controls-row desktop-only">
-          <router-link v-if="user.role === 'admin'" class="admin-pill" to="/admin" aria-label="Panel de administracion">
+          <router-link v-if="user.role === 'admin'" class="admin-pill" to="/admin" aria-label="Panel de administración">
             <img :src="adminUserIcon" alt="Admin" class="admin-icon" />
           </router-link>
   
@@ -313,12 +313,11 @@ export default {
   content: '';
   position: absolute;
   bottom: -5px;
-  left: 50%;
+  left: 0;
   width: 0%;
   height: 2px;
   background-color: #00c47d;
   transition: all 0.3s ease;
-  transform: translateX(-50%);
 }
 
 .nav-link-reglado:hover {

@@ -591,3 +591,18 @@ summary:focus-visible {
     transition: none !important;
   }
 }
+
+.m-link-home {
+  display: flex;
+  align-items: center;
+  color: var(--gold);
+  font-weight: bold;
+  text-decoration: none;
+  margin-bottom: 1rem;
+}
+
+.m-link-home .home-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 0.5rem;
+}

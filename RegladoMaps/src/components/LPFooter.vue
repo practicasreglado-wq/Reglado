@@ -1,20 +1,11 @@
-<!--
-  Módulo LPFooter (Pie de Página Global)
-  Consolida el cierre visual de la aplicación y facilita el acceso a términos legales 
-  y redes sociales sin competir con la acción principal del Hero.
-  Usa un Grid elástico para las columnas de enlaces y una franja baja auto-alineada 
-  (`flex-wrap`) para asegurar un apilado limpio del copyright en móvil.
--->
 <template>
   <footer class="footer">
-    <div class="footer-container footer-inner">
+    <div class="container footer-inner">
       <div class="col brand-col">
-        <div class="footer-title">REGLADO MAPS</div>
-        <p class="footer-small">Plataforma cartográfica avanzada para la visualización, análisis y gestión geoespacial
-          de activos e infraestructuras de energía renovable en tiempo real.</p>
+        <div class="title">REGLADO MAPS</div>
+        <p class="small">Plataforma cartográfica avanzada para la visualización, análisis y gestión geoespacial de activos e infraestructuras de energía renovable en tiempo real.</p>
         <div class="social-links" aria-label="Redes sociales">
-          <a href="https://www.linkedin.com/in/reglado-abogados-y-consultores-90b7a0233/" target="_blank"
-            rel="noopener noreferrer" aria-label="LinkedIn">
+          <a href="https://www.linkedin.com/in/reglado-abogados-y-consultores-90b7a0233/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
             <svg class="social-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
               <path d="M6.75 8.25C7.57843 8.25 8.25 7.57843 8.25 6.75C8.25 5.92157 7.57843 5.25 6.75 5.25C5.92157 5.25 5.25 5.92157 5.25 6.75C5.25 7.57843 5.92157 8.25 6.75 8.25Z" fill="currentColor"/>
               <path d="M5.5 9.75H8V18.5H5.5V9.75Z" fill="currentColor"/>
@@ -31,9 +22,10 @@
           </a>
         </div>
       </div>
+
       <div class="col">
-        <div class="footer-title">Navegación</div>
-        <div class="footer-links">
+        <div class="title">Navegación</div>
+        <div class="links">
           <a href="#" @click.prevent="$emit('scrollTo', 'eolica')">Eólica</a>
           <a href="#" @click.prevent="$emit('scrollTo', 'solar')">Solar</a>
           <a href="#" @click.prevent="$emit('scrollTo', 'hidrogeno')">Hidrógeno</a>
@@ -42,19 +34,20 @@
           <a href="#" @click.prevent="$emit('scrollTo', 'hidraulica')">Hidráulica</a>
         </div>
       </div>
+
       <div class="col">
-        <div class="footer-title">Contacto</div>
-        <div class="footer-small">
-          <br>
+        <div class="title">Contacto</div>
+        <div class="small contact-list">
           <div><strong>Teléfono:</strong> +34 911462674</div>
           <div><strong>Email:</strong> info@regladoconsultores.com</div>
         </div>
       </div>
     </div>
-    <div class="footer-container bottom">
-      <div class="footer-small">© {{ year }} Reglado Maps. Todos los derechos reservados.</div>
-      <div class="footer-small footer-legal-links">
-        <router-link to="/aviso-legal">Aviso legal</router-link> &middot;
+
+    <div class="container bottom">
+      <div class="small">&copy; {{ year }} Reglado Maps. Todos los derechos reservados.</div>
+      <div class="small footer-legal-links">
+        <router-link to="/aviso-legal">Aviso legal</router-link> &middot; 
         <router-link to="/politica-cookies">Política de cookies</router-link>
       </div>
     </div>
@@ -75,14 +68,15 @@ defineEmits(['scrollTo']);
   z-index: 2;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   background: linear-gradient(180deg, #020c16 0%, #06090e 100%);
-  padding: 40px 0 60px;
+  padding: 60px 0 40px;
+  color: #fff;
   text-align: left;
+  font-size: 0.8rem;
 }
 
-.footer-container {
-  max-width: 1200px;
+.container {
+  max-width: min(1160px, 92%);
   margin: 0 auto;
-  padding: 0 20px;
 }
 
 .footer-inner {
@@ -96,11 +90,20 @@ defineEmits(['scrollTo']);
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  margin-right: 150px;
 }
 
-.footer-title {
+.col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+}
+
+.title {
   font-weight: 800;
-  margin-bottom: 10px;
+  font-size: 0.8rem;
+  margin-bottom: 32px;
   letter-spacing: 0.6px;
   display: inline-block;
   padding: 8px 12px;
@@ -108,33 +111,29 @@ defineEmits(['scrollTo']);
   border-radius: 6px;
   background: rgba(0, 196, 125, 0.05);
   color: #00c47d;
+  text-transform: uppercase;
 }
 
-.footer-small {
-  font-size: 0.9rem;
-  color: rgba(233, 238, 246, 0.7);
-  line-height: 1.6;
-}
-
-.footer-links {
+.links,
+.contact-list {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.footer-links a {
+.links a {
   color: rgba(233, 238, 246, 0.78);
   text-decoration: none;
-  font-size: 0.95rem;
-  transition: color 0.2s ease;
+  font-size: 0.8rem;
 }
 
-.footer-links a:hover {
+.links a:hover {
   color: #fff;
 }
 
 .social-links {
   display: flex;
+  justify-content: center;
   gap: 18px;
   margin-top: auto;
   padding-top: 28px;
@@ -145,6 +144,7 @@ defineEmits(['scrollTo']);
   align-items: center;
   justify-content: center;
   transition: transform 0.2s ease;
+  text-decoration: none;
 }
 
 .social-links a:hover {
@@ -159,7 +159,6 @@ defineEmits(['scrollTo']);
   transition: all 0.2s ease;
 }
 
-/* Compensación de tamaño para que el icono de LinkedIn se vea igual que el de Instagram */
 a[aria-label="LinkedIn"] .social-icon {
   transform: scale(1.15);
 }
@@ -173,7 +172,7 @@ a[aria-label="Instagram"]:hover .social-icon {
 }
 
 .bottom {
-  margin-top: 22px;
+  margin-top: 60px;
   padding-top: 18px;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
@@ -188,6 +187,13 @@ a[aria-label="Instagram"]:hover .social-icon {
   transition: color 0.2s ease;
 }
 
+.small {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.6;
+  margin: 0;
+}
+
 .footer-legal-links a:hover {
   color: #fff;
 }
@@ -195,15 +201,12 @@ a[aria-label="Instagram"]:hover .social-icon {
 @media (max-width: 980px) {
   .footer-inner {
     grid-template-columns: 1fr;
-    gap: 40px;
   }
 }
 
-/* 📱 Centrado para móviles estrechos */
-@media (max-width: 480px) {
-  .bottom {
-    justify-content: center;
-    text-align: center;
+@media (max-width: 768px) {
+  .brand-col {
+    margin-right: 0;
   }
 }
 </style>

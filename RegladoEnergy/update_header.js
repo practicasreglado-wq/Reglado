@@ -47,7 +47,7 @@ const newHtml = `        <router-link to="/sobre-nosotros" class="nav-link">Sobr
         </template>
 
         <router-link to="/contacto" class="btn primary glow header-action" v-glow>
-          Solicitar analisis
+          Solicitar análisis
         </router-link>
       </div>`;
 

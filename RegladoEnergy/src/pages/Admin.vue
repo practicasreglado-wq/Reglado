@@ -22,8 +22,34 @@
             <!-- Derecha: Buscador y Actualizar -->
             <div class="actions-right">
               <input type="text" v-model="searchQuery" placeholder="Buscar por nombre o email..." class="search-input" />
-              <button class="btn ghost" @click="loadRows" :disabled="loading">
-                {{ loading ? "Cargando..." : "Actualizar" }}
+              <button
+                class="btn ghost refresh-btn"
+                @click="loadRows"
+                :disabled="loading"
+                :aria-label="loading ? 'Cargando datos' : 'Actualizar datos'"
+                :title="loading ? 'Cargando...' : 'Actualizar'"
+              >
+                <span class="refresh-label">{{ loading ? "Cargando..." : "Actualizar" }}</span>
+                <span class="refresh-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" focusable="false">
+                    <path
+                      d="M19.2 12a7.2 7.2 0 1 1-1.8-5.75"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                    />
+                    <path
+                      d="M19.5 4.4v4h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-linecap="square"
+                      stroke-linejoin="miter"
+                      stroke-width="2"
+                    />
+                  </svg>
+                </span>
               </button>
             </div>
           </div>
@@ -292,6 +318,23 @@ onMounted(() => {
   color: rgba(233, 238, 246, 0.4);
 }
 
+.refresh-btn {
+  white-space: nowrap;
+}
+
+.refresh-icon {
+  display: none;
+  width: 18px;
+  height: 18px;
+  line-height: 0;
+}
+
+.refresh-icon svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
 .table-wrap {
   margin-top: 16px;
   overflow-x: auto;
@@ -371,5 +414,38 @@ onMounted(() => {
   border: 1px solid rgba(230, 90, 90, 0.45);
   background: rgba(230, 90, 90, 0.12);
   color: #ffd3d3;
+}
+
+@media (max-width: 980px) {
+  .actions-right {
+    width: 100%;
+    gap: 8px;
+  }
+
+  .search-input {
+    width: auto;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .refresh-btn {
+    flex: 0 0 auto;
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+    padding: 0;
+    border-radius: 14px;
+    justify-content: center;
+  }
+
+  .refresh-label {
+    display: none;
+  }
+
+  .refresh-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
 }
 </style>
