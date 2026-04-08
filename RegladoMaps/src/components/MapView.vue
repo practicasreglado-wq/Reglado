@@ -357,8 +357,8 @@ export default {
   /* Margen simétrico para que no se corte */
   right: 30px;
   /* Esquina derecha */
-  z-index: 99999;
-  /* Máxima prioridad sobre el canvas de Leaflet */
+  z-index: 2000;
+  /* Ajustado para permanecer bajo la cabecera (z-index 2005) */
   width: 44px;
   height: 44px;
   background: white;
