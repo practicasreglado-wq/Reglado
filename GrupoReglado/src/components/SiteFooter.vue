@@ -18,10 +18,10 @@
           <div class="footer-links">
             <a href="https://regladoconsultores.com/" target="_blank" rel="noreferrer">Abogados</a>
             <a :href="energyUrl" target="_blank" rel="noreferrer">Energy</a>
-            <a href="#" target="_blank" rel="noreferrer">Ingeniería</a>
-            <a href="#" target="_blank" rel="noreferrer">Arquitectura</a>
-            <a :href="mapasUrl" target="_blank" rel="noreferrer">Mapas</a>
             <a :href="realstateUrl" target="_blank" rel="noreferrer">Real Estate</a>
+            <a :href="mapasUrl" target="_blank" rel="noreferrer">Mapas</a>
+            <a href="#" target="_blank" rel="noreferrer">Ingeniería</a>
+            <a href="#" target="_blank" rel="noreferrer">RBR</a>
           </div>
         </div>
 

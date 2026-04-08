@@ -1,7 +1,7 @@
 <template>
   <div class="landing">
     <section id="inicio" class="block block-hero" :style="heroStyle">
-      <video class="hero-video" autoplay="autoplay" muted="muted" loop playsinline preload="auto" poster="/hero-poster.png">
+      <video ref="heroVideoRef" class="hero-video" autoplay="autoplay" muted="muted" playsinline preload="auto" @ended="handleVideoEnded">
         <source src="/Bissness.webm" type="video/webm" />
         <source src="/Bissness.mp4" type="video/mp4" />
         <source src="/HandShacke.mp4" type="video/mp4" />
@@ -264,6 +264,17 @@ function buildExternalProductUrl(baseUrl) {
   }
 
   return `${cleanBase}/auth/callback?token=${encodeURIComponent(token)}`;
+}
+
+const heroVideoRef = ref(null);
+
+function handleVideoEnded() {
+  setTimeout(() => {
+    if (heroVideoRef.value) {
+      heroVideoRef.value.currentTime = 0;
+      heroVideoRef.value.play().catch(console.error);
+    }
+  }, 4000);
 }
 
 </script>
