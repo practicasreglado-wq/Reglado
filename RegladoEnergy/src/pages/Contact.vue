@@ -13,7 +13,7 @@
           <div class="card" style="margin-top:14px;" v-reveal="{ from: 'up', delay: 210 }">
             <h2 class="h2" style="margin-bottom:10px;" v-reveal="{ from: 'up', delay: 240 }">Estudios personalizados</h2>
             <p class="p" v-reveal="{ from: 'up', delay: 270 }">
-              Cada cliente tiene un consumo distinto. Realizamos estudios personalizados en función del perfil y las necesidades reales.
+              Cada cliente tiene un consumo distinto. Realizamos estudios personalizados en funcion del perfil y las necesidades reales.
             </p>
 
             <h2 class="h2" style="margin:14px 0 10px;" v-reveal="{ from: 'up', delay: 300 }">Subida de facturas</h2>
@@ -25,7 +25,7 @@
 
         <div class="card glow" v-glow v-reveal="{ from: 'right', delay: 70 }">
           <h2 class="h2" v-reveal="{ from: 'up', delay: 100 }">Formulario</h2>
-          <p class="p" v-reveal="{ from: 'up', delay: 130 }">Tus datos se guardan en base de datos y el archivo de factura se almacena en el servidor.</p>
+          <p class="p" v-reveal="{ from: 'up', delay: 130 }">Completa el formulario para solicitar un análisis gratuito de tu factura. Puedes adjuntar tu factura en PDF o imagen.</p>
 
           <form class="form" @submit.prevent="submit" v-reveal="{ from: 'up', delay: 160 }">
             <div class="grid grid-2">
@@ -34,7 +34,7 @@
                 <input v-model="f.name" :disabled="isLoggedIn" required placeholder="Tu nombre" />
               </div>
               <div class="field" v-reveal="{ from: 'right', delay: 220 }">
-                <label>Teléfono *</label>
+                <label>Telefono *</label>
                 <input
                   v-model="f.phone"
                   :disabled="isPhoneLocked"
@@ -44,7 +44,7 @@
                   pattern="[0-9]{9}"
                   minlength="9"
                   maxlength="9"
-                  title="Introduce un teléfono de 9 dígitos"
+                  title="Introduce un telefono de 9 digitos"
                   placeholder="Ej: 612345678"
                   @input="onPhoneInput"
                 />
@@ -58,12 +58,17 @@
 
             <div class="field" v-reveal="{ from: 'up', delay: 280 }">
               <label>Mensaje (opcional)</label>
-              <textarea v-model="f.msg" placeholder="Cuéntanos tu caso (tarifa, potencia, incidencias, etc.)"></textarea>
+              <textarea v-model="f.msg" placeholder="Cuentanos tu caso (tarifa, potencia, incidencias, etc.)"></textarea>
             </div>
 
             <div class="field" v-reveal="{ from: 'up', delay: 310 }">
-              <label>Factura (PDF o imagen) (opcional)</label>
-              <input ref="fileInput" type="file" accept="application/pdf,image/*" @change="onFile" class="file" />
+              <label>Facturas (PDF o imagen) (opcional)</label>
+              <input ref="fileInput" type="file" accept="application/pdf,image/*" @change="onFile" class="file" multiple />
+            </div>
+
+            <div class="alert" style="margin: 10px auto; padding: 10px; border: 1px solid #f39c12; background-color: rgba(242, 197, 61, 0.26); color: rgb(187, 185, 185); border-radius: 8px; display: flex; align-items: center; max-width: 90%;">
+              <span class="icon" style="margin-right: 10px; margin-bottom: 8px; font-size: 2em;">⚠️</span>
+              <span> <strong>Para un mejor análisis, la factura debe tener un máximo de 6 meses de antigüedad.</strong></span>
             </div>
 
             <button class="btn primary glow" :disabled="sending" v-glow v-reveal="{ from: 'up', delay: 340 }" type="submit">
@@ -141,33 +146,30 @@ function resetForm() {
 function onFile(e) {
   errorMsg.value = "";
   successMsg.value = "";
-  const selectedFile = e.target.files?.[0] || null;
+  const selectedFiles = e.target.files || [];
 
-  if (!selectedFile) {
-    f.file = null;
-    return;
-  }
+  const maxBytes = 100 * 1024 * 1024; // LÍMITE -> 100 MB
+  const allowedTypes = ["application/pdf", "image/jpeg", "image/png", "image/gif"];
 
-  const maxBytes = 10 * 1024 * 1024;
-  const isAllowedType =
-    selectedFile.type === "application/pdf" ||
-    selectedFile.type.startsWith("image/");
+  f.files = Array.from(selectedFiles).filter((file) => {
+    console.log(`Archivo: ${file.name}, Tamaño: ${file.size} bytes`); // Debug: Verificar tamaño del archivo
 
-  if (!isAllowedType) {
-    errorMsg.value = "El archivo debe ser PDF o imagen.";
+    if (!allowedTypes.includes(file.type)) {
+      errorMsg.value = "Algunos archivos tienen un formato no permitido.";
+      return false;
+    }
+
+    if (maxBytes > 0 && file.size > maxBytes) {
+      errorMsg.value = `El archivo "${file.name}" supera el límite de 100 MB.`;
+      return false;
+    }
+
+    return true;
+  });
+
+  if (f.files.length === 0) {
     e.target.value = "";
-    f.file = null;
-    return;
   }
-
-  if (selectedFile.size > maxBytes) {
-    errorMsg.value = "El archivo supera el límite de 10 MB.";
-    e.target.value = "";
-    f.file = null;
-    return;
-  }
-
-  f.file = selectedFile;
 }
 
 function onPhoneInput(e) {
@@ -186,7 +188,7 @@ async function submit() {
 
   const phone = f.phone.trim();
   if (!/^\d{9}$/.test(phone)) {
-    errorMsg.value = "El teléfono debe tener exactamente 9 dígitos numéricos.";
+    errorMsg.value = "El telefono debe tener exactamente 9 digitos numericos.";
     sending.value = false;
     return;
   }
@@ -197,8 +199,10 @@ async function submit() {
   formData.append("email", f.email.trim());
   formData.append("mensaje", f.msg.trim());
 
-  if (f.file) {
-    formData.append("pdf", f.file);
+  if (f.files && f.files.length > 0) {
+    f.files.forEach((file, index) => {
+      formData.append(`file_${index + 1}`, file);
+    });
   }
 
   try {

@@ -101,7 +101,7 @@ DB_USER=TU_USUARIO
 DB_PASS=TU_PASSWORD
 JWT_SECRET=EL_MISMO_SECRET_DE_APILOGING
 CORS_ALLOWED_ORIGINS=https://regladoenergy.com,https://regladogroup.com
-CONTACT_MAIL_TO=formulario@regladoenergy.com
+CONTACT_MAIL_TO=info@regladoenergy.com
 CONTACT_MAIL_FROM=no-reply@regladoenergy.com
 ```
 

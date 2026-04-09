@@ -21,7 +21,7 @@
           <p><strong>3. OBJETO.</strong></p>
           <p>El presente Aviso Legal recoge las condiciones de uso que regulan el acceso, navegación y uso del Portal, así como las responsabilidades derivadas de la utilización, prestación y/o contratación de los productos o servicios que, en su caso, puedan ser ofrecidos, así como de los contenidos que lo integran.</p>
 
-          <p><strong>4. ACEPTACIÓN.</strong></p>
+          <h2><strong>4. ACEPTACIÓN.</strong></h2>
           <p>El acceso y utilización de este portal de Internet como usuario implica la aceptación de las disposiciones contenidas en este Aviso legal, el cual puede cambiar en cualquier momento.</p>
 
           <p><strong>5. ACCESO Y USO DEL PORTAL.</strong></p>
@@ -54,8 +54,10 @@
           <p><strong>14. LEGISLACIÓN APLICABLE Y TRIBUNALES COMPETENTES.</strong></p>
           <p>El presente Aviso Legal y las relaciones establecidas entre la Empresa y el Usuario se regirán y resolverán de conformidad con lo establecido en la normativa española. Para los casos en los que la normativa prevea la posibilidad a las partes de someterse a un fuero, la Empresa y el Usuario, someterán cualesquiera controversias a los Juzgados y Tribunales competentes.</p>
         </div>
+        
       </div>
     </div>
+    <br><br>
   </section>
 </template>
 
@@ -90,4 +92,6 @@ onMounted(() => {
 .legal-content strong {
   color: #fff;
 }
+
+
 </style>

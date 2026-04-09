@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/security.php';
 
+// Este archivo gestiona la autenticación de administradores.
+// Verifica tokens JWT y asegura que el usuario tenga el rol adecuado.
+
 function requireAdminAuth(): array
 {
     $token = extractBearerToken();
@@ -200,3 +203,5 @@ function respondForbidden(string $message): void
     echo json_encode(['ok' => false, 'message' => $message], JSON_UNESCAPED_UNICODE);
     exit;
 }
+
+

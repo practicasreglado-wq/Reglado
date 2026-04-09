@@ -5,6 +5,8 @@
       <div class="col brand-col">
         <div class="title">REGLADO ENERGY</div>
         <p class="small">Optimizamos contratos de luz y gas, reducimos costes y te acompañamos en toda la gestión energética.</p>
+        <p class="small">CIF: B24887754 <br>
+          Avda. Isla Graciosa, 7, 28703 San Sebastián de los Reyes.</p>
         <div class="social-links" aria-label="Redes sociales">
           <a href="https://www.linkedin.com/in/reglado-abogados-y-consultores-90b7a0233/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
             <img :src="linkedinIcon" alt="" class="social-icon" />
@@ -39,7 +41,8 @@
     <div class="container bottom">
       <div class="small">&copy; {{ year }} Reglado Energy. Todos los derechos reservados.</div>
       <div class="small footer-legal-links">
-        <router-link to="/aviso-legal">Aviso legal</router-link> &middot; 
+        <router-link to="/aviso-legal">Aviso legal</router-link> &middot;
+        <router-link to="/politica-privacidad">Privacidad</router-link> &middot;
         <router-link to="/politica-cookies">Política de cookies</router-link>
       </div>
     </div>
