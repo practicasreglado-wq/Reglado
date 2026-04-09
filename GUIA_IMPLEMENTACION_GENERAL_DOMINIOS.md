@@ -4,7 +4,7 @@ Esta guia describe como pasar el ecosistema Reglado desde local a produccion con
 
 ## 1. Dominios objetivo
 
-- `GrupoReglado`: `https://gruporeglado.com`
+- `GrupoReglado`: `https://regladogroup.com`
 - `ApiLoging`: alojada dentro del mismo dominio de `GrupoReglado`
 - `Inmobiliaria_Reglados`: `https://realstate.com`
 - `RegladoEnergy`: `https://regladoenergy.com`
@@ -15,10 +15,10 @@ Esta guia describe como pasar el ecosistema Reglado desde local a produccion con
 
 La idea correcta para produccion es:
 
-- `GrupoReglado` sirve el frontend en `https://gruporeglado.com`
+- `GrupoReglado` sirve el frontend en `https://regladogroup.com`
 - `ApiLoging` queda accesible en el mismo dominio, por ejemplo:
-  - `https://gruporeglado.com/api`
-  - o `https://gruporeglado.com/auth/...`
+  - `https://regladogroup.com/api`
+  - o `https://regladogroup.com/auth/...`
 
 Si mantienes `ApiLoging` en el mismo dominio que `GrupoReglado`, reduces problemas de CORS y simplificas enlaces de verificacion y recuperacion.
 
@@ -33,20 +33,20 @@ Ambos seguiran redirigiendo a `GrupoReglado` para login y registro.
 
 Para dejarlo consistente, la recomendacion es esta:
 
-- frontend `GrupoReglado`: `https://gruporeglado.com`
-- API auth: `https://gruporeglado.com`
+- frontend `GrupoReglado`: `https://regladogroup.com`
+- API auth: `https://regladogroup.com`
 
 Es decir:
-- login: `https://gruporeglado.com/auth/login`
-- registro: `https://gruporeglado.com/auth/register`
-- verify email: `https://gruporeglado.com/auth/verify-email`
+- login: `https://regladogroup.com/auth/login`
+- registro: `https://regladogroup.com/auth/register`
+- verify email: `https://regladogroup.com/auth/verify-email`
 
 Y las pantallas del frontend:
-- `https://gruporeglado.com/login`
-- `https://gruporeglado.com/registro`
-- `https://gruporeglado.com/verificacion-exitosa`
-- `https://gruporeglado.com/restablecer-contrasena`
-- `https://gruporeglado.com/configuracion`
+- `https://regladogroup.com/login`
+- `https://regladogroup.com/registro`
+- `https://regladogroup.com/verificacion-exitosa`
+- `https://regladogroup.com/restablecer-contrasena`
+- `https://regladogroup.com/configuracion`
 
 ## 4. Cambios necesarios por proyecto
 
@@ -68,16 +68,16 @@ DB_PASS=TU_PASSWORD
 
 JWT_SECRET=TU_SECRETO_LARGO_Y_UNICO
 JWT_TTL_SECONDS=86400
-JWT_ISSUER=gruporeglado.com
+JWT_ISSUER=regladogroup.com
 
-CORS_ALLOWED_ORIGINS=https://gruporeglado.com,https://regladoenergy.com,https://realstate.com
-REDIRECT_ALLOWED_ORIGINS=https://gruporeglado.com,https://regladoenergy.com,https://realstate.com
+CORS_ALLOWED_ORIGINS=https://regladogroup.com,https://regladoenergy.com,https://realstate.com
+REDIRECT_ALLOWED_ORIGINS=https://regladogroup.com,https://regladoenergy.com,https://realstate.com
 
-EMAIL_VERIFY_URL_BASE=https://gruporeglado.com/auth/verify-email
-EMAIL_VERIFY_REDIRECT_URL=https://gruporeglado.com/verificacion-exitosa
-EMAIL_CHANGE_VERIFY_URL_BASE=https://gruporeglado.com/auth/confirm-email-change
-EMAIL_CHANGE_REDIRECT_URL=https://gruporeglado.com/configuracion
-PASSWORD_RESET_URL_BASE=https://gruporeglado.com/restablecer-contrasena
+EMAIL_VERIFY_URL_BASE=https://regladogroup.com/auth/verify-email
+EMAIL_VERIFY_REDIRECT_URL=https://regladogroup.com/verificacion-exitosa
+EMAIL_CHANGE_VERIFY_URL_BASE=https://regladogroup.com/auth/confirm-email-change
+EMAIL_CHANGE_REDIRECT_URL=https://regladogroup.com/configuracion
+PASSWORD_RESET_URL_BASE=https://regladogroup.com/restablecer-contrasena
 
 MAIL_DRIVER=smtp
 MAIL_HOST=smtp.gmail.com
@@ -102,7 +102,7 @@ Archivo:
 Debes poner:
 
 ```env
-VITE_AUTH_API_URL=https://gruporeglado.com
+VITE_AUTH_API_URL=https://regladogroup.com
 VITE_REGLADO_REALSTATE_URL=https://realstate.com
 VITE_REGLADO_ENERGY_URL=https://regladoenergy.com
 VITE_REGLADO_MAPAS_URL=#
@@ -121,8 +121,8 @@ Archivo:
 Debes poner:
 
 ```env
-VITE_AUTH_API_URL=https://gruporeglado.com
-VITE_GRUPO_REGLADO_BASE_URL=https://gruporeglado.com
+VITE_AUTH_API_URL=https://regladogroup.com
+VITE_GRUPO_REGLADO_BASE_URL=https://regladogroup.com
 VITE_GRUPO_REGLADO_LOGIN_PATH=/login
 VITE_GRUPO_REGLADO_REGISTER_PATH=/registro
 VITE_GRUPO_REGLADO_SETTINGS_PATH=/configuracion
@@ -145,7 +145,7 @@ Debes garantizar:
 ```env
 APP_ENV=production
 JWT_SECRET=EL_MISMO_JWT_SECRET_DE_APILOGING
-CORS_ALLOWED_ORIGINS=https://regladoenergy.com,https://gruporeglado.com
+CORS_ALLOWED_ORIGINS=https://regladoenergy.com,https://regladogroup.com
 ```
 
 Ademas:
@@ -160,8 +160,8 @@ Archivo:
 Debes poner:
 
 ```env
-VITE_AUTH_API_URL=https://gruporeglado.com
-VITE_GRUPO_REGLADO_BASE_URL=https://gruporeglado.com
+VITE_AUTH_API_URL=https://regladogroup.com
+VITE_GRUPO_REGLADO_BASE_URL=https://regladogroup.com
 VITE_GRUPO_REGLADO_LOGIN_PATH=/login
 VITE_GRUPO_REGLADO_REGISTER_PATH=/registro
 VITE_INMOBILIARIA_BACKEND_BASE=https://realstate.com/backend
@@ -202,13 +202,13 @@ Deben coincidir en:
 Valor esperado:
 
 ```env
-VITE_GRUPO_REGLADO_BASE_URL=https://gruporeglado.com
+VITE_GRUPO_REGLADO_BASE_URL=https://regladogroup.com
 ```
 
 ### 5.3 Redirect allowlist
 
 En `ApiLoging`, `REDIRECT_ALLOWED_ORIGINS` debe incluir:
-- `https://gruporeglado.com`
+- `https://regladogroup.com`
 - `https://regladoenergy.com`
 - `https://realstate.com`
 
@@ -218,7 +218,7 @@ Si falta uno:
 ### 5.4 CORS allowlist
 
 En `ApiLoging`, `CORS_ALLOWED_ORIGINS` debe incluir:
-- `https://gruporeglado.com`
+- `https://regladogroup.com`
 - `https://regladoenergy.com`
 - `https://realstate.com`
 
@@ -228,22 +228,22 @@ Los correos deben abrir siempre paginas publicas reales:
 
 ### Verificacion de cuenta
 
-- enlace de la API: `https://gruporeglado.com/auth/verify-email?token=...`
-- redireccion final del usuario: `https://gruporeglado.com/verificacion-exitosa?token=...`
+- enlace de la API: `https://regladogroup.com/auth/verify-email?token=...`
+- redireccion final del usuario: `https://regladogroup.com/verificacion-exitosa?token=...`
 
 ### Cambio de email
 
-- enlace de la API: `https://gruporeglado.com/auth/confirm-email-change?token=...`
-- redireccion final: `https://gruporeglado.com/configuracion?token=...`
+- enlace de la API: `https://regladogroup.com/auth/confirm-email-change?token=...`
+- redireccion final: `https://regladogroup.com/configuracion?token=...`
 
 ### Recuperacion de contrasena
 
-- pagina de destino: `https://gruporeglado.com/restablecer-contrasena?token=...`
+- pagina de destino: `https://regladogroup.com/restablecer-contrasena?token=...`
 
 ## 7. Orden recomendado de despliegue
 
-1. Desplegar `ApiLoging` en `gruporeglado.com`
-2. Verificar que `https://gruporeglado.com/auth/me` responde bien
+1. Desplegar `ApiLoging` en `regladogroup.com`
+2. Verificar que `https://regladogroup.com/auth/me` responde bien
 3. Desplegar `GrupoReglado`
 4. Verificar:
    - login
@@ -260,14 +260,14 @@ Los correos deben abrir siempre paginas publicas reales:
 ### GrupoReglado
 
 - el registro envia correo
-- el enlace de verificacion abre `gruporeglado.com`
+- el enlace de verificacion abre `regladogroup.com`
 - el login funciona
 - la recuperacion de contrasena funciona
 - configuracion actualiza usuario
 
 ### RegladoEnergy
 
-- `Iniciar sesion / registrarse` redirige a `gruporeglado.com/login`
+- `Iniciar sesion / registrarse` redirige a `regladogroup.com/login`
 - tras login correcto vuelve a `regladoenergy.com`
 - el usuario queda logeado
 - si es admin, ve el panel admin
@@ -275,7 +275,7 @@ Los correos deben abrir siempre paginas publicas reales:
 
 ### Inmobiliaria
 
-- `Iniciar sesion` redirige a `gruporeglado.com/login`
+- `Iniciar sesion` redirige a `regladogroup.com/login`
 - tras login correcto vuelve a `realstate.com`
 - el usuario queda logeado
 - `dashboard` y `profile` cargan datos
@@ -319,20 +319,20 @@ Revisar:
 
 ```env
 APP_ENV=production
-JWT_ISSUER=gruporeglado.com
-CORS_ALLOWED_ORIGINS=https://gruporeglado.com,https://regladoenergy.com,https://realstate.com
-REDIRECT_ALLOWED_ORIGINS=https://gruporeglado.com,https://regladoenergy.com,https://realstate.com
-EMAIL_VERIFY_URL_BASE=https://gruporeglado.com/auth/verify-email
-EMAIL_VERIFY_REDIRECT_URL=https://gruporeglado.com/verificacion-exitosa
-EMAIL_CHANGE_VERIFY_URL_BASE=https://gruporeglado.com/auth/confirm-email-change
-EMAIL_CHANGE_REDIRECT_URL=https://gruporeglado.com/configuracion
-PASSWORD_RESET_URL_BASE=https://gruporeglado.com/restablecer-contrasena
+JWT_ISSUER=regladogroup.com
+CORS_ALLOWED_ORIGINS=https://regladogroup.com,https://regladoenergy.com,https://realstate.com
+REDIRECT_ALLOWED_ORIGINS=https://regladogroup.com,https://regladoenergy.com,https://realstate.com
+EMAIL_VERIFY_URL_BASE=https://regladogroup.com/auth/verify-email
+EMAIL_VERIFY_REDIRECT_URL=https://regladogroup.com/verificacion-exitosa
+EMAIL_CHANGE_VERIFY_URL_BASE=https://regladogroup.com/auth/confirm-email-change
+EMAIL_CHANGE_REDIRECT_URL=https://regladogroup.com/configuracion
+PASSWORD_RESET_URL_BASE=https://regladogroup.com/restablecer-contrasena
 ```
 
 ### GrupoReglado
 
 ```env
-VITE_AUTH_API_URL=https://gruporeglado.com
+VITE_AUTH_API_URL=https://regladogroup.com
 VITE_REGLADO_REALSTATE_URL=https://realstate.com
 VITE_REGLADO_ENERGY_URL=https://regladoenergy.com
 ```
@@ -340,15 +340,15 @@ VITE_REGLADO_ENERGY_URL=https://regladoenergy.com
 ### RegladoEnergy
 
 ```env
-VITE_AUTH_API_URL=https://gruporeglado.com
-VITE_GRUPO_REGLADO_BASE_URL=https://gruporeglado.com
+VITE_AUTH_API_URL=https://regladogroup.com
+VITE_GRUPO_REGLADO_BASE_URL=https://regladogroup.com
 VITE_CONTACT_ENDPOINT=https://regladoenergy.com/BACKEND/contact.php
 ```
 
 ### Inmobiliaria
 
 ```env
-VITE_AUTH_API_URL=https://gruporeglado.com
-VITE_GRUPO_REGLADO_BASE_URL=https://gruporeglado.com
+VITE_AUTH_API_URL=https://regladogroup.com
+VITE_GRUPO_REGLADO_BASE_URL=https://regladogroup.com
 VITE_INMOBILIARIA_BACKEND_BASE=https://realstate.com/backend
 ```
