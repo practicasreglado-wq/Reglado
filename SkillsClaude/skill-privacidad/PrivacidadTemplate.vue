@@ -2,7 +2,7 @@
   <div class="legal-page">
     <div class="container">
       <div class="legal-card">
-        <h1>Política de Privacidad</h1>
+        <h1>Privacidad</h1>
         <div class="legal-content">
           <p><strong>1. ¿QUIÉN ES EL RESPONSABLE DEL TRATAMIENTO DE SUS DATOS?</strong></p>
           <p>El responsable del tratamiento de los datos personales es REGLADO GROUP S.L, con CIF B23982762 y domicilio en AVDA. ISLA GRACIOSA, 7 PISO 1º DESPACHOS 5-6 28703 SAN SEBASTIÁN DE LOS REYES (Madrid).</p>

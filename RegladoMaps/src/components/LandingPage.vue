@@ -69,15 +69,17 @@
                 <stop offset="100%" stop-color="#CBD5E1"/>
               </linearGradient>
             </defs>
-            <path d="M8 22h8" stroke="#E2E8F0" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
-            <path d="M11.3 22 L11.7 10 L12.3 10 L12.7 22 Z" fill="url(#towerGrad)" />
-            <rect x="11" y="9.2" width="2" height="1.6" rx="0.4" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="0.3" />
+            <path d="M8 22h8" stroke="#E2E8F0" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
+            <!-- Pilar principal reforzado (más ancho para visibilidad en móvil) -->
+            <path d="M10.8 22 L11.5 10 L12.5 10 L13.2 22 Z" fill="url(#towerGrad)" stroke="#FFFFFF" stroke-width="0.2" />
+            <rect x="10.8" y="9" width="2.4" height="2" rx="0.4" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="0.5" />
             <g class="molino-aspas">
-              <path d="M12 10 L12.4 4 A 0.4 0.4 0 0 0 11.6 4 L12 10 Z" fill="url(#bladeGrad)" />
-              <path d="M12 10 L12.4 4 A 0.4 0.4 0 0 0 11.6 4 L12 10 Z" fill="url(#bladeGrad)" transform="rotate(120, 12, 10)" />
-              <path d="M12 10 L12.4 4 A 0.4 0.4 0 0 0 11.6 4 L12 10 Z" fill="url(#bladeGrad)" transform="rotate(240, 12, 10)" />
+              <!-- Aspas reforzadas (un poco más anchas) -->
+              <path d="M12 10 L12.6 3.5 A 0.6 0.6 0 0 0 11.4 3.5 L12 10 Z" fill="url(#bladeGrad)" stroke="#FFFFFF" stroke-width="0.1" />
+              <path d="M12 10 L12.6 3.5 A 0.6 0.6 0 0 0 11.4 3.5 L12 10 Z" fill="url(#bladeGrad)" stroke="#FFFFFF" stroke-width="0.1" transform="rotate(120, 12, 10)" />
+              <path d="M12 10 L12.6 3.5 A 0.6 0.6 0 0 0 11.4 3.5 L12 10 Z" fill="url(#bladeGrad)" stroke="#FFFFFF" stroke-width="0.1" transform="rotate(240, 12, 10)" />
             </g>
-            <circle cx="12" cy="10" r="1.2" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="0.5" />
+            <circle cx="12" cy="10" r="1.5" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="0.8" />
           </svg>
 
           <!-- 🌀 Hidrógeno: Solo H -->

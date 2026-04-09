@@ -52,7 +52,7 @@
         <div class="legal-links">
           <a href="#" class="legal-link">Aviso legal</a>
           <span class="separator">&middot;</span>
-          <a href="#" class="legal-link">Política de privacidad</a>
+          <a href="#" class="legal-link">Privacidad</a>
           <span class="separator">&middot;</span>
           <a href="#" class="legal-link">Política de cookies</a>
         </div>
