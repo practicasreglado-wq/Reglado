@@ -9,6 +9,10 @@
             Grupo empresarial líder en consultoría, energía, tecnología, inmuebles e inversión. 
             Transformando el futuro con soluciones integrales.
           </p>
+          <div class="brand-company-data">
+            <div>CIF: B23982762</div>
+            <div>Avda. Isla Graciosa, 7, 28703 San Sebastián de los Reyes.</div>
+          </div>
           <div class="social-links" aria-label="Redes sociales">
             <a href="#" target="_blank" rel="noreferrer" aria-label="LinkedIn" class="social-icon-wrapper">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-linkedin"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
@@ -124,11 +128,15 @@ const currentYear = computed(() => new Date().getFullYear());
 }
 
 .brand-description {
-  font-size: 0.95rem;
-  line-height: 1.6;
-  color: rgba(255, 255, 255, 0.7);
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   max-width: 380px;
+}
+
+.brand-company-data {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 2rem;
 }
 
 .social-links {

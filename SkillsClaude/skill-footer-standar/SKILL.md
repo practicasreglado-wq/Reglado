@@ -30,10 +30,12 @@ Este archivo está estructurado como una **Skill** de contexto (System Prompt) p
       - Las micro-animaciones paramétricas incluidas en botones, iconos y links interactivos de la plantilla deben quedar intactas.
     </rule>
     
-    <rule id="3" name="Adaptación Funcional de Información">
-      - Título y Descripción de Marca: En el bloque principal, DEBES sustituir "Grupo Reglado" por el nombre concreto de la página o proyecto. Además, debajo del título, debes autogenerar una breve descripción acorde al contexto del proyecto o preguntarle explícitamente al usuario qué descripción corporativa desea colocar.
-      - Navegación: Debes ajustar las rutas, `<router-link>` o propiedades `href` de los enlaces ubicados en la columna de "Navegación", vinculando las páginas en curso.
-      - Datos de Contacto: En la columna de Contacto, ES OBLIGATORIO que le PREGUNTES expresamente al usuario qué Teléfono y qué Email deben incluirse, antes de dar por completado el componente.
+    <rule id="3" name="Adaptación Funcional y Transparencia Corporativa">
+      - Título y Descripción: Sustituir "Grupo Reglado" por el nombre del proyecto y generar una descripción acorde.
+      - Datos Fiscales (OBLIGATORIO): Debes configurar y mostrar el CIF (B23982762) y la dirección oficial en la columna de marca. Esto es crítico para el SEO y evitar bloqueos de seguridad de Google.
+      - Navegación: Ajustar las rutas y enlaces vinculando las páginas del proyecto.
+      - Enlaces Legales (OBLIGATORIO): Debes incluir enlaces funcionales a la "Política de Privacidad" y "Aviso Legal".
+      - Datos de Contacto: Preguntar expresamente al usuario qué Teléfono y Email deben incluirse.
     </rule>
 
     <rule id="4" name="Scripts Reactivos">
