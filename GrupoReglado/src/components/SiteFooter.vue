@@ -4,6 +4,10 @@
       <div class="col brand-col">
         <div class="title">GRUPO REGLADO</div>
         <p class="small">Grupo empresarial en consultoría, energía, tecnología, inmuebles e inversión.</p>
+        <div class="footer-company-data small">
+          <div>CIF: B23982762</div>
+          <div>Avda. Isla Graciosa, 7, 28703 San Sebastián de los Reyes.</div>
+        </div>
         <div class="social-links" aria-label="Redes sociales">
           <a class="social-link" href="https://www.linkedin.com/in/reglado-abogados-y-consultores-90b7a0233/"
             target="_blank" rel="noreferrer" aria-label="LinkedIn">
@@ -37,6 +41,7 @@
       <div class="small">&copy; {{ year }} Reglado Group. Todos los derechos reservados.</div>
       <div class="small footer-legal-links">
         <router-link to="/aviso-legal">Aviso legal</router-link> &middot;
+        <router-link to="/politica-privacidad">Privacidad</router-link> &middot;
         <router-link to="/politica-cookies">Política de cookies</router-link>
       </div>
     </div>
@@ -195,6 +200,11 @@ function buildExternalProductUrl(baseUrl) {
 
 .footer-legal-links a:hover {
   color: #fff;
+}
+
+.footer-company-data {
+  margin-top: 10px;
+  opacity: 0.85;
 }
 
 @media (max-width: 980px) {
