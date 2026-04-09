@@ -5,7 +5,7 @@
         <img class="logo" :src="logo" alt="Reglado Energy" />
         <div class="brand-text">
           <div class="brand-name">REGLADO ENERGY</div>
-          <div class="brand-sub">Consultoría energética independiente</div>
+          <div class="brand-sub">Consultoria energetica independiente</div>
         </div>
       </router-link>
 
@@ -61,11 +61,11 @@
               aria-haspopup="menu"
               :aria-expanded="userMenuOpen ? 'true' : 'false'"
               :title="displayUsername"
-              aria-label="Menú de usuario"
+              aria-label="Menu de usuario"
             >
               <span class="user-initial" aria-hidden="true">{{ userInitial }}</span>
             </button>
-            <div v-if="userMenuOpen" class="user-menu" role="menu" aria-label="Menú de usuario">
+            <div v-if="userMenuOpen" class="user-menu" role="menu" aria-label="Menu de usuario">
               <button class="user-menu-item" type="button" role="menuitem" @click="goToSettings">
                 Configuración
               </button>
@@ -88,8 +88,8 @@
           v-if="isAdmin"
           to="/admin"
           class="admin-pill mobile-admin-pill"
-          title="Panel de administración"
-          aria-label="Panel de administración"
+          title="Panel de administracion"
+          aria-label="Panel de administracion"
         >
           <img :src="adminUserIcon" alt="" class="admin-icon" />
         </router-link>
@@ -98,13 +98,13 @@
           v-if="user"
           class="user-pill mobile-user-trigger"
           :title="displayUsername"
-          aria-label="Configuración de usuario"
+          aria-label="Configuracion de usuario"
           @click="handleMobileSettings"
         >
           <span class="user-initial" aria-hidden="true">{{ userInitial }}</span>
         </button>
 
-        <button class="burger" @click="toggleMobileMenu" aria-label="Abrir menú">
+        <button class="burger" @click="toggleMobileMenu" aria-label="Abrir menu">
           <span></span><span></span><span></span>
         </button>
       </div>
@@ -267,7 +267,7 @@ function goToLogin() {
 function goToSettings() {
   userMenuOpen.value = false;
   const base = import.meta.env.VITE_GRUPO_REGLADO_BASE_URL || "http://localhost:5173";
-  const settingsPath = import.meta.env.VITE_GRUPO_REGLADO_SETTINGS_PATH || "/configuración";
+  const settingsPath = import.meta.env.VITE_GRUPO_REGLADO_SETTINGS_PATH || "/configuracion";
   window.location.href = new URL(settingsPath, base).toString();
 }
 

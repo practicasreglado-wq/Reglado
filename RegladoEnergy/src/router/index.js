@@ -15,6 +15,7 @@ import AuthCallback from "../pages/AuthCallback.vue";
 import Admin from "../pages/Admin.vue";
 import AvisoLegal from "../pages/AvisoLegal.vue";
 import PoliticaCookies from "../pages/PoliticaCookies.vue";
+import PoliticaPrivacidad from "../pages/PoliticaPrivacidad.vue";
 
 const routes = [
   { path: "/", component: Home },
@@ -31,6 +32,7 @@ const routes = [
   { path: "/admin", component: Admin },
   { path: "/aviso-legal", component: AvisoLegal },
   { path: "/politica-cookies", component: PoliticaCookies },
+  { path: "/politica-privacidad", component: PoliticaPrivacidad },
   { path: "/auth/callback", component: AuthCallback },
   { path: "/:pathMatch(.*)*", component: NotFound },
 ];

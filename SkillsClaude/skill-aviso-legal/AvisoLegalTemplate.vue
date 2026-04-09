@@ -1,27 +1,27 @@
 <template>
-  <section class="section">
+  <div class="legal-page">
     <div class="container">
-      <div class="card soft glow">
-        <h1 class="h1">Aviso Legal</h1>
+      <div class="legal-card">
+        <h1>Aviso Legal</h1>
         <div class="legal-content">
           <p><strong>1. TITULARIDAD DEL PORTAL.</strong></p>
-          <p>REGLADO ENERGY, es la titular y responsable de este sitio web, poniendo a disposición de los usuarios el presente documento, con el que pretende dar cumplimiento a las obligaciones dispuestas en la Ley 34/2002, de 11 de julio, de Servicios de la Sociedad de la Información y del Comercio Electrónico (LSSICE), así como informar a todos los usuarios del sitio web respecto a cuáles son las condiciones de uso.</p>
-          <p>REGLADO ENERGY se reserva el derecho de modificar cualquier tipo de información que pudiera aparecer en el sitio web, sin que exista obligación de preavisar o poner en conocimiento de los usuarios dichas obligaciones.</p>
+          <p>{{ projectName }}, es la titular y responsable de este sitio web, poniendo a disposición de los usuarios el presente documento, con el que pretende dar cumplimiento a las obligaciones dispuestas en la Ley 34/2002, de 11 de julio, de Servicios de la Sociedad de la Información y del Comercio Electrónico (LSSICE), así como informar a todos los usuarios del sitio web respecto a cuáles son las condiciones de uso.</p>
+          <p>REGLADO GROUP se reserva el derecho de modificar cualquier tipo de información que pudiera aparecer en el sitio web, sin que exista obligación de preavisar o poner en conocimiento de los usuarios dichas obligaciones.</p>
 
           <p><strong>2. DATOS IDENTIFICATIVOS.</strong></p>
           <ul>
-            <li>Denominación social: REGLADO ENERGY SL</li>
-            <li>Nombre Comercial: REGLADO ENERGY</li>
-            <li>CIF: B24887754</li>
+            <li>Denominación social: REGLADO GROUP S.L</li>
+            <li>Nombre Comercial: {{ CommercialName }}</li>
+            <li>CIF: B23982762</li>
             <li>Domicilio: AVDA. ISLA GRACIOSA, 7 PISO 1º DESPACHOS 5-6 28703 SAN SEBASTIÁN DE LOS REYES.</li>
-            <li>Teléfono: +34 911462674 / 615-641-081</li>
-            <li>Dirección electrónica: info@regladoenergy.com</li>
+            <li>Teléfono: {{ contactPhone }}</li>
+            <li>Dirección electrónica: {{ contactEmail }}</li>
           </ul>
 
           <p><strong>3. OBJETO.</strong></p>
           <p>El presente Aviso Legal recoge las condiciones de uso que regulan el acceso, navegación y uso del Portal, así como las responsabilidades derivadas de la utilización, prestación y/o contratación de los productos o servicios que, en su caso, puedan ser ofrecidos, así como de los contenidos que lo integran.</p>
 
-          <h2><strong>4. ACEPTACIÓN.</strong></h2>
+          <p><strong>4. ACEPTACIÓN.</strong></p>
           <p>El acceso y utilización de este portal de Internet como usuario implica la aceptación de las disposiciones contenidas en este Aviso legal, el cual puede cambiar en cualquier momento.</p>
 
           <p><strong>5. ACCESO Y USO DEL PORTAL.</strong></p>
@@ -40,58 +40,85 @@
           <p>Todos aquellos activos intangibles puestos a disposición del público por la presente página web están protegidos. Quedan reservados todos los derechos de propiedad intelectual e industrial sobre los Contenidos y, en particular, queda prohibido modificar, copiar, reproducir, comunicar públicamente, transformar o distribuir de cualquier forma la totalidad o parte de los contenidos incluidos en el Portal.</p>
 
           <p><strong>10. HIPERVÍNCULOS Y ENLACES A OTRAS PÁGINAS WEB</strong></p>
-          <p>En el caso de que se dispusiesen enlaces o hipervínculos hacía otros sitios de Internet, REGLADO ENERGY no ejercerá ningún tipo de control sobre dichos sitios y contenidos, ni asumirá responsabilidad alguna por sus contenidos.</p>
+          <p>En el caso de que se dispusiesen enlaces o hipervínculos hacía otros sitios de Internet, REGLADO GROUP no ejercerá ningún tipo de control sobre dichos sitios y contenidos, ni asumirá responsabilidad alguna por sus contenidos.</p>
 
           <p><strong>11. COOKIES.</strong></p>
           <p>La empresa se reserva el derecho de utilizar la tecnología "cookie" en el espacio Web, a fin de reconocerlo como Usuario frecuente y personalizar el uso que realice del espacio Web.</p>
 
           <p><strong>12. DURACIÓN Y MODIFICACIÓN.</strong></p>
-          <p>REGLADO ENERGY se reserva el derecho de modificar el presente Aviso Legal y/o las condiciones particulares.</p>
+          <p>REGLADO GROUP se reserva el derecho de modificar el presente Aviso Legal y/o las condiciones particulares.</p>
 
           <p><strong>13. COMUNICACIONES.</strong></p>
-          <p>Cualquier comunicación entre REGLADO ENERGY y el Usuario, deberá dirigirse a la Empresa a la dirección electrónica: info@regladoenergy.com</p>
+          <p>Cualquier comunicación entre REGLADO GROUP y el Usuario, deberá dirigirse a la Empresa a la dirección electrónica: {{ contactEmail }}</p>
 
           <p><strong>14. LEGISLACIÓN APLICABLE Y TRIBUNALES COMPETENTES.</strong></p>
           <p>El presente Aviso Legal y las relaciones establecidas entre la Empresa y el Usuario se regirán y resolverán de conformidad con lo establecido en la normativa española. Para los casos en los que la normativa prevea la posibilidad a las partes de someterse a un fuero, la Empresa y el Usuario, someterán cualesquiera controversias a los Juzgados y Tribunales competentes.</p>
         </div>
-        
       </div>
     </div>
-    <br><br>
-  </section>
+  </div>
 </template>
 
 <script setup>
-import { onMounted } from 'vue';
-import { setSeo } from '../seo.js';
-
-onMounted(() => {
-  setSeo({
-    title: 'Aviso Legal | Reglado Energy',
-    description: 'Aviso Legal y Condiciones de Uso de Reglado Energy.',
-    canonical: '/#/aviso-legal'
-  });
+defineProps({
+  projectName: {
+    type: String,
+    default: 'REGLADO GROUP'
+  },
+  CommercialName: {
+    type: String,
+    default: 'REGLADO GROUP'
+  },
+  contactPhone: {
+    type: String,
+    default: '+34 911462674 / 615-641-081'
+  },
+  contactEmail: {
+    type: String,
+    default: 'info@regladoconsultores.com'
+  }
 });
 </script>
 
 <style scoped>
+.legal-page {
+  padding: 80px 0;
+  min-height: calc(100vh - 200px);
+  background-color: #f8fafc;
+}
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+.legal-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 40px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+}
+.legal-card h1 {
+  margin-top: 0;
+  margin-bottom: 30px;
+  color: #1e293b;
+  font-size: 2.2rem;
+}
 .legal-content {
-  color: rgba(255, 255, 255, 0.85);
-  line-height: 1.6;
+  color: #475569;
+  line-height: 1.7;
 }
 .legal-content p {
-  margin-bottom: 1.2rem;
+  margin-bottom: 1.5rem;
 }
 .legal-content ul {
-  margin-bottom: 1.2rem;
+  margin-bottom: 1.5rem;
   padding-left: 20px;
 }
 .legal-content ul li {
   margin-bottom: 0.5rem;
 }
 .legal-content strong {
-  color: #fff;
+  color: #334155;
 }
-
-
 </style>

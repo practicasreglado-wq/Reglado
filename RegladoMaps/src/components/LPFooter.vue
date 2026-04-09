@@ -48,6 +48,7 @@
       <div class="small">&copy; {{ year }} Reglado Maps. Todos los derechos reservados.</div>
       <div class="small footer-legal-links">
         <router-link to="/aviso-legal">Aviso legal</router-link> &middot; 
+        <router-link to="/politica-privacidad">Privacidad</router-link> &middot; 
         <router-link to="/politica-cookies">Política de cookies</router-link>
       </div>
     </div>

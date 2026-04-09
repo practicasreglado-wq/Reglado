@@ -9,6 +9,7 @@ const routes = [
   { path: '/login', component: { template: '<div style="padding-top:100px; text-align:center;"><h1>Iniciar Sesión</h1><p>Área de clientes en desarrollo.</p></div>' } },
   { path: '/aviso-legal', component: () => import('./components/AvisoLegal.vue') },
   { path: '/politica-cookies', component: () => import('./components/PoliticaCookies.vue') },
+  { path: '/politica-privacidad', component: () => import('./components/PoliticaPrivacidad.vue') },
   { path: '/admin', component: () => import('./components/AdminPanel.vue') },
   { path: '/mapa', component: () => import('./components/MapView.vue') },
   { 

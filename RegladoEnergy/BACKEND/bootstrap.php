@@ -1,3 +1,6 @@
+// Este archivo carga el entorno del backend.
+// Configura variables de entorno desde un archivo .env.
+
 <?php
 
 declare(strict_types=1);

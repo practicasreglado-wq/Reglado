@@ -30,12 +30,15 @@ Este archivo está estructurado como una **Skill** de contexto (System Prompt) p
       - Las micro-animaciones paramétricas incluidas en botones, iconos y links interactivos de la plantilla deben quedar intactas.
     </rule>
     
-    <rule id="3" name="Adaptación Funcional y Transparencia Corporativa">
+    <rule id="3" name="Adaptación Funcional y Fallback Estándar">
       - Título y Descripción: Sustituir "Grupo Reglado" por el nombre del proyecto y generar una descripción acorde.
-      - Datos Fiscales (OBLIGATORIO): Debes configurar y mostrar el CIF (B23982762) y la dirección oficial en la columna de marca. Esto es crítico para el SEO y evitar bloqueos de seguridad de Google.
-      - Navegación: Ajustar las rutas y enlaces vinculando las páginas del proyecto.
-      - Enlaces Legales (OBLIGATORIO): Debes incluir enlaces funcionales a la "Política de Privacidad" y "Aviso Legal".
-      - Datos de Contacto: Preguntar expresamente al usuario qué Teléfono y Email deben incluirse.
+      - Datos Fiscales (OBLIGATORIO): Siempre mostrar el CIF (B23982762) y la dirección oficial (Avda. Isla Graciosa, 7).
+      - Datos de Contacto: Debes PREGUNTAR obligatoriamente por el nombre del proyecto, el Teléfono y el Email.
+      - REGLA DE FALLBACK: Si el usuario no los tiene o prefiere el estándar, usar:
+        * Nombre: "REGLADO GROUP"
+        * Teléfono: "+34 911462674 / 615-641-081"
+        * Email: "info@regladoconsultores.com"
+      - Navegación: Ajustar las rutas y enlaces legales (Privacidad y Aviso Legal).
     </rule>
 
     <rule id="4" name="Scripts Reactivos">
