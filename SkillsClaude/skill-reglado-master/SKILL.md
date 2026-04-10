@@ -16,6 +16,12 @@ Esta skill define los cimientos técnicos y estéticos de todo el ecosistema de 
   <instructions>
     Al diseñar o implementar cualquier funcionalidad, debes adherirte a este "Master Stack". 
     Si el usuario solicita algo que rompa estas reglas, debes advertirle de la desviación del estándar.
+    
+    FLUJO DE INICIO OBLIGATORIO:
+    Antes de generar código para una nueva aplicación o módulo principal, PREGUNTA SIEMPRE: 
+    "¿Deseas incluir un sistema de usuarios/autenticación para este proyecto?"
+    - Si el usuario dice SÍ: Implementa el estándar descrito en <auth_system>.
+    - Si el usuario dice NO: No incluyas lógica de login ni perfiles.
   </instructions>
 
   <standards>
@@ -49,6 +55,21 @@ Esta skill define los cimientos técnicos y estéticos de todo el ecosistema de 
         Uso estricto de PDO para consultas a base de datos locales.
       </pattern>
     </backend>
+
+    <auth_system>
+      <implementation>
+        - Usar `src/services/auth.js` como gestor de estado (u objeto reactivo).
+        - Conexión obligatoria con ApiLoging (Hub Central).
+        - Recuperar perfil mediante `/auth/me` con el JWT alojado en cookies/localStorage.
+      </implementation>
+      <ui_standard>
+        - Header Component: Debe incluir un "User Pill" (Avatar con inicial).
+        - Dropdown Menu: Al hacer clic en el pill, mostrar menú con:
+           1. "Configuración" (Redirect a configuración/perfil).
+           2. "Cerrar sesión" (Llamada a `/auth/logout` y limpieza de estado).
+        - Estilo: Glassmorphism, bordes sutiles, hover effects premium.
+      </ui_standard>
+    </auth_system>
   </standards>
 
   <rules>
