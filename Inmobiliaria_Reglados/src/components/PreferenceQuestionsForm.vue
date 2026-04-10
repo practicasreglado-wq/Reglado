@@ -18,6 +18,9 @@
             :value="option"
             type="radio"
             v-model="form[question.key]"
+            required
+            @invalid="onInvalid"
+            @change="onInput"
           />
           <span>{{ option }}</span>
         </label>
@@ -42,6 +45,16 @@ export default {
       required: true,
     },
   },
+  methods: {
+    onInvalid(e) {
+      e.target.setCustomValidity("Por favor, asegúrese de responder todas las preguntas");
+    },
+    onInput(e) {
+      // Clear validity for ALL radios with the same name in this form
+      const radios = e.target.form.querySelectorAll(`input[name="${e.target.name}"]`);
+      radios.forEach(r => r.setCustomValidity(""));
+    }
+  }
 };
 </script>
 

@@ -1,7 +1,6 @@
 ApiLoging/.env
 ApiLoging/.env.local.bak
-.agent/
-n8n-desktop-chat/
-RegladoBienesRaices/
-ReleasesEstables/
-n8nJson/
+Inmobiliaria_Reglados/backend/uploads/
+ApiLoging/vendor/
+Inmobiliaria_Reglados/backend/vendor/
+.env

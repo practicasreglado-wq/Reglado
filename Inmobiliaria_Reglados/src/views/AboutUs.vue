@@ -1,68 +1,93 @@
 <template>
-  <section class="about">
+  <section id="about-us" class="about">
+    <div class="about-images">
+      <div class="img-large">
+        <img src="@/assets/aboutimg2.png" alt="Descripcion imagen pequeña">
+      </div>
+    </div>
 
-   <!-- Lado izquierdo (imágenes reales) -->
-<div class="about-images">
-  <div class="img-large">
-    <img src="@/assets/aboutimg2.png" alt="Descripción imagen pequeña">
-  </div>
-</div>
-
-    <!-- Lado derecho (texto) -->
     <div class="about-content">
+      <span class="about-kicker">Reglado Real State</span>
       <h2>Quiénes somos</h2>
       <div class="about-text">
-      <p>
-        En RS Inmobiliaria ayudamos a nuestros clientes a encontrar el hogar
-        ideal y las mejores oportunidades de inversión. Nuestro equipo combina
-        experiencia, cercanía y profesionalidad para ofrecer un servicio
-        inmobiliario transparente y personalizado.
-      </p>
+        <p class="about-lead">
+          En Reglado Real State trabajamos con un enfoque más exclusivo, orientado a clientes que saben exactamente qué inversión están buscando.
+        </p>
+      </div>
 
-      <p>
-        Creemos en la confianza, la calidad y el compromiso como pilares
-        fundamentales de nuestro trabajo.
-      </p>
-    </div>
-    </div>
+      <div class="about-highlights">
+        <article class="about-card">
+          <span class="about-card__index">01</span>
+          <h3>Búsqueda muy precisa</h3>
+          <p>Cada filtro está pensado para que el cliente llegue directamente al tipo de inmueble de inversión que realmente busca.</p>
+        </article>
 
+        <article class="about-card">
+          <span class="about-card__index">02</span>
+          <h3>Cliente con intención real</h3>
+          <p>Cuando alguien pide más información de un inmueble, suele hacerlo porque el activo ya encaja de forma seria en su objetivo de compra.</p>
+        </article>
+
+        <article class="about-card">
+          <span class="about-card__index">03</span>
+          <h3>Activos con encaje inversor</h3>
+          <p>Priorizamos oportunidades con sentido estratégico para perfiles que valoran rentabilidad, seguridad y decisión rápida.</p>
+        </article>
+      </div>
+
+      <div class="about-metrics">
+        <div class="about-metric">
+          <strong>Filtro</strong>
+          <span>Más afinado y selectivo</span>
+        </div>
+        <div class="about-metric">
+          <strong>Interés</strong>
+          <span>Consultas con intención real</span>
+        </div>
+        <div class="about-metric">
+          <strong>Inversión</strong>
+          <span>Activos con mejor encaje</span>
+        </div>
+      </div>
+    </div>
   </section>
 </template>
 
 <script>
 export default {
-  name: "AboutUs"
+  name: "AboutUs",
 };
 </script>
 
 <style scoped>
-
 .about {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 120px;
-  min-height: 100vh;
-  background: rgba(0, 0, 0, 0.269);
-  padding: 60px 40px;
+  gap: var(--spacing-lg);
+  min-height: 80vh;
+  background: #e9e9e9; /* Blanco más oscuro requested */
+  padding: var(--spacing-md) var(--spacing-md); /* Added balanced vertical padding */
 }
-
-/* ----- IMÁGENES ----- */
 
 .about-images {
   position: relative;
   display: flex;
-  align-items: flex-start;
+  justify-content: center;
+  flex: 1;
+  max-width: 500px;
 }
 
 .img-large {
-  width: 420px;
-  height: 500px;
+  width: 100%;
+  aspect-ratio: 4 / 5;
   overflow: hidden;
-  border-radius: 5%;
-  margin-top: 120px;
-   mask-image: radial-gradient(circle, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%);
-  -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 80%, rgba(0,0,0,0) 100%);
+  border-radius: 28px;
+  padding: 10px;
+  background: rgba(200, 200, 200, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 22px 48px rgba(28, 46, 88, 0.08);
 }
 
 .about-images img {
@@ -70,135 +95,207 @@ export default {
   height: 100%;
   object-fit: cover;
   display: block;
-  
+  border-radius: 22px;
 }
 
-/* ----- CONTENIDO ----- */
-
 .about-content {
+  flex: 1.2;
   max-width: 700px;
+  display: grid;
+  gap: var(--spacing-sm);
+}
+
+.about-kicker {
+  display: inline-flex;
+  align-items: center;
+  width: max-content;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #172a5d 0%, #3654ae 100%);
+  border: 1px solid rgba(244, 208, 120, 0.4);
+  color: #f4d078;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
 }
 
 .about-content h2 {
-  font-size: 5rem;
-  margin-bottom: 25px;
-  background: linear-gradient(
-    135deg,
-    #5f4b08 0%,
-    #bd9b2c 20%,
-    #f9d766 45%,
-    #c6aa46 55%,
-    #a48424 75%,
-    #6e560c 100%
-  );
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-shadow: 0 2px 3px rgba(253, 203, 2, 0.313);
-}
-
-.about-content p {
-  font-size: 1.75rem;
-  text-shadow: 0 2px 3px rgba(0, 0, 0, 0.605);
-  line-height: 1.7;
-  margin-bottom: 20px;
-  color: #ffffff;
+  margin: 0;
+  font-size: var(--font-size-h2);
+  line-height: 1.1;
+  color: #1f2f4d;
 }
 
 .about-text {
-  background: rgba(0, 0, 0, 0.226);
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.475);
+  position: relative;
+  padding: var(--spacing-md);
+  border-radius: 24px;
+  background: linear-gradient(180deg, #ffffff, #f7f9fc);
+  border: 1px solid rgba(224, 219, 202, 0.8);
+  box-shadow: 0 20px 40px rgba(28, 46, 88, 0.06);
+}
+
+.about-text p {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  font-size: var(--font-size-base);
+  line-height: 1.7;
+  color: #4b5b78;
+}
+
+.about-lead {
+  font-weight: 800;
+  color: #20386b !important;
+  margin-bottom: 12px !important;
+}
+
+.about-highlights {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-sm);
+}
+
+.about-card {
+  padding: var(--spacing-sm);
+  border-radius: 20px;
+  background: #fff;
+  border: 1px solid rgba(202, 211, 224, 0.8);
+  box-shadow: 0 12px 24px rgba(28, 46, 88, 0.05);
+  transition: transform 0.3s ease;
+}
+
+.about-card:hover {
+  transform: translateY(-4px);
+  border-color: #bd9b2c;
+}
+
+.about-card__index {
+  display: inline-flex;
+  margin-bottom: 12px;
+  padding: 4px 8px;
+  border-radius: 10px;
+  background: rgba(189, 155, 44, 0.1);
+  color: #9b7a1d;
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.about-card h3 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+  color: #1f2f4d;
+}
+
+.about-card p {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: #5b6b86;
+}
+
+.about-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-xs);
+}
+
+.about-metric {
+  display: grid;
+  gap: 8px;
+  padding: 20px 18px;
+  border-radius: 20px;
+  background: #ffffff;
+  border: 1px solid rgba(189, 155, 44, 0.2); /* Subtle Gold border */
+  box-shadow: 0 10px 25px rgba(28, 46, 88, 0.08);
+  transition: all 0.4s var(--motion-ease-premium);
+  position: relative;
+  overflow: hidden;
+}
+
+.about-metric::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(to bottom, #bd9b2c, #f4d078);
+  opacity: 0.8;
+}
+
+.about-metric:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(28, 46, 88, 0.12);
+  border-color: rgba(189, 155, 44, 0.5);
+}
+
+.about-metric strong {
+  color: #1a2545;
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.about-metric span {
+  color: #5b6b86;
+  font-size: 0.85rem;
+  line-height: 1.4;
 }
 
 /* =========================
-TABLET
-========================= */
+   BREAKPOINTS
+   ========================= */
 
-@media (max-width:1024px){
-
-  .about{
-    gap:40px;
+@media (max-width: 1024px) {
+  .about {
+    gap: var(--spacing-md);
   }
 
-  .img-large{
-    width:200px;
-    height:260px;
-    margin-top:60px;
+  .about-highlights {
+    grid-template-columns: 1fr;
   }
-
-  .about-content h2{
-    font-size:3.5rem;
-  }
-
-  .about-content p{
-    font-size:1.4rem;
-  }
-
 }
 
-/* =========================
-TABLET PEQUEÑA (CAMBIO DE LAYOUT)
-========================= */
-
-@media (max-width:768px){
-
-  .about{
-    flex-direction:column;
-    text-align:center;
-    gap:50px;
+@media (max-width: 768px) {
+  .about {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--spacing-md);
   }
 
-  .about-images{
-    align-items:center;
-    gap:20px;
+  .about-images {
+    width: 60%;
+    margin: 0 auto;
   }
 
-  .img-large{
-    width:200px;
-    height:260px;
-    margin-top:60px;
+  .about-content {
+    justify-items: center;
   }
 
-  .about-content{
-    max-width:600px;
+  .about-metrics {
+    grid-template-columns: 1fr;
+    width: 100%;
   }
 
-  .about-content h2{
-    font-size:2.8rem;
+  .about-kicker {
+    align-self: center;
   }
-
-  .about-content p{
-    font-size:1.25rem;
-  }
-
 }
 
-/* =========================
-MÓVIL
-========================= */
-
-@media (max-width:480px){
-
-  .img-large{
-    width:150px;
-    height:210px;
-    margin-top:60px;
+@media (max-width: 480px) {
+  .about {
+    padding: var(--spacing-md) var(--spacing-sm);
   }
 
-  .about{
-    padding:60px 20px;
+  .about-images {
+    width: 80%;
   }
 
-  .about-content h2{
-    font-size:2.2rem;
+  .about-text {
+    padding: var(--spacing-sm);
   }
-
-  .about-content p{
-    font-size:1.1rem;
-    line-height:1.6;
-  }
-
 }
-
 </style>

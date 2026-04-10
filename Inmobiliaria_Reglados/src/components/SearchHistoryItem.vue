@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import { computed, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import { buildPreferenceEntries } from "../data/preferenceSchemas";
 
 export default {
@@ -63,16 +63,22 @@ export default {
   },
   setup(props) {
     const expanded = ref(false);
+    const isMobile = ref(false);
+    let mediaQuery = null;
+
+    const syncViewport = () => {
+      isMobile.value = !!mediaQuery?.matches;
+    };
 
     const entries = computed(() =>
       buildPreferenceEntries(props.item.category, props.item.preferences)
     );
 
     const visibleEntries = computed(() =>
-      expanded.value ? entries.value : entries.value.slice(0, 5)
+      expanded.value ? entries.value : entries.value.slice(0, isMobile.value ? 2 : 3)
     );
 
-    const hiddenEntries = computed(() => entries.value.slice(5));
+    const hiddenEntries = computed(() => entries.value.slice(isMobile.value ? 2 : 3));
 
     const formattedDate = computed(() => {
       if (!props.item.created_at) {
@@ -84,6 +90,16 @@ export default {
         month: "2-digit",
         year: "numeric",
       }).format(new Date(props.item.created_at));
+    });
+
+    onMounted(() => {
+      mediaQuery = window.matchMedia("(max-width: 768px)");
+      syncViewport();
+      mediaQuery.addEventListener("change", syncViewport);
+    });
+
+    onBeforeUnmount(() => {
+      mediaQuery?.removeEventListener("change", syncViewport);
     });
 
     return {
@@ -269,18 +285,107 @@ export default {
 }
 
 @media (max-width: 768px) {
+  .history-card {
+    padding: 18px;
+    gap: 14px;
+    border-radius: 16px;
+  }
+
   .history-card__top,
   .history-card__item,
   .history-card__actions {
     flex-direction: column;
   }
 
+  .history-card h3 {
+    font-size: 1.2rem;
+  }
+
+  .history-card__date {
+    padding: 6px 10px;
+    font-size: 0.82rem;
+  }
+
+  .history-card__section-title {
+    margin-bottom: 10px;
+    font-size: 0.92rem;
+  }
+
+  .history-card__list {
+    gap: 8px;
+  }
+
+  .history-card__item {
+    gap: 8px;
+    padding: 10px 12px;
+    border-radius: 12px;
+  }
+
+  .history-card__item-label,
   .history-card__item-value {
+    font-size: 0.9rem;
     text-align: left;
+  }
+
+  .history-card__toggle {
+    margin-top: 12px;
+    padding: 8px 12px;
+    font-size: 0.84rem;
+  }
+
+  .history-card__actions {
+    gap: 10px;
+  }
+
+  .history-card__action {
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 0.9rem;
   }
 
   .history-card__item:hover {
     transform: translateY(-2px);
+  }
+}
+
+@media (max-width: 480px) {
+  .history-card {
+    padding: 14px;
+    gap: 12px;
+    border-radius: 14px;
+  }
+
+  .history-card h3 {
+    font-size: 1.05rem;
+  }
+
+  .history-card__date {
+    padding: 5px 9px;
+    font-size: 0.76rem;
+  }
+
+  .history-card__section-title {
+    font-size: 0.85rem;
+  }
+
+  .history-card__item {
+    padding: 8px 10px;
+    gap: 6px;
+  }
+
+  .history-card__item-label,
+  .history-card__item-value {
+    font-size: 0.82rem;
+  }
+
+  .history-card__toggle {
+    padding: 7px 11px;
+    font-size: 0.78rem;
+  }
+
+  .history-card__action {
+    padding: 9px 12px;
+    font-size: 0.84rem;
   }
 }
 </style>

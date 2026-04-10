@@ -2,14 +2,8 @@
   <div class="carousel">
 
     <!-- TITULOS -->
-    <div class="categories">
-      <span
-        v-for="(item, index) in visibleItems"
-        :key="item.value"
-        :class="{ active: index === 1 }"
-      >
-        {{ item.title }}
-      </span>
+    <div class="carousel-header">
+      <p class="carousel-kicker">Explorar Categorías</p>
     </div>
 
     <div class="carousel-wrapper">
@@ -34,7 +28,7 @@
           class="card-wrapper"
           :style="cardStyle(index)"
         >
-          <div class="mobile-title">
+          <div class="category-title" :class="{ active: index === 1 }">
             {{ item.title }}
           </div>
 
@@ -354,71 +348,90 @@ export default {
   will-change:transform;
 }
 
-.mobile-title{
-  display:none;
-  font-size:1.4rem;
-  font-weight:600;
-  margin-bottom:10px;
-  opacity:0.4;
-  transition:0.1s;
+.category-title {
+  display: block;
 }
 
-/* TITULO ACTIVO EN MOVIL */
-.card-wrapper:has(.center) .mobile-title{
-  opacity:1;
-  font-weight:700;
-}
-
-.carousel{
-  text-align:center;
-  padding:80px 0;
+.carousel {
+  position: relative;
+  text-align: center;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 }
 
 /* TITULOS */
-
-.categories{
-  display:flex;
-  justify-content:center;
-  gap:220px;
-  margin-bottom:60px;
-  font-size:2rem;
-  font-weight:500;
+.carousel-header {
+  position: absolute;
+  top: 40px;
+  left: 0;
+  width: 100%;
 }
 
-.categories span{
-  opacity:0.5;
-  transition:0.1s;
+.carousel-kicker {
+  color: #d4af37; /* Brighter gold */
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.4em; /* More spaced */
+  font-size: clamp(1.25rem, 1rem + 1vw, 2.1rem);
+  text-shadow: 0 2px 10px rgba(212, 175, 55, 0.3);
 }
 
-.categories .active{
-  opacity:1;
-  font-weight:700;
+.category-title {
+  font-size: clamp(1.2rem, 3vw, 2.2rem);
+  font-weight: 700;
+  color: #12244d;
+  margin-bottom: 30px;
+  opacity: 0.15;
+  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  transform: translateY(24px) scale(0.85);
+  filter: blur(1px);
+  white-space: nowrap;
+}
+
+.category-title.active {
+  opacity: 1;
+  transform: translateY(0) scale(1.1);
+  filter: blur(0);
+  text-shadow: 0 10px 20px rgba(18, 36, 77, 0.1);
 }
 
 /* WRAPPER */
-
-.carousel-wrapper{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:50px;
+.carousel-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 50px;
 }
 
 /* BOTONES */
 
-.arrow{
-  background-color:var(--azul-principal);
-  color:white;
-  border:none;
-  border-radius:50%;
-  width:60px;
-  height:60px;
-  font-size:26px;
-  cursor:pointer;
+.arrow {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  color: #12244d;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  width: 64px;
+  height: 64px;
+  font-size: 24px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 32px rgba(18, 36, 77, 0.1);
 }
 
-.arrow:hover{
-  background-color:var(--azul-secundario);
+.arrow:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.1);
+  box-shadow: 0 12px 40px rgba(18, 36, 77, 0.2);
 }
 
 /* CARDS */
@@ -434,139 +447,141 @@ export default {
   cursor:grabbing;
 }
 
-.card{
-  width:280px;
-  height:380px;
-  background-size:cover;
-  background-position:center;
-  border-radius:20px;
-  transition:0.4s ease;
-  user-select:none;
+.card {
+  width: 280px;
+  height: 380px;
+  background-size: cover;
+  background-position: center;
+  border-radius: 24px;
+  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  user-select: none;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 60%, rgba(18, 36, 77, 0.4) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.center::after {
+  opacity: 1;
 }
 
 /* POSICIONES */
 
-.left{
-  transform:scale(0.95);
-  opacity:0.6;
+.left {
+  transform: scale(0.9);
+  opacity: 0.9; /* Semi-opaque to balance visibility and masking */
+  filter: blur(2px) grayscale(0.2) brightness(0.9);
 }
 
-.center{
-  transform:scale(1.15);
-  opacity:1;
-  box-shadow:0 25px 45px rgba(0,0,0,0.25);
-  cursor:pointer;
+.center {
+  transform: scale(1.1);
+  opacity: 1;
+  box-shadow: 
+    0 30px 60px rgba(18, 36, 77, 0.3),
+    0 10px 20px rgba(18, 36, 77, 0.15);
+  cursor: pointer;
+  border-color: rgba(255, 255, 255, 0.5);
 }
 
-.right{
-  transform:scale(0.95);
-  opacity:0.6;
+.right {
+  transform: scale(0.9);
+  opacity: 0.9; /* Semi-opaque to balance visibility and masking */
+  filter: blur(2px) grayscale(0.2) brightness(0.9);
+}
+
+.center:hover {
+  transform: scale(1.12) translateY(-5px);
+  box-shadow: 
+    0 40px 80px rgba(18, 36, 77, 0.4),
+    0 15px 30px rgba(18, 36, 77, 0.2);
 }
 
 /* ------------------------
 TABLETS / LAPTOPS
 -------------------------*/
 @media (max-width: 1440px) {
-
-  .carousel{
-    padding:60px 0;
+  .carousel {
+    padding: 60px 0;
   }
-
-  .categories{
-    gap:100px;
-    font-size:1.35rem;
-    margin-bottom:50px;
+  .carousel-header {
+    margin-bottom: 40px;
   }
-
-  .carousel-wrapper{
-    gap:25px;
+  .categories {
+    width: 100%;
   }
-
-  .cards{
-    gap:28px;
+  .card {
+    width: 220px;
+    height: 300px;
   }
-
-  .card{
-    width:200px;
-    height:270px;
+  .arrow {
+    width: 54px;
+    height: 54px;
   }
+}
 
-  .center{
-    transform:scale(1.1);
+@media (max-width: 980px) {
+  .categories {
+    width: 100%;
   }
-
-  .arrow{
-    display:none;
+  .arrow {
+    display: none;
   }
-
 }
 
 @media (max-width: 768px) {
-
-  .categories{
-    gap:110px;
-    font-size:1.1rem;
-    margin-bottom:35px;
+  .carousel-wrapper {
+    gap: 20px;
   }
-
-  .card{
-    width:150px;
-    height:200px;
+  .card {
+    width: 160px;
+    height: 220px;
   }
-
-  .cards{
-    gap:18px;
+  .carousel-header {
+    margin-bottom: 20px;
   }
-
-  .arrow{
-    display:none;
-  }
-
 }
 
 @media (max-width: 480px) {
-
-  .carousel{
-    padding:30px 0;
+  .carousel {
+    padding: 20px 0 30px;
   }
-
-  .mobile-title{
-    display:block;
+  .category-title {
+    font-size: 1.2rem;
+    color: #12244d;
+    margin-bottom: 8px;
+    opacity: 0.4;
+    transform: none;
+    filter: none;
   }
-
-  .categories{
-    flex-direction:column;
-    gap:10px;
-    font-size:1rem;
-    margin-bottom:25px;
-    display:none;
+  .card-wrapper:has(.center) .category-title {
+    opacity: 1;
+    font-weight: 700;
   }
-
-  .carousel-wrapper{
-    flex-direction:column;
-    gap:25px;
+  .carousel-header {
+    display: none;
   }
-
-  .cards{
-    flex-direction:column;
-    gap:25px;
-    cursor:default;
-    touch-action:none;
+  .carousel-wrapper {
+    flex-direction: column;
+    gap: 20px;
   }
-
-  .card{
-    width:180px;
-    height:120px;
+  .cards {
+    flex-direction: column;
+    gap: 20px;
+    cursor: default;
+    touch-action: none;
   }
-
-  .center{
-    transform:scale(1.05);
+  .card {
+    width: 150px;
+    height: 95px;
   }
-
-  .arrow{
-    display:none;
-  }
-
 }
 
 </style>

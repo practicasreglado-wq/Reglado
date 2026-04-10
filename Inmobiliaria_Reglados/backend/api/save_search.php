@@ -2,8 +2,8 @@
 
 require_once dirname(__DIR__) . "/config/db.php";
 require_once dirname(__DIR__) . "/config/auth.php";
-
-applyAuthCors();
+require_once __DIR__ . '/../config/cors.php';
+applyCors();
 handlePreflight();
 
 $context = requireAuthenticatedUser($pdo);
@@ -23,19 +23,27 @@ if ($category === "" || !is_array($preferences) || empty($preferences)) {
     respondJson(422, ["success" => false, "message" => "Datos de búsqueda incompletos."]);
 }
 
-$stmt = $pdo->prepare("
-    INSERT INTO search_history (user_id, category, preferences_json)
-    VALUES (:user_id, :category, :preferences_json)
-");
+try {
+    $stmt = $pdo->prepare("
+        INSERT INTO search_history (user_id, categoria, preferences)
+        VALUES (:user_id, :categoria, :preferences)
+    ");
 
-$stmt->execute([
-    "user_id" => $userId,
-    "category" => $category,
-    "preferences_json" => json_encode($preferences, JSON_UNESCAPED_UNICODE),
-]);
+    $stmt->execute([
+        "user_id" => $userId,
+        "categoria" => $category,
+        "preferences" => json_encode($preferences, JSON_UNESCAPED_UNICODE),
+    ]);
 
-respondJson(200, [
-    "success" => true,
-    "message" => "Búsqueda guardada correctamente.",
-    "search_id" => (int) $pdo->lastInsertId(),
-]);
+    respondJson(200, [
+        "success" => true,
+        "message" => "Búsqueda guardada correctamente.",
+        "search_id" => (int) $pdo->lastInsertId(),
+    ]);
+
+} catch (PDOException $e) {
+    respondJson(500, [
+        "success" => false, 
+        "message" => "No se pudo guardar la búsqueda. Error interno en la base de datos."
+    ]);
+}

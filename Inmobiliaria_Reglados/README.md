@@ -77,7 +77,7 @@ Archivos principales:
 - [backend/save_preferences.php](c:\xampp\htdocs\Reglado\Inmobiliaria_Reglados\backend\save_preferences.php): guarda preferencias.
 - [backend/api/createProperty.php](c:\xampp\htdocs\Reglado\Inmobiliaria_Reglados\backend\api\createProperty.php)
 - [backend/api/get_favorite_properties.php](c:\xampp\htdocs\Reglado\Inmobiliaria_Reglados\backend\api\get_favorite_properties.php)
-- [backend/api/get_user_properties_for_sale.php](c:\xampp\htdocs\Reglado\Inmobiliaria_Reglados\backend\api\get_user_properties_for_sale.php)
+- [backend/api/get_user_properties.php](c:\xampp\htdocs\Reglado\Inmobiliaria_Reglados\backend\api\get_user_properties.php)
 
 ## Rutas principales
 
