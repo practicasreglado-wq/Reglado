@@ -1,14 +1,12 @@
 # ApiLoging
 
-API de autenticacion central del ecosistema Reglado.
+API de autenticación central del ecosistema Reglado. Esta es la única fuente de verdad para la identidad de los usuarios en todos los productos (Energy, Inmobiliaria, Maps).
 
-Gestiona:
-- registro con confirmacion por correo
-- inicio y cierre de sesion con JWT
-- recuperacion de contrasena
-- cambio de email con confirmacion
-- edicion basica de perfil
-- listado de usuarios para administracion
+## Funcionalidades Principales
+- **Autenticación Centralizada**: Registro único y acceso global.
+- **Gestión de Identidad**: Confirmación de email, recuperación de credenciales y cambios seguros de correo.
+- **Seguridad**: Emisión de JWT firmados, rate-limiting, y logs de seguridad.
+- **Integración Operativa**: Sincronización automática de usuarios con Notion.
 
 ## Requisitos
 

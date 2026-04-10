@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <section class="form-page">
     <div class="form-card">
       <h1>Verificación de correo</h1>
@@ -12,7 +12,7 @@
 
       <template v-else>
         <p class="feedback success">Se ha verificado tu correo correctamente.</p>
-        <p>Seras redirigido al portal en {{ countdown }} segundos...</p>
+        <p>Serás redirigido al portal en {{ countdown }} segundos...</p>
         <RouterLink class="btn-primary inline-btn" to="/">Ir ahora</RouterLink>
       </template>
     </div>

@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <section class="form-page">
     <div class="form-card">
       <h1>{{ title }}</h1>
@@ -58,6 +58,17 @@
           <PasswordField v-model="passwordConfirmation" placeholder="" required minlength="6" />
         </label>
 
+        <div class="privacy-note">
+          <label class="checkbox-label">
+            <input v-model="acceptPrivacy" type="checkbox" required />
+            <span>
+              Acepto la
+              <router-link to="/politica-privacidad" target="_blank">Política de Privacidad</router-link>
+              y el tratamiento de mis datos personales.
+            </span>
+          </label>
+        </div>
+
         <p v-if="error" class="feedback error">{{ error }}</p>
         <p v-if="success" class="feedback success">{{ success }}</p>
 
@@ -101,6 +112,7 @@ const error = ref("");
 const success = ref("");
 const registrationComplete = ref(false);
 const submittedEmail = ref("");
+const acceptPrivacy = ref(false);
 
 function handlePhoneInput(event) {
   const target = event.target;
@@ -119,6 +131,12 @@ async function submitRegister() {
 
   if (password.value !== passwordConfirmation.value) {
     error.value = "Las contraseñas no coinciden";
+    loading.value = false;
+    return;
+  }
+
+  if (!acceptPrivacy.value) {
+    error.value = "Debes aceptar la política de privacidad";
     loading.value = false;
     return;
   }
@@ -172,6 +190,32 @@ function resetFormState() {
 .confirmation-text {
   margin: 0;
   color: rgba(15, 23, 42, 0.72);
+}
+
+.privacy-note {
+  margin: 1rem 0;
+  font-size: 0.9rem;
+}
+
+.checkbox-label {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 0.6rem;
+  cursor: pointer;
+  color: var(--muted);
+  font-weight: 400 !important;
+}
+
+.checkbox-label input {
+  width: auto !important;
+  margin: 0;
+}
+
+.checkbox-label a {
+  color: var(--secondary);
+  text-decoration: none;
+  font-weight: 600;
 }
 </style>
 

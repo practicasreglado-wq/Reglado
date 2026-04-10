@@ -1,8 +1,10 @@
 <template>
   <div class="landing">
     <section id="inicio" class="block block-hero" :style="heroStyle">
-      <video class="hero-video" autoplay muted loop playsinline preload="metadata">
-        <source :src="heroVideo" type="video/mp4" />
+      <video ref="heroVideoRef" class="hero-video" autoplay="autoplay" muted="muted" playsinline preload="auto" @ended="handleVideoEnded">
+        <source src="/Bissness.webm" type="video/webm" />
+        <source src="/Bissness.mp4" type="video/mp4" />
+        <source src="/HandShacke.mp4" type="video/mp4" />
       </video>
       <div class="hero-overlay"></div>
       <div class="hero-particles"></div>
@@ -33,8 +35,8 @@
       <div class="group-intro">
         <h2>Soluciones empresariales para crecimiento sostenible.</h2>
         <p>
-          Reglado Group combina experiencia sectorial, tecnologia y vision de negocio en seis
-          areas clave.
+          Reglado Group combina experiencia sectorial, tecnología y visión de negocio en seis
+          áreas clave.
         </p>
       </div>
 
@@ -48,7 +50,7 @@
               <path d="M22 19V3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
             </svg>
           </span>
-          <strong>Consultoria</strong>
+          <strong>Consultoría</strong>
         </li>
 
         <li class="group-card" tabindex="0">
@@ -69,7 +71,7 @@
                 stroke-linejoin="round" />
             </svg>
           </span>
-          <strong>Energia</strong>
+          <strong>Energía</strong>
         </li>
 
         <li class="group-card" tabindex="0">
@@ -80,7 +82,7 @@
               <path d="M12 9V15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
             </svg>
           </span>
-          <strong>Tecnologia</strong>
+          <strong>Tecnología</strong>
         </li>
 
         <li class="group-card" tabindex="0">
@@ -101,7 +103,7 @@
                 stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
             </svg>
           </span>
-          <strong>Innovacion</strong>
+          <strong>Innovación</strong>
         </li>
       </ul>
     </section>
@@ -112,7 +114,18 @@
         <h2>Empresas Reglado</h2>
       </div>
 
-      <div class="company-grid">
+      <div class="carousel-wrapper">
+        <button class="carousel-btn btn-left" type="button" aria-label="Anterior" @click="scrollCarousel('left')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+        <button class="carousel-btn btn-right" type="button" aria-label="Siguiente" @click="scrollCarousel('right')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+        <div class="company-grid" ref="carouselGrid">
         <article v-for="company in companies" :key="company.name" class="company-card">
           <div class="company-image-wrap">
             <img class="company-image" :src="company.image" :alt="company.name" loading="lazy" />
@@ -128,6 +141,7 @@
             <a class="company-link" :href="company.href" target="_blank" rel="noreferrer">Entrar</a>
           </div>
         </article>
+        </div>
       </div>
     </section>
 
@@ -135,21 +149,25 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { computed, ref } from "vue";
+import { auth } from "../services/auth";
 
-import companyEnergy from "../assets/company-energy.png";
 import companyEnProceso from "../assets/company-enproceso.png";
-import companyMapas from "../assets/company-mapas.webp";
-import companyRealstate from "../assets/company-realstate.png";
+import companyProceso from "../assets/company-proceso.png";
+import RegladoConsultoresCard from "../assets/RegladoConsultoresCard.png";
+import RegladoEnergyCard from "../assets/RegladoEnergyCard.png";
+import RegladoMapsCard from "../assets/RegladoMapsCard.png";
+import RegladoRealStateCard from "../assets/RegladoRealStateCard.png";
 import balanceIcon from "../assets/Balance.svg";
 import boltIcon from "../assets/Bolt.svg";
-import heroVideo from "../assets/Bissness.mp4";
 import mapIcon from "../assets/Map.svg";
 import apartmentIcon from "../assets/Apartment.svg";
-import corporateLogo from "../assets/reglado-energy-logo.svg";
+import addHomeIcon from "../assets/add_home.svg";
+import engineeringIcon from "../assets/Enginering.svg";
+import corporateLogo from "../assets/reglado-logo.svg";
 
 const heroSubtitle =
-  "Grupo empresarial especializado en consultoria, inmuebles, energia, tecnologia, inversiones e innovacion.";
+  "Grupo empresarial especializado en consultoría, inmuebles, energía, tecnología, inversiones e innovación.";
 
 const heroSubtitleChars = computed(() => Array.from(heroSubtitle));
 
@@ -159,43 +177,70 @@ const heroStyle = computed(() => ({
 
 const realstateUrl = import.meta.env.VITE_REGLADO_REALSTATE_URL || "#";
 const energyUrl = import.meta.env.VITE_REGLADO_ENERGY_URL || "http://localhost:5174";
-const mapasUrl = import.meta.env.VITE_REGLADO_MAPAS_URL || "#";
+const mapasUrl = import.meta.env.VITE_REGLADO_MAPAS_URL || "https://teal-bat-675895.hostingersite.com/";
+const mapasEntryUrl = computed(() => buildExternalProductUrl(mapasUrl));
 const enProcesoUrl = import.meta.env.VITE_REGLADO_ENPROCESO_URL || "#";
+const energyEntryUrl = computed(() => buildExternalProductUrl(energyUrl));
 
-const companies = [
+const companies = computed(() => [
   {
-    name: "Reglado Consultores",
-    tag: "Consultores",
-    description: "Consultoria estrategica y legal para operaciones, crecimiento y desarrollo empresarial.",
+    name: "Reglado Abogados",
+    tag: "Abogados",
+    description: "Consultoría estratégica y legal para operaciones, crecimiento y desarrollo empresarial.",
     href: "https://regladoconsultores.com/",
-    image: companyRealstate,
+    image: RegladoConsultoresCard,
     logo: balanceIcon,
   },
   {
-    name: "Reglado Energy",
-    tag: "Energy",
-    description: "Optimizacion energetica, analisis de consumo y gestion de contratos.",
-    href: energyUrl,
-    image: companyEnergy,
+    name: "Reglado Energía",
+    tag: "Energía",
+    description: "Optimización energética, análisis de consumo y gestión de contratos.",
+    href: energyEntryUrl.value,
+    image: RegladoEnergyCard,
     logo: boltIcon,
+  },
+  {
+    name: "Reglado Inmobiliaria",
+    tag: "Inmobiliaria",
+    description: "Consultoría estratégica y legal enfocada a operaciones inmobiliarias.",
+    href: realstateUrl,
+    image: RegladoRealStateCard,
+    logo: addHomeIcon,
   },
   {
     name: "Reglado Mapas",
     tag: "Mapas",
-    description: "Plataforma geografica y visualizacion avanzada para decisiones de negocio.",
-    href: enProcesoUrl,
-    image: companyMapas,
+    description: "Plataforma geográfica y visualización avanzada para decisiones de negocio.",
+    href: mapasEntryUrl.value,
+    image: RegladoMapsCard,
     logo: mapIcon,
   },
   {
-    name: "Reglado Realstate",
-    tag: "Realstate",
-    description: "Consultoria estrategica y legal enfocada a operaciones inmobiliarias.",
-    href: realstateUrl,
-    image: companyEnProceso,
+    name: "Reglado Ingeniería",
+    tag: "Ingeniería",
+    description: "Servicios integrales de ingeniería para el desarrollo y optimización de proyectos.",
+    href: "#",
+    image: companyProceso,
+    logo: engineeringIcon,
+  },
+  {
+    name: "Reglado RBR",
+    tag: "RBR",
+    description: "Servicios especializados de Recuperación de Bienes y Rentas (RBR).",
+    href: "#",
+    image: companyProceso,
     logo: apartmentIcon,
   },
-];
+]);
+
+const carouselGrid = ref(null);
+
+function scrollCarousel(direction) {
+  if (!carouselGrid.value) return;
+  // Desplazamiento de unos 360px (ancho tarjeta + gap aprox)
+  const offset = direction === 'left' ? -380 : 380;
+  carouselGrid.value.scrollBy({ left: offset, behavior: 'smooth' });
+}
 
 function scrollToCompanies() {
   const target = document.getElementById("empresas");
@@ -204,6 +249,32 @@ function scrollToCompanies() {
   }
 
   target.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function buildExternalProductUrl(baseUrl) {
+  if (!baseUrl || baseUrl === "#") {
+    return "#";
+  }
+
+  const cleanBase = String(baseUrl).replace(/\/+$/, "");
+  const token = auth.state.token;
+
+  if (!token) {
+    return cleanBase;
+  }
+
+  return `${cleanBase}/auth/callback?token=${encodeURIComponent(token)}`;
+}
+
+const heroVideoRef = ref(null);
+
+function handleVideoEnded() {
+  setTimeout(() => {
+    if (heroVideoRef.value) {
+      heroVideoRef.value.currentTime = 0;
+      heroVideoRef.value.play().catch(console.error);
+    }
+  }, 4000);
 }
 
 </script>
@@ -294,6 +365,17 @@ function scrollToCompanies() {
   mask-size: contain;
   filter: blur(0.2px);
   pointer-events: none;
+  animation: rotateSlow 20s linear infinite;
+  transform-origin: center center;
+}
+
+@keyframes rotateSlow {
+  from {
+    transform: translateY(-50%) rotate(0deg);
+  }
+  to {
+    transform: translateY(-50%) rotate(360deg);
+  }
 }
 
 .hero-content {
@@ -351,7 +433,7 @@ function scrollToCompanies() {
   align-items: center;
   justify-content: center;
   padding: 0.78rem 1.2rem;
-  border-radius: 12px;
+  border-radius: 20px;
   text-decoration: none;
   font-weight: 700;
   color: #fff;
@@ -564,7 +646,7 @@ function scrollToCompanies() {
 }
 
 .section-head {
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .section-head h2 {
@@ -573,13 +655,69 @@ function scrollToCompanies() {
   font-size: clamp(1.4rem, 3.2vw, 2rem);
 }
 
-.company-grid {
+.carousel-wrapper {
+  position: relative;
+  margin: 0 calc(-1 * clamp(1.2rem, 3vw, 1.8rem));
+  padding: 0 clamp(1.2rem, 3vw, 1.8rem) 1.5rem;
+}
+
+.carousel-btn {
+  position: absolute;
+  top: calc(50% - 1.5rem);
+  transform: translateY(-50%);
+  z-index: 10;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid #d8e0ed;
+  background: #ffffff;
+  color: #273d5c;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.8rem;
+  place-items: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 10px rgba(15, 32, 57, 0.15);
+}
+
+.btn-left {
+  left: 5px;
+}
+
+.btn-right {
+  right: 5px;
+}
+
+.carousel-btn:hover {
+  background: #f1f5fb;
+  border-color: #bcc9dd;
+  transform: translateY(-50%) scale(1.05);
+  box-shadow: 0 6px 14px rgba(15, 32, 57, 0.2);
+}
+
+.carousel-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.company-grid {
+  display: flex;
+  gap: 1.2rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;  /* IE and Edge */
+  padding-bottom: 1rem;
+}
+
+.company-grid::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }
 
 .company-card {
+  flex: 0 0 min(100%, 350px);
+  scroll-snap-align: start;
+  border: 1px solid #d7e0ee;
   border: 1px solid #d7e0ee;
   border-radius: 14px;
   background: #fff;
@@ -617,7 +755,7 @@ function scrollToCompanies() {
   position: absolute;
   z-index: 2;
   top: 0.7rem;
-  left: 0.7rem;
+  right: 0.7rem;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.52);
   padding: 0.28rem 0.52rem;
@@ -753,10 +891,6 @@ function scrollToCompanies() {
   .group-icons {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
-
-  .company-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
 }
 
 @media (max-width: 760px) {
@@ -785,19 +919,11 @@ function scrollToCompanies() {
     padding: 0.65rem 0.45rem;
     text-align: center;
   }
-
-  .company-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 @media (max-width: 520px) {
   .group-icons {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .company-grid {
-    grid-template-columns: 1fr;
   }
 
   .group-card strong {

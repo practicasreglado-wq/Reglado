@@ -3,8 +3,19 @@
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 
+/**
+ * Servicio encargado de la generación y verificación de tokens JWT (JSON Web Tokens).
+ * Utiliza la librería firebase/php-jwt para asegurar la integridad de las sesiones.
+ */
 class JwtService
 {
+    /**
+     * Genera un token JWT para un usuario.
+     * Incluye datos de perfil básicos en el payload para evitar consultas constantes a la BD.
+     * 
+     * @param array $user Datos del usuario (id, email, role, etc.)
+     * @return string Token JWT codificado
+     */
     public static function generate(array $user): string
     {
         $now = time();
@@ -29,6 +40,13 @@ class JwtService
         return JWT::encode($payload, $secret, 'HS256');
     }
 
+    /**
+     * Verifica la validez de un token JWT.
+     * 
+     * @param string $token Token a verificar
+     * @return array Payload decodificado
+     * @throws Exception Si el token es inválido o ha expirado
+     */
     public static function verify(string $token): array
     {
         $secret = getenv('JWT_SECRET') ?: 'change-this-secret';

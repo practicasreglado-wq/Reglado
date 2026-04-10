@@ -45,6 +45,7 @@ npm run build
 - `VITE_GRUPO_REGLADO_LOGIN_PATH`
 - `VITE_GRUPO_REGLADO_REGISTER_PATH`
 - `VITE_GRUPO_REGLADO_SETTINGS_PATH`
+- `VITE_BACKEND_BASE`
 - `VITE_CONTACT_ENDPOINT`
 
 ## Autenticacion
@@ -85,9 +86,24 @@ La carpeta `BACKEND/` contiene:
 SOURCE BACKEND/sql/facturas.sql;
 ```
 
-2. Ajustar la conexion en `BACKEND/db.php`.
+2. Crear `BACKEND/.env` con la configuracion real del servidor.
 
 3. Configurar `JWT_SECRET` en el backend para que coincida con `ApiLoging`.
+
+Ejemplo de `BACKEND/.env`:
+
+```env
+APP_ENV=production
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=facturas
+DB_USER=TU_USUARIO
+DB_PASS=TU_PASSWORD
+JWT_SECRET=EL_MISMO_SECRET_DE_APILOGING
+CORS_ALLOWED_ORIGINS=https://regladoenergy.com,https://regladogroup.com
+CONTACT_MAIL_TO=info@regladoenergy.com
+CONTACT_MAIL_FROM=no-reply@regladoenergy.com
+```
 
 ## Seguridad relevante
 

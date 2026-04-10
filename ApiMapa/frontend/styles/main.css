@@ -1,0 +1,574 @@
+/* Estilos generales */
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f5f5f5;
+}
+
+/* Desactivar controles de zoom de Leaflet */
+.leaflet-control-container .leaflet-top.leaflet-right {
+    display: none !important;
+}
+
+/* Panel de filtros */
+.panel-filtros {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 1000;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    width: 330px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.panel-filtros.colapsado .contenido-filtros {
+    display: none;
+}
+
+.header-filtros {
+    padding: 15px;
+    background: #2c3e50;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.header-filtros h2 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.header-filtros button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.contenido-filtros {
+    padding: 15px;
+}
+
+/* Filtros */
+.filtro {
+    margin-bottom: 20px;
+}
+
+.filtro label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.filtro label i {
+    margin-right: 8px;
+    color: #444B52;
+}
+
+/* Filtro con iconos */
+.icon-filters {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+    margin-top: 10px;
+}
+
+.icon-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 2px solid #ddd;
+    background: white;
+    transition: all 0.2s;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.icon-option.selected {
+    border-color: #00172e;
+    transform: scale(1.05);
+    box-shadow: 0 0 8px rgba(94, 94, 94, 0.3);
+}
+
+#subestacion.selected {
+    background: #fadbdb; 
+}
+#eolica.selected {
+    background: #e6f4f8; 
+}
+#solar.selected {
+    background: #f8f8da; 
+}
+#biometano.selected {
+    background: #e6d7f8; 
+}
+#hidrogeno.selected {
+    background: #fae4d1; 
+}
+#biodiesel.selected {
+    background: #dffcd6; 
+}
+#hidraulica.selected {
+    background: #cedbff; 
+}
+.icon-option img {
+    width: 24px;
+    height: 24px;
+    margin-bottom: 5px;
+}
+
+.icon-option span {
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+/* Select de comunidad */
+.select2-container {
+    width: 100% !important;
+    margin-top: 5px;
+}
+
+.select2-selection {
+    border-radius: 6px !important;
+    border: 1px solid #ddd !important;
+    height: auto !important;
+    padding: 8px !important;
+}
+
+.select2-dropdown {
+    border: none !important;
+    border-radius: 8px !important;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1) !important;
+    padding: 5px 0 !important;
+    margin-top: 5px !important;
+}
+
+.select2-results__option {
+    padding: 8px 15px !important;
+}
+
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background-color: #444B52 !important;
+    color: white !important;
+}
+
+.select2-container--default .select2-results__option[aria-selected=true] {
+    background-color: #e6eff8bd !important;
+    color: #444B52 !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 38px !important;
+    right: 10px !important;
+}
+
+/* Botones */
+.btn-filtrar, .btn-reset {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+#aplicar-filtros {
+    background: #444B52;
+    color: white;
+}
+
+#aplicar-filtros:hover, #cargar-todo:hover {
+    background: #2c98e0;
+}
+
+#cargar-todo {
+    background: #767e86;
+    color: white;
+}
+
+.btn-reset {
+    background: #ecf0f1;
+    color: #2c3e50;
+}
+
+.btn-reset:hover {
+    background: #bdc3c7;
+}
+
+/* Mapa */
+#map {
+    height: calc(100vh - 36px) !important;
+    background: #e0f7fa;
+}
+
+/* ===== CLUSTERS MEJORADOS ===== */
+.dynamic-cluster {
+    transition: all 0.3s ease;
+}
+
+.cluster-container {
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.cluster-container:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(0,90,200,0.5);
+    z-index: 1000;
+}
+
+.cluster-count {
+    font-size: 14px;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+
+/* ===== POPUPS MEJORADOS - VERSIÓN CORREGIDA ===== */
+.leaflet-popup-content {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 350px !important;
+    max-height: 70vh !important;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.popup-content-single {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.popup-header {
+    background: #2c3e50;
+    color: white;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.popup-header i {
+    font-size: 20px;
+    color: #ecf0f1;
+}
+
+.popup-header h4 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.popup-scrollable {
+    flex-grow: 1;
+    overflow-y: auto;
+    max-height: calc(60vh - 180px);
+    padding-bottom: 10px;
+}
+
+.popup-body {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.popup-body.multiple-instalaciones {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.instalacion-item {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    background: white;
+}
+
+.instalacion-item:last-child {
+    border-bottom: none;
+}
+
+.instalacion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.instalacion-header strong {
+    font-size: 15px;
+    color: #2c3e50;
+    margin: 0;
+    flex-grow: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ELIMINADO: Capacidad duplicada en el header */
+.instalacion-header .capacidad {
+    display: none;
+}
+
+.instalacion-details {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.popup-field {
+    display: flex;
+    align-items: flex-start;
+    padding: 6px 0;
+}
+
+.field-label {
+    font-weight: 600;
+    color: #2c3e50;
+    min-width: 140px;
+    font-size: 13px;
+    flex-shrink: 0;
+}
+
+.field-value {
+    color: #34495e;
+    font-size: 13px;
+    flex-grow: 1;
+    word-break: break-word;
+}
+
+.contact-info-link {
+    color: #2c98e0;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: #f0f7ff;
+    transition: all 0.2s;
+    font-size: 13px;
+    display: inline-block;
+}
+
+.contact-info-link:hover {
+    background: #2c98e0;
+    color: white;
+    text-decoration: none;
+}
+
+.popup-footer {
+    padding: 15px;
+    background: #f8f9fa;
+    border-top: 1px solid #eee;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex-shrink: 0;
+    margin-top: auto;
+}
+
+.comunidad-info, .provincia-info {
+    font-weight: 500;
+    color: #2c3e50;
+    font-size: 13px;
+}
+
+.contact-link-container {
+    width: 100%;
+    margin-top: 5px;
+}
+
+.contact-link {
+    background: #444B52;
+    color: white !important;
+    padding: 10px 15px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 13px;
+    transition: background 0.2s;
+    display: block;
+    text-align: center;
+    width: 100%;
+    box-sizing: border-box;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.contact-link:hover {
+    background: #2c98e0;
+}
+
+/* Footer de página */
+#footer-info {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    color: white;
+    padding: 5px 0;
+    z-index: 1000;
+    font-size: 12px;
+}
+
+.footer-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.footer-logo {
+    height: 20px;
+    margin-right: 12px;
+    margin-top: 5px;
+    transition: transform 0.3s ease;
+}
+
+.footer-logo:hover {
+    transform: scale(1.1);
+}
+
+.footer-text {
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.footer-text a {
+    color: #f8f9fa;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.footer-text a:hover {
+    color: #093a6b;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .panel-filtros {
+        width: calc(100% - 20px);
+        left: 10px;
+    }
+    
+    .leaflet-popup-content {
+        width: 280px !important;
+        max-height: 65vh !important;
+    }
+    
+    .popup-scrollable {
+        max-height: calc(65vh - 170px);
+    }
+    
+    .popup-header {
+        padding: 12px;
+    }
+    
+    .contact-link {
+        padding: 8px 10px;
+        font-size: 12px;
+    }
+    
+    /* Footer en móvil */
+    #footer-info {
+        height: 28px;
+    }
+    
+    .footer-content {
+        padding: 0 10px;
+    }
+    
+    .footer-logo {
+        height: 16px;
+        margin-right: 8px;
+    }
+    
+    .footer-text {
+        font-size: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .leaflet-popup-content {
+        width: 260px !important;
+    }
+    
+    .popup-header {
+        padding: 10px;
+    }
+    
+    .popup-body, .instalacion-item {
+        padding: 12px;
+    }
+    
+    .field-label {
+        font-size: 12px;
+        min-width: 120px;
+    }
+    
+    .field-value {
+        font-size: 12px;
+    }
+}
+
+/* == Responsive Popups == */
+.leaflet-popup-content {
+    /* en lugar de width: 350px */
+    width: 90vw !important;
+    max-width: 350px !important;   /* no crece más de 350px */
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* Ajustes adicionales en móvil */
+@media (max-width: 768px) {
+    .leaflet-popup-content {
+        width: 95vw !important;    /* casi todo el ancho */
+        max-height: 65vh !important;
+    }
+    .popup-scrollable {
+        max-height: calc(65vh - 180px) !important;
+    }
+    /* Que los labels no ocupen demasiado */
+    .field-label {
+        min-width: 80px !important;
+        font-size: 12px;
+    }
+    .field-value {
+        font-size: 12px;
+    }
+}

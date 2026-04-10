@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div v-if="open" class="modal-backdrop" @click.self="closeModal">
     <div class="modal-card" role="dialog" aria-modal="true" aria-label="Iniciar sesión">
       <div class="modal-head">
@@ -42,6 +42,11 @@
       <p class="register-text">
         ¿No tienes cuenta?
         <RouterLink to="/registro" @click="closeModal">Regístrate</RouterLink>
+      </p>
+
+      <p class="privacy-modal-link">
+        Al entrar, aceptas nuestra 
+        <RouterLink to="/politica-privacidad" @click="closeModal">Política de Privacidad</RouterLink>
       </p>
     </div>
   </div>

@@ -1,29 +1,31 @@
 <template>
-  <header ref="headerRef" class="topbar" :class="{ 'topbar-scrolled': isScrolled }">
+  <header ref="headerRef" class="topbar" :class="{ 'topbar-scrolled': isScrolled || isInternalRoute }">
     <RouterLink class="brand-link" to="/" aria-label="Ir al inicio">
       <img :src="logoSrc" alt="Reglado Energy" class="brand-logo" />
       <span class="brand">Grupo Reglado</span>
     </RouterLink>
 
     <nav class="menu desktop-menu">
-      <a href="https://regladoconsultores.com/">Consultores</a>
-      <a :href="energyUrl">Energy</a>
-      <a href="#">Mapas</a>
-      <a :href="realstateUrl">Real Estate</a>
+      <a href="https://regladoconsultores.com/">Abogados</a>
+      <a :href="energyUrl">Energía</a>
+      <a :href="realstateUrl">Inmobiliaria</a>
+      <a :href="mapasUrl">Mapas</a>
+      <a href="#">Ingeniería</a>
+      <a href="#">RBR</a>
     </nav>
 
     <div class="session-box desktop-session">
       <template v-if="user">
-        <RouterLink v-if="isAdmin" class="admin-pill" to="/admin" aria-label="Panel de administracion">
+        <RouterLink v-if="isAdmin" class="admin-pill" to="/admin" aria-label="Panel de administración">
           <img :src="adminUserIcon" alt="" class="admin-icon" />
         </RouterLink>
         <div class="user-menu-wrap">
           <button class="user-pill user-menu-trigger" @click="toggleUserMenu" aria-haspopup="menu"
-            :aria-expanded="userMenuOpen ? 'true' : 'false'" :title="displayUsername" aria-label="Menu de usuario">
+            :aria-expanded="userMenuOpen ? 'true' : 'false'" :title="displayUsername" aria-label="Menú de usuario">
             <span class="user-initial" aria-hidden="true">{{ userInitial }}</span>
           </button>
 
-          <div v-if="userMenuOpen" class="user-menu" role="menu" aria-label="Menu de usuario">
+          <div v-if="userMenuOpen" class="user-menu" role="menu" aria-label="Menú de usuario">
             <button class="user-menu-item" type="button" role="menuitem" @click="goToSettings">
               Configuración
             </button>
@@ -38,7 +40,7 @@
 
     <div class="mobile-controls">
       <RouterLink v-if="user && isAdmin" class="admin-pill mobile-admin-pill" to="/admin"
-        aria-label="Panel de administracion">
+        aria-label="Panel de administración">
         <img :src="adminUserIcon" alt="" class="admin-icon" />
       </RouterLink>
 
@@ -48,22 +50,43 @@
       </RouterLink>
 
       <button class="mobile-menu-toggle" type="button" :aria-expanded="mobileMenuOpen ? 'true' : 'false'"
-        aria-label="Abrir menu" @click="toggleMobileMenu">
+        aria-label="Abrir menú" @click="toggleMobileMenu">
         <img :src="menuIcon" alt="" class="mobile-menu-icon" />
       </button>
     </div>
 
-    <div v-if="mobileMenuOpen" class="mobile-menu" role="menu" aria-label="Menu principal">
+    <div v-if="mobileMenuOpen" class="mobile-menu" role="menu" aria-label="Menú principal">
       <nav class="mobile-nav">
-        <a href="https://regladoconsultores.com/" @click="closeMobileMenu">Consultores</a>
-        <a :href="energyUrl" @click="closeMobileMenu">Energy</a>
-        <a href="#" @click="closeMobileMenu">Mapas</a>
-        <a :href="realstateUrl" @click="closeMobileMenu">Real Estate</a>
+        <a href="https://regladoconsultores.com/" @click="closeMobileMenu">
+          Abogados
+        </a>
+        <a :href="energyUrl" @click="closeMobileMenu">
+          Energía
+        </a>
+        <a :href="realstateUrl" @click="closeMobileMenu">
+          Inmobiliaria
+        </a>
+        <a :href="mapasUrl" @click="closeMobileMenu">
+          Mapas
+        </a>
+        <a href="#" @click="closeMobileMenu">
+          Ingeniería
+        </a>
+        <a href="#" @click="closeMobileMenu">
+          RBR
+        </a>
       </nav>
 
       <div class="mobile-session">
         <template v-if="user">
-          <button class="mobile-session-action" type="button" role="menuitem" @click="logoutAndCloseMobile">
+          <div class="menu-divider"></div>
+          <button class="mobile-session-action" type="button" role="menuitem" @click="goToSettings(); closeMobileMenu()">
+            Configuración
+          </button>
+          <button v-if="isAdmin" class="mobile-session-action" type="button" role="menuitem" @click="router.push('/admin'); closeMobileMenu()">
+            Administración
+          </button>
+          <button class="mobile-session-action danger" type="button" role="menuitem" @click="logoutAndCloseMobile">
             Cerrar sesión
           </button>
         </template>
@@ -78,10 +101,11 @@
 
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
-import { RouterLink, useRouter } from "vue-router";
+import { RouterLink, useRouter, useRoute } from "vue-router";
 import adminUserIcon from "../assets/admin-user-icon.svg";
 import menuIcon from "../assets/menu.svg";
-import logoSrc from "../assets/reglado-energy-logo.svg";
+import logoSrc from "../assets/reglado-logo.svg";
+import { auth } from "../services/auth";
 
 const props = defineProps({
   user: {
@@ -92,14 +116,19 @@ const props = defineProps({
 
 const emit = defineEmits(["open-login", "logout"]);
 const router = useRouter();
+const route = useRoute();
 const realstateUrl = import.meta.env.VITE_REGLADO_REALSTATE_URL || "#";
-const energyUrl = import.meta.env.VITE_REGLADO_ENERGY_URL || "http://localhost:5174";
+const rawMapasUrl = import.meta.env.VITE_REGLADO_MAPAS_URL || "https://teal-bat-675895.hostingersite.com/";
+const mapasUrl = computed(() => buildExternalProductUrl(rawMapasUrl));
+const rawEnergyUrl = import.meta.env.VITE_REGLADO_ENERGY_URL || "http://localhost:5174";
+const energyUrl = computed(() => buildExternalProductUrl(rawEnergyUrl));
 
 const userMenuOpen = ref(false);
 const mobileMenuOpen = ref(false);
 const headerRef = ref(null);
 const isScrolled = ref(false);
 const isAdmin = computed(() => props.user?.role === "admin");
+const isInternalRoute = computed(() => route.path !== '/');
 
 const displayUsername = computed(() => {
   const username = props.user?.username;
@@ -177,6 +206,21 @@ onBeforeUnmount(() => {
   document.removeEventListener("pointerdown", handlePointerDown);
   window.removeEventListener("scroll", handleScroll);
 });
+
+function buildExternalProductUrl(baseUrl) {
+  if (!baseUrl || baseUrl === "#") {
+    return "#";
+  }
+
+  const cleanBase = String(baseUrl).replace(/\/+$/, "");
+  const token = auth.state.token;
+
+  if (!token) {
+    return cleanBase;
+  }
+
+  return `${cleanBase}/auth/callback?token=${encodeURIComponent(token)}`;
+}
 </script>
 
 <style scoped>
@@ -235,6 +279,12 @@ onBeforeUnmount(() => {
   width: 36px;
   height: 36px;
   object-fit: contain;
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), filter 0.4s ease;
+}
+
+.brand-link:hover .brand-logo {
+  transform: rotate(180deg) scale(1.05);
+  filter: drop-shadow(0 0.35rem 0.8rem rgba(255, 255, 255, 0.15));
 }
 
 .brand {
@@ -494,6 +544,16 @@ onBeforeUnmount(() => {
   .mobile-login-btn {
     width: 100%;
   }
+
+  .menu-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.12);
+    margin: 0.4rem 0.6rem;
+  }
+
+  .mobile-session-action.danger {
+    color: #ff8a8a;
+  }
 }
 
 @media (max-width: 640px) {
@@ -515,3 +575,5 @@ onBeforeUnmount(() => {
   }
 }
 </style>
+
+

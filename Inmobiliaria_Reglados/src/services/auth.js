@@ -2,7 +2,7 @@ import { reactive } from "vue";
 
 const API_BASE = import.meta.env.VITE_AUTH_API_URL || "http://localhost:8000";
 const TOKEN_KEY = "inmobiliaria_auth_token";
-const COOKIE_TOKEN_KEY = "reglado_auth_token";
+const COOKIE_TOKEN_KEY = "reglado_auth_token"; // Cookie compartida entre proyectos del ecosistema
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 
 const state = reactive({

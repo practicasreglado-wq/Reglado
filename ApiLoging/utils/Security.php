@@ -115,15 +115,19 @@ class Security
         return [
             'http://localhost:5173',
             'http://localhost:5174',
+            'http://localhost:5175',
+            'http://localhost:5176',
             'http://127.0.0.1:5173',
             'http://127.0.0.1:5174',
+            'http://127.0.0.1:5175',
+            'http://127.0.0.1:5176',
         ];
     }
 
     private static function parseCsv(string $value): array
     {
         $parts = array_map('trim', explode(',', $value));
-        $parts = array_values(array_filter($parts, static fn ($item) => $item !== ''));
+        $parts = array_values(array_filter($parts, static fn($item) => $item !== ''));
         return array_values(array_unique($parts));
     }
 
