@@ -73,17 +73,139 @@ $approveUrl = "http://localhost/Reglado/Inmobiliaria_Reglados/backend/api/approv
 $rejectUrl = "http://localhost/Reglado/Inmobiliaria_Reglados/backend/api/reject_user.php?email=" . urlencode($userEmail) . "&token=" . $token;
 
 $body = <<<HTML
-<h2>Solicitud de Usuario promocionar a Real</h2>
-<p><strong>El solicitante:</strong> {$safeFirstName} {$safeLastName}</p>
-<p><strong>Username:</strong> {$safeUsername}</p>
-<p><strong>Correo de cuenta:</strong> {$safeEmail}</p>
-<p>Esta interesado en ser usuario Real.</p>
-<p><strong>Motivo:</strong> {$safeMessage}</p>
-<br>
-<div style="display: flex; gap: 15px; margin-top: 10px;">
-    <a href="{$approveUrl}" style="display: inline-block; padding: 10px 20px; background-color: #0b3d91; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; font-family: sans-serif;">Aprobar y asignar rol Real</a>
-    <a href="{$rejectUrl}" style="display: inline-block; padding: 10px 20px; background-color: #d32f2f; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; font-family: sans-serif; margin-left: 15px;">Rechazar solicitud</a>
-</div>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Solicitud de promoción a usuario Real</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f4f6f8;font-family:Arial,Helvetica,sans-serif;color:#1f2937;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f4f6f8;margin:0;padding:0;">
+    <tr>
+      <td align="center" style="padding:32px 16px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:680px;background-color:#ffffff;border-radius:18px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,0.08);">
+          
+          <tr>
+            <td style="background:linear-gradient(135deg,#0b3d91 0%,#123f7a 100%);padding:32px 36px;text-align:center;">
+              <div style="display:inline-block;background-color:rgba(255,255,255,0.12);color:#ffffff;font-size:12px;font-weight:bold;letter-spacing:0.08em;text-transform:uppercase;padding:8px 14px;border-radius:999px;">
+                Reglado Real Estate
+              </div>
+              <h1 style="margin:18px 0 8px 0;font-size:30px;line-height:1.2;color:#ffffff;font-weight:700;">
+                Nueva solicitud de promoción
+              </h1>
+              <p style="margin:0;font-size:15px;line-height:1.6;color:#dbe7ff;">
+                Solicitud para promocionar un usuario al rol Real
+              </p>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:36px 36px 20px 36px;">
+              <div style="display:inline-block;background-color:#eef4ff;color:#0b3d91;font-size:13px;font-weight:700;padding:8px 14px;border-radius:999px;margin-bottom:20px;">
+                Revisión administrativa
+              </div>
+
+              <p style="margin:0 0 18px 0;font-size:16px;line-height:1.7;color:#374151;">
+                Se ha recibido una nueva solicitud para promocionar a un usuario al perfil <strong>Real</strong>.
+              </p>
+
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #e5e7eb;border-radius:16px;background-color:#f9fafb;margin:0 0 24px 0;">
+                <tr>
+                  <td style="padding:24px;">
+                    <p style="margin:0 0 14px 0;font-size:15px;line-height:1.6;color:#111827;font-weight:700;">
+                      Datos del solicitante
+                    </p>
+
+                    <p style="margin:0 0 10px 0;font-size:15px;line-height:1.6;color:#4b5563;">
+                      <strong>Nombre:</strong> {$safeFirstName} {$safeLastName}
+                    </p>
+
+                    <p style="margin:0 0 10px 0;font-size:15px;line-height:1.6;color:#4b5563;">
+                      <strong>Username:</strong> {$safeUsername}
+                    </p>
+
+                    <p style="margin:0 0 10px 0;font-size:15px;line-height:1.6;color:#4b5563;">
+                      <strong>Correo de cuenta:</strong> {$safeEmail}
+                    </p>
+
+                    <p style="margin:0;font-size:15px;line-height:1.6;color:#4b5563;">
+                      <strong>Estado:</strong> Interesado en ser usuario Real
+                    </p>
+                  </td>
+                </tr>
+              </table>
+
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #e5e7eb;border-radius:16px;background-color:#ffffff;margin:0 0 28px 0;">
+                <tr>
+                  <td style="padding:24px;">
+                    <p style="margin:0 0 12px 0;font-size:15px;line-height:1.6;color:#111827;font-weight:700;">
+                      Motivo de la solicitud
+                    </p>
+                    <p style="margin:0;font-size:15px;line-height:1.8;color:#4b5563;">
+                      {$safeMessage}
+                    </p>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="margin:0 0 18px 0;font-size:15px;line-height:1.7;color:#374151;font-weight:600;text-align:center;">
+                Seleccione una acción para gestionar esta solicitud:
+              </p>
+
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td align="center" style="padding:0 0 10px 0;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td align="center" style="border-radius:10px;background-color:#0b3d91;">
+                          <a href="{$approveUrl}" style="display:inline-block;padding:14px 24px;font-size:15px;font-weight:700;color:#ffffff;text-decoration:none;border-radius:10px;">
+                            Aprobar y asignar rol Real
+                          </a>
+                        </td>
+                        <td style="width:12px;"></td>
+                        <td align="center" style="border-radius:10px;background-color:#d32f2f;">
+                          <a href="{$rejectUrl}" style="display:inline-block;padding:14px 24px;font-size:15px;font-weight:700;color:#ffffff;text-decoration:none;border-radius:10px;">
+                            Rechazar solicitud
+                          </a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="margin:22px 0 0 0;font-size:13px;line-height:1.7;color:#6b7280;text-align:center;">
+                Si los botones no funcionan en su cliente de correo, puede copiar y pegar manualmente los enlaces desde la versión de texto del mensaje.
+              </p>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:8px 36px 32px 36px;">
+              <div style="height:1px;background-color:#e5e7eb;margin-bottom:22px;"></div>
+              <p style="margin:0 0 6px 0;font-size:15px;line-height:1.6;color:#111827;font-weight:700;">
+                Reglado Real Estate
+              </p>
+              <p style="margin:0;font-size:14px;line-height:1.6;color:#6b7280;">
+                Correo automático de revisión de solicitudes de promoción de rol.
+              </p>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="background-color:#f9fafb;padding:18px 24px;text-align:center;border-top:1px solid #e5e7eb;">
+              <p style="margin:0;font-size:12px;line-height:1.6;color:#6b7280;">
+                Este correo ha sido generado automáticamente por la plataforma de Reglado Real Estate.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
 HTML;
 
 $altBody = trim(

@@ -45,10 +45,11 @@ export function normalizeProperty(property) {
 
   return {
     ...property,
-    categoria: categoria,
+    categoria,
     caracteristicas: parseCharacteristics(property),
     imageUrl:
       property.image_url ||
+      property.imageUrl ||
       categoryImageMap[normalizedCategory] ||
       activosImage,
     titulo:
@@ -56,6 +57,11 @@ export function normalizeProperty(property) {
       property.nombre ||
       property.tipo_propiedad ||
       "Activo inmobiliario",
+    ubicacion_general:
+      property.ubicacion_general ||
+      property.ubicacion ||
+      property.direccion ||
+      "",
   };
 }
 
@@ -72,6 +78,7 @@ export async function fetchProperties(filters = {}) {
   const queryString = queryParams.toString();
   const query = queryString ? `?${queryString}` : "";
   const payload = await backendJson(`api/get_properties.php${query}`);
+
   return (payload.properties || []).map(normalizeProperty);
 }
 
@@ -146,35 +153,45 @@ export async function requestPropertyPurchase(propertyId) {
 
 export async function fetchFavoriteProperties() {
   const payload = await backendJson("api/get_favorite_properties.php");
-  return (payload.properties || []).map(normalizeProperty);
+  const list = Array.isArray(payload?.properties) ? payload.properties : [];
+  return list.map(normalizeProperty);
 }
 
-export async function saveFavorite(data) {
+export async function saveFavorite(propertyId) {
+  if (!propertyId) {
+    throw new Error("Identificador de propiedad requerido");
+  }
+
   return backendJson("api/save-favorite.php", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
+    body: JSON.stringify({ property_id: propertyId }),
   });
 }
 
 export async function removeFavorite(propertyId) {
+  if (!propertyId) {
+    throw new Error("Identificador de propiedad requerido");
+  }
+
   return backendJson("api/remove-favorite.php", {
-    method: "DELETE",
+    method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ property_id: propertyId }),
   });
 }
 
 export async function fetchUserPropertiesForSale() {
-  const payload = await backendJson("api/get_user_properties_for_sale.php");
-  const list = Array.isArray(payload) ? payload : payload?.properties || [];
+  const payload = await backendJson("api/get_user_properties.php");
+  const list = Array.isArray(payload?.properties) ? payload.properties : [];
 
   return list.map((p) =>
     normalizeProperty({
       ...p,
       titulo: p.titulo || p.nombre || p.tipo_propiedad,
       categoria: p.categoria || p.tipo || "activos",
-      ubicacion_general: p.ubicacion || p.direccion || "",
+      ubicacion_general:
+        p.ubicacion_general || p.ubicacion || p.direccion || "",
     })
   );
 }

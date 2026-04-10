@@ -10,6 +10,9 @@ function sendNotificationEmail(string $to, string $subject, string $htmlBody, ?s
 {
     $mailer = new PHPMailer(true);
 
+    $mailer->CharSet = 'UTF-8';
+    $mailer->Encoding = 'base64';   
+
     $host = getenv('SMTP_HOST') ?: '';
     $port = (int) (getenv('SMTP_PORT') ?: 0);
     $user = getenv('SMTP_USER') ?: '';

@@ -167,3 +167,18 @@ CREATE TABLE IF NOT EXISTS signed_document_review_tokens (
     INDEX idx_review_property (property_id),
     INDEX idx_review_buyer (buyer_user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS user_match_preferences (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    category VARCHAR(50) NOT NULL,
+    answers_json JSON NOT NULL,
+    is_active TINYINT(1) NOT NULL DEFAULT 1,
+    last_used_at TIMESTAMP NULL DEFAULT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    UNIQUE KEY uniq_user_match (user_id),
+    INDEX idx_user_match_category (category),
+    INDEX idx_user_match_user (user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

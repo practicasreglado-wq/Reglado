@@ -64,7 +64,7 @@ async function handleProcessText() {
     const payload = await processPropertyFromText(clean);
     feedbackMessage.value =
       payload.message ||
-      `Propiedad procesada correctamente (ID ${payload.propertyId ?? "?"}).`;
+      `Propiedad procesada correctamente`;
     description.value = "";
   } catch (error) {
     feedbackMessage.value =

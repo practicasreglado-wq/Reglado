@@ -27,8 +27,12 @@ class PdfGenerator
         $ficha = $data['ficha_web'] ?? [];
         $dossier = $data['dossier_inversion'] ?? [];
 
-        $ndaFile = "nda_{$propertyId}.pdf";
-        $loiFile = "loi_{$propertyId}.pdf";
+        $propertyType = $this->slugifyFilenamePart($ficha['tipo_propiedad'] ?? null);
+        $city = $this->slugifyFilenamePart($ficha['ciudad'] ?? null);
+        $zone = $this->slugifyFilenamePart($ficha['zona'] ?? null);
+
+        $ndaFile = "nda_{$propertyId}-{$propertyType}_{$city}_{$zone}.pdf";
+        $loiFile = "loi_{$propertyId}-{$propertyType}_{$city}_{$zone}.pdf";
 
         $ndaPath = $this->storageDir . DIRECTORY_SEPARATOR . $ndaFile;
         $loiPath = $this->storageDir . DIRECTORY_SEPARATOR . $loiFile;
@@ -396,5 +400,40 @@ class PdfGenerator
     private function formatDate(): string
     {
         return date('d/m/Y');
+    }
+
+    private function slugifyFilenamePart(mixed $value): string
+    {
+        $text = trim((string) ($value ?? ''));
+
+        if ($text === '') {
+            return 'sin_dato';
+        }
+
+        $replacements = [
+            'á' => 'a', 'à' => 'a', 'ä' => 'a', 'â' => 'a',
+            'é' => 'e', 'è' => 'e', 'ë' => 'e', 'ê' => 'e',
+            'í' => 'i', 'ì' => 'i', 'ï' => 'i', 'î' => 'i',
+            'ó' => 'o', 'ò' => 'o', 'ö' => 'o', 'ô' => 'o',
+            'ú' => 'u', 'ù' => 'u', 'ü' => 'u', 'û' => 'u',
+            'ñ' => 'n', 'ç' => 'c',
+            'Á' => 'a', 'À' => 'a', 'Ä' => 'a', 'Â' => 'a',
+            'É' => 'e', 'È' => 'e', 'Ë' => 'e', 'Ê' => 'e',
+            'Í' => 'i', 'Ì' => 'i', 'Ï' => 'i', 'Î' => 'i',
+            'Ó' => 'o', 'Ò' => 'o', 'Ö' => 'o', 'Ô' => 'o',
+            'Ú' => 'u', 'Ù' => 'u', 'Ü' => 'u', 'Û' => 'u',
+            'Ñ' => 'n', 'Ç' => 'c',
+        ];
+
+        $text = strtr($text, $replacements);
+        $text = strtolower($text);
+        $text = preg_replace('/[^a-z0-9]+/', '_', $text);
+        $text = trim((string) $text, '_');
+
+        if ($text === '') {
+            return 'sin_dato';
+        }
+
+        return $text;
     }
 }

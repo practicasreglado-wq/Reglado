@@ -1,15 +1,15 @@
 <?php
 declare(strict_types=1);
 
-function pdfSeemsSigned($uploadedPath, $originalPath = null): array
+/*function pdfSeemsSigned($uploadedPath, $originalPath = null): array
 {
     return [
         'accepted' => true,
         'reason' => 'Validación desactivada (modo debug)'
     ];
-}
+}*/
 
-/*function pdfSeemsSigned(string $uploadedPath, ?string $originalPath = null): array
+function pdfSeemsSigned(string $uploadedPath, ?string $originalPath = null): array
 {
     if (!is_file($uploadedPath) || !is_readable($uploadedPath)) {
         return ['accepted' => false, 'reason' => 'Archivo no accesible'];
@@ -130,4 +130,4 @@ function pdfSeemsSigned($uploadedPath, $originalPath = null): array
         'accepted' => true,
         'reason' => implode(', ', array_filter($reasonParts)),
     ];
-}*/
+}

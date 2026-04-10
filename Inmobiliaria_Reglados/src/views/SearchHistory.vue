@@ -80,13 +80,13 @@ export default {
 
       // 2. Sincronizar preferencias con el backend
       try {
-        await backendJson("api/save_preferences.php", {
+        await backendJson("api/match_preferences.php", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            categoria: item.category,
-            preferencias: item.preferences
-          })
+            category: item.category,
+            answers: item.preferences,
+          }),
         });
       } catch (err) {
         console.error("Error syncing preferences to backend:", err);
@@ -104,23 +104,24 @@ export default {
     };
 
     const deleteSearch = async (item) => {
-      error.value = "";
+  error.value = "";
 
-      try {
-        await backendJson("api/delete_search_history.php", {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            search_id: item.id,
-            user_id: userStore.user?.iduser,
-          }),
-        });
+  try {
+    await backendJson("api/delete_search_history.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        search_id: item.id,
+        user_id: userStore.user?.iduser,
+      }),
+    });
 
-        history.value = history.value.filter((entry) => entry.id !== item.id);
-      } catch (err) {
-        error.value = err.message || "No se pudo eliminar la búsqueda.";
-      }
-    };
+    history.value = history.value.filter((entry) => entry.id !== item.id);
+  } catch (err) {
+    error.value = err.message || "No se pudo eliminar la búsqueda.";
+    console.error("Error eliminando búsqueda:", err);
+  }
+};
 
     onMounted(loadHistory);
 

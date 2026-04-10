@@ -21,8 +21,11 @@ class DossierService
 
     public function generateDossierPDF(int $propertyId, array $dossier, array $ficha = []): string
     {
-        $fileName = sprintf('dossier_%d.pdf', $propertyId);
-        $path = $this->workingDir . DIRECTORY_SEPARATOR . 'dossiers' . DIRECTORY_SEPARATOR . $fileName;
+        $propertyType = $this->slugifyFilenamePart($ficha['tipo_propiedad'] ?? null);
+        $city = $this->slugifyFilenamePart($ficha['ciudad'] ?? null);
+        $zone = $this->slugifyFilenamePart($ficha['zona'] ?? null);
+
+        $fileName = "dossier_{$propertyId}-{$propertyType}_{$city}_{$zone}.pdf";        $path = $this->workingDir . DIRECTORY_SEPARATOR . 'dossiers' . DIRECTORY_SEPARATOR . $fileName;
 
         $dompdf = new Dompdf();
         $dompdf->loadHtml($this->buildHtml($dossier, $ficha));
@@ -36,6 +39,45 @@ class DossierService
 
         return 'dossiers/' . $fileName;
     }
+
+    private function slugifyFilenamePart(mixed $value): string
+{
+    $text = trim((string) ($value ?? ''));
+
+    if ($text === '') {
+        return 'sin_dato';
+    }
+
+    $replacements = [
+        'á' => 'a', 'à' => 'a', 'ä' => 'a', 'â' => 'a',
+        'é' => 'e', 'è' => 'e', 'ë' => 'e', 'ê' => 'e',
+        'í' => 'i', 'ì' => 'i', 'ï' => 'i', 'î' => 'i',
+        'ó' => 'o', 'ò' => 'o', 'ö' => 'o', 'ô' => 'o',
+        'ú' => 'u', 'ù' => 'u', 'ü' => 'u', 'û' => 'u',
+        'ñ' => 'n', 'ç' => 'c',
+        'Á' => 'a', 'À' => 'a', 'Ä' => 'a', 'Â' => 'a',
+        'É' => 'e', 'È' => 'e', 'Ë' => 'e', 'Ê' => 'e',
+        'Í' => 'i', 'Ì' => 'i', 'Ï' => 'i', 'Î' => 'i',
+        'Ó' => 'o', 'Ò' => 'o', 'Ö' => 'o', 'Ô' => 'o',
+        'Ú' => 'u', 'Ù' => 'u', 'Ü' => 'u', 'Û' => 'u',
+        'Ñ' => 'n', 'Ç' => 'c',
+    ];
+
+    $text = strtr($text, $replacements);
+    $text = strtolower($text);
+
+    $text = str_replace(['/', '\\', ':', '*', '?', '"', '<', '>', '|'], '_', $text);
+    $text = preg_replace('/\s+/', '_', $text);
+    $text = preg_replace('/_+/', '_', $text);
+
+    $text = trim((string) $text, '._- ');
+
+    if ($text === '') {
+        return 'sin_dato';
+    }
+
+    return $text;
+}
 
     private function buildHtml(array $dossier, array $ficha = []): string
     {
@@ -152,7 +194,7 @@ class DossierService
         $html .= $this->buildListSection('Observaciones', $dossier['observaciones'] ?? []);
 
         $html .= '<div class="footer-note">';
-        $html .= 'Documento generado automáticamente a partir de información recibida y estructurada mediante IA. ';
+        $html .= 'Documento generado automáticamente. ';
         $html .= 'Debe validarse jurídica, urbanística, técnica y económicamente antes de adoptar decisiones de inversión.';
         $html .= '</div>';
 

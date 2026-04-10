@@ -33,6 +33,7 @@
       >
         <PropertyCard
           :property="property"
+          :favorite-loading="pendingFavorites.has(property.id)"
           @toggle-favorite="toggleFavorite"
         />
       </div>
@@ -44,7 +45,6 @@
 import PropertyCard from "../components/PropertyCard.vue";
 import {
   fetchUserPropertiesForSale,
-  normalizeProperty,
   removeFavorite,
   saveFavorite,
 } from "../services/properties";
@@ -97,14 +97,10 @@ export default {
         if (property.is_favorite) {
           await removeFavorite(property.id);
         } else {
-          await saveFavorite({
-            property_id: property.id,
-            categoria: property.categoria,
-          });
+          await saveFavorite(property.id);
         }
 
-        const updated = await fetchUserPropertiesForSale();
-        this.properties = updated.map(normalizeProperty);
+        await this.getProperties();
       } catch (error) {
         console.error("Error actualizando favorito:", error);
       } finally {

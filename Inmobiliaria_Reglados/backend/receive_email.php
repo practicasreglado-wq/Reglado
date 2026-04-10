@@ -295,35 +295,72 @@ function notifySenderProcessingResult(?string $sender, bool $success): void
         ? 'Tu propiedad ha sido procesada correctamente y añadida al sistema.'
         : 'Tu propiedad no ha podido ser procesada porque faltan datos necesarios o se produjo un error interno al procesarla.';
 
+    $status = $success
+        ? 'Procesado correctamente'
+        : 'Error en el procesamiento';
+
+    $color = $success
+        ? '#16a34a'
+        : '#dc2626';
+
+    $html = "
+    <!DOCTYPE html>
+    <html lang='es'>
+    <head>
+        <meta charset='UTF-8'>
+        <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+        <title>{$subject}</title>
+    </head>
+    <body style='margin:0; padding:0; background-color:#f4f6f8; font-family:Arial, sans-serif;'>
+        <table width='100%' cellpadding='0' cellspacing='0' border='0' style='background-color:#f4f6f8; padding:24px 0;'>
+            <tr>
+                <td align='center'>
+                    <table width='520' cellpadding='0' cellspacing='0' border='0' style='max-width:520px; width:100%; background:#ffffff; border-radius:10px; overflow:hidden; box-shadow:0 2px 10px rgba(0,0,0,0.06);'>
+                        <tr>
+                            <td style='background:#111827; color:#ffffff; text-align:center; padding:18px 24px; font-size:20px; font-weight:bold;'>
+                                Reglado Real State
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style='padding:30px 28px; color:#333333;'>
+                                <p style='margin:0 0 14px 0; font-size:15px;'>
+                                    Hola,
+                                </p>
+
+                                <p style='margin:0 0 18px 0; font-size:15px; line-height:1.6; color:#374151;'>
+                                    {$message}
+                                </p>
+
+                                <div style='margin:0 0 20px 0; padding:12px 16px; border-radius:8px; background:#f9fafb; border-left:4px solid {$color};'>
+                                    <span style='font-size:14px; font-weight:bold; color:{$color};'>
+                                        {$status}
+                                    </span>
+                                </div>
+
+                                <p style='margin:0; font-size:13px; line-height:1.5; color:#6b7280;'>
+                                    Este es un mensaje automático generado por la plataforma.
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style='background:#f9fafb; text-align:center; padding:14px 20px; font-size:12px; color:#9ca3af;'>
+                                © " . date('Y') . " Reglado Real State
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </body>
+    </html>
+    ";
+
     try {
-        sendNotificationEmail($sender, $subject, "<p>{$message}</p>");
+        sendNotificationEmail($sender, $subject, $html);
     } catch (Throwable $mailException) {
         webhookLog('ERROR EN ENVÍO DE EMAIL', [
             'message' => $mailException->getMessage(),
             'sender' => $sender,
-        ]);
-    }
-}
-
-function markAssetAsError(PDO $pdo, int $assetId, string $errorMessage): void
-{
-    try {
-        $stmt = $pdo->prepare("
-            UPDATE activos_recibidos
-            SET procesado = 'error'
-            WHERE id = ?
-        ");
-        $stmt->execute([$assetId]);
-
-        webhookLog('PASO ERROR activo marcado como error', [
-            'asset_id' => $assetId,
-            'error' => $errorMessage,
-        ]);
-    } catch (Throwable $e) {
-        webhookLog('ERROR MARCANDO ACTIVO COMO ERROR', [
-            'asset_id' => $assetId,
-            'message' => $e->getMessage(),
-            'original_error' => $errorMessage,
         ]);
     }
 }
@@ -440,6 +477,7 @@ try {
             webhookLog('Duplicado por message_id', [
                 'message_id' => $messageId,
                 'existing_asset_id' => $existingByMessageId['id'] ?? null,
+                'procesado' => $existingByMessageId['procesado'] ?? null
             ]);
 
             jsonResponse([
@@ -489,6 +527,8 @@ try {
         ]);
     }
 
+    $pdo->beginTransaction();
+
     $repository = new Repository($pdo);
 
     $metadata = [
@@ -507,41 +547,45 @@ try {
     ];
 
     $insertResult = $repository->insertReceivedAsset(
-    'email',
-    $sender,
-    $text,
-    $contentHash,
-    $messageId,
-    $metadata
-);
+        'email',
+        $sender,
+        $text,
+        $contentHash,
+        $messageId,
+        $metadata
+    );
 
-$assetId = (int) $insertResult['id'];
-$isDuplicateInsert = (bool) $insertResult['is_duplicate'];
+    $assetId = (int) $insertResult['id'];
+    $isDuplicateInsert = (bool) $insertResult['is_duplicate'];
 
-webhookLog('PASO 4 activo insertado o recuperado', [
-    'asset_id' => $assetId,
-    'sender' => $sender,
-    'is_duplicate_insert' => $isDuplicateInsert,
-]);
-
-if ($repository->isAssetAlreadyProcessed($assetId)) {
-    webhookLog('DUPLICADO: activo ya procesado, se corta el flujo', [
+    webhookLog('PASO 4 activo insertado o recuperado', [
         'asset_id' => $assetId,
+        'sender' => $sender,
+        'is_duplicate_insert' => $isDuplicateInsert,
     ]);
 
-    jsonResponse([
-        'success' => true,
-        'duplicate' => true,
-        'reason' => 'already_processed',
-        'asset_id' => $assetId,
-    ]);
-}
+    if ($repository->isAssetAlreadyProcessed($assetId)) {
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
 
-if ($isDuplicateInsert) {
-    webhookLog('DUPLICADO: activo existente recuperado pero aún no procesado', [
-        'asset_id' => $assetId,
-    ]);
-}
+        webhookLog('DUPLICADO: activo ya procesado, se corta el flujo', [
+            'asset_id' => $assetId,
+        ]);
+
+        jsonResponse([
+            'success' => true,
+            'duplicate' => true,
+            'reason' => 'already_processed',
+            'asset_id' => $assetId,
+        ]);
+    }
+
+    if ($isDuplicateInsert) {
+        webhookLog('DUPLICADO: activo existente recuperado pero aún no procesado', [
+            'asset_id' => $assetId,
+        ]);
+    }
 
     $claudeKey = getenv('ANTHROPIC_API_KEY') ?: '';
     $claudeModel = getenv('ANTHROPIC_MODEL') ?: 'claude-3-5-sonnet-20240620';
@@ -577,18 +621,71 @@ if ($isDuplicateInsert) {
 
     $propertyId = $processor->process($assetId);
 
+    webhookLog('PASO 6B resultado process()', [
+        'asset_id' => $assetId,
+        'property_id_raw' => $propertyId,
+        'property_id_type' => gettype($propertyId),
+    ]);
+
+    if (!is_numeric($propertyId) || (int) $propertyId <= 0) {
+        throw new RuntimeException('La propiedad no se creó correctamente.');
+    }
+
+    $propertyId = (int) $propertyId;
+
     webhookLog('PASO 7 propiedad creada correctamente', [
         'asset_id' => $assetId,
         'property_id' => $propertyId,
     ]);
 
+    if ($pdo->inTransaction()) {
+        webhookLog('PASO 8 antes commit', [
+            'asset_id' => $assetId,
+            'property_id' => $propertyId,
+        ]);
+
+        $pdo->commit();
+
+        webhookLog('PASO 9 commit realizado', [
+            'asset_id' => $assetId,
+            'property_id' => $propertyId,
+        ]);
+    }
+
+    webhookLog('PASO 10 antes email OK', [
+        'sender' => $sender,
+        'property_id' => $propertyId,
+    ]);
+
     notifySenderProcessingResult($sender, true);
+
+    webhookLog('PASO 11 después email OK', [
+        'sender' => $sender,
+        'property_id' => $propertyId,
+    ]);
 
     jsonResponse([
         'success' => true,
         'propertyId' => $propertyId,
     ]);
+
 } catch (Throwable $exception) {
+    if ($assetId !== null) {
+    try {
+            $stmt = $pdo->prepare("
+                UPDATE activos_recibidos 
+                SET procesado = 'error', processed_at = NOW()
+                WHERE id = ?
+            ");
+            $stmt->execute([$assetId]);
+        } catch (Throwable $e) {
+            webhookLog('ERROR marcando como error', [
+                'asset_id' => $assetId,
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
+    
     webhookLog('ERROR GLOBAL', [
         'message' => $exception->getMessage(),
         'file' => $exception->getFile(),
@@ -598,8 +695,12 @@ if ($isDuplicateInsert) {
         'sender' => $sender ?? null,
     ]);
 
-    if ($assetId !== null) {
-        markAssetAsError($pdo, (int) $assetId, $exception->getMessage());
+    if (isset($pdo) && $pdo instanceof PDO && $pdo->inTransaction()) {
+        $pdo->rollBack();
+
+        webhookLog('ROLLBACK EJECUTADO', [
+            'asset_id' => $assetId,
+        ]);
     }
 
     notifySenderProcessingResult($sender ?? null, false);
@@ -607,5 +708,5 @@ if ($isDuplicateInsert) {
     jsonResponse([
         'success' => false,
         'error' => $exception->getMessage(),
-    ], 500);
+    ], 200);
 }

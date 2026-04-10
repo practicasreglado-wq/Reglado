@@ -26,7 +26,16 @@ if ($baseDir === false) {
 
 $filePath = realpath($baseDir . DIRECTORY_SEPARATOR . $relative);
 
-if ($filePath === false || !is_file($filePath)) {
+/*
+ * Fallback por si en la BD viene "dossiers/archivo.pdf"
+ * pero el archivo real está en la raíz de uploads,
+ * o viceversa.
+ */
+if ($filePath === false) {
+    $filePath = realpath($baseDir . DIRECTORY_SEPARATOR . basename($relative));
+}
+
+if ($filePath === false || !is_file($filePath) || !is_readable($filePath)) {
     http_response_code(404);
     exit('Archivo no encontrado.');
 }
@@ -43,7 +52,7 @@ if (ob_get_level()) {
 }
 
 header('Content-Description: File Transfer');
-header('Content-Type: application/octet-stream');
+header('Content-Type: application/pdf');
 header('Content-Disposition: attachment; filename="' . $filename . '"');
 header('Content-Transfer-Encoding: binary');
 header('Cache-Control: no-store, no-cache, must-revalidate');

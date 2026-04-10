@@ -17,6 +17,12 @@
           </button>
         </li>
 
+        <li>
+          <a href="http://regladogroup.com" class="grupo-link" target="_blank">
+            Reglado Group
+          </a>
+        </li>
+
         <li v-if="isReal">
           <button class="catalog-btn" @click="goToCatalog">
             <span class="catalog-text">Busqueda por catalogo</span>
@@ -38,6 +44,8 @@
             </svg>
           </button>
         </li>
+
+        
 
         <li v-if="user" class="profile-nav-item" :class="{ 'in-profile': isInProfile }">
           <router-link
@@ -210,6 +218,60 @@ header {
   border-bottom: 1px solid rgba(0, 0, 0, 0.04);
 }
 
+.grupo-link {
+  position: relative;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  display: inline-block; 
+  transition: all 0.3s ease;
+}
+
+/* Línea elegante animada */
+.grupo-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px; /* 👈 más pegado al texto */
+  width: 0%;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #c9a227, #f2d46b, #c9a227);
+  transition: width 0.3s ease;
+}
+
+/* Hover */
+.grupo-link:hover::after {
+  width: 100%;
+}
+
+.grupo-link:hover {
+  transform: translateY(-2px);
+}
+
+/* MODO HOME (sobre fondo oscuro/video) */
+header.at-top-home .grupo-link {
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+/* MODO NORMAL */
+header:not(.at-top-home) .grupo-link {
+  color: #1a2545;
+}
+
+/* Opcional: efecto dorado al hover en modo normal */
+header:not(.at-top-home) .grupo-link:hover {
+  background: linear-gradient(
+    135deg,
+    #5f4b08,
+    #c9a227,
+    #cfad30,
+    #c8a12d
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
 /* TRANSPARENT HOME STATE */
 header.at-top-home {
   background: transparent;
@@ -281,6 +343,26 @@ header:not(.at-top-home) .catalog-btn {
   justify-content: center;
   gap: 12px; /* Increased gap */
   line-height: 1; /* Ensure text isn't pushed down */
+}
+
+.grupo-link {
+  font-size: 0.95rem;
+  font-weight: 700;
+  transition: all 0.3s ease;
+}
+
+/* En home transparente */
+header.at-top-home .grupo-link {
+  color: #ffffff;
+}
+
+/* En modo normal */
+header:not(.at-top-home) .grupo-link {
+  color: #1a2545;
+}
+
+.grupo-link:hover {
+  opacity: 0.7;
 }
 
 .catalog-text {

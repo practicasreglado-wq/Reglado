@@ -53,3 +53,550 @@
 [2026-03-26 13:22:26] PASO 5 antes de crear processor | {"default_owner_user_id":1}
 [2026-03-26 13:22:26] PASO 6 antes process() | {"asset_id":22}
 [2026-03-26 13:22:40] PASO 7 propiedad creada correctamente | {"asset_id":22,"property_id":16}
+[2026-04-07 11:59:40] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-07 11:59:40] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-07 11:59:40] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-07 11:59:40] PASO 2A texto encontrado | {"source_key":"plain","text_len":741,"text_preview":"Practicas Reglado <practicasreglado@gmail.com>\r\nmié, 25 mar, 11:04 (hace 13 días)\r\npara aa52fb341d5bce9b03aa\r\nUbicación:\r\n\r\nCalle de la Magdalena Nº 6\r\nCalle Cabeza nº 15\r\n28012 MADRID\r\n\r\nSuperficie parcela: 1.017 m².\r\n\r\nConstruidos: 4.395 m².\r\n\r\nUso: RESIDENCIAL (Plurifamiliar en altura).\r\nAlternativo: Hotelero / Terciario oficinas / Dotacional.\r\n\r\nAltura: IV (PB + 3) + Sótano.\r\n\r\nNorma Zonal: 1 Patrimonio histórico.\r\n\r\nPrecio INICIAL: 20.000.000 €.\r\n\r\nPrecio mínimo de cierre: 19.000.000 €.\r\n(M"}
+[2026-04-07 11:59:40] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-07 11:59:40] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":741,"text_preview":"Practicas Reglado <practicasreglado@gmail.com>\r\nmié, 25 mar, 11:04 (hace 13 días)\r\npara aa52fb341d5bce9b03aa\r\nUbicación:\r\n\r\nCalle de la Magdalena Nº 6\r\nCalle Cabeza nº 15\r\n28012 MADRID\r\n\r\nSuperficie parcela: 1.017 m².\r\n\r\nConstruidos: 4.395 m².\r\n\r\nUso: RESIDENCIAL (Plurifamiliar en altura).\r\nAlternativo: Hotelero / Terciario oficinas / Dotacional.\r\n\r\nAltura: IV (PB + 3) + Sótano.\r\n\r\nNorma Zonal: 1 Patrimonio histórico.\r\n\r\nPrecio INICIAL: 20.000.000 €.\r\n\r\nPrecio mínimo de cierre: 19.000.000 €.\r\n(Mínimo NO negociable)\r\n\r\nNO SE ACEPTAN OFERTAS POR UN IMPORTE MENOR.\r\n\r\nRepercusión techo: 4.323 €/m²t.\r\n\r\nPropiedad: Persona Jurídica.\r\n\r\nEl Inmueble se entrega VACÍO.\r\n\r\nPrecio de venta m² Obra Nueva"}
+[2026-04-07 11:59:40] PASO 3 antes duplicados | {"message_id":"CAF+o0zucOZYB4mqm6jGC-R-gJ3rBNmH-xhphP5LX0qQDiycHsw@mail.gmail.com","content_hash":"88f0d9ab479979e3ed2076fa139b56d58ae3a50480b3c6d8dbfefa6e62488d5b"}
+[2026-04-07 11:59:40] PASO 4 activo insertado o recuperado | {"asset_id":26,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-07 11:59:40] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-07 11:59:40] PASO 6 antes process() | {"asset_id":26}
+[2026-04-07 11:59:55] PASO 7 propiedad creada correctamente | {"asset_id":26,"property_id":19}
+[2026-04-07 12:11:15] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-07 12:11:15] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-07 12:11:15] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-07 12:11:15] PASO 2A texto encontrado | {"source_key":"plain","text_len":847,"text_preview":"Se ofrece en venta un *excelente terreno urbano residencial de 14.000 m²*,\r\nubicado en una de las zonas con mayor proyección de crecimiento de *San\r\nCristóbal de La Laguna (Tenerife)*.\r\n\r\n📍 *Ubicación estratégica*\r\nEl activo se encuentra en un entorno privilegiado, perfectamente conectado\r\ny rodeado de servicios clave:\r\n\r\n   - A escasos minutos del *Centro Comercial Alisios*\r\n   - Muy próximo a la *Universidad de La Laguna*\r\n   - Cercano a grandes superficies como *Carrefour e IKEA*\r\n   - A tan "}
+[2026-04-07 12:11:15] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-07 12:11:15] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":847,"text_preview":"Se ofrece en venta un *excelente terreno urbano residencial de 14.000 m²*,\r\nubicado en una de las zonas con mayor proyección de crecimiento de *San\r\nCristóbal de La Laguna (Tenerife)*.\r\n\r\n📍 *Ubicación estratégica*\r\nEl activo se encuentra en un entorno privilegiado, perfectamente conectado\r\ny rodeado de servicios clave:\r\n\r\n   - A escasos minutos del *Centro Comercial Alisios*\r\n   - Muy próximo a la *Universidad de La Laguna*\r\n   - Cercano a grandes superficies como *Carrefour e IKEA*\r\n   - A tan solo *10 minutos de Santa Cruz de Tenerife*\r\n\r\n🏗️ *Potencial urbanístico*\r\nSe trata de una parcela de uso residencial con gran capacidad de\r\ndesarrollo, ideal para:\r\n\r\n   - Promociones de vivienda plu"}
+[2026-04-07 12:11:15] PASO 3 antes duplicados | {"message_id":"CAF+o0zujFaK9+cc2=B9qa5B5t=oKiaqeJwZv8=Lhx1UCTxOFcQ@mail.gmail.com","content_hash":"082874f4783c79e109a61ba44d523e7338ad65259a853a489f3d1aa0f67ca036"}
+[2026-04-07 12:11:15] PASO 4 activo insertado o recuperado | {"asset_id":27,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-07 12:11:15] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-07 12:11:15] PASO 6 antes process() | {"asset_id":27}
+[2026-04-07 12:11:24] PASO 7 propiedad creada correctamente | {"asset_id":27,"property_id":20}
+[2026-04-08 10:27:16] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-08 10:27:16] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-08 10:27:16] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-08 10:27:16] PASO 2A texto encontrado | {"source_key":"plain","text_len":1257,"text_preview":"DOSSIER DE INVERSIÓN – EDIFICIO EN SAGRADA FAMILIA (BARCELONA)\r\nRESUMEN EJECUTIVO\r\nActivo residencial con potencial de reposicionamiento situado en una de las\r\nzonas más\r\ndemandadas de Barcelona. Operación tipo value-add con alto componente\r\nestratégico.\r\nDATOS CLAVE\r\n- Precio: 8.000.000 € (negociables)\r\n- Superficie: ~1.850 m²\r\n- Unidades: 23 viviendas + 4 locales + portería\r\n- Vacancia: 21 viviendas libres\r\nSITUACIÓN ACTUAL\r\n- 16 viviendas reformadas\r\n- 5 viviendas a reformar\r\n- 2 con rentas a"}
+[2026-04-08 10:27:16] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-08 10:27:16] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":1257,"text_preview":"DOSSIER DE INVERSIÓN – EDIFICIO EN SAGRADA FAMILIA (BARCELONA)\r\nRESUMEN EJECUTIVO\r\nActivo residencial con potencial de reposicionamiento situado en una de las\r\nzonas más\r\ndemandadas de Barcelona. Operación tipo value-add con alto componente\r\nestratégico.\r\nDATOS CLAVE\r\n- Precio: 8.000.000 € (negociables)\r\n- Superficie: ~1.850 m²\r\n- Unidades: 23 viviendas + 4 locales + portería\r\n- Vacancia: 21 viviendas libres\r\nSITUACIÓN ACTUAL\r\n- 16 viviendas reformadas\r\n- 5 viviendas a reformar\r\n- 2 con rentas antiguas\r\n- Locales 100% ocupados\r\nINGRESOS\r\n- Ingresos actuales: ~349.000 €\r\n- Ingresos potenciales: >500.000 €\r\nANÁLISIS FINANCIERO\r\n- Yield actual: ~4,3%\r\n- Yield potencial: 6–7%\r\n- CAPEX estimado: "}
+[2026-04-08 10:27:16] PASO 3 antes duplicados | {"message_id":"CAF+o0zvzrD7sWp5Q=EfmN_2ERU60Xun+Sd6m4RFF9-1nk=zDjA@mail.gmail.com","content_hash":"840b3fa9b868befc9fbb6642c2f1355c1578fc81d2df487a45daf09e502cd2ce"}
+[2026-04-08 10:27:16] PASO 4 activo insertado o recuperado | {"asset_id":28,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-08 10:27:16] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-08 10:27:16] PASO 6 antes process() | {"asset_id":28}
+[2026-04-08 10:27:24] PASO 7 propiedad creada correctamente | {"asset_id":28,"property_id":21}
+[2026-04-08 11:50:34] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-08 11:50:34] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-08 11:50:34] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-08 11:50:34] PASO 2A texto encontrado | {"source_key":"plain","text_len":4,"text_preview":"hola"}
+[2026-04-08 11:50:34] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-08 11:50:34] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":4,"text_preview":"hola"}
+[2026-04-08 11:50:34] PASO 3 antes duplicados | {"message_id":"CAF+o0zsUFDy8aufayNK=RUbG38WaM-vEH2eqXzo8MrkTZk1CjA@mail.gmail.com","content_hash":"b221d9dbb083a7f33428d7c2a3c3198ae925614d70210e28716ccaa7cd4ddb79"}
+[2026-04-08 11:50:34] PASO 4 activo insertado o recuperado | {"asset_id":30,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-08 11:50:34] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-08 11:50:34] PASO 6 antes process() | {"asset_id":30}
+[2026-04-08 11:50:37] ERROR GLOBAL | {"message":"Campo requerido faltante en ficha_web: tipo_propiedad","file":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\processing\\ClaudeClient.php","line":79,"asset_id":30,"message_id":"CAF+o0zsUFDy8aufayNK=RUbG38WaM-vEH2eqXzo8MrkTZk1CjA@mail.gmail.com","sender":"practicasreglado@gmail.com"}
+[2026-04-08 11:50:37] PASO ERROR activo marcado como error | {"asset_id":30,"error":"Campo requerido faltante en ficha_web: tipo_propiedad"}
+[2026-04-08 11:56:19] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-08 11:56:19] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-08 11:56:19] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-08 11:56:19] PASO 2A texto encontrado | {"source_key":"plain","text_len":4,"text_preview":"hola"}
+[2026-04-08 11:56:19] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-08 11:56:19] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":4,"text_preview":"hola"}
+[2026-04-08 11:56:19] PASO 3 antes duplicados | {"message_id":"CAF+o0zsUFDy8aufayNK=RUbG38WaM-vEH2eqXzo8MrkTZk1CjA@mail.gmail.com","content_hash":"b221d9dbb083a7f33428d7c2a3c3198ae925614d70210e28716ccaa7cd4ddb79"}
+[2026-04-08 11:56:19] Duplicado por message_id | {"message_id":"CAF+o0zsUFDy8aufayNK=RUbG38WaM-vEH2eqXzo8MrkTZk1CjA@mail.gmail.com","existing_asset_id":30}
+[2026-04-08 12:58:44] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-08 12:58:44] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-08 12:58:44] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-08 12:58:44] PASO 2A texto encontrado | {"source_key":"plain","text_len":4,"text_preview":"hola"}
+[2026-04-08 12:58:44] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-08 12:58:44] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":4,"text_preview":"hola"}
+[2026-04-08 12:58:44] PASO 3 antes duplicados | {"message_id":"CAF+o0zsmfh37icNwBXni-y78U09tDG3SYZM-F+AQWOMb-1JmGA@mail.gmail.com","content_hash":"b221d9dbb083a7f33428d7c2a3c3198ae925614d70210e28716ccaa7cd4ddb79"}
+[2026-04-08 12:58:44] Duplicado por content_hash | {"content_hash":"b221d9dbb083a7f33428d7c2a3c3198ae925614d70210e28716ccaa7cd4ddb79","existing_asset_id":30}
+[2026-04-08 13:01:02] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-08 13:01:02] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-08 13:01:02] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-08 13:01:02] PASO 2A texto encontrado | {"source_key":"plain","text_len":4,"text_preview":"hola"}
+[2026-04-08 13:01:02] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-08 13:01:02] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":4,"text_preview":"hola"}
+[2026-04-08 13:01:02] PASO 3 antes duplicados | {"message_id":"CAF+o0zv6U4BRuA=Y8NEhpDZv8riWOwhx6owSaYsdJwGY22Ge=g@mail.gmail.com","content_hash":"b221d9dbb083a7f33428d7c2a3c3198ae925614d70210e28716ccaa7cd4ddb79"}
+[2026-04-08 13:01:02] Duplicado por content_hash | {"content_hash":"b221d9dbb083a7f33428d7c2a3c3198ae925614d70210e28716ccaa7cd4ddb79","existing_asset_id":30}
+[2026-04-08 13:07:06] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-08 13:07:06] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-08 13:07:06] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-08 13:07:06] PASO 2A texto encontrado | {"source_key":"plain","text_len":4,"text_preview":"hola"}
+[2026-04-08 13:07:06] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-08 13:07:06] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":4,"text_preview":"hola"}
+[2026-04-08 13:07:06] PASO 3 antes duplicados | {"message_id":"CAF+o0zvCYzjpGAMcyX35cmSyYyy9mgM38XVCawK_tchUOZ5ftw@mail.gmail.com","content_hash":"b221d9dbb083a7f33428d7c2a3c3198ae925614d70210e28716ccaa7cd4ddb79"}
+[2026-04-08 13:07:06] Duplicado por content_hash | {"content_hash":"b221d9dbb083a7f33428d7c2a3c3198ae925614d70210e28716ccaa7cd4ddb79","existing_asset_id":30}
+[2026-04-08 13:12:20] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-08 13:12:20] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-08 13:12:20] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-08 13:12:20] PASO 2A texto encontrado | {"source_key":"plain","text_len":4,"text_preview":"hola"}
+[2026-04-08 13:12:20] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-08 13:12:20] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":4,"text_preview":"hola"}
+[2026-04-08 13:12:20] PASO 3 antes duplicados | {"message_id":"CAF+o0ztoYTu5i3LzqFq29y2xr53OoKEuL86Jcp3gVkuC26aygA@mail.gmail.com","content_hash":"b221d9dbb083a7f33428d7c2a3c3198ae925614d70210e28716ccaa7cd4ddb79"}
+[2026-04-08 13:12:20] PASO 4 activo insertado o recuperado | {"asset_id":31,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-08 13:12:20] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-08 13:12:20] PASO 6 antes process() | {"asset_id":31}
+[2026-04-08 13:12:23] ERROR GLOBAL | {"message":"Campo requerido faltante en ficha_web: tipo_propiedad","file":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\processing\\ClaudeClient.php","line":79,"asset_id":31,"message_id":"CAF+o0ztoYTu5i3LzqFq29y2xr53OoKEuL86Jcp3gVkuC26aygA@mail.gmail.com","sender":"practicasreglado@gmail.com"}
+[2026-04-08 13:12:23] PASO ERROR activo marcado como error | {"asset_id":31,"error":"Campo requerido faltante en ficha_web: tipo_propiedad"}
+[2026-04-08 13:18:59] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-08 13:18:59] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-08 13:18:59] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-08 13:18:59] PASO 2A texto encontrado | {"source_key":"plain","text_len":4,"text_preview":"hola"}
+[2026-04-08 13:18:59] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-08 13:18:59] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":4,"text_preview":"hola"}
+[2026-04-08 13:18:59] PASO 3 antes duplicados | {"message_id":"CAF+o0ztoYTu5i3LzqFq29y2xr53OoKEuL86Jcp3gVkuC26aygA@mail.gmail.com","content_hash":"b221d9dbb083a7f33428d7c2a3c3198ae925614d70210e28716ccaa7cd4ddb79"}
+[2026-04-08 13:18:59] Duplicado por message_id | {"message_id":"CAF+o0ztoYTu5i3LzqFq29y2xr53OoKEuL86Jcp3gVkuC26aygA@mail.gmail.com","existing_asset_id":31}
+[2026-04-08 13:26:17] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-08 13:26:17] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-08 13:26:17] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-08 13:26:17] PASO 2A texto encontrado | {"source_key":"plain","text_len":4,"text_preview":"hola"}
+[2026-04-08 13:26:17] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-08 13:26:17] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":4,"text_preview":"hola"}
+[2026-04-08 13:26:17] PASO 3 antes duplicados | {"message_id":"CAF+o0zspEFfN0JWHgXeCwhwOWovvt06OeVqFmz6V+z2+kSuDTQ@mail.gmail.com","content_hash":"b221d9dbb083a7f33428d7c2a3c3198ae925614d70210e28716ccaa7cd4ddb79"}
+[2026-04-08 13:26:17] PASO 4 activo insertado o recuperado | {"asset_id":32,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-08 13:26:17] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-08 13:26:17] PASO 6 antes process() | {"asset_id":32}
+[2026-04-08 13:26:20] ERROR GLOBAL | {"message":"Campo requerido faltante en ficha_web: tipo_propiedad","file":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\processing\\ClaudeClient.php","line":79,"asset_id":32,"message_id":"CAF+o0zspEFfN0JWHgXeCwhwOWovvt06OeVqFmz6V+z2+kSuDTQ@mail.gmail.com","sender":"practicasreglado@gmail.com"}
+[2026-04-08 13:26:20] ROLLBACK EJECUTADO | {"asset_id":32}
+[2026-04-08 13:28:21] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-08 13:28:21] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-08 13:28:21] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-08 13:28:21] PASO 2A texto encontrado | {"source_key":"plain","text_len":3745,"text_preview":"MEMORANDO CONFIDENCIAL DE INVERSIÓN\r\nSUELO TURÍSTICO RESIDENCIAL – 5★ LUJO\r\nISLAS CANARIAS 2025.\r\nDOCUMENTO CONFIDENCIAL – SOLO PARA INVERSORES CUALIFICADOS\r\nPREPARADO CON FINES EXCLUSIVAMENTE INFORMATIVOS.\r\nNO CONSTITUYE OFERTA DE VENTA NI COMPROMISO DE INVERSIÓN.\r\nRESUMEN EJECUTIVO\r\nEl activo corresponde a un suelo turístico-residencial ubicado en primera\r\nlínea de\r\nplaya en una de las zonas más exclusivas y consolidadas del sur de\r\nTenerife. El\r\nplaneamiento vigente permite el desarrollo de u"}
+[2026-04-08 13:28:21] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-08 13:28:21] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":3745,"text_preview":"MEMORANDO CONFIDENCIAL DE INVERSIÓN\r\nSUELO TURÍSTICO RESIDENCIAL – 5★ LUJO\r\nISLAS CANARIAS 2025.\r\nDOCUMENTO CONFIDENCIAL – SOLO PARA INVERSORES CUALIFICADOS\r\nPREPARADO CON FINES EXCLUSIVAMENTE INFORMATIVOS.\r\nNO CONSTITUYE OFERTA DE VENTA NI COMPROMISO DE INVERSIÓN.\r\nRESUMEN EJECUTIVO\r\nEl activo corresponde a un suelo turístico-residencial ubicado en primera\r\nlínea de\r\nplaya en una de las zonas más exclusivas y consolidadas del sur de\r\nTenerife. El\r\nplaneamiento vigente permite el desarrollo de un complejo 5★ Gran Lujo, con\r\ncapacidad para un resort de aproximadamente 230 unidades y 460 plazas\r\nturísticas.\r\nLa parcela se sitúa en un entorno de alta demanda internacional, junto a\r\ncampos de\r\ng"}
+[2026-04-08 13:28:21] PASO 3 antes duplicados | {"message_id":"CAF+o0ztLSfBDP238hPV53Y=j=Y+eYPKMer=SQnuk+v0kqu7X4g@mail.gmail.com","content_hash":"ea9fb7ac2fc4b74d6e8388a265e68eed901bf39b9ada369199593772790bce45"}
+[2026-04-08 13:28:21] Duplicado por content_hash | {"content_hash":"ea9fb7ac2fc4b74d6e8388a265e68eed901bf39b9ada369199593772790bce45","existing_asset_id":29}
+[2026-04-08 13:32:56] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-08 13:32:56] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-08 13:32:56] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-08 13:32:56] PASO 2A texto encontrado | {"source_key":"plain","text_len":4,"text_preview":"hola"}
+[2026-04-08 13:32:56] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-08 13:32:56] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":4,"text_preview":"hola"}
+[2026-04-08 13:32:56] PASO 3 antes duplicados | {"message_id":"CAF+o0zspEFfN0JWHgXeCwhwOWovvt06OeVqFmz6V+z2+kSuDTQ@mail.gmail.com","content_hash":"b221d9dbb083a7f33428d7c2a3c3198ae925614d70210e28716ccaa7cd4ddb79"}
+[2026-04-08 13:32:56] PASO 4 activo insertado o recuperado | {"asset_id":33,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-08 13:32:56] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-08 13:32:56] PASO 6 antes process() | {"asset_id":33}
+[2026-04-08 13:32:59] ERROR GLOBAL | {"message":"Campo requerido faltante en ficha_web: tipo_propiedad","file":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\processing\\ClaudeClient.php","line":79,"asset_id":33,"message_id":"CAF+o0zspEFfN0JWHgXeCwhwOWovvt06OeVqFmz6V+z2+kSuDTQ@mail.gmail.com","sender":"practicasreglado@gmail.com"}
+[2026-04-08 13:32:59] ROLLBACK EJECUTADO | {"asset_id":33}
+[2026-04-08 13:39:30] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-08 13:39:30] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-08 13:39:30] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-08 13:39:30] PASO 2A texto encontrado | {"source_key":"plain","text_len":3745,"text_preview":"MEMORANDO CONFIDENCIAL DE INVERSIÓN\r\nSUELO TURÍSTICO RESIDENCIAL – 5★ LUJO\r\nISLAS CANARIAS 2025.\r\nDOCUMENTO CONFIDENCIAL – SOLO PARA INVERSORES CUALIFICADOS\r\nPREPARADO CON FINES EXCLUSIVAMENTE INFORMATIVOS.\r\nNO CONSTITUYE OFERTA DE VENTA NI COMPROMISO DE INVERSIÓN.\r\nRESUMEN EJECUTIVO\r\nEl activo corresponde a un suelo turístico-residencial ubicado en primera\r\nlínea de\r\nplaya en una de las zonas más exclusivas y consolidadas del sur de\r\nTenerife. El\r\nplaneamiento vigente permite el desarrollo de u"}
+[2026-04-08 13:39:30] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-08 13:39:30] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":3745,"text_preview":"MEMORANDO CONFIDENCIAL DE INVERSIÓN\r\nSUELO TURÍSTICO RESIDENCIAL – 5★ LUJO\r\nISLAS CANARIAS 2025.\r\nDOCUMENTO CONFIDENCIAL – SOLO PARA INVERSORES CUALIFICADOS\r\nPREPARADO CON FINES EXCLUSIVAMENTE INFORMATIVOS.\r\nNO CONSTITUYE OFERTA DE VENTA NI COMPROMISO DE INVERSIÓN.\r\nRESUMEN EJECUTIVO\r\nEl activo corresponde a un suelo turístico-residencial ubicado en primera\r\nlínea de\r\nplaya en una de las zonas más exclusivas y consolidadas del sur de\r\nTenerife. El\r\nplaneamiento vigente permite el desarrollo de un complejo 5★ Gran Lujo, con\r\ncapacidad para un resort de aproximadamente 230 unidades y 460 plazas\r\nturísticas.\r\nLa parcela se sitúa en un entorno de alta demanda internacional, junto a\r\ncampos de\r\ng"}
+[2026-04-08 13:39:30] PASO 3 antes duplicados | {"message_id":"CAF+o0zva9zHRjXyXBDA3ioaT4L7mS+idmpGz8FmdYKT_KEMDsw@mail.gmail.com","content_hash":"ea9fb7ac2fc4b74d6e8388a265e68eed901bf39b9ada369199593772790bce45"}
+[2026-04-08 13:39:30] PASO 4 activo insertado o recuperado | {"asset_id":34,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-08 13:39:30] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-08 13:39:30] PASO 6 antes process() | {"asset_id":34}
+[2026-04-08 13:39:41] PASO 6B resultado process() | {"asset_id":34,"property_id_raw":23,"property_id_type":"integer"}
+[2026-04-08 13:39:41] PASO 7 propiedad creada correctamente | {"asset_id":34,"property_id":23}
+[2026-04-08 13:39:41] PASO 8 antes commit | {"asset_id":34,"property_id":23}
+[2026-04-08 13:39:41] PASO 9 commit realizado | {"asset_id":34,"property_id":23}
+[2026-04-08 13:39:41] PASO 10 antes email OK | {"sender":"practicasreglado@gmail.com","property_id":23}
+[2026-04-08 13:39:42] PASO 11 después email OK | {"sender":"practicasreglado@gmail.com","property_id":23}
+[2026-04-08 13:43:47] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-08 13:43:47] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-08 13:43:47] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-08 13:43:47] PASO 2A texto encontrado | {"source_key":"plain","text_len":4,"text_preview":"hola"}
+[2026-04-08 13:43:47] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-08 13:43:47] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":4,"text_preview":"hola"}
+[2026-04-08 13:43:47] PASO 3 antes duplicados | {"message_id":"CAF+o0zsCLknkaJZEO47k5CvdQk+MbYXuJt7P8a78U_agf6vf2w@mail.gmail.com","content_hash":"b221d9dbb083a7f33428d7c2a3c3198ae925614d70210e28716ccaa7cd4ddb79"}
+[2026-04-08 13:43:47] PASO 4 activo insertado o recuperado | {"asset_id":35,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-08 13:43:47] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-08 13:43:47] PASO 6 antes process() | {"asset_id":35}
+[2026-04-08 13:43:52] ERROR GLOBAL | {"message":"Campo requerido faltante en ficha_web: tipo_propiedad","file":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\processing\\ClaudeClient.php","line":79,"asset_id":35,"message_id":"CAF+o0zsCLknkaJZEO47k5CvdQk+MbYXuJt7P8a78U_agf6vf2w@mail.gmail.com","sender":"practicasreglado@gmail.com"}
+[2026-04-08 13:43:52] ROLLBACK EJECUTADO | {"asset_id":35}
+[2026-04-08 13:49:02] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-08 13:49:02] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-08 13:49:02] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-08 13:49:02] PASO 2A texto encontrado | {"source_key":"plain","text_len":4,"text_preview":"hola"}
+[2026-04-08 13:49:02] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-08 13:49:02] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":4,"text_preview":"hola"}
+[2026-04-08 13:49:02] PASO 3 antes duplicados | {"message_id":"CAF+o0zsCLknkaJZEO47k5CvdQk+MbYXuJt7P8a78U_agf6vf2w@mail.gmail.com","content_hash":"b221d9dbb083a7f33428d7c2a3c3198ae925614d70210e28716ccaa7cd4ddb79"}
+[2026-04-08 13:49:02] PASO 4 activo insertado o recuperado | {"asset_id":36,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-08 13:49:02] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-08 13:49:02] PASO 6 antes process() | {"asset_id":36}
+[2026-04-08 13:49:05] ERROR GLOBAL | {"message":"Campo requerido faltante en ficha_web: tipo_propiedad","file":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\processing\\ClaudeClient.php","line":79,"asset_id":36,"message_id":"CAF+o0zsCLknkaJZEO47k5CvdQk+MbYXuJt7P8a78U_agf6vf2w@mail.gmail.com","sender":"practicasreglado@gmail.com"}
+[2026-04-08 13:49:05] ROLLBACK EJECUTADO | {"asset_id":36}
+[2026-04-08 13:50:52] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-08 13:50:52] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-08 13:50:52] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-08 13:50:52] PASO 2A texto encontrado | {"source_key":"plain","text_len":3745,"text_preview":"MEMORANDO CONFIDENCIAL DE INVERSIÓN\r\nSUELO TURÍSTICO RESIDENCIAL – 5★ LUJO\r\nISLAS CANARIAS 2025.\r\nDOCUMENTO CONFIDENCIAL – SOLO PARA INVERSORES CUALIFICADOS\r\nPREPARADO CON FINES EXCLUSIVAMENTE INFORMATIVOS.\r\nNO CONSTITUYE OFERTA DE VENTA NI COMPROMISO DE INVERSIÓN.\r\nRESUMEN EJECUTIVO\r\nEl activo corresponde a un suelo turístico-residencial ubicado en primera\r\nlínea de\r\nplaya en una de las zonas más exclusivas y consolidadas del sur de\r\nTenerife. El\r\nplaneamiento vigente permite el desarrollo de u"}
+[2026-04-08 13:50:52] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-08 13:50:52] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":3745,"text_preview":"MEMORANDO CONFIDENCIAL DE INVERSIÓN\r\nSUELO TURÍSTICO RESIDENCIAL – 5★ LUJO\r\nISLAS CANARIAS 2025.\r\nDOCUMENTO CONFIDENCIAL – SOLO PARA INVERSORES CUALIFICADOS\r\nPREPARADO CON FINES EXCLUSIVAMENTE INFORMATIVOS.\r\nNO CONSTITUYE OFERTA DE VENTA NI COMPROMISO DE INVERSIÓN.\r\nRESUMEN EJECUTIVO\r\nEl activo corresponde a un suelo turístico-residencial ubicado en primera\r\nlínea de\r\nplaya en una de las zonas más exclusivas y consolidadas del sur de\r\nTenerife. El\r\nplaneamiento vigente permite el desarrollo de un complejo 5★ Gran Lujo, con\r\ncapacidad para un resort de aproximadamente 230 unidades y 460 plazas\r\nturísticas.\r\nLa parcela se sitúa en un entorno de alta demanda internacional, junto a\r\ncampos de\r\ng"}
+[2026-04-08 13:50:52] PASO 3 antes duplicados | {"message_id":"CAF+o0zsPXaVJZ=kza-0W+Lfku+ENPQMTTwB=OS5FoN0TZ7t7FA@mail.gmail.com","content_hash":"ea9fb7ac2fc4b74d6e8388a265e68eed901bf39b9ada369199593772790bce45"}
+[2026-04-08 13:50:52] PASO 4 activo insertado o recuperado | {"asset_id":37,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-08 13:50:52] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-08 13:50:52] PASO 6 antes process() | {"asset_id":37}
+[2026-04-08 13:51:05] PASO 6B resultado process() | {"asset_id":37,"property_id_raw":24,"property_id_type":"integer"}
+[2026-04-08 13:51:05] PASO 7 propiedad creada correctamente | {"asset_id":37,"property_id":24}
+[2026-04-08 13:51:05] PASO 8 antes commit | {"asset_id":37,"property_id":24}
+[2026-04-08 13:51:05] PASO 9 commit realizado | {"asset_id":37,"property_id":24}
+[2026-04-08 13:51:05] PASO 10 antes email OK | {"sender":"practicasreglado@gmail.com","property_id":24}
+[2026-04-08 13:51:06] PASO 11 después email OK | {"sender":"practicasreglado@gmail.com","property_id":24}
+[2026-04-08 13:57:50] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-08 13:57:50] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-08 13:57:50] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-08 13:57:50] PASO 2A texto encontrado | {"source_key":"plain","text_len":4,"text_preview":"hola"}
+[2026-04-08 13:57:50] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-08 13:57:50] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":4,"text_preview":"hola"}
+[2026-04-08 13:57:50] PASO 3 antes duplicados | {"message_id":"CAF+o0zspEFfN0JWHgXeCwhwOWovvt06OeVqFmz6V+z2+kSuDTQ@mail.gmail.com","content_hash":"b221d9dbb083a7f33428d7c2a3c3198ae925614d70210e28716ccaa7cd4ddb79"}
+[2026-04-08 13:57:50] PASO 4 activo insertado o recuperado | {"asset_id":39,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-08 13:57:50] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-08 13:57:50] PASO 6 antes process() | {"asset_id":39}
+[2026-04-08 13:57:53] ERROR GLOBAL | {"message":"Campo requerido faltante en ficha_web: tipo_propiedad","file":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\processing\\ClaudeClient.php","line":79,"asset_id":39,"message_id":"CAF+o0zspEFfN0JWHgXeCwhwOWovvt06OeVqFmz6V+z2+kSuDTQ@mail.gmail.com","sender":"practicasreglado@gmail.com"}
+[2026-04-08 13:57:53] ROLLBACK EJECUTADO | {"asset_id":39}
+[2026-04-08 14:08:34] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-08 14:08:34] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-08 14:08:34] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-08 14:08:34] PASO 2A texto encontrado | {"source_key":"plain","text_len":4,"text_preview":"hola"}
+[2026-04-08 14:08:34] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-08 14:08:34] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":4,"text_preview":"hola"}
+[2026-04-08 14:08:34] PASO 3 antes duplicados | {"message_id":"CAF+o0zsCLknkaJZEO47k5CvdQk+MbYXuJt7P8a78U_agf6vf2w@mail.gmail.com","content_hash":"b221d9dbb083a7f33428d7c2a3c3198ae925614d70210e28716ccaa7cd4ddb79"}
+[2026-04-08 14:08:34] PASO 4 activo insertado o recuperado | {"asset_id":40,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-08 14:08:34] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-08 14:08:34] PASO 6 antes process() | {"asset_id":40}
+[2026-04-08 14:08:39] ERROR GLOBAL | {"message":"Campo requerido faltante en ficha_web: tipo_propiedad","file":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\processing\\ClaudeClient.php","line":79,"asset_id":40,"message_id":"CAF+o0zsCLknkaJZEO47k5CvdQk+MbYXuJt7P8a78U_agf6vf2w@mail.gmail.com","sender":"practicasreglado@gmail.com"}
+[2026-04-08 14:08:39] ROLLBACK EJECUTADO | {"asset_id":40}
+[2026-04-08 14:10:31] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-08 14:10:31] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-08 14:10:31] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-08 14:10:31] PASO 2A texto encontrado | {"source_key":"plain","text_len":1257,"text_preview":"DOSSIER DE INVERSIÓN – EDIFICIO EN SAGRADA FAMILIA (BARCELONA)\r\nRESUMEN EJECUTIVO\r\nActivo residencial con potencial de reposicionamiento situado en una de las\r\nzonas más\r\ndemandadas de Barcelona. Operación tipo value-add con alto componente\r\nestratégico.\r\nDATOS CLAVE\r\n- Precio: 8.000.000 € (negociables)\r\n- Superficie: ~1.850 m²\r\n- Unidades: 23 viviendas + 4 locales + portería\r\n- Vacancia: 21 viviendas libres\r\nSITUACIÓN ACTUAL\r\n- 16 viviendas reformadas\r\n- 5 viviendas a reformar\r\n- 2 con rentas a"}
+[2026-04-08 14:10:31] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-08 14:10:31] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":1257,"text_preview":"DOSSIER DE INVERSIÓN – EDIFICIO EN SAGRADA FAMILIA (BARCELONA)\r\nRESUMEN EJECUTIVO\r\nActivo residencial con potencial de reposicionamiento situado en una de las\r\nzonas más\r\ndemandadas de Barcelona. Operación tipo value-add con alto componente\r\nestratégico.\r\nDATOS CLAVE\r\n- Precio: 8.000.000 € (negociables)\r\n- Superficie: ~1.850 m²\r\n- Unidades: 23 viviendas + 4 locales + portería\r\n- Vacancia: 21 viviendas libres\r\nSITUACIÓN ACTUAL\r\n- 16 viviendas reformadas\r\n- 5 viviendas a reformar\r\n- 2 con rentas antiguas\r\n- Locales 100% ocupados\r\nINGRESOS\r\n- Ingresos actuales: ~349.000 €\r\n- Ingresos potenciales: >500.000 €\r\nANÁLISIS FINANCIERO\r\n- Yield actual: ~4,3%\r\n- Yield potencial: 6–7%\r\n- CAPEX estimado: "}
+[2026-04-08 14:10:31] PASO 3 antes duplicados | {"message_id":"CAF+o0ztpz=e0rbT8hpOgdJeKq-MK7GssRTn4Gck7WAqFuTi+dA@mail.gmail.com","content_hash":"840b3fa9b868befc9fbb6642c2f1355c1578fc81d2df487a45daf09e502cd2ce"}
+[2026-04-08 14:10:31] PASO 4 activo insertado o recuperado | {"asset_id":42,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-08 14:10:31] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-08 14:10:31] PASO 6 antes process() | {"asset_id":42}
+[2026-04-08 14:10:38] PASO 6B resultado process() | {"asset_id":42,"property_id_raw":27,"property_id_type":"integer"}
+[2026-04-08 14:10:38] PASO 7 propiedad creada correctamente | {"asset_id":42,"property_id":27}
+[2026-04-08 14:10:38] PASO 8 antes commit | {"asset_id":42,"property_id":27}
+[2026-04-08 14:10:38] PASO 9 commit realizado | {"asset_id":42,"property_id":27}
+[2026-04-08 14:10:38] PASO 10 antes email OK | {"sender":"practicasreglado@gmail.com","property_id":27}
+[2026-04-08 14:10:39] PASO 11 después email OK | {"sender":"practicasreglado@gmail.com","property_id":27}
+[2026-04-08 14:12:10] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-08 14:12:10] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-08 14:12:10] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-08 14:12:10] PASO 2A texto encontrado | {"source_key":"plain","text_len":4,"text_preview":"hola"}
+[2026-04-08 14:12:10] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-08 14:12:10] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":4,"text_preview":"hola"}
+[2026-04-08 14:12:10] PASO 3 antes duplicados | {"message_id":"CAF+o0zuzdBgkFU8BAkd8Y4G1t2=epvF0yUhnMk1AQdgsimJxAQ@mail.gmail.com","content_hash":"b221d9dbb083a7f33428d7c2a3c3198ae925614d70210e28716ccaa7cd4ddb79"}
+[2026-04-08 14:12:10] PASO 4 activo insertado o recuperado | {"asset_id":43,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-08 14:12:10] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-08 14:12:10] PASO 6 antes process() | {"asset_id":43}
+[2026-04-08 14:12:13] ERROR GLOBAL | {"message":"Campo requerido faltante en ficha_web: tipo_propiedad","file":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\processing\\ClaudeClient.php","line":79,"asset_id":43,"message_id":"CAF+o0zuzdBgkFU8BAkd8Y4G1t2=epvF0yUhnMk1AQdgsimJxAQ@mail.gmail.com","sender":"practicasreglado@gmail.com"}
+[2026-04-08 14:12:13] ROLLBACK EJECUTADO | {"asset_id":43}
+[2026-04-08 14:19:05] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-08 14:19:05] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-08 14:19:05] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-08 14:19:05] PASO 2A texto encontrado | {"source_key":"plain","text_len":4,"text_preview":"hola"}
+[2026-04-08 14:19:05] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-08 14:19:05] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":4,"text_preview":"hola"}
+[2026-04-08 14:19:05] PASO 3 antes duplicados | {"message_id":"CAF+o0zuzdBgkFU8BAkd8Y4G1t2=epvF0yUhnMk1AQdgsimJxAQ@mail.gmail.com","content_hash":"b221d9dbb083a7f33428d7c2a3c3198ae925614d70210e28716ccaa7cd4ddb79"}
+[2026-04-08 14:19:05] PASO 4 activo insertado o recuperado | {"asset_id":44,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-08 14:19:05] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-08 14:19:05] PASO 6 antes process() | {"asset_id":44}
+[2026-04-08 14:19:08] ERROR GLOBAL | {"message":"Campo requerido faltante en ficha_web: tipo_propiedad","file":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\processing\\ClaudeClient.php","line":79,"asset_id":44,"message_id":"CAF+o0zuzdBgkFU8BAkd8Y4G1t2=epvF0yUhnMk1AQdgsimJxAQ@mail.gmail.com","sender":"practicasreglado@gmail.com"}
+[2026-04-08 14:19:08] ROLLBACK EJECUTADO | {"asset_id":44}
+[2026-04-08 14:35:18] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-08 14:35:18] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-08 14:35:18] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-08 14:35:18] PASO 2A texto encontrado | {"source_key":"plain","text_len":4,"text_preview":"hola"}
+[2026-04-08 14:35:18] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-08 14:35:18] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":4,"text_preview":"hola"}
+[2026-04-08 14:35:18] PASO 3 antes duplicados | {"message_id":"CAF+o0zspEFfN0JWHgXeCwhwOWovvt06OeVqFmz6V+z2+kSuDTQ@mail.gmail.com","content_hash":"b221d9dbb083a7f33428d7c2a3c3198ae925614d70210e28716ccaa7cd4ddb79"}
+[2026-04-08 14:35:19] PASO 4 activo insertado o recuperado | {"asset_id":45,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-08 14:35:19] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-08 14:35:19] PASO 6 antes process() | {"asset_id":45}
+[2026-04-08 14:35:21] ERROR GLOBAL | {"message":"Campo requerido faltante en ficha_web: tipo_propiedad","file":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\processing\\ClaudeClient.php","line":79,"asset_id":45,"message_id":"CAF+o0zspEFfN0JWHgXeCwhwOWovvt06OeVqFmz6V+z2+kSuDTQ@mail.gmail.com","sender":"practicasreglado@gmail.com"}
+[2026-04-08 14:35:21] ROLLBACK EJECUTADO | {"asset_id":45}
+[2026-04-08 14:38:22] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-08 14:38:22] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-08 14:38:22] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-08 14:38:22] PASO 2A texto encontrado | {"source_key":"plain","text_len":4,"text_preview":"hola"}
+[2026-04-08 14:38:22] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-08 14:38:22] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":4,"text_preview":"hola"}
+[2026-04-08 14:38:22] PASO 3 antes duplicados | {"message_id":"CAF+o0zuzdBgkFU8BAkd8Y4G1t2=epvF0yUhnMk1AQdgsimJxAQ@mail.gmail.com","content_hash":"b221d9dbb083a7f33428d7c2a3c3198ae925614d70210e28716ccaa7cd4ddb79"}
+[2026-04-08 14:38:22] PASO 4 activo insertado o recuperado | {"asset_id":46,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-08 14:38:22] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-08 14:38:22] PASO 6 antes process() | {"asset_id":46}
+[2026-04-08 14:38:27] ERROR GLOBAL | {"message":"Campo requerido faltante en ficha_web: tipo_propiedad","file":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\processing\\ClaudeClient.php","line":79,"asset_id":46,"message_id":"CAF+o0zuzdBgkFU8BAkd8Y4G1t2=epvF0yUhnMk1AQdgsimJxAQ@mail.gmail.com","sender":"practicasreglado@gmail.com"}
+[2026-04-08 14:38:27] ROLLBACK EJECUTADO | {"asset_id":46}
+[2026-04-08 14:43:04] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-08 14:43:04] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-08 14:43:04] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-08 14:43:04] PASO 2A texto encontrado | {"source_key":"plain","text_len":4,"text_preview":"hola"}
+[2026-04-08 14:43:04] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-08 14:43:04] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":4,"text_preview":"hola"}
+[2026-04-08 14:43:04] PASO 3 antes duplicados | {"message_id":"CAF+o0zsCLknkaJZEO47k5CvdQk+MbYXuJt7P8a78U_agf6vf2w@mail.gmail.com","content_hash":"b221d9dbb083a7f33428d7c2a3c3198ae925614d70210e28716ccaa7cd4ddb79"}
+[2026-04-08 14:43:04] PASO 4 activo insertado o recuperado | {"asset_id":47,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-08 14:43:04] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-08 14:43:04] PASO 6 antes process() | {"asset_id":47}
+[2026-04-08 14:43:07] ERROR GLOBAL | {"message":"Campo requerido faltante en ficha_web: tipo_propiedad","file":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\processing\\ClaudeClient.php","line":79,"asset_id":47,"message_id":"CAF+o0zsCLknkaJZEO47k5CvdQk+MbYXuJt7P8a78U_agf6vf2w@mail.gmail.com","sender":"practicasreglado@gmail.com"}
+[2026-04-08 14:43:07] ROLLBACK EJECUTADO | {"asset_id":47}
+[2026-04-09 07:28:55] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-09 07:28:55] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-09 07:28:55] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-09 07:28:55] PASO 2A texto encontrado | {"source_key":"plain","text_len":664,"text_preview":"Ubicación:\r\n\r\nCalle de la Magdalena Nº 6\r\nCalle Cabeza nº 15\r\n28012 MADRID\r\n\r\nSuperficie parcela: 1.017 m².\r\n\r\nConstruidos: 4.395 m².\r\n\r\nUso: RESIDENCIAL (Plurifamiliar en altura).\r\nAlternativo: Hotelero / Terciario oficinas / Dotacional.\r\n\r\nAltura: IV (PB + 3) + Sótano.\r\n\r\nNorma Zonal: 1 Patrimonio histórico.\r\n\r\nPrecio INICIAL: 20.000.000 €.\r\n\r\nPrecio mínimo de cierre: 19.000.000 €.\r\n(Mínimo NO negociable)\r\n\r\nNO SE ACEPTAN OFERTAS POR UN IMPORTE MENOR.\r\n\r\nRepercusión techo: 4.323 €/m²t.\r\n\r\nProp"}
+[2026-04-09 07:28:55] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-09 07:28:55] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":664,"text_preview":"Ubicación:\r\n\r\nCalle de la Magdalena Nº 6\r\nCalle Cabeza nº 15\r\n28012 MADRID\r\n\r\nSuperficie parcela: 1.017 m².\r\n\r\nConstruidos: 4.395 m².\r\n\r\nUso: RESIDENCIAL (Plurifamiliar en altura).\r\nAlternativo: Hotelero / Terciario oficinas / Dotacional.\r\n\r\nAltura: IV (PB + 3) + Sótano.\r\n\r\nNorma Zonal: 1 Patrimonio histórico.\r\n\r\nPrecio INICIAL: 20.000.000 €.\r\n\r\nPrecio mínimo de cierre: 19.000.000 €.\r\n(Mínimo NO negociable)\r\n\r\nNO SE ACEPTAN OFERTAS POR UN IMPORTE MENOR.\r\n\r\nRepercusión techo: 4.323 €/m²t.\r\n\r\nPropiedad: Persona Jurídica.\r\n\r\nEl Inmueble se entrega VACÍO.\r\n\r\nPrecio de venta m² Obra Nueva en la Zona:\r\n10.923 €/m²t – 13.800 €/m²t\r\n\r\nHonorarios: + 2% (Comprador)."}
+[2026-04-09 07:28:55] PASO 3 antes duplicados | {"message_id":"CAF+o0ztt__w3qGWCv-xrjJbe1EkPP8Ektn4hvKA_iRYdZxbndA@mail.gmail.com","content_hash":"715b2ae4f3de6489715212746a6b818ef15c5b35968f0b63444ed876a0b154e0"}
+[2026-04-09 07:28:55] PASO 4 activo insertado o recuperado | {"asset_id":48,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-09 07:28:55] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-09 07:28:55] PASO 6 antes process() | {"asset_id":48}
+[2026-04-09 07:29:03] PASO 6B resultado process() | {"asset_id":48,"property_id_raw":28,"property_id_type":"integer"}
+[2026-04-09 07:29:03] PASO 7 propiedad creada correctamente | {"asset_id":48,"property_id":28}
+[2026-04-09 07:29:03] PASO 8 antes commit | {"asset_id":48,"property_id":28}
+[2026-04-09 07:29:03] PASO 9 commit realizado | {"asset_id":48,"property_id":28}
+[2026-04-09 07:29:03] PASO 10 antes email OK | {"sender":"practicasreglado@gmail.com","property_id":28}
+[2026-04-09 07:29:05] PASO 11 después email OK | {"sender":"practicasreglado@gmail.com","property_id":28}
+[2026-04-09 07:46:32] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-09 07:46:32] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-09 07:46:32] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-09 07:46:32] PASO 2A texto encontrado | {"source_key":"plain","text_len":4,"text_preview":"hola"}
+[2026-04-09 07:46:32] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-09 07:46:32] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":4,"text_preview":"hola"}
+[2026-04-09 07:46:32] PASO 3 antes duplicados | {"message_id":"CAF+o0zsPV=g9e8q1GR4e5o-fgiPHDkMoHzWqOOdi8Np8zBzHJg@mail.gmail.com","content_hash":"b221d9dbb083a7f33428d7c2a3c3198ae925614d70210e28716ccaa7cd4ddb79"}
+[2026-04-09 07:46:32] PASO 4 activo insertado o recuperado | {"asset_id":49,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-09 07:46:32] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-09 07:46:32] PASO 6 antes process() | {"asset_id":49}
+[2026-04-09 07:46:35] ERROR GLOBAL | {"message":"Campo requerido faltante en ficha_web: tipo_propiedad","file":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\processing\\ClaudeClient.php","line":79,"asset_id":49,"message_id":"CAF+o0zsPV=g9e8q1GR4e5o-fgiPHDkMoHzWqOOdi8Np8zBzHJg@mail.gmail.com","sender":"practicasreglado@gmail.com"}
+[2026-04-09 07:46:35] ROLLBACK EJECUTADO | {"asset_id":49}
+[2026-04-09 07:51:46] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-09 07:51:46] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-09 07:51:46] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-09 07:51:46] PASO 2A texto encontrado | {"source_key":"plain","text_len":4,"text_preview":"hola"}
+[2026-04-09 07:51:46] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-09 07:51:46] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":4,"text_preview":"hola"}
+[2026-04-09 07:51:46] PASO 3 antes duplicados | {"message_id":"CAF+o0zsPV=g9e8q1GR4e5o-fgiPHDkMoHzWqOOdi8Np8zBzHJg@mail.gmail.com","content_hash":"b221d9dbb083a7f33428d7c2a3c3198ae925614d70210e28716ccaa7cd4ddb79"}
+[2026-04-09 07:51:46] PASO 4 activo insertado o recuperado | {"asset_id":50,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-09 07:51:46] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-09 07:51:46] PASO 6 antes process() | {"asset_id":50}
+[2026-04-09 07:51:49] ERROR GLOBAL | {"message":"Campo requerido faltante en ficha_web: tipo_propiedad","file":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\processing\\ClaudeClient.php","line":79,"asset_id":50,"message_id":"CAF+o0zsPV=g9e8q1GR4e5o-fgiPHDkMoHzWqOOdi8Np8zBzHJg@mail.gmail.com","sender":"practicasreglado@gmail.com"}
+[2026-04-09 07:51:50] ROLLBACK EJECUTADO | {"asset_id":50}
+[2026-04-09 08:10:29] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-09 08:10:29] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-09 08:10:29] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-09 08:10:29] PASO 2A texto encontrado | {"source_key":"plain","text_len":4,"text_preview":"hola"}
+[2026-04-09 08:10:29] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-09 08:10:29] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":4,"text_preview":"hola"}
+[2026-04-09 08:10:29] PASO 3 antes duplicados | {"message_id":"CAF+o0zvdAZLbaMAJ_gSgiTm-rpDdYx2Z3VsubM=H3z=S3w2syg@mail.gmail.com","content_hash":"b221d9dbb083a7f33428d7c2a3c3198ae925614d70210e28716ccaa7cd4ddb79"}
+[2026-04-09 08:10:29] PASO 4 activo insertado o recuperado | {"asset_id":51,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-09 08:10:29] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-09 08:10:29] PASO 6 antes process() | {"asset_id":51}
+[2026-04-09 08:10:32] ERROR GLOBAL | {"message":"Campo requerido faltante en ficha_web: tipo_propiedad","file":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\processing\\ClaudeClient.php","line":79,"asset_id":51,"message_id":"CAF+o0zvdAZLbaMAJ_gSgiTm-rpDdYx2Z3VsubM=H3z=S3w2syg@mail.gmail.com","sender":"practicasreglado@gmail.com"}
+[2026-04-09 08:10:32] ROLLBACK EJECUTADO | {"asset_id":51}
+[2026-04-09 08:10:33] ERROR EN ENVÍO DE EMAIL | {"message":"Error SMTP: Los siguientes destinos fallaron: practicasreglado@gmail.com: <info@regladoconsultores.com>: Sender address rejected: not owned by user realstate@regladoconsultores.com\r\n","sender":"practicasreglado@gmail.com"}
+[2026-04-09 08:12:44] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-09 08:12:44] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-09 08:12:44] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-09 08:12:44] PASO 2A texto encontrado | {"source_key":"plain","text_len":4,"text_preview":"hola"}
+[2026-04-09 08:12:44] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-09 08:12:44] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":4,"text_preview":"hola"}
+[2026-04-09 08:12:44] PASO 3 antes duplicados | {"message_id":"CAF+o0zsPV=g9e8q1GR4e5o-fgiPHDkMoHzWqOOdi8Np8zBzHJg@mail.gmail.com","content_hash":"b221d9dbb083a7f33428d7c2a3c3198ae925614d70210e28716ccaa7cd4ddb79"}
+[2026-04-09 08:12:44] PASO 4 activo insertado o recuperado | {"asset_id":52,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-09 08:12:44] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-09 08:12:44] PASO 6 antes process() | {"asset_id":52}
+[2026-04-09 08:12:48] ERROR GLOBAL | {"message":"Campo requerido faltante en ficha_web: tipo_propiedad","file":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\processing\\ClaudeClient.php","line":79,"asset_id":52,"message_id":"CAF+o0zsPV=g9e8q1GR4e5o-fgiPHDkMoHzWqOOdi8Np8zBzHJg@mail.gmail.com","sender":"practicasreglado@gmail.com"}
+[2026-04-09 08:12:48] ROLLBACK EJECUTADO | {"asset_id":52}
+[2026-04-09 08:12:49] ERROR EN ENVÍO DE EMAIL | {"message":"Error SMTP: Los siguientes destinos fallaron: practicasreglado@gmail.com: <info@regladoconsultores.com>: Sender address rejected: not owned by user realstate@regladoconsultores.com\r\n","sender":"practicasreglado@gmail.com"}
+[2026-04-09 08:18:39] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-09 08:18:39] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-09 08:18:39] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-09 08:18:39] PASO 2A texto encontrado | {"source_key":"plain","text_len":4,"text_preview":"hola"}
+[2026-04-09 08:18:39] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-09 08:18:39] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":4,"text_preview":"hola"}
+[2026-04-09 08:18:39] PASO 3 antes duplicados | {"message_id":"CAF+o0zuT136ejOphj5=jq5xpAeFJpYMAk53Zd2CY9=kUuB4n7w@mail.gmail.com","content_hash":"b221d9dbb083a7f33428d7c2a3c3198ae925614d70210e28716ccaa7cd4ddb79"}
+[2026-04-09 08:18:40] PASO 4 activo insertado o recuperado | {"asset_id":53,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-09 08:18:40] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-09 08:18:40] PASO 6 antes process() | {"asset_id":53}
+[2026-04-09 08:18:43] ERROR GLOBAL | {"message":"Campo requerido faltante en ficha_web: tipo_propiedad","file":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\processing\\ClaudeClient.php","line":79,"asset_id":53,"message_id":"CAF+o0zuT136ejOphj5=jq5xpAeFJpYMAk53Zd2CY9=kUuB4n7w@mail.gmail.com","sender":"practicasreglado@gmail.com"}
+[2026-04-09 08:18:43] ROLLBACK EJECUTADO | {"asset_id":53}
+[2026-04-09 08:23:17] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-09 08:23:17] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-09 08:23:17] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-09 08:23:17] PASO 2A texto encontrado | {"source_key":"plain","text_len":1257,"text_preview":"DOSSIER DE INVERSIÓN – EDIFICIO EN SAGRADA FAMILIA (BARCELONA)\r\nRESUMEN EJECUTIVO\r\nActivo residencial con potencial de reposicionamiento situado en una de las\r\nzonas más\r\ndemandadas de Barcelona. Operación tipo value-add con alto componente\r\nestratégico.\r\nDATOS CLAVE\r\n- Precio: 8.000.000 € (negociables)\r\n- Superficie: ~1.850 m²\r\n- Unidades: 23 viviendas + 4 locales + portería\r\n- Vacancia: 21 viviendas libres\r\nSITUACIÓN ACTUAL\r\n- 16 viviendas reformadas\r\n- 5 viviendas a reformar\r\n- 2 con rentas a"}
+[2026-04-09 08:23:17] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-09 08:23:17] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":1257,"text_preview":"DOSSIER DE INVERSIÓN – EDIFICIO EN SAGRADA FAMILIA (BARCELONA)\r\nRESUMEN EJECUTIVO\r\nActivo residencial con potencial de reposicionamiento situado en una de las\r\nzonas más\r\ndemandadas de Barcelona. Operación tipo value-add con alto componente\r\nestratégico.\r\nDATOS CLAVE\r\n- Precio: 8.000.000 € (negociables)\r\n- Superficie: ~1.850 m²\r\n- Unidades: 23 viviendas + 4 locales + portería\r\n- Vacancia: 21 viviendas libres\r\nSITUACIÓN ACTUAL\r\n- 16 viviendas reformadas\r\n- 5 viviendas a reformar\r\n- 2 con rentas antiguas\r\n- Locales 100% ocupados\r\nINGRESOS\r\n- Ingresos actuales: ~349.000 €\r\n- Ingresos potenciales: >500.000 €\r\nANÁLISIS FINANCIERO\r\n- Yield actual: ~4,3%\r\n- Yield potencial: 6–7%\r\n- CAPEX estimado: "}
+[2026-04-09 08:23:17] PASO 3 antes duplicados | {"message_id":"CAF+o0zvEF328T9+3vwJQEYvpYvjB=Eaz4Wd8_NR7G9_g-aGQbg@mail.gmail.com","content_hash":"840b3fa9b868befc9fbb6642c2f1355c1578fc81d2df487a45daf09e502cd2ce"}
+[2026-04-09 08:23:17] PASO 4 activo insertado o recuperado | {"asset_id":55,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-09 08:23:17] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-09 08:23:17] PASO 6 antes process() | {"asset_id":55}
+[2026-04-09 08:23:24] PASO 6B resultado process() | {"asset_id":55,"property_id_raw":30,"property_id_type":"integer"}
+[2026-04-09 08:23:24] PASO 7 propiedad creada correctamente | {"asset_id":55,"property_id":30}
+[2026-04-09 08:23:24] PASO 8 antes commit | {"asset_id":55,"property_id":30}
+[2026-04-09 08:23:24] PASO 9 commit realizado | {"asset_id":55,"property_id":30}
+[2026-04-09 08:23:24] PASO 10 antes email OK | {"sender":"practicasreglado@gmail.com","property_id":30}
+[2026-04-09 08:23:25] PASO 11 después email OK | {"sender":"practicasreglado@gmail.com","property_id":30}
+[2026-04-09 09:09:11] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-09 09:09:11] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-09 09:09:11] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-09 09:09:11] PASO 2A texto encontrado | {"source_key":"plain","text_len":664,"text_preview":"Ubicación:\r\n\r\nCalle de la Magdalena Nº 6\r\nCalle Cabeza nº 15\r\n28012 MADRID\r\n\r\nSuperficie parcela: 1.017 m².\r\n\r\nConstruidos: 4.395 m².\r\n\r\nUso: RESIDENCIAL (Plurifamiliar en altura).\r\nAlternativo: Hotelero / Terciario oficinas / Dotacional.\r\n\r\nAltura: IV (PB + 3) + Sótano.\r\n\r\nNorma Zonal: 1 Patrimonio histórico.\r\n\r\nPrecio INICIAL: 20.000.000 €.\r\n\r\nPrecio mínimo de cierre: 19.000.000 €.\r\n(Mínimo NO negociable)\r\n\r\nNO SE ACEPTAN OFERTAS POR UN IMPORTE MENOR.\r\n\r\nRepercusión techo: 4.323 €/m²t.\r\n\r\nProp"}
+[2026-04-09 09:09:11] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-09 09:09:11] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":664,"text_preview":"Ubicación:\r\n\r\nCalle de la Magdalena Nº 6\r\nCalle Cabeza nº 15\r\n28012 MADRID\r\n\r\nSuperficie parcela: 1.017 m².\r\n\r\nConstruidos: 4.395 m².\r\n\r\nUso: RESIDENCIAL (Plurifamiliar en altura).\r\nAlternativo: Hotelero / Terciario oficinas / Dotacional.\r\n\r\nAltura: IV (PB + 3) + Sótano.\r\n\r\nNorma Zonal: 1 Patrimonio histórico.\r\n\r\nPrecio INICIAL: 20.000.000 €.\r\n\r\nPrecio mínimo de cierre: 19.000.000 €.\r\n(Mínimo NO negociable)\r\n\r\nNO SE ACEPTAN OFERTAS POR UN IMPORTE MENOR.\r\n\r\nRepercusión techo: 4.323 €/m²t.\r\n\r\nPropiedad: Persona Jurídica.\r\n\r\nEl Inmueble se entrega VACÍO.\r\n\r\nPrecio de venta m² Obra Nueva en la Zona:\r\n10.923 €/m²t – 13.800 €/m²t\r\n\r\nHonorarios: + 2% (Comprador)."}
+[2026-04-09 09:09:11] PASO 3 antes duplicados | {"message_id":"CAF+o0zs81osii-9FFVAWuDw8ZOa=xxHGuiJXOAWUbOokSsi=QA@mail.gmail.com","content_hash":"715b2ae4f3de6489715212746a6b818ef15c5b35968f0b63444ed876a0b154e0"}
+[2026-04-09 09:09:11] Duplicado por content_hash | {"content_hash":"715b2ae4f3de6489715212746a6b818ef15c5b35968f0b63444ed876a0b154e0","existing_asset_id":60}
+[2026-04-09 09:12:21] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-09 09:12:21] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-09 09:12:21] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-09 09:12:21] PASO 2A texto encontrado | {"source_key":"plain","text_len":664,"text_preview":"Ubicación:\r\n\r\nCalle de la Magdalena Nº 6\r\nCalle Cabeza nº 15\r\n28012 MADRID\r\n\r\nSuperficie parcela: 1.017 m².\r\n\r\nConstruidos: 4.395 m².\r\n\r\nUso: RESIDENCIAL (Plurifamiliar en altura).\r\nAlternativo: Hotelero / Terciario oficinas / Dotacional.\r\n\r\nAltura: IV (PB + 3) + Sótano.\r\n\r\nNorma Zonal: 1 Patrimonio histórico.\r\n\r\nPrecio INICIAL: 20.000.000 €.\r\n\r\nPrecio mínimo de cierre: 19.000.000 €.\r\n(Mínimo NO negociable)\r\n\r\nNO SE ACEPTAN OFERTAS POR UN IMPORTE MENOR.\r\n\r\nRepercusión techo: 4.323 €/m²t.\r\n\r\nProp"}
+[2026-04-09 09:12:21] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-09 09:12:21] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":664,"text_preview":"Ubicación:\r\n\r\nCalle de la Magdalena Nº 6\r\nCalle Cabeza nº 15\r\n28012 MADRID\r\n\r\nSuperficie parcela: 1.017 m².\r\n\r\nConstruidos: 4.395 m².\r\n\r\nUso: RESIDENCIAL (Plurifamiliar en altura).\r\nAlternativo: Hotelero / Terciario oficinas / Dotacional.\r\n\r\nAltura: IV (PB + 3) + Sótano.\r\n\r\nNorma Zonal: 1 Patrimonio histórico.\r\n\r\nPrecio INICIAL: 20.000.000 €.\r\n\r\nPrecio mínimo de cierre: 19.000.000 €.\r\n(Mínimo NO negociable)\r\n\r\nNO SE ACEPTAN OFERTAS POR UN IMPORTE MENOR.\r\n\r\nRepercusión techo: 4.323 €/m²t.\r\n\r\nPropiedad: Persona Jurídica.\r\n\r\nEl Inmueble se entrega VACÍO.\r\n\r\nPrecio de venta m² Obra Nueva en la Zona:\r\n10.923 €/m²t – 13.800 €/m²t\r\n\r\nHonorarios: + 2% (Comprador)."}
+[2026-04-09 09:12:21] PASO 3 antes duplicados | {"message_id":"CAF+o0zsc+LAn0iAVcm3qmuSyO=8sOhAgUT3UZyp1ucv-U2riHw@mail.gmail.com","content_hash":"715b2ae4f3de6489715212746a6b818ef15c5b35968f0b63444ed876a0b154e0"}
+[2026-04-09 09:12:21] Duplicado por content_hash | {"content_hash":"715b2ae4f3de6489715212746a6b818ef15c5b35968f0b63444ed876a0b154e0","existing_asset_id":60}
+[2026-04-09 09:22:20] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-09 09:22:20] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-09 09:22:20] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-09 09:22:20] PASO 2A texto encontrado | {"source_key":"plain","text_len":664,"text_preview":"Ubicación:\r\n\r\nCalle de la Magdalena Nº 6\r\nCalle Cabeza nº 15\r\n28012 MADRID\r\n\r\nSuperficie parcela: 1.017 m².\r\n\r\nConstruidos: 4.395 m².\r\n\r\nUso: RESIDENCIAL (Plurifamiliar en altura).\r\nAlternativo: Hotelero / Terciario oficinas / Dotacional.\r\n\r\nAltura: IV (PB + 3) + Sótano.\r\n\r\nNorma Zonal: 1 Patrimonio histórico.\r\n\r\nPrecio INICIAL: 20.000.000 €.\r\n\r\nPrecio mínimo de cierre: 19.000.000 €.\r\n(Mínimo NO negociable)\r\n\r\nNO SE ACEPTAN OFERTAS POR UN IMPORTE MENOR.\r\n\r\nRepercusión techo: 4.323 €/m²t.\r\n\r\nProp"}
+[2026-04-09 09:22:20] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-09 09:22:20] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":664,"text_preview":"Ubicación:\r\n\r\nCalle de la Magdalena Nº 6\r\nCalle Cabeza nº 15\r\n28012 MADRID\r\n\r\nSuperficie parcela: 1.017 m².\r\n\r\nConstruidos: 4.395 m².\r\n\r\nUso: RESIDENCIAL (Plurifamiliar en altura).\r\nAlternativo: Hotelero / Terciario oficinas / Dotacional.\r\n\r\nAltura: IV (PB + 3) + Sótano.\r\n\r\nNorma Zonal: 1 Patrimonio histórico.\r\n\r\nPrecio INICIAL: 20.000.000 €.\r\n\r\nPrecio mínimo de cierre: 19.000.000 €.\r\n(Mínimo NO negociable)\r\n\r\nNO SE ACEPTAN OFERTAS POR UN IMPORTE MENOR.\r\n\r\nRepercusión techo: 4.323 €/m²t.\r\n\r\nPropiedad: Persona Jurídica.\r\n\r\nEl Inmueble se entrega VACÍO.\r\n\r\nPrecio de venta m² Obra Nueva en la Zona:\r\n10.923 €/m²t – 13.800 €/m²t\r\n\r\nHonorarios: + 2% (Comprador)."}
+[2026-04-09 09:22:20] PASO 3 antes duplicados | {"message_id":"CAF+o0zsq0+SwczKGQXwfJC4C7NPwpnkn=4MAhp-LVwi6VWte=A@mail.gmail.com","content_hash":"715b2ae4f3de6489715212746a6b818ef15c5b35968f0b63444ed876a0b154e0"}
+[2026-04-09 09:22:20] PASO 4 activo insertado o recuperado | {"asset_id":61,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-09 09:22:20] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-09 09:22:20] PASO 6 antes process() | {"asset_id":61}
+[2026-04-09 09:22:32] PASO 6B resultado process() | {"asset_id":61,"property_id_raw":36,"property_id_type":"integer"}
+[2026-04-09 09:22:32] PASO 7 propiedad creada correctamente | {"asset_id":61,"property_id":36}
+[2026-04-09 09:22:32] PASO 8 antes commit | {"asset_id":61,"property_id":36}
+[2026-04-09 09:22:32] PASO 9 commit realizado | {"asset_id":61,"property_id":36}
+[2026-04-09 09:22:32] PASO 10 antes email OK | {"sender":"practicasreglado@gmail.com","property_id":36}
+[2026-04-09 09:22:34] PASO 11 después email OK | {"sender":"practicasreglado@gmail.com","property_id":36}
+[2026-04-09 09:26:03] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-09 09:26:03] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-09 09:26:03] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-09 09:26:03] PASO 2A texto encontrado | {"source_key":"plain","text_len":664,"text_preview":"Ubicación:\r\n\r\nCalle de la Magdalena Nº 6\r\nCalle Cabeza nº 15\r\n28012 MADRID\r\n\r\nSuperficie parcela: 1.017 m².\r\n\r\nConstruidos: 4.395 m².\r\n\r\nUso: RESIDENCIAL (Plurifamiliar en altura).\r\nAlternativo: Hotelero / Terciario oficinas / Dotacional.\r\n\r\nAltura: IV (PB + 3) + Sótano.\r\n\r\nNorma Zonal: 1 Patrimonio histórico.\r\n\r\nPrecio INICIAL: 20.000.000 €.\r\n\r\nPrecio mínimo de cierre: 19.000.000 €.\r\n(Mínimo NO negociable)\r\n\r\nNO SE ACEPTAN OFERTAS POR UN IMPORTE MENOR.\r\n\r\nRepercusión techo: 4.323 €/m²t.\r\n\r\nProp"}
+[2026-04-09 09:26:03] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-09 09:26:03] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":664,"text_preview":"Ubicación:\r\n\r\nCalle de la Magdalena Nº 6\r\nCalle Cabeza nº 15\r\n28012 MADRID\r\n\r\nSuperficie parcela: 1.017 m².\r\n\r\nConstruidos: 4.395 m².\r\n\r\nUso: RESIDENCIAL (Plurifamiliar en altura).\r\nAlternativo: Hotelero / Terciario oficinas / Dotacional.\r\n\r\nAltura: IV (PB + 3) + Sótano.\r\n\r\nNorma Zonal: 1 Patrimonio histórico.\r\n\r\nPrecio INICIAL: 20.000.000 €.\r\n\r\nPrecio mínimo de cierre: 19.000.000 €.\r\n(Mínimo NO negociable)\r\n\r\nNO SE ACEPTAN OFERTAS POR UN IMPORTE MENOR.\r\n\r\nRepercusión techo: 4.323 €/m²t.\r\n\r\nPropiedad: Persona Jurídica.\r\n\r\nEl Inmueble se entrega VACÍO.\r\n\r\nPrecio de venta m² Obra Nueva en la Zona:\r\n10.923 €/m²t – 13.800 €/m²t\r\n\r\nHonorarios: + 2% (Comprador)."}
+[2026-04-09 09:26:03] PASO 3 antes duplicados | {"message_id":"CAF+o0zv_FwPR-S7jdh7xUtks66Nd-9LDgqMP=Rppz-o2Mv9v2g@mail.gmail.com","content_hash":"715b2ae4f3de6489715212746a6b818ef15c5b35968f0b63444ed876a0b154e0"}
+[2026-04-09 09:26:03] PASO 4 activo insertado o recuperado | {"asset_id":62,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-09 09:26:03] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-09 09:26:03] PASO 6 antes process() | {"asset_id":62}
+[2026-04-09 09:26:16] PASO 6B resultado process() | {"asset_id":62,"property_id_raw":37,"property_id_type":"integer"}
+[2026-04-09 09:26:16] PASO 7 propiedad creada correctamente | {"asset_id":62,"property_id":37}
+[2026-04-09 09:26:16] PASO 8 antes commit | {"asset_id":62,"property_id":37}
+[2026-04-09 09:26:16] PASO 9 commit realizado | {"asset_id":62,"property_id":37}
+[2026-04-09 09:26:16] PASO 10 antes email OK | {"sender":"practicasreglado@gmail.com","property_id":37}
+[2026-04-09 09:26:17] PASO 11 después email OK | {"sender":"practicasreglado@gmail.com","property_id":37}
+[2026-04-09 10:01:59] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-09 10:01:59] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-09 10:01:59] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-09 10:01:59] PASO 2A texto encontrado | {"source_key":"plain","text_len":4,"text_preview":"hola"}
+[2026-04-09 10:01:59] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-09 10:01:59] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":4,"text_preview":"hola"}
+[2026-04-09 10:01:59] PASO 3 antes duplicados | {"message_id":"CAF+o0zvqieFu6QORsgjtm06PqVuAvosSvm89FD0R12=BaMFVww@mail.gmail.com","content_hash":"b221d9dbb083a7f33428d7c2a3c3198ae925614d70210e28716ccaa7cd4ddb79"}
+[2026-04-09 10:01:59] PASO 4 activo insertado o recuperado | {"asset_id":67,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-09 10:01:59] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-09 10:01:59] PASO 6 antes process() | {"asset_id":67}
+[2026-04-09 10:02:05] ERROR GLOBAL | {"message":"Claude API 529: {\"type\":\"error\",\"error\":{\"type\":\"overloaded_error\",\"message\":\"Overloaded\"},\"request_id\":\"req_011CZsr5rkVVDh94SvgqQLDR\"}","file":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\processing\\ClaudeClient.php","line":169,"asset_id":67,"message_id":"CAF+o0zvqieFu6QORsgjtm06PqVuAvosSvm89FD0R12=BaMFVww@mail.gmail.com","sender":"practicasreglado@gmail.com"}
+[2026-04-09 10:02:05] ROLLBACK EJECUTADO | {"asset_id":67}
+[2026-04-09 10:37:44] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-09 10:37:44] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-09 10:37:44] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-09 10:37:44] PASO 2A texto encontrado | {"source_key":"plain","text_len":2,"text_preview":"aa"}
+[2026-04-09 10:37:44] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-09 10:37:44] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":2,"text_preview":"aa"}
+[2026-04-09 10:37:44] PASO 3 antes duplicados | {"message_id":"CAF+o0zsMtTi7XsznNkY75L9_ej2Y80ySO0Eze3Xq0or39UcjSg@mail.gmail.com","content_hash":"961b6dd3ede3cb8ecbaacbd68de040cd78eb2ed5889130cceb4c49268ea4d506"}
+[2026-04-09 10:37:44] PASO 4 activo insertado o recuperado | {"asset_id":68,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-09 10:37:44] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-09 10:37:44] PASO 6 antes process() | {"asset_id":68}
+[2026-04-09 10:37:49] ERROR GLOBAL | {"message":"Campo requerido faltante en ficha_web: tipo_propiedad","file":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\processing\\ClaudeClient.php","line":79,"asset_id":68,"message_id":"CAF+o0zsMtTi7XsznNkY75L9_ej2Y80ySO0Eze3Xq0or39UcjSg@mail.gmail.com","sender":"practicasreglado@gmail.com"}
+[2026-04-09 10:37:49] ROLLBACK EJECUTADO | {"asset_id":68}
+[2026-04-09 11:54:03] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-09 11:54:03] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-09 11:54:03] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-09 11:54:03] PASO 2A texto encontrado | {"source_key":"plain","text_len":4,"text_preview":"hola"}
+[2026-04-09 11:54:03] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-09 11:54:03] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":4,"text_preview":"hola"}
+[2026-04-09 11:54:03] PASO 3 antes duplicados | {"message_id":"CAF+o0zv8YRAmJQ+x8LXKdmnNRpP34k3-j6n+eWAuiMtgadYKaw@mail.gmail.com","content_hash":"b221d9dbb083a7f33428d7c2a3c3198ae925614d70210e28716ccaa7cd4ddb79"}
+[2026-04-09 11:54:03] PASO 4 activo insertado o recuperado | {"asset_id":69,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-09 11:54:03] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-09 11:54:03] PASO 6 antes process() | {"asset_id":69}
+[2026-04-09 11:54:06] ERROR GLOBAL | {"message":"Campo requerido faltante en ficha_web: tipo_propiedad","file":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\processing\\ClaudeClient.php","line":79,"asset_id":69,"message_id":"CAF+o0zv8YRAmJQ+x8LXKdmnNRpP34k3-j6n+eWAuiMtgadYKaw@mail.gmail.com","sender":"practicasreglado@gmail.com"}
+[2026-04-09 11:54:06] ROLLBACK EJECUTADO | {"asset_id":69}
+[2026-04-10 07:11:01] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-10 07:11:01] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-10 07:11:01] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-10 07:11:01] PASO 2A texto encontrado | {"source_key":"plain","text_len":3745,"text_preview":"MEMORANDO CONFIDENCIAL DE INVERSIÓN\r\nSUELO TURÍSTICO RESIDENCIAL – 5★ LUJO\r\nISLAS CANARIAS 2025.\r\nDOCUMENTO CONFIDENCIAL – SOLO PARA INVERSORES CUALIFICADOS\r\nPREPARADO CON FINES EXCLUSIVAMENTE INFORMATIVOS.\r\nNO CONSTITUYE OFERTA DE VENTA NI COMPROMISO DE INVERSIÓN.\r\nRESUMEN EJECUTIVO\r\nEl activo corresponde a un suelo turístico-residencial ubicado en primera\r\nlínea de\r\nplaya en una de las zonas más exclusivas y consolidadas del sur de\r\nTenerife. El\r\nplaneamiento vigente permite el desarrollo de u"}
+[2026-04-10 07:11:01] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-10 07:11:01] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":3745,"text_preview":"MEMORANDO CONFIDENCIAL DE INVERSIÓN\r\nSUELO TURÍSTICO RESIDENCIAL – 5★ LUJO\r\nISLAS CANARIAS 2025.\r\nDOCUMENTO CONFIDENCIAL – SOLO PARA INVERSORES CUALIFICADOS\r\nPREPARADO CON FINES EXCLUSIVAMENTE INFORMATIVOS.\r\nNO CONSTITUYE OFERTA DE VENTA NI COMPROMISO DE INVERSIÓN.\r\nRESUMEN EJECUTIVO\r\nEl activo corresponde a un suelo turístico-residencial ubicado en primera\r\nlínea de\r\nplaya en una de las zonas más exclusivas y consolidadas del sur de\r\nTenerife. El\r\nplaneamiento vigente permite el desarrollo de un complejo 5★ Gran Lujo, con\r\ncapacidad para un resort de aproximadamente 230 unidades y 460 plazas\r\nturísticas.\r\nLa parcela se sitúa en un entorno de alta demanda internacional, junto a\r\ncampos de\r\ng"}
+[2026-04-10 07:11:01] PASO 3 antes duplicados | {"message_id":"CAF+o0zsRrrdQh-NEk8xe0H12BMeokHTCaEnn=Zp_nESTPoDQzA@mail.gmail.com","content_hash":"ea9fb7ac2fc4b74d6e8388a265e68eed901bf39b9ada369199593772790bce45"}
+[2026-04-10 07:11:01] PASO 4 activo insertado o recuperado | {"asset_id":72,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-10 07:11:01] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-10 07:11:01] PASO 6 antes process() | {"asset_id":72}
+[2026-04-10 07:11:17] PASO 6B resultado process() | {"asset_id":72,"property_id_raw":40,"property_id_type":"integer"}
+[2026-04-10 07:11:17] PASO 7 propiedad creada correctamente | {"asset_id":72,"property_id":40}
+[2026-04-10 07:11:17] PASO 8 antes commit | {"asset_id":72,"property_id":40}
+[2026-04-10 07:11:17] PASO 9 commit realizado | {"asset_id":72,"property_id":40}
+[2026-04-10 07:11:17] PASO 10 antes email OK | {"sender":"practicasreglado@gmail.com","property_id":40}
+[2026-04-10 07:11:19] PASO 11 después email OK | {"sender":"practicasreglado@gmail.com","property_id":40}
+[2026-04-10 08:00:56] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-10 08:00:56] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-10 08:00:56] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-10 08:00:56] PASO 2A texto encontrado | {"source_key":"plain","text_len":664,"text_preview":"Ubicación:\r\n\r\nCalle de la Magdalena Nº 6\r\nCalle Cabeza nº 15\r\n28012 MADRID\r\n\r\nSuperficie parcela: 1.017 m².\r\n\r\nConstruidos: 4.395 m².\r\n\r\nUso: RESIDENCIAL (Plurifamiliar en altura).\r\nAlternativo: Hotelero / Terciario oficinas / Dotacional.\r\n\r\nAltura: IV (PB + 3) + Sótano.\r\n\r\nNorma Zonal: 1 Patrimonio histórico.\r\n\r\nPrecio INICIAL: 20.000.000 €.\r\n\r\nPrecio mínimo de cierre: 19.000.000 €.\r\n(Mínimo NO negociable)\r\n\r\nNO SE ACEPTAN OFERTAS POR UN IMPORTE MENOR.\r\n\r\nRepercusión techo: 4.323 €/m²t.\r\n\r\nProp"}
+[2026-04-10 08:00:56] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-10 08:00:56] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":664,"text_preview":"Ubicación:\r\n\r\nCalle de la Magdalena Nº 6\r\nCalle Cabeza nº 15\r\n28012 MADRID\r\n\r\nSuperficie parcela: 1.017 m².\r\n\r\nConstruidos: 4.395 m².\r\n\r\nUso: RESIDENCIAL (Plurifamiliar en altura).\r\nAlternativo: Hotelero / Terciario oficinas / Dotacional.\r\n\r\nAltura: IV (PB + 3) + Sótano.\r\n\r\nNorma Zonal: 1 Patrimonio histórico.\r\n\r\nPrecio INICIAL: 20.000.000 €.\r\n\r\nPrecio mínimo de cierre: 19.000.000 €.\r\n(Mínimo NO negociable)\r\n\r\nNO SE ACEPTAN OFERTAS POR UN IMPORTE MENOR.\r\n\r\nRepercusión techo: 4.323 €/m²t.\r\n\r\nPropiedad: Persona Jurídica.\r\n\r\nEl Inmueble se entrega VACÍO.\r\n\r\nPrecio de venta m² Obra Nueva en la Zona:\r\n10.923 €/m²t – 13.800 €/m²t\r\n\r\nHonorarios: + 2% (Comprador)."}
+[2026-04-10 08:00:56] PASO 3 antes duplicados | {"message_id":"CAF+o0zvwVeznU0kigYCysqVohkMYJUPg6R8eAdGKk6L4F9n8ZQ@mail.gmail.com","content_hash":"715b2ae4f3de6489715212746a6b818ef15c5b35968f0b63444ed876a0b154e0"}
+[2026-04-10 08:00:56] Duplicado por content_hash | {"content_hash":"715b2ae4f3de6489715212746a6b818ef15c5b35968f0b63444ed876a0b154e0","existing_asset_id":70}
+[2026-04-10 08:04:30] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-10 08:04:30] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-10 08:04:30] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-10 08:04:30] PASO 2A texto encontrado | {"source_key":"plain","text_len":664,"text_preview":"Ubicación:\r\n\r\nCalle de la Magdalena Nº 6\r\nCalle Cabeza nº 15\r\n28012 MADRID\r\n\r\nSuperficie parcela: 1.017 m².\r\n\r\nConstruidos: 4.395 m².\r\n\r\nUso: RESIDENCIAL (Plurifamiliar en altura).\r\nAlternativo: Hotelero / Terciario oficinas / Dotacional.\r\n\r\nAltura: IV (PB + 3) + Sótano.\r\n\r\nNorma Zonal: 1 Patrimonio histórico.\r\n\r\nPrecio INICIAL: 20.000.000 €.\r\n\r\nPrecio mínimo de cierre: 19.000.000 €.\r\n(Mínimo NO negociable)\r\n\r\nNO SE ACEPTAN OFERTAS POR UN IMPORTE MENOR.\r\n\r\nRepercusión techo: 4.323 €/m²t.\r\n\r\nProp"}
+[2026-04-10 08:04:30] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-10 08:04:30] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":664,"text_preview":"Ubicación:\r\n\r\nCalle de la Magdalena Nº 6\r\nCalle Cabeza nº 15\r\n28012 MADRID\r\n\r\nSuperficie parcela: 1.017 m².\r\n\r\nConstruidos: 4.395 m².\r\n\r\nUso: RESIDENCIAL (Plurifamiliar en altura).\r\nAlternativo: Hotelero / Terciario oficinas / Dotacional.\r\n\r\nAltura: IV (PB + 3) + Sótano.\r\n\r\nNorma Zonal: 1 Patrimonio histórico.\r\n\r\nPrecio INICIAL: 20.000.000 €.\r\n\r\nPrecio mínimo de cierre: 19.000.000 €.\r\n(Mínimo NO negociable)\r\n\r\nNO SE ACEPTAN OFERTAS POR UN IMPORTE MENOR.\r\n\r\nRepercusión techo: 4.323 €/m²t.\r\n\r\nPropiedad: Persona Jurídica.\r\n\r\nEl Inmueble se entrega VACÍO.\r\n\r\nPrecio de venta m² Obra Nueva en la Zona:\r\n10.923 €/m²t – 13.800 €/m²t\r\n\r\nHonorarios: + 2% (Comprador)."}
+[2026-04-10 08:04:30] PASO 3 antes duplicados | {"message_id":"CAF+o0ztBqqrDhpmuks4OgXPcH00ge=5Dtkp36Ymb5foOdRLOYA@mail.gmail.com","content_hash":"715b2ae4f3de6489715212746a6b818ef15c5b35968f0b63444ed876a0b154e0"}
+[2026-04-10 08:04:30] Duplicado por content_hash | {"content_hash":"715b2ae4f3de6489715212746a6b818ef15c5b35968f0b63444ed876a0b154e0","existing_asset_id":70}
+[2026-04-10 08:07:18] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-10 08:07:18] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-10 08:07:18] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-10 08:07:18] PASO 2A texto encontrado | {"source_key":"plain","text_len":664,"text_preview":"Ubicación:\r\n\r\nCalle de la Magdalena Nº 6\r\nCalle Cabeza nº 15\r\n28012 MADRID\r\n\r\nSuperficie parcela: 1.017 m².\r\n\r\nConstruidos: 4.395 m².\r\n\r\nUso: RESIDENCIAL (Plurifamiliar en altura).\r\nAlternativo: Hotelero / Terciario oficinas / Dotacional.\r\n\r\nAltura: IV (PB + 3) + Sótano.\r\n\r\nNorma Zonal: 1 Patrimonio histórico.\r\n\r\nPrecio INICIAL: 20.000.000 €.\r\n\r\nPrecio mínimo de cierre: 19.000.000 €.\r\n(Mínimo NO negociable)\r\n\r\nNO SE ACEPTAN OFERTAS POR UN IMPORTE MENOR.\r\n\r\nRepercusión techo: 4.323 €/m²t.\r\n\r\nProp"}
+[2026-04-10 08:07:18] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-10 08:07:18] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":664,"text_preview":"Ubicación:\r\n\r\nCalle de la Magdalena Nº 6\r\nCalle Cabeza nº 15\r\n28012 MADRID\r\n\r\nSuperficie parcela: 1.017 m².\r\n\r\nConstruidos: 4.395 m².\r\n\r\nUso: RESIDENCIAL (Plurifamiliar en altura).\r\nAlternativo: Hotelero / Terciario oficinas / Dotacional.\r\n\r\nAltura: IV (PB + 3) + Sótano.\r\n\r\nNorma Zonal: 1 Patrimonio histórico.\r\n\r\nPrecio INICIAL: 20.000.000 €.\r\n\r\nPrecio mínimo de cierre: 19.000.000 €.\r\n(Mínimo NO negociable)\r\n\r\nNO SE ACEPTAN OFERTAS POR UN IMPORTE MENOR.\r\n\r\nRepercusión techo: 4.323 €/m²t.\r\n\r\nPropiedad: Persona Jurídica.\r\n\r\nEl Inmueble se entrega VACÍO.\r\n\r\nPrecio de venta m² Obra Nueva en la Zona:\r\n10.923 €/m²t – 13.800 €/m²t\r\n\r\nHonorarios: + 2% (Comprador)."}
+[2026-04-10 08:07:18] PASO 3 antes duplicados | {"message_id":"CAF+o0zsfCc45-tTHUrPj0pxt0HQeZa9OZHF7MFSwa8BOkhGWdA@mail.gmail.com","content_hash":"715b2ae4f3de6489715212746a6b818ef15c5b35968f0b63444ed876a0b154e0"}
+[2026-04-10 08:07:18] Duplicado por content_hash | {"content_hash":"715b2ae4f3de6489715212746a6b818ef15c5b35968f0b63444ed876a0b154e0","existing_asset_id":70}
+[2026-04-10 08:09:01] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-10 08:09:01] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-10 08:09:01] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-10 08:09:01] PASO 2A texto encontrado | {"source_key":"plain","text_len":664,"text_preview":"Ubicación:\r\n\r\nCalle de la Magdalena Nº 6\r\nCalle Cabeza nº 15\r\n28012 MADRID\r\n\r\nSuperficie parcela: 1.017 m².\r\n\r\nConstruidos: 4.395 m².\r\n\r\nUso: RESIDENCIAL (Plurifamiliar en altura).\r\nAlternativo: Hotelero / Terciario oficinas / Dotacional.\r\n\r\nAltura: IV (PB + 3) + Sótano.\r\n\r\nNorma Zonal: 1 Patrimonio histórico.\r\n\r\nPrecio INICIAL: 20.000.000 €.\r\n\r\nPrecio mínimo de cierre: 19.000.000 €.\r\n(Mínimo NO negociable)\r\n\r\nNO SE ACEPTAN OFERTAS POR UN IMPORTE MENOR.\r\n\r\nRepercusión techo: 4.323 €/m²t.\r\n\r\nProp"}
+[2026-04-10 08:09:01] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-10 08:09:01] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":664,"text_preview":"Ubicación:\r\n\r\nCalle de la Magdalena Nº 6\r\nCalle Cabeza nº 15\r\n28012 MADRID\r\n\r\nSuperficie parcela: 1.017 m².\r\n\r\nConstruidos: 4.395 m².\r\n\r\nUso: RESIDENCIAL (Plurifamiliar en altura).\r\nAlternativo: Hotelero / Terciario oficinas / Dotacional.\r\n\r\nAltura: IV (PB + 3) + Sótano.\r\n\r\nNorma Zonal: 1 Patrimonio histórico.\r\n\r\nPrecio INICIAL: 20.000.000 €.\r\n\r\nPrecio mínimo de cierre: 19.000.000 €.\r\n(Mínimo NO negociable)\r\n\r\nNO SE ACEPTAN OFERTAS POR UN IMPORTE MENOR.\r\n\r\nRepercusión techo: 4.323 €/m²t.\r\n\r\nPropiedad: Persona Jurídica.\r\n\r\nEl Inmueble se entrega VACÍO.\r\n\r\nPrecio de venta m² Obra Nueva en la Zona:\r\n10.923 €/m²t – 13.800 €/m²t\r\n\r\nHonorarios: + 2% (Comprador)."}
+[2026-04-10 08:09:01] PASO 3 antes duplicados | {"message_id":"CAF+o0zv6S_WE1uNBZzWchdKZfNCtVWSD048NN7bkrL60R++2cA@mail.gmail.com","content_hash":"715b2ae4f3de6489715212746a6b818ef15c5b35968f0b63444ed876a0b154e0"}
+[2026-04-10 08:09:01] PASO 4 activo insertado o recuperado | {"asset_id":73,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-10 08:09:01] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-10 08:09:01] PASO 6 antes process() | {"asset_id":73}
+[2026-04-10 08:09:14] PASO 6B resultado process() | {"asset_id":73,"property_id_raw":41,"property_id_type":"integer"}
+[2026-04-10 08:09:14] PASO 7 propiedad creada correctamente | {"asset_id":73,"property_id":41}
+[2026-04-10 08:09:14] PASO 8 antes commit | {"asset_id":73,"property_id":41}
+[2026-04-10 08:09:14] PASO 9 commit realizado | {"asset_id":73,"property_id":41}
+[2026-04-10 08:09:14] PASO 10 antes email OK | {"sender":"practicasreglado@gmail.com","property_id":41}
+[2026-04-10 08:09:15] PASO 11 después email OK | {"sender":"practicasreglado@gmail.com","property_id":41}
+[2026-04-10 12:39:09] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-10 12:39:09] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-10 12:39:09] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-10 12:39:09] PASO 2A texto encontrado | {"source_key":"plain","text_len":3745,"text_preview":"MEMORANDO CONFIDENCIAL DE INVERSIÓN\r\nSUELO TURÍSTICO RESIDENCIAL – 5★ LUJO\r\nISLAS CANARIAS 2025.\r\nDOCUMENTO CONFIDENCIAL – SOLO PARA INVERSORES CUALIFICADOS\r\nPREPARADO CON FINES EXCLUSIVAMENTE INFORMATIVOS.\r\nNO CONSTITUYE OFERTA DE VENTA NI COMPROMISO DE INVERSIÓN.\r\nRESUMEN EJECUTIVO\r\nEl activo corresponde a un suelo turístico-residencial ubicado en primera\r\nlínea de\r\nplaya en una de las zonas más exclusivas y consolidadas del sur de\r\nTenerife. El\r\nplaneamiento vigente permite el desarrollo de u"}
+[2026-04-10 12:39:09] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-10 12:39:09] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":3745,"text_preview":"MEMORANDO CONFIDENCIAL DE INVERSIÓN\r\nSUELO TURÍSTICO RESIDENCIAL – 5★ LUJO\r\nISLAS CANARIAS 2025.\r\nDOCUMENTO CONFIDENCIAL – SOLO PARA INVERSORES CUALIFICADOS\r\nPREPARADO CON FINES EXCLUSIVAMENTE INFORMATIVOS.\r\nNO CONSTITUYE OFERTA DE VENTA NI COMPROMISO DE INVERSIÓN.\r\nRESUMEN EJECUTIVO\r\nEl activo corresponde a un suelo turístico-residencial ubicado en primera\r\nlínea de\r\nplaya en una de las zonas más exclusivas y consolidadas del sur de\r\nTenerife. El\r\nplaneamiento vigente permite el desarrollo de un complejo 5★ Gran Lujo, con\r\ncapacidad para un resort de aproximadamente 230 unidades y 460 plazas\r\nturísticas.\r\nLa parcela se sitúa en un entorno de alta demanda internacional, junto a\r\ncampos de\r\ng"}
+[2026-04-10 12:39:09] PASO 3 antes duplicados | {"message_id":"CAF+o0zsS6hpruydAoy520whobeX4r+GpQBCHjw_UTw7m_jDLPg@mail.gmail.com","content_hash":"ea9fb7ac2fc4b74d6e8388a265e68eed901bf39b9ada369199593772790bce45"}
+[2026-04-10 12:39:09] PASO 4 activo insertado o recuperado | {"asset_id":75,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-10 12:39:09] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-10 12:39:09] PASO 6 antes process() | {"asset_id":75}
+[2026-04-10 12:39:24] PASO 6B resultado process() | {"asset_id":75,"property_id_raw":43,"property_id_type":"integer"}
+[2026-04-10 12:39:24] PASO 7 propiedad creada correctamente | {"asset_id":75,"property_id":43}
+[2026-04-10 12:39:24] PASO 8 antes commit | {"asset_id":75,"property_id":43}
+[2026-04-10 12:39:24] PASO 9 commit realizado | {"asset_id":75,"property_id":43}
+[2026-04-10 12:39:24] PASO 10 antes email OK | {"sender":"practicasreglado@gmail.com","property_id":43}
+[2026-04-10 12:39:25] PASO 11 después email OK | {"sender":"practicasreglado@gmail.com","property_id":43}
+[2026-04-10 12:40:44] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-10 12:40:44] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-10 12:40:44] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-10 12:40:44] PASO 2A texto encontrado | {"source_key":"plain","text_len":4,"text_preview":"hola"}
+[2026-04-10 12:40:44] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-10 12:40:44] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":4,"text_preview":"hola"}
+[2026-04-10 12:40:44] PASO 3 antes duplicados | {"message_id":"CAF+o0zud_5XQ4V9=Vc7dFrExTam9ev-0So256M9b7Tzh27VtfQ@mail.gmail.com","content_hash":"b221d9dbb083a7f33428d7c2a3c3198ae925614d70210e28716ccaa7cd4ddb79"}
+[2026-04-10 12:40:44] PASO 4 activo insertado o recuperado | {"asset_id":76,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-10 12:40:44] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-10 12:40:44] PASO 6 antes process() | {"asset_id":76}
+[2026-04-10 12:40:47] ERROR GLOBAL | {"message":"Campo requerido faltante en ficha_web: tipo_propiedad","file":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\processing\\ClaudeClient.php","line":79,"asset_id":76,"message_id":"CAF+o0zud_5XQ4V9=Vc7dFrExTam9ev-0So256M9b7Tzh27VtfQ@mail.gmail.com","sender":"practicasreglado@gmail.com"}
+[2026-04-10 12:40:47] ROLLBACK EJECUTADO | {"asset_id":76}

@@ -13,6 +13,7 @@ $userId = 0;
 
 try {
     $context = requireAuthenticatedUser($pdo);
+
     $userId = (int) (
         $context['local']['id']
         ?? $context['local']['iduser']
@@ -41,11 +42,12 @@ $stmt = $pdo->prepare('
     SELECT
         p.*,
         pf.created_at AS favorited_at
-    FROM propiedades_favoritas pf
-    INNER JOIN propiedades p
-        ON p.id = pf.propiedad_id
-    WHERE pf.user_id = :user_id
-    ORDER BY pf.created_at DESC, p.id DESC
+    FROM propiedades p
+    LEFT JOIN propiedades_favoritas pf
+        ON pf.propiedad_id = p.id
+        AND pf.user_id = :user_id
+    WHERE p.owner_user_id = :user_id
+    ORDER BY p.created_at DESC, p.id DESC
 ');
 
 $stmt->execute([
@@ -93,7 +95,7 @@ foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
         'created_at' => $row['created_at'] ?? null,
         'updated_at' => $row['updated_at'] ?? null,
         'favorited_at' => $row['favorited_at'] ?? null,
-        'is_favorite' => true,
+        'is_favorite' => !empty($row['favorited_at']),
     ];
 }
 

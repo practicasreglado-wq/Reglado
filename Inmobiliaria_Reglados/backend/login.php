@@ -4,6 +4,7 @@ applyCors();
 handlePreflight();
 require_once "config/session.php";
 require_once "config/db.php";
+require_once __DIR__ . "/lib/match_preferences.php";
 
 $data = json_decode(file_get_contents("php://input"), true);
 
@@ -58,6 +59,14 @@ if (!password_verify($password, $usuario["password"])) {
     exit;
 }
 
+    $matchPreferences = fetchUserMatchPreferences($pdo, (int) $usuario["id"]);
+    $category = $matchPreferences["category"] ?? $usuario["categoria_seleccionada"];
+    $preferences = $matchPreferences["answers"] ?? null;
+
+    if ($preferences === null && !empty($usuario["preferencias"])) {
+        $preferences = json_decode((string) $usuario["preferencias"], true);
+    }
+
 $_SESSION["user"] = [
     "id" => $usuario["id"],
     "nombre" => $usuario["nombre"],
@@ -66,7 +75,7 @@ $_SESSION["user"] = [
     "email" => $usuario["email"],
     "nombre_usuario" => $usuario["nombre_usuario"],
     "profile_picture" => $usuario["profile_picture"],
-    "categoria" => $usuario["categoria_seleccionada"]
+    "categoria" => $category
 ];
 
 error_log('[LOGIN SESSION] ' . json_encode($_SESSION));
@@ -81,9 +90,7 @@ echo json_encode([
         "email" => $usuario["email"],
         "nombre_usuario" => $usuario["nombre_usuario"],
         "profile_picture" => $usuario["profile_picture"],
-        "categoria" => $usuario["categoria_seleccionada"],
-        "preferencias" => $usuario["preferencias"]
-            ? json_decode($usuario["preferencias"], true)
-            : null
+        "categoria" => $category,
+        "preferencias" => $preferences
     ]
 ]);

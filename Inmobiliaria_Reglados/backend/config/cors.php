@@ -1,16 +1,27 @@
 <?php
 declare(strict_types=1);
 
-function applyCors(): void
+function getCorsAllowedOrigins(): array
 {
-    $allowedOrigins = [
+    $defaults = [
         'http://localhost:5175',
         'http://127.0.0.1:5175',
     ];
 
+    $envRaw = getenv('CORS_ALLOWED_ORIGINS') ?: '';
+    $extras = array_filter(array_map('trim', explode(',', $envRaw)), function ($value) {
+        return $value !== '';
+    });
+
+    return array_values(array_unique(array_merge($defaults, $extras)));
+}
+
+function applyCors(): void
+{
+    $allowedOrigins = getCorsAllowedOrigins();
     $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 
-    if (in_array($origin, $allowedOrigins, true)) {
+    if ($origin && in_array($origin, $allowedOrigins, true)) {
         header("Access-Control-Allow-Origin: $origin");
         header('Vary: Origin');
         header('Access-Control-Allow-Credentials: true');

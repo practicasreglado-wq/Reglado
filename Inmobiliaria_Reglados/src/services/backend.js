@@ -1,11 +1,11 @@
-import { auth } from "./auth";
+﻿import { auth } from "./auth";
 
 export const BACKEND_BASE =
   import.meta.env.VITE_INMOBILIARIA_BACKEND_BASE ||
   "http://localhost/Reglado/Inmobiliaria_Reglados/backend";
 
 export const GROUP_BASE =
-  import.meta.env.VITE_GRUPO_REGLADO_BASE_URL || "http://localhost:5173";
+  import.meta.env.VITE_GRUPO_REGLADO_BASE_URL || "http://localhost:5175";
 
 export function buildBackendUrl(path) {
   return new URL(path, `${BACKEND_BASE}/`).toString();
@@ -30,21 +30,17 @@ export function buildUploadsUrl(fileName) {
 }
 
 export async function backendJson(path, options = {}) {
+  const finalHeaders = {
+    ...(options.headers || {}),
+    ...(auth.state.token
+      ? { Authorization: `Bearer ${auth.state.token}` }
+      : {}),
+  };
 
   const response = await fetch(buildBackendUrl(path), {
     ...options,
-
-    // 🔥 CLAVE ABSOLUTA (ENVÍA COOKIES)
     credentials: "include",
-
-    headers: {
-      ...(options.headers || {}),
-
-      // 🔥 JWT (tu sistema externo)
-      ...(auth.state.token
-        ? { Authorization: `Bearer ${auth.state.token}` }
-        : {}),
-    },
+    headers: finalHeaders,
   });
 
   let payload = {};
@@ -55,7 +51,6 @@ export async function backendJson(path, options = {}) {
   }
 
   if (!response.ok) {
-    console.error("BACKEND ERROR:", payload); // 🔥 VER ERROR REAL
     throw new Error(
       payload.message ||
       payload.error ||
@@ -66,3 +61,4 @@ export async function backendJson(path, options = {}) {
 
   return payload;
 }
+

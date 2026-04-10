@@ -5,23 +5,47 @@
       <div class="property-card__overlay"></div>
 
       <div class="property-card__actions">
-        <button
-          class="favorite-button"
-          :class="{ active: localFavorite, popping: isFavoritePopping }"
-          type="button"
-          :title="localFavorite ? 'Quitar de favoritos' : 'Guardar en favoritos'"
-          aria-label="Guardar en favoritos"
-          @click="handleFavoriteClick"
-        >
-          <span class="favorite-icon">
-            {{ localFavorite ? "★" : "☆" }}
-          </span>
+        <div class="property-card__top-badges">
+          <button
+            v-if="hasMatch"
+            class="match-badge"
+            type="button"
+            disabled
+          >
+            <span class="match-badge__label">Match</span>
+            <strong class="match-badge__value">{{ formatMatch(matchValue) }}</strong>
+          </button>
 
-          <span class="favorite-text">
-            {{ localFavorite ? "Guardado" : "Favorito" }}
-          </span>
-        </button>
+          <button
+            class="favorite-button"
+            :class="{ active: localFavorite, popping: isFavoritePopping }"
+            type="button"
+            :title="localFavorite ? 'Quitar de favoritos' : 'Guardar en favoritos'"
+            aria-label="Guardar en favoritos"
+            :disabled="favoriteLoading"
+            @click="handleFavoriteClick"
+          >
+            <span class="favorite-icon">
+              {{ localFavorite ? "★" : "☆" }}
+            </span>
 
+            <span class="favorite-text">
+              {{ favoriteLoading ? "Procesando..." : localFavorite ? "Guardado" : "Favorito" }}
+            </span>
+          </button>
+
+          <button
+            v-if="showRemoveFavorite && localFavorite"
+            class="remove-favorite-button"
+            type="button"
+            :disabled="favoriteLoading"
+            title="Eliminar de favoritos"
+            aria-label="Eliminar de favoritos"
+            @click.stop.prevent="handleRemoveFavoriteClick"
+          >
+            {{ favoriteLoading ? "..." : "Eliminar" }}
+          </button>
+        </div>
       </div>
     </div>
 
@@ -30,32 +54,39 @@
       <h3>{{ property.titulo }}</h3>
 
       <div class="property-card__meta">
-        <span>{{ property.ubicacion_general }}</span>
+        <span>{{ property.ciudad}}</span><span>{{ property.zona}}</span>
         <span>{{ formatSurface(property.metros_cuadrados) }}</span>
       </div>
 
-    <div class="property-card__footer">
-      <strong>{{ formatPrice(property.precio) }}</strong>
+      <div class="property-card__footer">
+        <strong>{{ formatPrice(property.precio) }}</strong>
 
-      <router-link :to="`/property/${property.id}`" class="detail-link">
-        Ver ficha
-      </router-link>
-
+        <router-link :to="`/property/${property.id}`" class="detail-link">
+          Ver ficha
+        </router-link>
+      </div>
     </div>
-  </div>
-</article>
+  </article>
 </template>
 
 <script>
 export default {
   name: "PropertyCard",
 
-  emits: ["toggle-favorite"],
+  emits: ["toggle-favorite", "remove-favorite"],
 
   props: {
     property: {
       type: Object,
       required: true,
+    },
+    showRemoveFavorite: {
+      type: Boolean,
+      default: false,
+    },
+    favoriteLoading: {
+      type: Boolean,
+      default: false,
     },
   },
 
@@ -63,12 +94,36 @@ export default {
     return {
       favoritePopTimeout: null,
       isFavoritePopping: false,
+      animationFrame: null,
+      animatedMatch: 0,
+      matchScale: 1,
     };
   },
 
   computed: {
     localFavorite() {
       return !!this.property.is_favorite;
+    },
+
+    matchValue() {
+      const raw =
+        this.property.match_percentage ??
+        this.property.matchPercentage ??
+        this.property.porcentaje_match ??
+        this.property.match ??
+        null;
+
+      const num = Number(raw);
+
+      if (!Number.isFinite(num)) {
+        return null;
+      }
+
+      return num;
+    },
+
+    hasMatch() {
+      return this.matchValue !== null && this.matchValue > 0;
     },
   },
 
@@ -77,15 +132,9 @@ export default {
     if (this.favoritePopTimeout) clearTimeout(this.favoritePopTimeout);
   },
 
-  watch: {
-    // Sistema de matching eliminado
-  },
-
   methods: {
     animateMatch() {
-      // Nota: Esta animación se mantiene con fines visuales usando el valor estático del objeto
-
-      const target = Number(this.property.match_percentage || 0);
+      const target = Number(this.matchValue || 0);
       const start = performance.now();
       const duration = 1150;
 
@@ -113,15 +162,24 @@ export default {
         style: "currency",
         currency: "EUR",
         maximumFractionDigits: 0,
-       }).format(Number(value || 0));
+      }).format(Number(value || 0));
     },
 
     formatSurface(value) {
       return `${new Intl.NumberFormat("es-ES").format(Number(value || 0))} m²`;
     },
 
+    formatMatch(value) {
+      const percent = Number(value) || 0;
+      return `${Math.round(percent)}%`;
+    },
+
     handleFavoriteClick() {
       this.isFavoritePopping = false;
+
+      if (this.favoriteLoading) {
+        return;
+      }
 
       if (this.favoritePopTimeout) clearTimeout(this.favoritePopTimeout);
 
@@ -136,12 +194,18 @@ export default {
       this.$emit("toggle-favorite", this.property);
     },
 
+    handleRemoveFavoriteClick() {
+      if (this.favoriteLoading) {
+        return;
+      }
+
+      this.$emit("remove-favorite", this.property);
+    },
   },
 };
 </script>
 
 <style scoped>
-
 .property-card {
   position: relative;
   z-index: 1;
@@ -188,10 +252,49 @@ export default {
   top: var(--spacing-sm);
   right: var(--spacing-sm);
   z-index: 2;
+  max-width: calc(100% - 24px);
+}
+
+.property-card__top-badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.match-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: none;
+  background: rgba(31, 74, 168, 0.88);
+  backdrop-filter: blur(8px);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: default;
+  opacity: 1;
+}
+
+.match-badge:disabled {
+  opacity: 1;
+}
+
+.match-badge__label {
+  line-height: 1;
+  opacity: 0.92;
+}
+
+.match-badge__value {
+  line-height: 1;
+  font-size: 0.82rem;
 }
 
 .favorite-button {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 4px;
   padding: 6px 12px;
@@ -203,6 +306,55 @@ export default {
   font-size: 0.8rem;
   font-weight: 700;
   cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease, opacity 0.2s ease;
+}
+
+.favorite-button.active {
+  background: rgba(22, 101, 52, 0.85);
+}
+
+.favorite-button.popping {
+  transform: scale(1.06);
+}
+
+.favorite-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.favorite-icon {
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.favorite-text {
+  line-height: 1;
+}
+
+.remove-favorite-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.34);
+  background: rgba(180, 35, 24, 0.78);
+  backdrop-filter: blur(8px);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease, opacity 0.2s ease;
+}
+
+.remove-favorite-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: rgba(180, 35, 24, 0.92);
+}
+
+.remove-favorite-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
 .property-card__body {
@@ -234,12 +386,14 @@ export default {
   background: #f3f7fd;
   font-size: 0.85rem;
   color: #5c6980;
+  gap: 12px;
 }
 
 .property-card__footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
   margin-top: 4px;
 }
 
@@ -268,7 +422,7 @@ export default {
   .property-card__media {
     height: 180px;
   }
-  
+
   .property-card__body {
     padding: var(--spacing-sm);
   }
@@ -277,20 +431,45 @@ export default {
     flex-direction: row;
     font-size: 0.8rem;
   }
+
+  .property-card__actions {
+    top: 10px;
+    right: 10px;
+    max-width: calc(100% - 20px);
+  }
+
+  .property-card__top-badges {
+    gap: 6px;
+  }
+
+  .favorite-button,
+  .remove-favorite-button,
+  .match-badge {
+    padding: 6px 10px;
+    font-size: 0.76rem;
+  }
 }
 
 @media (max-width: 480px) {
   .property-card__media {
     height: 160px;
   }
-  
+
   .property-card__body h3 {
     font-size: 1rem;
+  }
+
+  .property-card__footer {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .property-card__footer strong {
     font-size: 1rem;
   }
-}
 
+  .property-card__actions {
+    max-width: calc(100% - 16px);
+  }
+}
 </style>

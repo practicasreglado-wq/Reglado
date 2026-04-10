@@ -138,53 +138,183 @@ $ownerId = (int) ($property['owner_id'] ?? 0);
     }
 
     $subject = sprintf(
-        'Solicitud de compra propiedad #%d - %s',
-        $propertyId,
-        $property['tipo_propiedad'] ?? ($property['titulo'] ?? 'Activo')
-    );
+    'Solicitud de compra propiedad #%d - %s',
+    $propertyId,
+    $property['tipo_propiedad'] ?? ($property['titulo'] ?? 'Activo')
+);
 
-    $body = '<h2>Solicitud de compra registrada</h2>';
-    $body .= '<p><strong>Comprador:</strong></p><ul>';
-    $body .= '<li>ID comprador: ' . htmlspecialchars((string) $buyerUserId, ENT_QUOTES, 'UTF-8') . '</li>';
-    $body .= '<li>Nombre completo: ' . htmlspecialchars($buyerFullName ?: 'Sin nombre', ENT_QUOTES, 'UTF-8') . '</li>';
-    $body .= '<li>Nombre: ' . htmlspecialchars($buyerFirstName ?: '-', ENT_QUOTES, 'UTF-8') . '</li>';
-    $body .= '<li>Apellidos: ' . htmlspecialchars($buyerLastName ?: '-', ENT_QUOTES, 'UTF-8') . '</li>';
-    $body .= '<li>Email: ' . htmlspecialchars($buyerEmail ?: 'Sin email', ENT_QUOTES, 'UTF-8') . '</li>';
-    $body .= '<li>Teléfono: ' . htmlspecialchars($buyerPhone ?: 'Sin teléfono', ENT_QUOTES, 'UTF-8') . '</li>';
-    $body .= '<li>Username: ' . htmlspecialchars($buyerUsername ?: '-', ENT_QUOTES, 'UTF-8') . '</li>';
-    $body .= '</ul>';
+$body = '
+<div style="margin:0;padding:24px;background:#f5f7fa;font-family:Arial,sans-serif;color:#1f2937;">
+    <div style="max-width:720px;margin:0 auto;background:#ffffff;border:1px solid #d9e2ec;border-radius:8px;overflow:hidden;">
 
-    $body .= '<p><strong>Propiedad:</strong></p><ul>';
-    $body .= '<li>ID: ' . htmlspecialchars((string) $propertyId, ENT_QUOTES, 'UTF-8') . '</li>';
-    $body .= '<li>Tipo: ' . htmlspecialchars($property['tipo_propiedad'] ?? 'No especificado', ENT_QUOTES, 'UTF-8') . '</li>';
-    $body .= '<li>Ciudad: ' . htmlspecialchars($property['ciudad'] ?? 'No especificado', ENT_QUOTES, 'UTF-8') . '</li>';
-    $body .= '<li>Zona: ' . htmlspecialchars($property['zona'] ?? 'No especificada', ENT_QUOTES, 'UTF-8') . '</li>';
-    $body .= '<li>Precio: ' . number_format((float) ($property['precio'] ?? 0), 2, ',', '.') . ' €</li>';
-    $body .= '<li>Metros cuadrados: ' . htmlspecialchars((string) ($property['metros_cuadrados'] ?? 0), ENT_QUOTES, 'UTF-8') . ' m²</li>';
-    $body .= '</ul>';
+        <div style="background:#2563eb;padding:20px 24px;color:#ffffff;">
+            <p style="margin:0 0 6px;font-size:12px;text-transform:uppercase;font-weight:700;">
+                Nueva oportunidad comercial
+            </p>
+            <h2 style="margin:0;font-size:22px;line-height:1.3;font-weight:700;">
+                Solicitud de compra registrada
+            </h2>
+            <p style="margin:8px 0 0;font-size:14px;line-height:1.6;">
+                Se ha registrado una nueva solicitud de compra sobre un activo inmobiliario con acceso documental previamente validado.
+            </p>
+        </div>
 
-    $body .= '<p><strong>Propietario / captador del activo:</strong></p><ul>';
-    $body .= '<li>ID propietario: ' . htmlspecialchars((string) $ownerId, ENT_QUOTES, 'UTF-8') . '</li>';
-    $body .= '<li>Nombre completo: ' . htmlspecialchars($ownerFullName ?: 'No disponible', ENT_QUOTES, 'UTF-8') . '</li>';
-    $body .= '<li>Email: ' . htmlspecialchars($ownerEmail ?: 'No disponible', ENT_QUOTES, 'UTF-8') . '</li>';
-    $body .= '<li>Teléfono: ' . htmlspecialchars($ownerPhone ?: 'No disponible', ENT_QUOTES, 'UTF-8') . '</li>';
-    $body .= '</ul>';
+        <div style="padding:24px;color:#1f2937;">
 
-    if ($characteristics) {
-        $body .= '<p><strong>Características destacadas:</strong></p><ul>';
-        foreach ($characteristics as $key => $value) {
-            if (is_array($value) || is_object($value)) {
-                $value = json_encode($value, JSON_UNESCAPED_UNICODE);
-            }
+            <div style="margin-bottom:24px;padding:16px;border:1px solid #d1d5db;border-radius:8px;background:#fafafa;">
+                <p style="margin:0 0 6px;font-size:12px;text-transform:uppercase;color:#6b7280;font-weight:700;">
+                    Resumen de la operación
+                </p>
+                <p style="margin:0;font-size:18px;color:#111827;font-weight:700;line-height:1.4;">
+                    ' . htmlspecialchars($property['tipo_propiedad'] ?? ($property['titulo'] ?? 'Activo'), ENT_QUOTES, 'UTF-8') . '
+                    <span style="color:#6b7280;font-weight:600;">· Propiedad #' . htmlspecialchars((string) $propertyId, ENT_QUOTES, 'UTF-8') . '</span>
+                </p>
+                <p style="margin:8px 0 0;font-size:14px;color:#4b5563;line-height:1.6;">
+                    ' . htmlspecialchars($property['ciudad'] ?? 'No especificado', ENT_QUOTES, 'UTF-8') . ' · ' . htmlspecialchars($property['zona'] ?? 'No especificada', ENT_QUOTES, 'UTF-8') . '
+                </p>
+            </div>
 
-            $body .= '<li>' .
-                htmlspecialchars(ucfirst(str_replace('_', ' ', (string) $key)), ENT_QUOTES, 'UTF-8') .
-                ': ' .
-                htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8') .
-                '</li>';
+            <div style="margin-bottom:22px;">
+                <h3 style="margin:0 0 12px;font-size:18px;font-weight:700;color:#111827;">
+                    Comprador
+                </h3>
+                <div style="background:#ffffff;border:1px solid #d1d5db;border-radius:8px;padding:16px;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;font-size:14px;color:#374151;">
+                        <tr>
+                            <td style="padding:8px 0;width:190px;font-weight:700;color:#6b7280;">ID comprador</td>
+                            <td style="padding:8px 0;">' . htmlspecialchars((string) $buyerUserId, ENT_QUOTES, 'UTF-8') . '</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px 0;font-weight:700;color:#6b7280;">Nombre completo</td>
+                            <td style="padding:8px 0;">' . htmlspecialchars($buyerFullName ?: 'Sin nombre', ENT_QUOTES, 'UTF-8') . '</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px 0;font-weight:700;color:#6b7280;">Nombre</td>
+                            <td style="padding:8px 0;">' . htmlspecialchars($buyerFirstName ?: '-', ENT_QUOTES, 'UTF-8') . '</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px 0;font-weight:700;color:#6b7280;">Apellidos</td>
+                            <td style="padding:8px 0;">' . htmlspecialchars($buyerLastName ?: '-', ENT_QUOTES, 'UTF-8') . '</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px 0;font-weight:700;color:#6b7280;">Email</td>
+                            <td style="padding:8px 0;">' . htmlspecialchars($buyerEmail ?: 'Sin email', ENT_QUOTES, 'UTF-8') . '</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px 0;font-weight:700;color:#6b7280;">Teléfono</td>
+                            <td style="padding:8px 0;">' . htmlspecialchars($buyerPhone ?: 'Sin teléfono', ENT_QUOTES, 'UTF-8') . '</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px 0;font-weight:700;color:#6b7280;">Username</td>
+                            <td style="padding:8px 0;">' . htmlspecialchars($buyerUsername ?: '-', ENT_QUOTES, 'UTF-8') . '</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div style="margin-bottom:22px;">
+                <h3 style="margin:0 0 12px;font-size:18px;font-weight:700;color:#111827;">
+                    Propiedad
+                </h3>
+                <div style="background:#ffffff;border:1px solid #d1d5db;border-radius:8px;padding:16px;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;font-size:14px;color:#374151;">
+                        <tr>
+                            <td style="padding:8px 0;width:190px;font-weight:700;color:#6b7280;">ID</td>
+                            <td style="padding:8px 0;">' . htmlspecialchars((string) $propertyId, ENT_QUOTES, 'UTF-8') . '</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px 0;font-weight:700;color:#6b7280;">Tipo</td>
+                            <td style="padding:8px 0;">' . htmlspecialchars($property['tipo_propiedad'] ?? 'No especificado', ENT_QUOTES, 'UTF-8') . '</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px 0;font-weight:700;color:#6b7280;">Ciudad</td>
+                            <td style="padding:8px 0;">' . htmlspecialchars($property['ciudad'] ?? 'No especificado', ENT_QUOTES, 'UTF-8') . '</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px 0;font-weight:700;color:#6b7280;">Zona</td>
+                            <td style="padding:8px 0;">' . htmlspecialchars($property['zona'] ?? 'No especificada', ENT_QUOTES, 'UTF-8') . '</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px 0;font-weight:700;color:#6b7280;">Precio</td>
+                            <td style="padding:8px 0;">' . number_format((float) ($property['precio'] ?? 0), 2, ',', '.') . ' €</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px 0;font-weight:700;color:#6b7280;">Metros cuadrados</td>
+                            <td style="padding:8px 0;">' . htmlspecialchars((string) ($property['metros_cuadrados'] ?? 0), ENT_QUOTES, 'UTF-8') . ' m²</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div style="margin-bottom:22px;">
+                <h3 style="margin:0 0 12px;font-size:18px;font-weight:700;color:#111827;">
+                    Propietario
+                </h3>
+                <div style="background:#ffffff;border:1px solid #d1d5db;border-radius:8px;padding:16px;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;font-size:14px;color:#374151;">
+                        <tr>
+                            <td style="padding:8px 0;width:190px;font-weight:700;color:#6b7280;">ID propietario</td>
+                            <td style="padding:8px 0;">' . htmlspecialchars((string) $ownerId, ENT_QUOTES, 'UTF-8') . '</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px 0;font-weight:700;color:#6b7280;">Nombre completo</td>
+                            <td style="padding:8px 0;">' . htmlspecialchars($ownerFullName ?: 'No disponible', ENT_QUOTES, 'UTF-8') . '</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px 0;font-weight:700;color:#6b7280;">Email</td>
+                            <td style="padding:8px 0;">' . htmlspecialchars($ownerEmail ?: 'No disponible', ENT_QUOTES, 'UTF-8') . '</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px 0;font-weight:700;color:#6b7280;">Teléfono</td>
+                            <td style="padding:8px 0;">' . htmlspecialchars($ownerPhone ?: 'No disponible', ENT_QUOTES, 'UTF-8') . '</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>';
+if ($characteristics) {
+$body .= '
+            <div style="margin-bottom:22px;">
+                <h3 style="margin:0 0 12px;font-size:18px;font-weight:700;color:#111827;">
+                    Características destacadas
+                </h3>
+                <div style="background:#fafafa;border:1px solid #d1d5db;border-radius:8px;padding:16px;">';
+
+    foreach ($characteristics as $key => $value) {
+        if (is_array($value) || is_object($value)) {
+            $value = json_encode($value, JSON_UNESCAPED_UNICODE);
         }
-        $body .= '</ul>';
+
+        $body .= '
+                    <p style="margin:0 0 10px;font-size:14px;line-height:1.6;color:#111827;">
+                        <strong>' .
+                            htmlspecialchars(ucfirst(str_replace('_', ' ', (string) $key)), ENT_QUOTES, 'UTF-8') .
+                        ':</strong> ' .
+                            htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8') .
+                    '</p>';
     }
+
+    $body .= '
+                </div>
+            </div>';
+}
+
+$body .= '
+            <div style="margin-top:24px;padding:14px 16px;background:#f8fbff;border:1px solid #dbeafe;border-radius:8px;">
+                <p style="margin:0;font-size:13px;line-height:1.6;color:#1d4ed8;">
+                    Esta solicitud ha sido generada desde la plataforma inmobiliaria automatizada y corresponde a un comprador con acceso documental habilitado.
+                </p>
+            </div>
+
+        </div>
+
+        <div style="padding:14px 18px;background:#f3f4f6;border-top:1px solid #d1d5db;text-align:center;">
+            <p style="margin:0;font-size:12px;color:#6b7280;">
+                Reglado Real Estate · Sistema automatizado de comercialización y control documental
+            </p>
+        </div>
+
+    </div>
+</div>';
 
     $officeEmail = 'practicasreglado@gmail.com';
 

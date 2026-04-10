@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <Header />
+    <NotificationBell />
     <main class="main-content">
       <router-view v-slot="{ Component, route }">
         <transition
@@ -25,6 +26,7 @@ import { useRoute, useRouter } from "vue-router";
 import Header from "./components/Header.vue";
 import Footer from "./components/Footer.vue";
 import ScrollToTop from "./components/ScrollToTop.vue";
+import NotificationBell from "./components/NotificationBell.vue";
 import { useUserStore } from "./stores/user";
 import {
   initRevealSystem,
@@ -37,6 +39,7 @@ export default {
     Header,
     Footer,
     ScrollToTop,
+    NotificationBell,
   },
 
   setup() {

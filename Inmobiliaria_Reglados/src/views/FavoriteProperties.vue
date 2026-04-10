@@ -1,190 +1,137 @@
 <template>
-  <section class="favorites-view">
-
-    <div class="favorites-view__header" v-reveal="0">
-      <div class="header-content">
-        <div class="header-main">
-          <p class="eyebrow">Tu shortlist</p>
-          <h2>Mis propiedades favoritas</h2>
-        </div>
-        <span class="favorites-count">
-          {{ filteredFavorites.length }} {{ filteredFavorites.length === 1 ? 'guardada' : 'guardadas' }}
-        </span>
+  <section class="favorite-properties">
+    <div class="favorite-properties__hero">
+      <div class="favorite-properties__copy">
+        <p class="eyebrow">Gestión Personal</p>
+        <h2>Mis propiedades favoritas</h2>
+        <p>
+          Aquí tienes los activos que has guardado para revisarlos más tarde,
+          compararlos y seguir sus oportunidades.
+        </p>
       </div>
     </div>
 
-    <!-- Controles de búsqueda y filtros -->
-    <div class="favorites-controls" v-reveal="0.5">
-      <div class="search-field">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="11" cy="11" r="8" />
-          <path d="M21 21l-4.35-4.35" />
-        </svg>
-        <input 
-          v-model="searchQuery" 
-          type="text" 
-          placeholder="Buscar por título o ciudad..."
-        >
-      </div>
-
-      <div class="filters-row">
-        <select v-model="filterCategory" class="filter-select">
-          <option value="">Todas las categorías</option>
-          <option v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</option>
-        </select>
-
-        <select v-model="sortBy" class="filter-select">
-          <option value="newest">Más recientes</option>
-          <option value="oldest">Más antiguos</option>
-          <option value="price_asc">Precio: Menor al Mayor</option>
-          <option value="price_desc">Precio: Mayor al Menor</option>
-        </select>
-      </div>
+    <div v-if="loading" class="favorite-properties__state">
+      Cargando tus favoritos...
     </div>
 
-    <transition name="content-fade" mode="out-in">
-    <div v-if="loading" key="loading" class="favorites-view__state" v-reveal="1">
-      Cargando favoritos...
+    <div v-else-if="properties.length === 0" class="favorite-properties__state">
+      <p>Todavía no has guardado propiedades favoritas.</p>
     </div>
 
-    <div
-      v-else-if="favorites.length === 0"
-      key="empty"
-      class="favorites-view__state"
-      v-reveal="1"
-    >
-      No tienes propiedades favoritas todavía.
-    </div>
-
-    <transition-group v-else key="results" name="stagger-list" tag="div" class="favorites-view__grid">
-
+    <div v-else class="favorite-properties__grid">
       <div
-        v-for="(property,index) in filteredFavorites"
+        v-for="property in properties"
         :key="property.id"
-        v-reveal="index+1"
-        class="favorite-card-wrapper"
-        :style="{ transitionDelay: `${Math.min(index * 70, 420)}ms` }"
+        class="favorite-properties__item"
       >
-
         <PropertyCard
           :property="property"
+          :show-remove-favorite="true"
+          :favorite-loading="pendingFavorites.has(property.id)"
           @toggle-favorite="toggleFavorite"
+          @remove-favorite="removeFromFavorites"
         />
-
       </div>
-
-    </transition-group>
-    </transition>
+    </div>
   </section>
 </template>
 
 <script>
-
-import PropertyCard from "../components/PropertyCard.vue"
+import PropertyCard from "../components/PropertyCard.vue";
 import {
   fetchFavoriteProperties,
-  removeFavorite
-} from "../services/properties"
+  removeFavorite,
+  saveFavorite,
+} from "../services/properties";
 
 export default {
+  name: "FavoriteProperties",
 
-  name:"FavoriteProperties",
-
-  components:{
-    PropertyCard
+  components: {
+    PropertyCard,
   },
 
-  data(){
-    return{
-      favorites:[],
-      loading:true,
-      searchQuery: '',
-      filterCategory: '',
-      sortBy: 'newest',
-      categories: ['Hoteles', 'Fincas', 'Parking', 'Edificios', 'Activos']
-    }
+  data() {
+    return {
+      properties: [],
+      loading: true,
+      pendingFavorites: new Set(),
+    };
   },
 
-  computed: {
-    filteredFavorites() {
-      let result = [...this.favorites];
-
-      // Búsqueda textual
-      if (this.searchQuery) {
-        const query = this.searchQuery.toLowerCase();
-        result = result.filter(p => 
-          p.titulo.toLowerCase().includes(query) || 
-          p.ubicacion_general.toLowerCase().includes(query)
-        );
-      }
-
-      // Filtro por categoría
-      if (this.filterCategory) {
-        result = result.filter(p => p.categoria === this.filterCategory);
-      }
-
-      // Ordenación
-      result.sort((a, b) => {
-        if (this.sortBy === 'price_asc') return a.precio - b.precio;
-        if (this.sortBy === 'price_desc') return b.precio - a.precio;
-        
-        // Ordenación cronológica (usamos favorited_at si está disponible, sino created_at)
-        const dateA = new Date(a.favorited_at || a.created_at || 0).getTime();
-        const dateB = new Date(b.favorited_at || b.created_at || 0).getTime();
-
-        if (this.sortBy === 'oldest') {
-          return dateA - dateB;
-        }
-        // newest (default)
-        return dateB - dateA;
-      });
-
-      return result;
-    }
+  mounted() {
+    this.getFavorites();
   },
 
-  mounted(){
-    this.loadFavorites()
-  },
+  methods: {
+    async getFavorites() {
+      this.loading = true;
 
-  methods:{
-    async loadFavorites(){
-      this.loading=true
-      try{
-        this.favorites = await fetchFavoriteProperties()
-      }catch(error){
-        console.error(error)
-        this.favorites=[]
-      }finally{
-        this.loading=false
+      try {
+        this.properties = await fetchFavoriteProperties();
+      } catch (error) {
+        console.error("Error cargando favoritos:", error);
+        this.properties = [];
+      } finally {
+        this.loading = false;
       }
     },
 
-    async toggleFavorite(property){
-      try{
-        await removeFavorite(property.id)
-        this.favorites = this.favorites.filter(
-          item => item.id !== property.id
-        )
-      }catch(error){
-        console.error(error)
+    async toggleFavorite(property) {
+      if (!property?.id || this.pendingFavorites.has(property.id)) {
+        return;
       }
-    }
-  }
 
-}
+      this.pendingFavorites.add(property.id);
+
+      try {
+        if (property.is_favorite) {
+          await removeFavorite(property.id);
+          this.properties = this.properties.filter(
+            (item) => item.id !== property.id
+          );
+        } else {
+          await saveFavorite(property.id);
+          await this.getFavorites();
+        }
+      } catch (error) {
+        console.error("Error actualizando favorito:", error);
+      } finally {
+        this.pendingFavorites.delete(property.id);
+      }
+    },
+
+    async removeFromFavorites(property) {
+      if (!property?.id || this.pendingFavorites.has(property.id)) {
+        return;
+      }
+
+      this.pendingFavorites.add(property.id);
+
+      try {
+        await removeFavorite(property.id);
+        this.properties = this.properties.filter(
+          (item) => item.id !== property.id
+        );
+      } catch (error) {
+        console.error("Error eliminando favorito:", error);
+      } finally {
+        this.pendingFavorites.delete(property.id);
+      }
+    },
+  },
+};
 </script>
 
-
 <style scoped>
-
-.favorites-view {
+.favorite-properties {
   display: grid;
   gap: 24px;
   min-width: 0;
 }
 
-.favorites-view__header {
+.favorite-properties__hero {
   position: relative;
   overflow: hidden;
   display: flex;
@@ -200,8 +147,8 @@ export default {
   color: #fff;
 }
 
-.favorites-view__header::before,
-.favorites-view__header::after {
+.favorite-properties__hero::before,
+.favorite-properties__hero::after {
   content: "";
   position: absolute;
   border-radius: 999px;
@@ -210,7 +157,7 @@ export default {
   transition: opacity 0.28s ease;
 }
 
-.favorites-view__header::before {
+.favorite-properties__hero::before {
   width: 200px;
   height: 200px;
   right: -60px;
@@ -218,7 +165,7 @@ export default {
   background: rgba(255, 255, 255, 0.08);
 }
 
-.favorites-view__header::after {
+.favorite-properties__hero::after {
   width: 140px;
   height: 140px;
   left: -50px;
@@ -226,16 +173,9 @@ export default {
   background: rgba(255, 204, 84, 0.14);
 }
 
-.header-content {
+.favorite-properties__copy {
   position: relative;
   z-index: 2;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-}
-
-.header-main {
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -257,98 +197,21 @@ export default {
   color: #ffffff;
 }
 
-.favorites-view__header h2 {
+.favorite-properties__hero h2 {
   margin: 0;
   font-size: clamp(1.6rem, 1.2rem + 1vw, 2.2rem);
   line-height: 1.1;
   color: #ffffff;
 }
 
-.favorites-count {
-  display: inline-flex;
-  align-items: center;
-  padding: 8px 16px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.14);
-  backdrop-filter: blur(10px);
-  color: #ffffff;
-  font-weight: 700;
-  font-size: 0.9rem;
-  white-space: nowrap;
+.favorite-properties__hero p:last-child {
+  margin: 0;
+  max-width: 62ch;
+  color: rgba(255, 255, 255, 0.84);
+  line-height: 1.6;
 }
 
-/* Controles */
-.favorites-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  background: white;
-  padding: 20px;
-  border-radius: 16px;
-  box-shadow: 0 4px 15px rgba(23,42,93,0.05);
-  min-width: 0;
-}
-
-.search-field {
-  position: relative;
-  display: flex;
-  align-items: center;
-  min-width: 0;
-}
-
-.search-field svg {
-  position: absolute;
-  left: 15px;
-  color: #94a3b8;
-}
-
-.search-field input {
-  width: 100%;
-  min-width: 0;
-  padding: 12px 15px 12px 45px;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
-  font-size: 1rem;
-  transition: 0.3s;
-}
-
-.search-field input:focus {
-  outline: none;
-  border-color: #bd9b2c;
-  box-shadow: 0 0 0 3px rgba(189, 155, 44, 0.1);
-}
-
-.filters-row {
-  display: flex;
-  gap: 12px;
-  min-width: 0;
-  align-items: stretch;
-}
-
-.filter-select {
-  flex: 1;
-  min-width: 0;
-  width: 100%;
-  padding: 10px 15px;
-  border-radius: 10px;
-  border: 1px solid #e2e8f0;
-  background: white;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #172a5d;
-  cursor: pointer;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 10px center;
-}
-
-.filter-select:focus {
-  outline: none;
-  border-color: #bd9b2c;
-}
-
-.favorites-view__state {
+.favorite-properties__state {
   padding: 24px;
   border-radius: 18px;
   background: #fff;
@@ -356,82 +219,78 @@ export default {
   box-shadow: 0 12px 26px rgba(23, 42, 93, 0.08);
 }
 
-.favorites-view__grid {
+.favorite-properties__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
-  gap: 22px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
   min-width: 0;
-  position: relative;
+  align-items: stretch;
 }
 
-.favorite-card-wrapper {
+.favorite-properties__item {
   min-width: 0;
+  width: 100%;
 }
 
-/* =========================================
-   RESPONSIVE (1440px / 768px / 480px)
-   ========================================= */
+.favorite-properties__item :deep(.property-card) {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
 
 @media (max-width: 1440px) {
-  .favorites-view__header {
+  .favorite-properties__hero {
     padding: 22px 30px;
     min-height: 120px;
+  }
+
+  .favorite-properties__grid {
+    gap: 16px;
   }
 }
 
 @media (max-width: 980px) {
-  .favorites-view__header {
+  .favorite-properties__hero {
     padding: 20px 24px;
     min-height: 100px;
+  }
+
+  .favorite-properties__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
   }
 }
 
 @media (max-width: 768px) {
-  .favorites-view {
+  .favorite-properties {
     gap: 20px;
   }
-  .favorites-view__header {
+
+  .favorite-properties__hero {
     padding: 24px;
     border-radius: 22px;
   }
-  .header-content {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
-  }
-  .favorites-count {
-    padding: 8px 14px;
-    font-size: 0.9rem;
-  }
-  .favorites-view__grid {
+
+  .favorite-properties__grid {
     grid-template-columns: 1fr;
     gap: 16px;
-  }
-  .favorites-controls {
-    padding: 18px;
-    gap: 14px;
-  }
-  .filters-row {
-    flex-direction: column;
-    gap: 10px;
-  }
-  .filter-select,
-  .search-field input {
-    width: 100%;
   }
 }
 
 @media (max-width: 480px) {
-  .favorites-view {
+  .favorite-properties {
     gap: 16px;
   }
-  .favorites-view__header {
+
+  .favorite-properties__hero {
     padding: 20px;
     min-height: auto;
   }
-  .favorites-view__header h2 {
+
+  .favorite-properties__hero h2 {
     font-size: 1.5rem;
   }
+
   .eyebrow {
     font-size: 0.7rem;
     padding: 5px 9px;
