@@ -1,52 +1,103 @@
 <?php
-
 declare(strict_types=1);
 
-require_once dirname(__DIR__) . '/config/db.php';
-require_once dirname(__DIR__) . '/config/auth.php';
-require_once dirname(__DIR__) . '/lib/property_matching.php';
+require_once __DIR__ . '/../config/cors.php';
+require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../config/auth.php';
+require_once __DIR__ . '/../config/session.php';
 
-applyAuthCors();
+applyCors();
 handlePreflight();
 
-$context = requireAuthenticatedUser($pdo);
-$local = $context['local'];
-$preferences = decodeJsonArray($local['preferencias'] ?? null);
+$userId = 0;
+
+try {
+    $context = requireAuthenticatedUser($pdo);
+    $userId = (int) (
+        $context['local']['id']
+        ?? $context['local']['iduser']
+        ?? $context['user']['id']
+        ?? $context['user']['iduser']
+        ?? 0
+    );
+} catch (\Throwable $error) {
+    $userId = (int) (
+        $_SESSION['user']['id']
+        ?? $_SESSION['user']['iduser']
+        ?? $_SESSION['id']
+        ?? $_SESSION['iduser']
+        ?? 0
+    );
+}
+
+if ($userId <= 0) {
+    respondJson(401, [
+        'success' => false,
+        'message' => 'Debes iniciar sesión'
+    ]);
+}
 
 $stmt = $pdo->prepare('
-    SELECT p.id, p.categoria, p.titulo, p.ubicacion_general, p.precio, p.metros_cuadrados, p.imagen_principal, p.caracteristicas_json, p.created_at
+    SELECT
+        p.*,
+        pf.created_at AS favorited_at
     FROM propiedades_favoritas pf
-    INNER JOIN propiedades p ON p.id = pf.propiedad_id
+    INNER JOIN propiedades p
+        ON p.id = pf.propiedad_id
     WHERE pf.user_id = :user_id
-    ORDER BY pf.created_at DESC
+    ORDER BY pf.created_at DESC, p.id DESC
 ');
+
 $stmt->execute([
-    'user_id' => (int) $local['iduser'],
+    'user_id' => $userId,
 ]);
 
-$favorites = [];
+$properties = [];
 
 foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
-    $characteristics = decodeJsonArray($row['caracteristicas_json'] ?? null);
-    $match = calculatePropertyMatch($preferences, $characteristics);
-
-    $favorites[] = [
+    $properties[] = [
         'id' => (int) $row['id'],
-        'categoria' => $row['categoria'],
-        'titulo' => $row['titulo'],
-        'ubicacion_general' => $row['ubicacion_general'],
-        'precio' => (float) $row['precio'],
-        'metros_cuadrados' => (int) $row['metros_cuadrados'],
-        'imagen_principal' => $row['imagen_principal'],
-        'image_url' => propertyImageUrl($row['imagen_principal'] ?? null),
-        'match_percentage' => $match['percentage'],
-        'match_count' => $match['matches'],
-        'match_total' => $match['total'],
+        'categoria' => $row['categoria'] ?? '',
+        'titulo' => $row['titulo'] ?? $row['nombre'] ?? '',
+        'ubicacion_general' => $row['ubicacion_general'] ?? $row['direccion'] ?? '',
+        'tipo_propiedad' => $row['tipo_propiedad'] ?? '',
+        'ciudad' => $row['ciudad'] ?? '',
+        'zona' => $row['zona'] ?? '',
+        'metros_cuadrados' => (int) ($row['metros_cuadrados'] ?? 0),
+        'habitaciones' => (int) ($row['habitaciones'] ?? 0),
+        'precio' => (float) ($row['precio'] ?? 0),
+        'tipo_input' => $row['tipo_input'] ?? '',
+        'precio_m2' => $row['precio_m2'] ?? null,
+        'ingresos_actuales' => $row['ingresos_actuales'] ?? null,
+        'ingresos_estimados' => $row['ingresos_estimados'] ?? null,
+        'gastos_estimados' => $row['gastos_estimados'] ?? null,
+        'EBITDA' => $row['EBITDA'] ?? null,
+        'cash_flow' => $row['cash_flow'] ?? null,
+        'rentabilidad_bruta' => $row['rentabilidad_bruta'] ?? null,
+        'rentabilidad_neta' => $row['rentabilidad_neta'] ?? null,
+        'cap_rate' => $row['cap_rate'] ?? null,
+        'roi' => $row['roi'] ?? null,
+        'payback' => $row['payback'] ?? null,
+        'ocupacion' => $row['ocupacion'] ?? null,
+        'ADR' => $row['ADR'] ?? null,
+        'RevPAR' => $row['RevPAR'] ?? null,
+        'analisis' => $row['analisis'] ?? '',
+        'analisis_json' => $row['analisis_json'] ?? null,
+        'caracteristicas' => !empty($row['caracteristicas_json'])
+            ? json_decode((string) $row['caracteristicas_json'], true)
+            : [],
+        'dossier_file' => $row['dossier_file'] ?? '',
+        'confidentiality_file' => $row['confidentiality_file'] ?? '',
+        'intention_file' => $row['intention_file'] ?? '',
+        'captador_id' => $row['captador_id'] ?? null,
+        'created_at' => $row['created_at'] ?? null,
+        'updated_at' => $row['updated_at'] ?? null,
+        'favorited_at' => $row['favorited_at'] ?? null,
         'is_favorite' => true,
     ];
 }
 
 respondJson(200, [
     'success' => true,
-    'properties' => $favorites,
+    'properties' => $properties,
 ]);

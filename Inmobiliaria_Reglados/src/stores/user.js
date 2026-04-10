@@ -11,12 +11,16 @@ export const useUserStore = defineStore("user", {
 
   getters: {
     isLoggedIn: (state) => !!state.user,
+    userRole: (state) => state.user?.rol || "user",
+    isAdmin: (state) => state.user?.rol === "admin",
+    isReal: (state) => state.user?.rol === "real" || state.user?.rol === "admin",
   },
 
   actions: {
     setUser(userData) {
       this.user = {
         ...userData,
+        rol: userData.rol || userData.role || "user",
         apellidos: userData.apellidos || "",
         telefono: userData.telefono || "",
       };
@@ -47,6 +51,7 @@ export const useUserStore = defineStore("user", {
         email: authUser.email || localData.email || "",
         telefono: authUser.phone || localData.telefono || "",
         nombre_usuario: authUser.username || localData.nombre_usuario || authUser.name || "",
+        rol: authUser.role || localData.rol || "user",
         categoria: localData.categoria ?? this.selectedCategory,
         preferencias: localData.preferencias ?? this.preferences,
       });

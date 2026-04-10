@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import { computed, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 
 export default {
   props: {
@@ -42,15 +42,36 @@ export default {
   },
   setup(props) {
     const expanded = ref(false);
+    const isMobile = ref(false);
+    let mobileQuery = null;
 
-    const hiddenEntries = computed(() => props.entries.slice(5));
+    const syncViewport = () => {
+      isMobile.value = window.innerWidth <= 480;
+    };
+
+    const collapsedCount = computed(() => (isMobile.value ? 3 : 5));
+    const hiddenEntries = computed(() => props.entries.slice(collapsedCount.value));
     const visibleEntries = computed(() =>
-      expanded.value ? props.entries : props.entries.slice(0, 5)
+      expanded.value ? props.entries : props.entries.slice(0, collapsedCount.value)
     );
+
+    onMounted(() => {
+      syncViewport();
+      mobileQuery = window.matchMedia("(max-width: 480px)");
+      mobileQuery.addEventListener("change", syncViewport);
+    });
+
+    onBeforeUnmount(() => {
+      if (mobileQuery) {
+        mobileQuery.removeEventListener("change", syncViewport);
+      }
+    });
 
     return {
       expanded,
+      collapsedCount,
       hiddenEntries,
+      isMobile,
       visibleEntries,
     };
   },
@@ -194,17 +215,76 @@ export default {
 }
 
 @media (max-width: 768px) {
-  .panel-header,
+  .preference-panel {
+    padding: 20px;
+  }
+
+  .panel-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .panel-header h3 {
+    font-size: 1.4rem;
+  }
+
   .preference-item {
     flex-direction: column;
+    gap: 4px;
+    padding: 12px;
   }
 
   .preference-value {
     text-align: left;
+    font-size: 0.95rem;
   }
 
   .preference-item:hover {
     transform: translateY(-2px);
+  }
+}
+
+@media (max-width: 480px) {
+  .preference-panel {
+    padding: 16px;
+    border-radius: 16px;
+  }
+
+  .panel-kicker {
+    font-size: 0.8rem;
+  }
+
+  .panel-header h3 {
+    font-size: 1.2rem;
+  }
+
+  .panel-count {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+  }
+
+  .preference-list {
+    gap: 10px;
+  }
+
+  .preference-item {
+    padding: 10px;
+    border-radius: 12px;
+  }
+
+  .preference-label {
+    font-size: 0.85rem;
+  }
+
+  .preference-value {
+    font-size: 0.9rem;
+  }
+
+  .toggle-button {
+    width: 100%;
+    font-size: 0.9rem;
+    padding: 8px 14px;
   }
 }
 </style>
