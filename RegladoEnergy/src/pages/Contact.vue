@@ -5,7 +5,7 @@
       <div class="grid grid-2">
         <div class="card soft glow" v-glow v-reveal="{ from: 'left', delay: 50 }">
           <div class="badge" v-reveal="{ from: 'up', delay: 80 }">Contacto</div>
-          <h1 class="h1" v-reveal="{ from: 'up', delay: 120 }">Realizamos un analisis gratuito de facturas.</h1>
+          <h1 class="h1" v-reveal="{ from: 'up', delay: 120 }">Realizamos un análisis gratuito de facturas.</h1>
           <p class="p" v-reveal="{ from: 'right', delay: 170 }">
             Completa el formulario o sube tu factura en PDF o imagen y te llamamos con los resultados.
           </p>
@@ -18,14 +18,14 @@
 
             <h2 class="h2" style="margin:14px 0 10px;" v-reveal="{ from: 'up', delay: 300 }">Subida de facturas</h2>
             <p class="p" v-reveal="{ from: 'up', delay: 330 }">
-              Sube tu factura en PDF o imagen. Realizaremos un analisis previo y te contactaremos para comentarte los resultados y las opciones de mejora.
+              Sube tu factura en PDF o imagen. Realizaremos un análisis previo y te contactaremos para comentarte los resultados y las opciones de mejora.
             </p>
           </div>
         </div>
 
         <div class="card glow" v-glow v-reveal="{ from: 'right', delay: 70 }">
           <h2 class="h2" v-reveal="{ from: 'up', delay: 100 }">Formulario</h2>
-          <p class="p" v-reveal="{ from: 'up', delay: 130 }">Tus datos se guardan en base de datos y el archivo de factura se almacena en el servidor.</p>
+          <p class="p" v-reveal="{ from: 'up', delay: 130 }">Completa el formulario para solicitar un análisis gratuito de tu factura. Puedes adjuntar tu factura en PDF o imagen.</p>
 
           <form class="form" @submit.prevent="submit" v-reveal="{ from: 'up', delay: 160 }">
             <div class="grid grid-2">
@@ -37,7 +37,7 @@
                 <label>Telefono *</label>
                 <input
                   v-model="f.phone"
-                  :disabled="isLoggedIn"
+                  :disabled="isPhoneLocked"
                   required
                   type="tel"
                   inputmode="numeric"
@@ -62,8 +62,13 @@
             </div>
 
             <div class="field" v-reveal="{ from: 'up', delay: 310 }">
-              <label>Factura (PDF o imagen) (opcional)</label>
-              <input ref="fileInput" type="file" accept="application/pdf,image/*" @change="onFile" class="file" />
+              <label>Facturas (PDF o imagen) (opcional)</label>
+              <input ref="fileInput" type="file" accept="application/pdf,image/*" @change="onFile" class="file" multiple />
+            </div>
+
+            <div class="alert" style="margin: 10px auto; padding: 10px; border: 1px solid #f39c12; background-color: rgba(242, 197, 61, 0.26); color: rgb(187, 185, 185); border-radius: 8px; display: flex; align-items: center; max-width: 90%;">
+              <span class="icon" style="margin-right: 10px; margin-bottom: 8px; font-size: 2em;">⚠️</span>
+              <span> <strong>Para un mejor análisis, la factura debe tener un máximo de 6 meses de antigüedad.</strong></span>
             </div>
 
             <button class="btn primary glow" :disabled="sending" v-glow v-reveal="{ from: 'up', delay: 340 }" type="submit">
@@ -100,6 +105,13 @@ const sending = ref(false);
 const errorMsg = ref("");
 const successMsg = ref("");
 const isLoggedIn = computed(() => Boolean(auth.state.user));
+const isPhoneLocked = computed(() => {
+  if (!auth.state.user) {
+    return false;
+  }
+
+  return Boolean(String(auth.state.user.phone || "").replace(/\D/g, "").slice(0, 9));
+});
 
 function fillLockedFields() {
   const user = auth.state.user;
@@ -134,33 +146,30 @@ function resetForm() {
 function onFile(e) {
   errorMsg.value = "";
   successMsg.value = "";
-  const selectedFile = e.target.files?.[0] || null;
+  const selectedFiles = e.target.files || [];
 
-  if (!selectedFile) {
-    f.file = null;
-    return;
-  }
+  const maxBytes = 100 * 1024 * 1024; // LÍMITE -> 100 MB
+  const allowedTypes = ["application/pdf", "image/jpeg", "image/png", "image/gif"];
 
-  const maxBytes = 10 * 1024 * 1024;
-  const isAllowedType =
-    selectedFile.type === "application/pdf" ||
-    selectedFile.type.startsWith("image/");
+  f.files = Array.from(selectedFiles).filter((file) => {
+    console.log(`Archivo: ${file.name}, Tamaño: ${file.size} bytes`); // Debug: Verificar tamaño del archivo
 
-  if (!isAllowedType) {
-    errorMsg.value = "El archivo debe ser PDF o imagen.";
+    if (!allowedTypes.includes(file.type)) {
+      errorMsg.value = "Algunos archivos tienen un formato no permitido.";
+      return false;
+    }
+
+    if (maxBytes > 0 && file.size > maxBytes) {
+      errorMsg.value = `El archivo "${file.name}" supera el límite de 100 MB.`;
+      return false;
+    }
+
+    return true;
+  });
+
+  if (f.files.length === 0) {
     e.target.value = "";
-    f.file = null;
-    return;
   }
-
-  if (selectedFile.size > maxBytes) {
-    errorMsg.value = "El archivo supera el limite de 10 MB.";
-    e.target.value = "";
-    f.file = null;
-    return;
-  }
-
-  f.file = selectedFile;
 }
 
 function onPhoneInput(e) {
@@ -190,8 +199,10 @@ async function submit() {
   formData.append("email", f.email.trim());
   formData.append("mensaje", f.msg.trim());
 
-  if (f.file) {
-    formData.append("pdf", f.file);
+  if (f.files && f.files.length > 0) {
+    f.files.forEach((file, index) => {
+      formData.append(`file_${index + 1}`, file);
+    });
   }
 
   try {
@@ -223,9 +234,9 @@ onMounted(() => {
   fillLockedFields();
 
   setSeo({
-    title: "Contacto | Analisis gratuito de facturas | Reglado Energy",
+    title: "Contacto | Análisis gratuito de facturas | Reglado Energy",
     description:
-      "Solicita un analisis gratuito de facturas. Completa el formulario o sube tu PDF o imagen y te llamamos con resultados y opciones de mejora.",
+      "Solicita un análisis gratuito de facturas. Completa el formulario o sube tu PDF o imagen y te llamamos con resultados y opciones de mejora.",
     canonical: "/#/contacto",
   });
 });

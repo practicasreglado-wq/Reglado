@@ -38,6 +38,126 @@ class NotionService
         return true;
     }
 
+    public static function syncUserUpdated(array $user): bool
+    {
+        if (!self::isEnabled()) {
+            return false;
+        }
+
+        $schema = self::getDatabaseSchema();
+        if ($schema === null) {
+            self::log('notion schema unavailable for update');
+            return false;
+        }
+
+        $email = trim((string) ($user['email'] ?? ''));
+        if ($email === '') {
+            self::log('cannot update notion without email');
+            return false;
+        }
+
+        $emailProperty = self::findPropertyByNames($schema, ['email', 'correo', 'correo electronico']);
+        if ($emailProperty === null || ($schema[$emailProperty]['type'] ?? '') !== 'email') {
+            self::log('notion email property not found for update filtering');
+            return false;
+        }
+
+        $databaseId = trim((string) getenv('NOTION_DATABASE_ID'));
+        $queryPayload = [
+            'filter' => [
+                'property' => $emailProperty,
+                'email' => [
+                    'equals' => $email
+                ]
+            ]
+        ];
+
+        $queryResponse = self::request('POST', '/databases/' . $databaseId . '/query', $queryPayload);
+        $results = $queryResponse['results'] ?? [];
+        
+        if (empty($results)) {
+            self::log("notion user page not found for email: {$email}, falling back to create.");
+            return self::syncUserCreated($user);
+        }
+
+        $pageId = (string) ($results[0]['id'] ?? '');
+        if ($pageId === '') {
+             self::log('notion user page id missing in result');
+             return false;
+        }
+
+        $properties = self::buildProperties($schema, $user);
+        if ($properties === []) {
+            self::log('notion properties could not be mapped for update');
+            return false;
+        }
+
+        $payload = [
+            'properties' => $properties,
+        ];
+
+        $response = self::request('PATCH', '/pages/' . $pageId, $payload);
+        if ($response === null) {
+            self::log('notion page update failed');
+            return false;
+        }
+
+        return true;
+    }
+
+    public static function clearDatabase(): string
+    {
+        if (!self::isEnabled()) {
+            self::log('clearDatabase skipped: notion not enabled');
+            return 'Notion no está habilitado (NOTION_ENABLED)';
+        }
+
+        $databaseId = trim((string) getenv('NOTION_DATABASE_ID'));
+        if ($databaseId === '') {
+            return 'NOTION_DATABASE_ID no configurado';
+        }
+
+        $deletedCount = 0;
+        $hasMore = true;
+        $nextCursor = null;
+
+        while ($hasMore) {
+            // Pass null (no body) when no cursor — avoids sending [] instead of {} to Notion API
+            $payload = $nextCursor !== null ? ['start_cursor' => $nextCursor] : null;
+
+            $response = self::request('POST', '/databases/' . $databaseId . '/query', $payload);
+            if (!is_array($response) || !isset($response['results'])) {
+                $msg = 'Notion query failed (puede ser un problema de permisos de lectura en la integración). databaseId=' . $databaseId;
+                self::log($msg . ' response=' . json_encode($response));
+                return $msg;
+            }
+
+            foreach ($response['results'] as $page) {
+                $pageId = (string) ($page['id'] ?? '');
+                if ($pageId === '') {
+                    continue;
+                }
+                // 'archived' + 'in_trash' for max compatibility across Notion API versions
+                $result = self::request('PATCH', '/pages/' . $pageId, [
+                    'archived' => true,
+                    'in_trash' => true,
+                ]);
+                if ($result !== null) {
+                    $deletedCount++;
+                } else {
+                    self::log('notion clearDatabase: failed to archive page ' . $pageId);
+                }
+                usleep(150000); // 150ms pause to respect API rate limits
+            }
+
+            $hasMore = !empty($response['has_more']);
+            $nextCursor = $response['next_cursor'] ?? null;
+        }
+
+        self::log('notion clearDatabase: archived ' . $deletedCount . ' pages');
+        return '';
+    }
+
     private static function buildProperties(array $schema, array $user): array
     {
         $result = [];
@@ -292,7 +412,7 @@ class NotionService
 
         if ($status < 200 || $status >= 300) {
             $message = (string) ($decoded['message'] ?? 'unknown notion error');
-            self::log('notion http error ' . $status . ': ' . $message);
+            self::log('notion http error ' . $status . ' on ' . $method . ' ' . $path . ': ' . $message);
             return null;
         }
 

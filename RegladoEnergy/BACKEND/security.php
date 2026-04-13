@@ -2,6 +2,11 @@
 
 declare(strict_types=1);
 
+require_once __DIR__ . '/bootstrap.php';
+
+// Este archivo contiene funciones para aplicar cabeceras de seguridad y CORS.
+// Se asegura de que las solicitudes cumplan con las políticas de seguridad definidas.
+
 function applySecurityHeaders(): void
 {
     header('X-Content-Type-Options: nosniff');

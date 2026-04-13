@@ -23,7 +23,7 @@ onMounted(async () => {
   const token = typeof route.query.token === "string" ? route.query.token : "";
 
   if (!token) {
-    error.value = "No se encontro el token de acceso.";
+    error.value = "No se encontró el token de acceso.";
     return;
   }
 
@@ -32,13 +32,13 @@ onMounted(async () => {
     await auth.initialize();
 
     if (!auth.state.user) {
-      throw new Error("No se pudo validar la sesion");
+      throw new Error("No se pudo validar la sesión");
     }
 
     await router.replace("/");
   } catch (err) {
     auth.clearSession();
-    error.value = err instanceof Error ? err.message : "No se pudo iniciar sesion";
+    error.value = err instanceof Error ? err.message : "No se pudo iniciar sesión";
   }
 });
 </script>

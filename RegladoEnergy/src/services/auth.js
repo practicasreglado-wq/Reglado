@@ -1,3 +1,10 @@
+/**
+ * Servicio de Autenticación para el frontend corporativo (RegladoEnergy).
+ * 
+ * Este servicio no maneja el login explícito (que recae en GrupoReglado),
+ * sino que recupera la sesión a partir de una cookie compartida o token JWT
+ * y solicita el perfil del usuario a ApiLoging para hidratar el estado local.
+ */
 import { reactive } from "vue";
 
 const API_BASE = import.meta.env.VITE_AUTH_API_URL || "http://localhost:8000";
@@ -13,13 +20,13 @@ const state = reactive({
 
 const AUTH_MESSAGE_MAP = {
   "request failed": "La solicitud no se pudo completar.",
-  "invalid token": "Tu sesion no es valida. Vuelve a iniciar sesion.",
-  "token revoked": "Tu sesion ya no es valida. Vuelve a iniciar sesion.",
-  unauthorized: "Debes iniciar sesion para continuar.",
-  forbidden: "No tienes permisos para realizar esta accion.",
-  "too many requests, try again later": "Has realizado demasiados intentos. Intentalo mas tarde.",
-  "email not verified": "Debes confirmar tu correo antes de iniciar sesion.",
-  "invalid credentials": "Correo o contrasena incorrectos.",
+  "invalid token": "Tu sesión no es válida. Vuelve a iniciar sesión.",
+  "token revoked": "Tu sesión ya no es válida. Vuelve a iniciar sesión.",
+  unauthorized: "Debes iniciar sesión para continuar.",
+  forbidden: "No tienes permisos para realizar esta acción.",
+  "too many requests, try again later": "Has realizado demasiados intentos. Inténtalo más tarde.",
+  "email not verified": "Debes confirmar tu correo antes de iniciar sesión.",
+  "invalid credentials": "Correo o contraseña incorrectos.",
 };
 
 function authHeaders() {
@@ -52,7 +59,7 @@ async function request(path, options = {}) {
 function setToken(token) {
   state.token = token || "";
   if (state.token) {
-    // Energy reutiliza la cookie compartida para detectar una sesion iniciada en GrupoReglado.
+    // Energy reutiliza la cookie compartida para detectar una sesión iniciada en GrupoReglado.
     localStorage.setItem(TOKEN_KEY, state.token);
     setCookie(COOKIE_TOKEN_KEY, state.token, COOKIE_MAX_AGE);
   } else {
@@ -71,6 +78,11 @@ function clearSession() {
   state.user = null;
 }
 
+/**
+ * Inicializa el estado reactivo del usuario. 
+ * Busca un token en localStorage o en la cookie compartida (dejada por GrupoReglado),
+ * y obtiene el perfil del usuario verificando el JWT contra el backend.
+ */
 async function initialize() {
   if (!state.token) {
     const cookieToken = getCookie(COOKIE_TOKEN_KEY);
@@ -98,6 +110,10 @@ async function initialize() {
   }
 }
 
+/**
+ * Cierra la sesión activa revocando el token en el backend y borrando
+ * los datos locales. Tras ello, devuelve al usuario al portal principal.
+ */
 async function logout() {
   try {
     if (state.token) {
@@ -108,6 +124,10 @@ async function logout() {
     }
   } finally {
     clearSession();
+    const mainHub = import.meta.env.VITE_AUTH_API_URL && import.meta.env.VITE_AUTH_API_URL.includes("regladogroup.com") 
+      ? "https://regladogroup.com" 
+      : "http://localhost:5173";
+    window.location.href = mainHub;
   }
 }
 

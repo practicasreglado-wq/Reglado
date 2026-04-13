@@ -5,7 +5,7 @@
       <div class="grid grid-2">
         <div class="card soft glow" v-glow v-reveal="{ from: 'left', delay: 50 }">
           <div class="badge" v-reveal="{ from: 'up', delay: 80 }">Servicios</div>
-          <h1 class="h1" v-reveal="{ from: 'up', delay: 120 }">Analizamos, optimizamos y gestionamos tus suministros energéticos con criterios técnicos y económicos.</h1>
+          <h1 class="h1" v-reveal="{ from: 'up', delay: 120 }">Analizamos, optimizamos y gestionamos tus suministros energéticos con criterios técnicos y económicos</h1>
           <p class="p" v-reveal="{ from: 'right', delay: 170 }">
             No vendemos tarifas: proponemos decisiones justificadas y verificamos su aplicación con seguimiento periódico.
           </p>

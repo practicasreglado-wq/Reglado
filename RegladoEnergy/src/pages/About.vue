@@ -4,7 +4,7 @@
     <div class="container">
       <div class="card soft glow" v-glow v-reveal="{ from: 'up', delay: 50 }">
         <div class="badge" v-reveal="{ from: 'left', delay: 80 }">Sobre nosotros</div>
-        <h1 class="h1" v-reveal="{ from: 'up', delay: 120 }">Consultoría energética independiente para particulares, empresas, administraciones públicas y gestores de múltiples suministros.</h1>
+        <h1 class="h1" v-reveal="{ from: 'up', delay: 120 }">Consultoría energética independiente para particulares, empresas, administraciones públicas y gestores de múltiples suministros</h1>
         <p class="p" v-reveal="{ from: 'right', delay: 170 }">
           Aportamos criterio técnico, transparencia y control en un mercado energético complejo y cambiante. Frente a modelos basados en la venta de tarifas,
           apostamos por un enfoque profesional, analítico y orientado al largo plazo.

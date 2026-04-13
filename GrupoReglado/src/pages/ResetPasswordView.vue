@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <section class="form-page">
     <div class="form-card">
       <h1>Restablecer contraseña</h1>
@@ -45,7 +45,7 @@ async function submitReset() {
   const token = typeof route.query.token === "string" ? route.query.token.trim() : "";
 
   if (!token) {
-    error.value = "El enlace de recuperacion no es valido.";
+    error.value = "El enlace de recuperación no es válido.";
     return;
   }
 

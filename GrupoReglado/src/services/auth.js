@@ -1,4 +1,10 @@
-﻿import { reactive } from "vue";
+/**
+ * Servicio central de Autenticación para el frontend (GrupoReglado).
+ * 
+ * Gestiona el estado reactivo del usuario, almacena el JWT (en LocalStorage y Cookies),
+ * y provee los métodos principales para interactuar de forma unificada con ApiLoging.
+ */
+import { reactive } from "vue";
 
 const API_BASE = import.meta.env.VITE_AUTH_API_URL || "http://localhost:8000";
 const TOKEN_KEY = "auth_token";
@@ -16,7 +22,7 @@ const AUTH_MESSAGE_MAP = {
   "invalid token": "Tu sesión no es válida. Vuelve a iniciar sesión.",
   "token revoked": "Tu sesión ya no es válida. Vuelve a iniciar sesión.",
   unauthorized: "Debes iniciar sesión para continuar.",
-  forbidden: "No tienes permisos para realizar esta acción.",
+  forbidden: "No tienes permisos para realizar esta acción. (Requiere rol admin)",
   "too many requests, try again later": "Has realizado demasiados intentos. Inténtalo más tarde.",
   "email not verified": "Debes confirmar tu correo antes de iniciar sesión.",
   "invalid credentials": "Correo o contraseña incorrectos.",
@@ -73,6 +79,7 @@ function setToken(token) {
     localStorage.setItem(TOKEN_KEY, state.token);
     setCookie(COOKIE_TOKEN_KEY, state.token, COOKIE_MAX_AGE);
   } else {
+    // Si no hay token, se limpian ambos almacenamientos.
     localStorage.removeItem(TOKEN_KEY);
     clearCookie(COOKIE_TOKEN_KEY);
   }
@@ -83,6 +90,10 @@ function setSession(token, user = null) {
   state.user = user;
 }
 
+/**
+ * Comprueba si hay un token almacenado y solicita los datos del usuario
+ * actual a la API (endpoint /auth/me) para hidratar el estado reactivo.
+ */
 async function initialize() {
   if (!state.token) {
     const cookieToken = getCookie(COOKIE_TOKEN_KEY);
@@ -124,6 +135,12 @@ function applySessionPayload(payload) {
   return payload;
 }
 
+/**
+ * Envía las credenciales a la API de autenticación y, en caso de éxito,
+ * inicializa la sesión local guardando el token y los datos del usuario.
+ * @param {string} email 
+ * @param {string} password 
+ */
 async function login(email, password) {
   const payload = await request("/auth/login", {
     method: "POST",
@@ -221,6 +238,21 @@ async function adminUsers() {
   });
 }
 
+async function adminUpdateRole(userId, role) {
+  return request("/auth/admin/update-role", {
+    method: "POST",
+    headers: authHeaders(),
+    body: JSON.stringify({ user_id: userId, role }),
+  });
+}
+
+async function adminSyncNotion() {
+  return request("/auth/admin/sync-notion", {
+    method: "POST",
+    headers: authHeaders(),
+  });
+}
+
 async function logout() {
   try {
     if (state.token) {
@@ -250,6 +282,8 @@ export const auth = {
   requestPasswordReset,
   resetPassword,
   adminUsers,
+  adminUpdateRole,
+  adminSyncNotion,
   logout,
   translateMessage: translateAuthMessage,
 };

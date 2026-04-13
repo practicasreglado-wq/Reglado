@@ -1,4 +1,4 @@
-import { createRouter, createWebHashHistory } from "vue-router";
+import { createRouter, createWebHistory } from "vue-router";
 import Home from "../pages/Home.vue";
 import Services from "../pages/Services.vue";
 import Clients from "../pages/Clients.vue";
@@ -13,6 +13,9 @@ import ClientArea from "../pages/ClientArea.vue";
 import NotFound from "../pages/NotFound.vue";
 import AuthCallback from "../pages/AuthCallback.vue";
 import Admin from "../pages/Admin.vue";
+import AvisoLegal from "../pages/AvisoLegal.vue";
+import PoliticaCookies from "../pages/PoliticaCookies.vue";
+import PoliticaPrivacidad from "../pages/PoliticaPrivacidad.vue";
 
 const routes = [
   { path: "/", component: Home },
@@ -27,12 +30,15 @@ const routes = [
   { path: "/sobre-nosotros", component: About },
   { path: "/area-clientes", component: ClientArea },
   { path: "/admin", component: Admin },
+  { path: "/aviso-legal", component: AvisoLegal },
+  { path: "/politica-cookies", component: PoliticaCookies },
+  { path: "/politica-privacidad", component: PoliticaPrivacidad },
   { path: "/auth/callback", component: AuthCallback },
   { path: "/:pathMatch(.*)*", component: NotFound },
 ];
 
 export default createRouter({
-  history: createWebHashHistory(),
+  history: createWebHistory(),
   routes,
   scrollBehavior() { return { top: 0 }; },
 });

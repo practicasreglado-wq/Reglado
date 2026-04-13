@@ -24,6 +24,7 @@ npm install
 ```
 
 2. Crear `GrupoReglado/.env` a partir de `GrupoReglado/.env.example`.
+   Para despliegue en Hostinger puedes partir de `GrupoReglado/.env.production.example`.
 
 3. Arrancar en desarrollo:
 
@@ -44,6 +45,16 @@ npm run build
 - `VITE_REGLADO_ENERGY_URL`
 - `VITE_REGLADO_MAPAS_URL`
 - `VITE_REGLADO_ENPROCESO_URL`
+
+Ejemplo de produccion:
+
+```env
+VITE_AUTH_API_URL=https://regladogroup.com
+VITE_REGLADO_REALSTATE_URL=https://realstate.com
+VITE_REGLADO_ENERGY_URL=https://regladoenergy.com
+VITE_REGLADO_MAPAS_URL=#
+VITE_REGLADO_ENPROCESO_URL=#
+```
 
 ## Rutas principales
 
