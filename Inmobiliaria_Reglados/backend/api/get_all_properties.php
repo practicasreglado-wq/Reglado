@@ -5,15 +5,16 @@ declare(strict_types=1);
 require_once dirname(__DIR__) . '/config/db.php';
 require_once dirname(__DIR__) . '/config/auth.php';
 require_once __DIR__ . '/../config/cors.php';
+
 applyCors();
 handlePreflight();
 
-// Verificar autenticación
 $context = requireAuthenticatedUser($pdo);
 $auth = $context['auth'];
 
-// Verificar rol ADMIN
-if (($auth['role'] ?? '') !== 'admin') {
+$role = strtolower((string) ($auth['role'] ?? ''));
+
+if (!in_array($role, ['admin', 'real'], true)) {
     respondJson(403, [
         'success' => false,
         'message' => 'Acceso restringido. Esta sección es solo para administradores.'
@@ -21,42 +22,116 @@ if (($auth['role'] ?? '') !== 'admin') {
 }
 
 try {
-    // Consulta para obtener todas las propiedades con info del propietario
-    // Asumimos que la base de datos regladousers está en el mismo servidor
     $query = "
         SELECT 
-            p.*,
-            u.id as owner_id,
-            u.username as owner_name,
-            u.email as owner_email
-        FROM propiedades p
-        LEFT JOIN regladousers.users u ON p.owner_user_id = u.id
+            p.id,
+            p.tipo_propiedad,
+            p.ciudad,
+            p.zona,
+            p.metros_cuadrados,
+            p.precio,
+            p.direccion,
+            p.categoria,
+            p.caracteristicas_json,
+            p.dossier_file,
+            p.confidentiality_file,
+            p.intention_file,
+            p.captador_id,
+            p.owner_user_id,
+            p.created_at,
+            p.updated_at,
+            u.id AS owner_id,
+            u.username AS owner_username,
+            u.email AS owner_email,
+            u.first_name AS owner_first_name,
+            u.last_name AS owner_last_name
+        FROM inmobiliaria.propiedades p
+        LEFT JOIN regladousers.users u 
+            ON p.owner_user_id = u.id
         ORDER BY p.created_at DESC
     ";
-    
+
     $stmt = $pdo->prepare($query);
     $stmt->execute();
     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     $properties = [];
+
     foreach ($rows as $row) {
+        $caracteristicas = null;
+
+        if (!empty($row['caracteristicas_json'])) {
+            $decoded = json_decode((string) $row['caracteristicas_json'], true);
+            $caracteristicas = is_array($decoded) ? $decoded : null;
+        }
+
+        $ownerFullName = trim(
+            (string) ($row['owner_first_name'] ?? '') . ' ' . (string) ($row['owner_last_name'] ?? '')
+        );
+
+        if ($ownerFullName === '') {
+            $ownerFullName = (string) ($row['owner_username'] ?? 'Sistema / Sin asignar');
+        }
+
+        $ubicacionGeneral = trim(
+            implode(' - ', array_filter([
+                (string) ($row['ciudad'] ?? ''),
+                (string) ($row['zona'] ?? '')
+            ]))
+        );
+
+        if ($ubicacionGeneral === '') {
+            $ubicacionGeneral = (string) ($row['direccion'] ?? '');
+        }
+
         $properties[] = [
-            'id' => (int) $row['id'],
-            'categoria' => $row['categoria'],
-            'titulo' => $row['titulo'],
-            'ubicacion_general' => $row['ubicacion_general'],
-            'precio' => (float) $row['precio'],
-            'metros_cuadrados' => (int) $row['metros_cuadrados'],
-            'imagen_principal' => $row['imagen_principal'],
-            'caracteristicas' => !empty($row['caracteristicas_json']) ? json_decode($row['caracteristicas_json'], true) : null,
+            'id' => (int) ($row['id'] ?? 0),
+
+            // Título visual para el frontend
+            'titulo' => (string) (
+                $row['tipo_propiedad']
+                ?? $row['categoria']
+                ?? ('Propiedad #' . (int) ($row['id'] ?? 0))
+            ),
+
+            'tipo_propiedad' => (string) ($row['tipo_propiedad'] ?? ''),
+            'categoria' => (string) ($row['categoria'] ?? ''),
+            'ciudad' => (string) ($row['ciudad'] ?? ''),
+            'zona' => (string) ($row['zona'] ?? ''),
+            'direccion' => (string) ($row['direccion'] ?? ''),
+            'ubicacion_general' => $ubicacionGeneral,
+
+            'precio' => (float) ($row['precio'] ?? 0),
+            'metros_cuadrados' => (int) ($row['metros_cuadrados'] ?? 0),
+
+            // No existe en tu tabla, lo dejamos nulo para no romper
+            'imagen_principal' => null,
+
+            'caracteristicas' => $caracteristicas,
+
+            'owner_user_id' => !empty($row['owner_user_id']) ? (int) $row['owner_user_id'] : null,
+            'captador_id' => !empty($row['captador_id']) ? (int) $row['captador_id'] : null,
+
             'owner' => [
-                'id' => $row['owner_id'] ? (int) $row['owner_id'] : null,
-                'nombre' => $row['owner_name'] ?? 'Sistema / Sin asignar',
-                'email' => $row['owner_email'] ?? '-'
+                'id' => !empty($row['owner_id']) ? (int) $row['owner_id'] : null,
+                'nombre' => $ownerFullName,
+                'email' => !empty($row['owner_email']) ? (string) $row['owner_email'] : '-',
+                'username' => !empty($row['owner_username']) ? (string) $row['owner_username'] : null,
             ],
-            'created_at' => $row['created_at'],
-            'updated_at' => $row['created_at'], // Usamos created_at como fallback si no hay updated_at
-            'estado_publicacion' => 'Publicado' // Por defecto para el MVP
+
+            // Compatibilidad extra por si alguna vista usa estos campos planos
+            'owner_id' => !empty($row['owner_id']) ? (int) $row['owner_id'] : null,
+            'owner_name' => $ownerFullName,
+            'owner_email' => !empty($row['owner_email']) ? (string) $row['owner_email'] : '-',
+
+            'dossier_file' => $row['dossier_file'] ?? null,
+            'confidentiality_file' => $row['confidentiality_file'] ?? null,
+            'intention_file' => $row['intention_file'] ?? null,
+
+            'created_at' => $row['created_at'] ?? null,
+            'updated_at' => $row['updated_at'] ?? ($row['created_at'] ?? null),
+
+            'estado_publicacion' => 'Publicado',
         ];
     }
 
@@ -64,8 +139,7 @@ try {
         'success' => true,
         'properties' => $properties
     ]);
-
-} catch (PDOException $e) {
+} catch (Throwable $e) {
     respondJson(500, [
         'success' => false,
         'message' => 'Error al obtener las propiedades: ' . $e->getMessage()

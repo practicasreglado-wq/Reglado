@@ -31,8 +31,8 @@ class PdfGenerator
         $city = $this->slugifyFilenamePart($ficha['ciudad'] ?? null);
         $zone = $this->slugifyFilenamePart($ficha['zona'] ?? null);
 
-        $ndaFile = "nda_{$propertyId}-{$propertyType}_{$city}_{$zone}.pdf";
-        $loiFile = "loi_{$propertyId}-{$propertyType}_{$city}_{$zone}.pdf";
+        $ndaFile = "nda_{$propertyType}_{$city}_{$zone}.pdf";
+        $loiFile = "loi_{$propertyType}_{$city}_{$zone}.pdf";
 
         $ndaPath = $this->storageDir . DIRECTORY_SEPARATOR . $ndaFile;
         $loiPath = $this->storageDir . DIRECTORY_SEPARATOR . $loiFile;

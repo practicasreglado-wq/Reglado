@@ -25,7 +25,8 @@ class DossierService
         $city = $this->slugifyFilenamePart($ficha['ciudad'] ?? null);
         $zone = $this->slugifyFilenamePart($ficha['zona'] ?? null);
 
-        $fileName = "dossier_{$propertyId}-{$propertyType}_{$city}_{$zone}.pdf";        $path = $this->workingDir . DIRECTORY_SEPARATOR . 'dossiers' . DIRECTORY_SEPARATOR . $fileName;
+        $fileName = "dossier_{$propertyType}_{$city}_{$zone}.pdf";      
+        $path = $this->workingDir . DIRECTORY_SEPARATOR . 'dossiers' . DIRECTORY_SEPARATOR . $fileName;
 
         $dompdf = new Dompdf();
         $dompdf->loadHtml($this->buildHtml($dossier, $ficha));

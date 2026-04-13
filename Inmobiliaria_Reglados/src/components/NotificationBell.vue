@@ -4,8 +4,6 @@
       ref="bellRef"
       type="button"
       class="notification-bell__button"
-      v-show="showBell"
-      :style="bellStyle"
       @click="togglePanel"
       :aria-expanded="panelVisible"
       aria-haspopup="dialog"
@@ -29,6 +27,7 @@
           />
         </svg>
       </span>
+
       <span
         v-if="unreadCount > 0"
         class="notification-bell__badge"
@@ -59,12 +58,20 @@
               ×
             </button>
           </header>
+
           <div class="notification-panel__body">
-            <p v-if="loading" class="notification-panel__state">Cargando notificaciones...</p>
-            <p v-else-if="error" class="notification-panel__state">{{ error }}</p>
+            <p v-if="loading" class="notification-panel__state">
+              Cargando notificaciones...
+            </p>
+
+            <p v-else-if="error" class="notification-panel__state">
+              {{ error }}
+            </p>
+
             <p v-else-if="!notifications.length" class="notification-panel__state">
               No hay notificaciones nuevas.
             </p>
+
             <div v-else class="notification-panel__list">
               <article
                 v-for="notification in notifications"
@@ -76,7 +83,11 @@
                   <h4>{{ notification.title }}</h4>
                   <time>{{ formatDate(notification.created_at) }}</time>
                 </div>
-                <p class="notification-panel__item-message">{{ notification.message }}</p>
+
+                <p class="notification-panel__item-message">
+                  {{ notification.message }}
+                </p>
+
                 <div class="notification-panel__item-footer">
                   <span
                     class="notification-panel__item-status"
@@ -84,6 +95,7 @@
                   >
                     {{ notification.is_read ? 'Leído' : 'Sin leer' }}
                   </span>
+
                   <button
                     v-if="!notification.is_read"
                     type="button"
@@ -114,19 +126,16 @@ import {
 import { useNotificationsStore } from "../stores/notifications";
 
 const store = useNotificationsStore();
+
 const bellRef = ref(null);
 const panelRef = ref(null);
 const panelVisible = ref(false);
 const panelStyle = ref({});
-const bellStyle = ref({ top: "16px", left: "16px" });
-const showBell = ref(false);
+
 const dateFormatter = new Intl.DateTimeFormat("es-ES", {
   dateStyle: "medium",
   timeStyle: "short",
 });
-const heroSelector = ".hero-title-row";
-const hasWindow = typeof window !== "undefined";
-const hasDocument = typeof document !== "undefined";
 
 const notifications = computed(() => store.orderedNotifications);
 const unreadCount = computed(() => store.unreadCount);
@@ -134,71 +143,39 @@ const loading = computed(() => store.loading);
 const error = computed(() => store.error);
 
 const formatDate = (value) => {
-  if (!value) {
-    return "";
-  }
+  if (!value) return "";
 
   const date = new Date(value);
   return Number.isNaN(date.getTime()) ? value : dateFormatter.format(date);
 };
 
-const updateAnchorAndVisibility = () => {
-  if (!hasDocument) {
-    showBell.value = false;
-    return;
-  }
-
-  const hero = document.querySelector(heroSelector);
-
-  if (!hero) {
-    showBell.value = false;
-    if (panelVisible.value) {
-      closePanel();
-    }
-    return;
-  }
-
-  const rect = hero.getBoundingClientRect();
-  const margin = 8;
-  if (!hasWindow) {
-    showBell.value = false;
-    return;
-  }
-
-  const top = Math.max(margin, Math.min(rect.top + margin, window.innerHeight - 48));
-  const left = Math.max(margin, Math.min(rect.right - 40, window.innerWidth - 48));
-
-  bellStyle.value = {
-    top: `${top}px`,
-    left: `${left}px`,
-  };
-  showBell.value = true;
-};
-
 const positionPanel = () => {
-  if (!hasWindow) {
-    return;
-  }
   const buttonEl = bellRef.value;
   const panelEl = panelRef.value;
 
-  if (!buttonEl || !panelEl) {
-    return;
-  }
+  if (!buttonEl || !panelEl) return;
 
   const margin = 12;
   const maxWidth = Math.min(360, window.innerWidth - margin * 2);
-  panelStyle.value = { width: `${maxWidth}px`, top: "0px", left: "0px" };
+
+  panelStyle.value = {
+    width: `${maxWidth}px`,
+    top: "0px",
+    left: "0px",
+  };
 
   window.requestAnimationFrame(() => {
     const panelHeight = panelEl.offsetHeight || 280;
     const buttonRect = buttonEl.getBoundingClientRect();
+
     const spaceBelow = window.innerHeight - buttonRect.bottom - margin;
     const openBelow = spaceBelow >= panelHeight;
+
     const top = openBelow
       ? buttonRect.bottom + margin
       : Math.max(margin, buttonRect.top - panelHeight - margin);
-    let left = buttonRect.left + buttonRect.width / 2 - maxWidth / 2;
+
+    let left = buttonRect.right - maxWidth;
     left = Math.max(margin, Math.min(left, window.innerWidth - maxWidth - margin));
 
     panelStyle.value = {
@@ -207,6 +184,34 @@ const positionPanel = () => {
       left: `${left}px`,
     };
   });
+};
+
+const closePanel = () => {
+  panelVisible.value = false;
+};
+
+const openPanel = async () => {
+  panelVisible.value = true;
+  await store.loadNotifications();
+  await nextTick();
+  positionPanel();
+};
+
+const togglePanel = () => {
+  if (panelVisible.value) {
+    closePanel();
+  } else {
+    openPanel();
+  }
+};
+
+const markNotification = async (notificationId) => {
+  await store.markAsRead(notificationId);
+
+  if (panelVisible.value) {
+    await nextTick();
+    positionPanel();
+  }
 };
 
 const handleDocumentClick = (event) => {
@@ -226,44 +231,7 @@ const handleKeyDown = (event) => {
 };
 
 const handleViewportChange = () => {
-  if (!hasWindow) {
-    return;
-  }
-  updateAnchorAndVisibility();
   if (panelVisible.value) {
-    positionPanel();
-  }
-};
-
-const openPanel = async () => {
-  updateAnchorAndVisibility();
-  if (!showBell.value) {
-    return;
-  }
-
-  panelVisible.value = true;
-  await store.loadNotifications();
-  await nextTick();
-  positionPanel();
-};
-
-const closePanel = () => {
-  panelVisible.value = false;
-};
-
-const togglePanel = () => {
-  if (panelVisible.value) {
-    closePanel();
-  } else {
-    openPanel();
-  }
-};
-
-const markNotification = async (notificationId) => {
-  await store.markAsRead(notificationId);
-
-  if (panelVisible.value) {
-    await nextTick();
     positionPanel();
   }
 };
@@ -291,11 +259,6 @@ watch(
 );
 
 onMounted(() => {
-  updateAnchorAndVisibility();
-  if (!hasWindow) {
-    return;
-  }
-
   window.addEventListener("resize", handleViewportChange);
   window.addEventListener("scroll", handleViewportChange, true);
   store.loadNotifications();
@@ -311,31 +274,29 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .notification-bell {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 1999;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
 }
 
 .notification-bell__button {
-  position: fixed;
+  position: relative;
   width: 44px;
   height: 44px;
   border-radius: 14px;
   border: 1px solid rgba(255, 255, 255, 0.4);
   background: rgba(255, 255, 255, 0.08);
-  color: #fff;
+  color: inherit;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  pointer-events: auto;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
 .notification-bell__button:hover {
   transform: translateY(-1px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
 }
 
 .notification-bell__icon {
