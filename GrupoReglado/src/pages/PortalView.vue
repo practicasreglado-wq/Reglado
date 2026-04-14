@@ -130,7 +130,7 @@
           <div class="company-image-wrap">
             <img class="company-image" :src="company.image" :alt="company.name" loading="lazy" />
             <div class="company-logo-pill">
-              <img :src="company.logo" alt="Logo" />
+              <img class="company-logo-icon" :src="company.logo" alt="Logo" />
               <span>{{ company.tag }}</span>
             </div>
           </div>
@@ -432,15 +432,15 @@ function handleVideoEnded() {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.78rem 1.2rem;
+  padding: 0.78rem 1.6rem;
   border-radius: 20px;
   text-decoration: none;
   font-weight: 700;
   color: #fff;
-  background: #273d5c;
-  border: 1px solid rgba(255, 255, 255, 0.38);
-  box-shadow: 0 10px 24px rgba(13, 24, 40, 0.34);
-  transition: transform 0.2s ease, background 0.2s ease;
+  background: var(--primary) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
   cursor: pointer;
 }
 
@@ -640,9 +640,10 @@ function handleVideoEnded() {
 }
 
 .block-companies {
-  border: 1px solid #d8e0ed;
-  background: #fff;
+  border: 1px solid var(--line);
+  background: var(--surface);
   padding: clamp(1.2rem, 3vw, 1.8rem);
+  transition: background-color 0.4s ease, border-color 0.4s ease;
 }
 
 .section-head {
@@ -651,7 +652,7 @@ function handleVideoEnded() {
 
 .section-head h2 {
   margin: 0.55rem 0 0;
-  color: #273d5c;
+  color: var(--text);
   font-size: clamp(1.4rem, 3.2vw, 2rem);
 }
 
@@ -669,14 +670,14 @@ function handleVideoEnded() {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  border: 1px solid #d8e0ed;
-  background: #ffffff;
-  color: #273d5c;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text);
   display: grid;
   place-items: center;
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 10px rgba(15, 32, 57, 0.15);
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-soft);
 }
 
 .btn-left {
@@ -688,10 +689,10 @@ function handleVideoEnded() {
 }
 
 .carousel-btn:hover {
-  background: #f1f5fb;
-  border-color: #bcc9dd;
+  background: var(--surface-soft);
+  border-color: var(--line-strong);
   transform: translateY(-50%) scale(1.05);
-  box-shadow: 0 6px 14px rgba(15, 32, 57, 0.2);
+  box-shadow: var(--shadow-strong);
 }
 
 .carousel-btn svg {
@@ -717,14 +718,13 @@ function handleVideoEnded() {
 .company-card {
   flex: 0 0 min(100%, 350px);
   scroll-snap-align: start;
-  border: 1px solid #d7e0ee;
-  border: 1px solid #d7e0ee;
+  border: 1px solid var(--line);
   border-radius: 14px;
-  background: #fff;
+  background: var(--surface);
   overflow: hidden;
   min-height: 460px;
-  box-shadow: 0 12px 24px rgba(15, 32, 57, 0.08);
-  transition: transform 0.23s ease, box-shadow 0.23s ease;
+  box-shadow: var(--card-shadow);
+  transition: transform 0.23s ease, box-shadow 0.23s ease, background-color 0.4s ease;
 }
 
 .company-card:hover {
@@ -757,12 +757,19 @@ function handleVideoEnded() {
   top: 0.7rem;
   right: 0.7rem;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.52);
-  padding: 0.28rem 0.52rem;
-  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  padding: 0.28rem 0.6rem;
+  background: rgba(255, 255, 255, 0.95);
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+body.dark-mode .company-logo-pill {
+  background: var(--surface-soft);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .company-logo-pill img {
@@ -776,6 +783,14 @@ function handleVideoEnded() {
   font-weight: 700;
 }
 
+body.dark-mode .company-logo-pill span {
+  color: #ffffff;
+}
+
+body.dark-mode .company-logo-icon {
+  filter: brightness(0) invert(1) !important;
+}
+
 .company-content {
   padding: 0.9rem;
   display: grid;
@@ -784,13 +799,13 @@ function handleVideoEnded() {
 
 .company-content h3 {
   margin: 0;
-  color: #223754;
+  color: var(--text);
   font-size: 1.03rem;
 }
 
 .company-content p {
   margin: 0;
-  color: #5f6e85;
+  color: var(--muted);
   font-size: 0.92rem;
   line-height: 1.4;
 }
@@ -803,17 +818,20 @@ function handleVideoEnded() {
   align-self: start;
   justify-self: center;
   text-decoration: none;
-  border: 1px solid #bcc9dd;
+  border: 1px solid var(--line-strong);
   color: #ffffff;
-  background-color: #1f3553;
+  background: var(--primary) !important;
   border-radius: 20px;
-  padding: 0.5rem 0.82rem;
+  padding: 0.5rem 1.4rem;
   font-weight: 700;
-  transition: background 0.2s ease;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
 .company-link:hover {
-  background: #2d4c79;
+  background: var(--primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
 
 @keyframes charIn {

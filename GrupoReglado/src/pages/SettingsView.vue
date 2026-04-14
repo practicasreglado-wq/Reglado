@@ -279,7 +279,13 @@ onMounted(() => {
   align-items: center;
   justify-content: space-between;
   gap: 0.8rem;
-  background: #fff;
+  background: var(--surface);
+  transition: all 0.4s ease;
+}
+
+.setting-row strong {
+  color: var(--text);
+  font-weight: 700;
 }
 
 .setting-row p {
@@ -292,15 +298,22 @@ onMounted(() => {
   border-radius: 10px;
   padding: 0.58rem 0.9rem;
   color: var(--text);
-  background: #fff;
+  background: var(--surface-soft);
   cursor: pointer;
   font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-outline:hover {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
 }
 
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.38);
+  background: rgba(0, 0, 0, 0.48);
   display: grid;
   place-items: center;
   padding: 1rem;
@@ -309,10 +322,12 @@ onMounted(() => {
 
 .modal-panel {
   width: min(520px, 100%);
-  background: #fff;
+  background: var(--surface);
+  border: 1px solid var(--line);
   border-radius: 14px;
   padding: 1rem;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+  box-shadow: var(--shadow-strong);
+  color: var(--text);
 }
 
 .modal-head {
@@ -324,7 +339,8 @@ onMounted(() => {
 
 .icon-btn {
   border: 1px solid var(--line);
-  background: #fff;
+  background: var(--surface-soft);
+  color: var(--text);
   border-radius: 8px;
   padding: 0.2rem 0.55rem;
   cursor: pointer;

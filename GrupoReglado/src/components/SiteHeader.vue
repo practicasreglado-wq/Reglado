@@ -15,6 +15,11 @@
     </nav>
 
     <div class="session-box desktop-session">
+      <button class="theme-toggle" @click="toggleDarkMode" :aria-label="isDarkMode ? 'Activar modo claro' : 'Activar modo oscuro'" :title="isDarkMode ? 'Cambiar a Modo Claro' : 'Cambiar a Modo Oscuro'">
+        <svg v-if="isDarkMode" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="theme-icon"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg v-else xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="theme-icon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
       <template v-if="user">
         <RouterLink v-if="isAdmin" class="admin-pill" to="/admin" aria-label="Panel de administración">
           <img :src="adminUserIcon" alt="" class="admin-icon" />
@@ -39,6 +44,11 @@
     </div>
 
     <div class="mobile-controls">
+      <button class="theme-toggle" @click="toggleDarkMode" :aria-label="isDarkMode ? 'Activar modo claro' : 'Activar modo oscuro'">
+        <svg v-if="isDarkMode" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="theme-icon"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <svg v-else xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="theme-icon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+
       <RouterLink v-if="user && isAdmin" class="admin-pill mobile-admin-pill" to="/admin"
         aria-label="Panel de administración">
         <img :src="adminUserIcon" alt="" class="admin-icon" />
@@ -127,6 +137,7 @@ const userMenuOpen = ref(false);
 const mobileMenuOpen = ref(false);
 const headerRef = ref(null);
 const isScrolled = ref(false);
+const isDarkMode = ref(false);
 const isAdmin = computed(() => props.user?.role === "admin");
 const isInternalRoute = computed(() => route.path !== '/');
 
@@ -154,6 +165,17 @@ function toggleUserMenu() {
 function toggleMobileMenu() {
   mobileMenuOpen.value = !mobileMenuOpen.value;
   userMenuOpen.value = false;
+}
+
+function toggleDarkMode() {
+  isDarkMode.value = !isDarkMode.value;
+  if (isDarkMode.value) {
+    document.body.classList.add("dark-mode");
+    auth.setCookie("reglado_theme", "dark", 60 * 60 * 24 * 365);
+  } else {
+    document.body.classList.remove("dark-mode");
+    auth.setCookie("reglado_theme", "light", 60 * 60 * 24 * 365);
+  }
 }
 
 function closeMobileMenu() {
@@ -200,6 +222,14 @@ onMounted(() => {
   document.addEventListener("pointerdown", handlePointerDown);
   handleScroll();
   window.addEventListener("scroll", handleScroll, { passive: true });
+
+  const savedTheme = auth.getCookie("reglado_theme");
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+  if (savedTheme === "dark" || (!savedTheme && prefersDark)) {
+    isDarkMode.value = true;
+    document.body.classList.add("dark-mode");
+  }
 });
 
 onBeforeUnmount(() => {
@@ -342,6 +372,32 @@ function buildExternalProductUrl(baseUrl) {
   transform: translateY(-1px);
 }
 
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 39px;
+  height: 39px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 0;
+  outline: none;
+}
+
+.theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.16);
+  transform: rotate(15deg) scale(1.05);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+}
+
+.theme-icon {
+  display: block;
+}
+
 .session-box {
   justify-self: end;
   display: inline-flex;
@@ -412,33 +468,36 @@ function buildExternalProductUrl(baseUrl) {
   top: calc(100% + 9px);
   right: 0;
   min-width: 180px;
-  border: 1px solid rgba(39, 61, 92, 0.2);
+  border: 1px solid var(--line);
   border-radius: 12px;
-  background: #fff;
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.18);
+  background: var(--surface);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
   padding: 0.35rem;
   display: grid;
   gap: 0.25rem;
   z-index: 60;
+  transition: background-color 0.4s ease;
 }
 
 .user-menu-item {
   width: 100%;
-  border: 1px solid transparent;
+  border: none;
   border-radius: 9px;
-  background: #fff;
-  color: #273d5c;
+  background: transparent;
+  color: var(--text);
   text-align: left;
   padding: 0.54rem 0.62rem;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .user-menu-item:hover {
-  background: #f1f5fb;
+  background: var(--surface-soft);
+  color: var(--primary);
 }
 
 .user-menu-item.danger {
-  color: #b42318;
+  color: var(--danger);
 }
 
 .mobile-controls,

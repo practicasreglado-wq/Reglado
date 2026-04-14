@@ -243,10 +243,10 @@ onUnmounted(() => {
 
 <style>
 .custom-detached-dropdown {
-  background: #fff;
+  background: var(--surface);
   border-radius: 12px;
-  box-shadow: 0 4px 14px rgba(15, 32, 57, 0.12);
-  border: 1px solid #e7edf5;
+  box-shadow: var(--shadow-strong);
+  border: 1px solid var(--line);
   padding: 0.4rem;
   margin: 0;
   animation: fadeInDown 0.15s ease-out;
@@ -261,16 +261,16 @@ onUnmounted(() => {
   font-size: 0.85rem;
   font-weight: 500;
   border-radius: 8px;
-  color: #5a6981;
+  color: var(--muted);
   cursor: pointer;
   transition: all 0.15s ease;
 }
 .custom-detached-dropdown li:hover {
-  background: #f1f5fb;
-  color: #273d5c;
+  background: var(--surface-soft);
+  color: var(--primary);
 }
 .custom-detached-dropdown li.active {
-  background: #273d5c;
+  background: var(--primary);
   color: #fff;
   font-weight: 600;
 }
@@ -304,9 +304,9 @@ onUnmounted(() => {
 .admin-search {
   padding: 0.6rem 1rem;
   border-radius: 8px;
-  border: 1px solid #d8e0ed;
-  background: #fff;
-  color: #273d5c;
+  border: 1px solid var(--line);
+  background: var(--surface-soft);
+  color: var(--text);
   font-family: inherit;
   font-size: 0.9rem;
   width: 250px;
@@ -325,7 +325,7 @@ onUnmounted(() => {
 
 .admin-kicker {
   margin: 0 0 0.35rem;
-  color: #5a6981;
+  color: var(--muted);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-size: 0.78rem;
@@ -334,15 +334,15 @@ onUnmounted(() => {
 
 .admin-head h1 {
   margin: 0;
-  color: #273d5c;
+  color: var(--text);
 }
 
 .table-shell {
   overflow-x: auto;
-  border: 1px solid #d8e0ed;
+  border: 1px solid var(--line);
   border-radius: 16px;
-  background: #fff;
-  box-shadow: 0 12px 24px rgba(15, 32, 57, 0.06);
+  background: var(--surface);
+  box-shadow: var(--shadow-soft);
 }
 
 .users-table {
@@ -355,24 +355,25 @@ onUnmounted(() => {
 .users-table td {
   padding: 0.85rem 0.9rem;
   text-align: left;
-  border-bottom: 1px solid #e7edf5;
+  border-bottom: 1px solid var(--line);
   font-size: 0.92rem;
+  color: var(--text);
 }
 
 .users-table th {
-  background: #f7f9fc;
-  color: #273d5c;
+  background: var(--surface-soft);
+  color: var(--text);
   font-weight: 800;
 }
 
 .users-table tbody tr:hover {
-  background: #fafcff;
+  background: var(--surface-soft);
 }
 
 .role-badge.admin {
   display: inline-block;
-  background-color: #f1f5fb;
-  color: #8fa0b5;
+  background-color: var(--surface-soft);
+  color: var(--muted);
   padding: 0.4rem 1rem;
   border-radius: 50px;
   font-weight: 600;
@@ -391,10 +392,10 @@ onUnmounted(() => {
   justify-content: space-between;
   gap: 0.6rem;
   padding: 0.4rem 0.8rem 0.4rem 1rem;
-  border: 1px solid #c0d0e6;
+  border: 1px solid var(--line-strong);
   border-radius: 50px;
-  background-color: #f7f9fc;
-  color: #273d5c;
+  background-color: var(--surface-soft);
+  color: var(--text);
   font-weight: 600;
   font-size: 0.82rem;
   cursor: pointer;
@@ -405,12 +406,12 @@ onUnmounted(() => {
 .dropdown-trigger svg {
   width: 16px;
   height: 16px;
-  stroke: #5a6981;
+  stroke: var(--text);
 }
 
 .dropdown-trigger:hover, .dropdown-trigger.is-active {
-  border-color: #9cb1cc;
-  background-color: #ffffff;
+  border-color: var(--primary);
+  background-color: var(--surface);
 }
 
 .empty-state {
