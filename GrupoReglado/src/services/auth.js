@@ -284,8 +284,12 @@ export const auth = {
   adminUsers,
   adminUpdateRole,
   adminSyncNotion,
+  adminSyncNotion,
   logout,
   translateMessage: translateAuthMessage,
+  setCookie,
+  getCookie,
+  clearCookie,
 };
 
 function setCookie(name, value, maxAgeSeconds) {
