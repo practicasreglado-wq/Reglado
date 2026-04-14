@@ -35,6 +35,16 @@ const router = useRouter();
 
 onMounted(() => {
   auth.initialize();
+
+  // Inicialización del tema (Modo Oscuro/Claro) desde Cookies
+  const savedTheme = auth.getCookie("reglado_theme");
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+  if (savedTheme === "dark" || (!savedTheme && prefersDark)) {
+    document.body.classList.add("dark-mode");
+  } else if (savedTheme === "light") {
+    document.body.classList.remove("dark-mode");
+  }
 });
 
 async function handleLogout() {

@@ -135,7 +135,7 @@ async function resendMail() {
   font-size: 2rem;
   line-height: 1;
   font-weight: 500;
-  color: #162235;
+  color: var(--text);
 }
 
 .close-btn:hover {

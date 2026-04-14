@@ -178,7 +178,7 @@ function resetFormState() {
   padding: 1.5rem;
   border: 1px solid rgba(15, 23, 42, 0.12);
   border-radius: 1rem;
-  background: rgba(255, 255, 255, 0.72);
+  background: var(--surface-soft);
 }
 
 .confirmation-title {
@@ -189,7 +189,7 @@ function resetFormState() {
 
 .confirmation-text {
   margin: 0;
-  color: rgba(15, 23, 42, 0.72);
+  color: var(--text);
 }
 
 .privacy-note {
