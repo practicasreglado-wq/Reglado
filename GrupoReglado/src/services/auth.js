@@ -9,7 +9,10 @@ import { reactive } from "vue";
 const API_BASE = import.meta.env.VITE_AUTH_API_URL || "http://localhost:8000";
 const TOKEN_KEY = "auth_token";
 const COOKIE_TOKEN_KEY = "reglado_auth_token";
-const COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
+const COOKIE_CONSENT_KEY = "reglado_consent_settings";
+const COOKIE_LANG_KEY = "reglado_lang";
+const COOKIE_MAX_AGE_SESSION = 60 * 60 * 24 * 7; // 7 days
+const COOKIE_MAX_AGE_YEAR = 60 * 60 * 24 * 365; // 1 year
 
 const state = reactive({
   token: localStorage.getItem(TOKEN_KEY) || getCookie(COOKIE_TOKEN_KEY) || "",
@@ -77,7 +80,7 @@ function setToken(token) {
   if (state.token) {
     // Se persiste en ambos sitios para compartir sesion entre proyectos en el mismo navegador.
     localStorage.setItem(TOKEN_KEY, state.token);
-    setCookie(COOKIE_TOKEN_KEY, state.token, COOKIE_MAX_AGE);
+    setCookie(COOKIE_TOKEN_KEY, state.token, COOKIE_MAX_AGE_SESSION, "Lax");
   } else {
     // Si no hay token, se limpian ambos almacenamientos.
     localStorage.removeItem(TOKEN_KEY);
@@ -99,6 +102,13 @@ async function initialize() {
     const cookieToken = getCookie(COOKIE_TOKEN_KEY);
     if (cookieToken) {
       setToken(cookieToken);
+    }
+  }
+
+  // Set default language only if user consented to preferences
+  if (hasConsentCategory('preferences')) {
+    if (!getCookie(COOKIE_LANG_KEY)) {
+      setCookie(COOKIE_LANG_KEY, "ESP", COOKIE_MAX_AGE_YEAR, "Lax");
     }
   }
 
@@ -290,10 +300,31 @@ export const auth = {
   setCookie,
   getCookie,
   clearCookie,
+  hasConsentCategory,
+  getConsent: () => getCookie(COOKIE_CONSENT_KEY),
+  acceptConsent: () => setCookie(COOKIE_CONSENT_KEY, "accepted", COOKIE_MAX_AGE_YEAR, "Strict"),
+  getLang: () => getCookie(COOKIE_LANG_KEY) || "ESP",
+  setLang: (lang) => {
+    if (hasConsentCategory('preferences')) {
+      setCookie(COOKIE_LANG_KEY, lang, COOKIE_MAX_AGE_YEAR, "Lax");
+    }
+  },
 };
 
-function setCookie(name, value, maxAgeSeconds) {
-  document.cookie = `${name}=${encodeURIComponent(value)}; Max-Age=${maxAgeSeconds}; Path=/; SameSite=Lax`;
+function hasConsentCategory(category) {
+  const saved = getCookie(COOKIE_CONSENT_KEY) || localStorage.getItem(COOKIE_CONSENT_KEY);
+  if (!saved) return false;
+  try {
+    const parsed = JSON.parse(saved);
+    return parsed?.categories?.[category] === true;
+  } catch {
+    return false;
+  }
+}
+
+function setCookie(name, value, maxAgeSeconds, sameSite = "Lax") {
+  const secure = window.location.protocol === "https:" ? "; Secure" : "";
+  document.cookie = `${name}=${encodeURIComponent(value)}; Max-Age=${maxAgeSeconds}; Path=/; SameSite=${sameSite}${secure}`;
 }
 
 function clearCookie(name) {
