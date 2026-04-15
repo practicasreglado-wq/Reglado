@@ -55,6 +55,32 @@ if ($buyerUserId <= 0) {
     ]);
 }
 
+$buyerStmt = $pdo->prepare('
+    SELECT
+        id,
+        email,
+        first_name,
+        last_name,
+        username,
+        phone
+    FROM regladousers.users
+    WHERE id = :id
+    LIMIT 1
+');
+$buyerStmt->execute([
+    'id' => $buyerUserId,
+]);
+$buyer = $buyerStmt->fetch(PDO::FETCH_ASSOC);
+
+purchaseLog('BUYER DB', $buyer);
+
+if (!$buyer) {
+    respondJson(404, [
+        'success' => false,
+        'message' => 'No se encontró el comprador autenticado en la base de datos.',
+    ]);
+}
+
 if ($propertyId <= 0) {
     respondJson(422, [
         'success' => false,
@@ -125,12 +151,12 @@ $ownerId = (int) ($property['owner_id'] ?? 0);
         ]);
     }
 
-    $buyerFirstName = trim((string) ($auth['first_name'] ?? ''));
-    $buyerLastName = trim((string) ($auth['last_name'] ?? ''));
-    $buyerFullName = trim((string) ($auth['name'] ?? trim($buyerFirstName . ' ' . $buyerLastName)));
-    $buyerEmail = filter_var($auth['email'] ?? '', FILTER_VALIDATE_EMAIL);
-    $buyerPhone = trim((string) ($auth['phone'] ?? ''));
-    $buyerUsername = trim((string) ($auth['username'] ?? ''));
+    $buyerFirstName = trim((string) ($buyer['first_name'] ?? ''));
+    $buyerLastName = trim((string) ($buyer['last_name'] ?? ''));
+    $buyerFullName = trim($buyerFirstName . ' ' . $buyerLastName);
+    $buyerEmail = filter_var((string) ($buyer['email'] ?? ''), FILTER_VALIDATE_EMAIL);
+    $buyerPhone = trim((string) ($buyer['phone'] ?? ''));
+    $buyerUsername = trim((string) ($buyer['username'] ?? ''));
 
     $characteristics = json_decode($property['caracteristicas_json'] ?? '[]', true);
     if (!is_array($characteristics)) {

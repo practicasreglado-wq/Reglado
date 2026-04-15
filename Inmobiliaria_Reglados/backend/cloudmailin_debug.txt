@@ -600,3 +600,251 @@
 [2026-04-10 12:40:44] PASO 6 antes process() | {"asset_id":76}
 [2026-04-10 12:40:47] ERROR GLOBAL | {"message":"Campo requerido faltante en ficha_web: tipo_propiedad","file":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\processing\\ClaudeClient.php","line":79,"asset_id":76,"message_id":"CAF+o0zud_5XQ4V9=Vc7dFrExTam9ev-0So256M9b7Tzh27VtfQ@mail.gmail.com","sender":"practicasreglado@gmail.com"}
 [2026-04-10 12:40:47] ROLLBACK EJECUTADO | {"asset_id":76}
+[2026-04-13 08:35:19] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-13 08:35:19] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-13 08:35:19] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-13 08:35:19] PASO 2A texto encontrado | {"source_key":"plain","text_len":1257,"text_preview":"DOSSIER DE INVERSIÓN – EDIFICIO EN SAGRADA FAMILIA (BARCELONA)\r\nRESUMEN EJECUTIVO\r\nActivo residencial con potencial de reposicionamiento situado en una de las\r\nzonas más\r\ndemandadas de Barcelona. Operación tipo value-add con alto componente\r\nestratégico.\r\nDATOS CLAVE\r\n- Precio: 8.000.000 € (negociables)\r\n- Superficie: ~1.850 m²\r\n- Unidades: 23 viviendas + 4 locales + portería\r\n- Vacancia: 21 viviendas libres\r\nSITUACIÓN ACTUAL\r\n- 16 viviendas reformadas\r\n- 5 viviendas a reformar\r\n- 2 con rentas a"}
+[2026-04-13 08:35:19] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-13 08:35:19] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":1257,"text_preview":"DOSSIER DE INVERSIÓN – EDIFICIO EN SAGRADA FAMILIA (BARCELONA)\r\nRESUMEN EJECUTIVO\r\nActivo residencial con potencial de reposicionamiento situado en una de las\r\nzonas más\r\ndemandadas de Barcelona. Operación tipo value-add con alto componente\r\nestratégico.\r\nDATOS CLAVE\r\n- Precio: 8.000.000 € (negociables)\r\n- Superficie: ~1.850 m²\r\n- Unidades: 23 viviendas + 4 locales + portería\r\n- Vacancia: 21 viviendas libres\r\nSITUACIÓN ACTUAL\r\n- 16 viviendas reformadas\r\n- 5 viviendas a reformar\r\n- 2 con rentas antiguas\r\n- Locales 100% ocupados\r\nINGRESOS\r\n- Ingresos actuales: ~349.000 €\r\n- Ingresos potenciales: >500.000 €\r\nANÁLISIS FINANCIERO\r\n- Yield actual: ~4,3%\r\n- Yield potencial: 6–7%\r\n- CAPEX estimado: "}
+[2026-04-13 08:35:19] PASO 3 antes duplicados | {"message_id":"CAF+o0zs7iaUYiPExoXyFAn1eNKvXcO_6vWY5QZWCNjLu6sJ-TA@mail.gmail.com","content_hash":"840b3fa9b868befc9fbb6642c2f1355c1578fc81d2df487a45daf09e502cd2ce"}
+[2026-04-13 08:35:19] PASO 4 activo insertado o recuperado | {"asset_id":81,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-13 08:35:19] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-13 08:35:19] PASO 6 antes process() | {"asset_id":81}
+[2026-04-13 08:35:26] PASO 6B resultado process() | {"asset_id":81,"property_id_raw":47,"property_id_type":"integer"}
+[2026-04-13 08:35:26] PASO 7 propiedad creada correctamente | {"asset_id":81,"property_id":47}
+[2026-04-13 08:35:26] PASO 8 antes commit | {"asset_id":81,"property_id":47}
+[2026-04-13 08:35:26] PASO 9 commit realizado | {"asset_id":81,"property_id":47}
+[2026-04-13 08:35:26] PASO 10 antes email OK | {"sender":"practicasreglado@gmail.com","property_id":47}
+[2026-04-13 08:35:27] PASO 11 después email OK | {"sender":"practicasreglado@gmail.com","property_id":47}
+[2026-04-13 08:35:40] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-13 08:35:40] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-13 08:35:40] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-13 08:35:40] PASO 2A texto encontrado | {"source_key":"plain","text_len":1257,"text_preview":"DOSSIER DE INVERSIÓN – EDIFICIO EN SAGRADA FAMILIA (BARCELONA)\r\nRESUMEN EJECUTIVO\r\nActivo residencial con potencial de reposicionamiento situado en una de las\r\nzonas más\r\ndemandadas de Barcelona. Operación tipo value-add con alto componente\r\nestratégico.\r\nDATOS CLAVE\r\n- Precio: 8.000.000 € (negociables)\r\n- Superficie: ~1.850 m²\r\n- Unidades: 23 viviendas + 4 locales + portería\r\n- Vacancia: 21 viviendas libres\r\nSITUACIÓN ACTUAL\r\n- 16 viviendas reformadas\r\n- 5 viviendas a reformar\r\n- 2 con rentas a"}
+[2026-04-13 08:35:40] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-13 08:35:40] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":1257,"text_preview":"DOSSIER DE INVERSIÓN – EDIFICIO EN SAGRADA FAMILIA (BARCELONA)\r\nRESUMEN EJECUTIVO\r\nActivo residencial con potencial de reposicionamiento situado en una de las\r\nzonas más\r\ndemandadas de Barcelona. Operación tipo value-add con alto componente\r\nestratégico.\r\nDATOS CLAVE\r\n- Precio: 8.000.000 € (negociables)\r\n- Superficie: ~1.850 m²\r\n- Unidades: 23 viviendas + 4 locales + portería\r\n- Vacancia: 21 viviendas libres\r\nSITUACIÓN ACTUAL\r\n- 16 viviendas reformadas\r\n- 5 viviendas a reformar\r\n- 2 con rentas antiguas\r\n- Locales 100% ocupados\r\nINGRESOS\r\n- Ingresos actuales: ~349.000 €\r\n- Ingresos potenciales: >500.000 €\r\nANÁLISIS FINANCIERO\r\n- Yield actual: ~4,3%\r\n- Yield potencial: 6–7%\r\n- CAPEX estimado: "}
+[2026-04-13 08:35:40] PASO 3 antes duplicados | {"message_id":"CAF+o0zvJ21bykuDjrYowoAPBOhQKvDsfUwh6=-tnvdp2r1jT3A@mail.gmail.com","content_hash":"840b3fa9b868befc9fbb6642c2f1355c1578fc81d2df487a45daf09e502cd2ce"}
+[2026-04-13 08:35:40] Duplicado por content_hash | {"content_hash":"840b3fa9b868befc9fbb6642c2f1355c1578fc81d2df487a45daf09e502cd2ce","existing_asset_id":81}
+[2026-04-13 08:36:20] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-13 08:36:20] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-13 08:36:20] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-13 08:36:20] PASO 2A texto encontrado | {"source_key":"plain","text_len":4,"text_preview":"hola"}
+[2026-04-13 08:36:20] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-13 08:36:20] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":4,"text_preview":"hola"}
+[2026-04-13 08:36:20] PASO 3 antes duplicados | {"message_id":"CAF+o0zsT8o_eLCKpgtq9muZrWSMFzEQ6s2QSS7C_w4FwtVfFqA@mail.gmail.com","content_hash":"b221d9dbb083a7f33428d7c2a3c3198ae925614d70210e28716ccaa7cd4ddb79"}
+[2026-04-13 08:36:20] PASO 4 activo insertado o recuperado | {"asset_id":82,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-13 08:36:20] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-13 08:36:20] PASO 6 antes process() | {"asset_id":82}
+[2026-04-13 08:36:23] ERROR GLOBAL | {"message":"Campo requerido faltante en ficha_web: tipo_propiedad","file":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\processing\\ClaudeClient.php","line":79,"asset_id":82,"message_id":"CAF+o0zsT8o_eLCKpgtq9muZrWSMFzEQ6s2QSS7C_w4FwtVfFqA@mail.gmail.com","sender":"practicasreglado@gmail.com"}
+[2026-04-13 08:36:23] ROLLBACK EJECUTADO | {"asset_id":82}
+[2026-04-13 08:38:27] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-13 08:38:27] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-13 08:38:27] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-13 08:38:27] PASO 2A texto encontrado | {"source_key":"plain","text_len":1257,"text_preview":"DOSSIER DE INVERSIÓN – EDIFICIO EN SAGRADA FAMILIA (BARCELONA)\r\nRESUMEN EJECUTIVO\r\nActivo residencial con potencial de reposicionamiento situado en una de las\r\nzonas más\r\ndemandadas de Barcelona. Operación tipo value-add con alto componente\r\nestratégico.\r\nDATOS CLAVE\r\n- Precio: 8.000.000 € (negociables)\r\n- Superficie: ~1.850 m²\r\n- Unidades: 23 viviendas + 4 locales + portería\r\n- Vacancia: 21 viviendas libres\r\nSITUACIÓN ACTUAL\r\n- 16 viviendas reformadas\r\n- 5 viviendas a reformar\r\n- 2 con rentas a"}
+[2026-04-13 08:38:27] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-13 08:38:27] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":1257,"text_preview":"DOSSIER DE INVERSIÓN – EDIFICIO EN SAGRADA FAMILIA (BARCELONA)\r\nRESUMEN EJECUTIVO\r\nActivo residencial con potencial de reposicionamiento situado en una de las\r\nzonas más\r\ndemandadas de Barcelona. Operación tipo value-add con alto componente\r\nestratégico.\r\nDATOS CLAVE\r\n- Precio: 8.000.000 € (negociables)\r\n- Superficie: ~1.850 m²\r\n- Unidades: 23 viviendas + 4 locales + portería\r\n- Vacancia: 21 viviendas libres\r\nSITUACIÓN ACTUAL\r\n- 16 viviendas reformadas\r\n- 5 viviendas a reformar\r\n- 2 con rentas antiguas\r\n- Locales 100% ocupados\r\nINGRESOS\r\n- Ingresos actuales: ~349.000 €\r\n- Ingresos potenciales: >500.000 €\r\nANÁLISIS FINANCIERO\r\n- Yield actual: ~4,3%\r\n- Yield potencial: 6–7%\r\n- CAPEX estimado: "}
+[2026-04-13 08:38:27] PASO 3 antes duplicados | {"message_id":"CAF+o0zvQ6ENX0yLBfCb9PzoRHxqNj+==2y5L+Ysk+3hYEMZAtw@mail.gmail.com","content_hash":"840b3fa9b868befc9fbb6642c2f1355c1578fc81d2df487a45daf09e502cd2ce"}
+[2026-04-13 08:38:27] Duplicado por content_hash | {"content_hash":"840b3fa9b868befc9fbb6642c2f1355c1578fc81d2df487a45daf09e502cd2ce","existing_asset_id":81}
+[2026-04-13 10:46:53] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-13 10:46:53] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-13 10:46:53] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-13 10:46:53] PASO 2A texto encontrado | {"source_key":"plain","text_len":664,"text_preview":"Ubicación:\r\n\r\nCalle de la Magdalena Nº 6\r\nCalle Cabeza nº 15\r\n28012 MADRID\r\n\r\nSuperficie parcela: 1.017 m².\r\n\r\nConstruidos: 4.395 m².\r\n\r\nUso: RESIDENCIAL (Plurifamiliar en altura).\r\nAlternativo: Hotelero / Terciario oficinas / Dotacional.\r\n\r\nAltura: IV (PB + 3) + Sótano.\r\n\r\nNorma Zonal: 1 Patrimonio histórico.\r\n\r\nPrecio INICIAL: 20.000.000 €.\r\n\r\nPrecio mínimo de cierre: 19.000.000 €.\r\n(Mínimo NO negociable)\r\n\r\nNO SE ACEPTAN OFERTAS POR UN IMPORTE MENOR.\r\n\r\nRepercusión techo: 4.323 €/m²t.\r\n\r\nProp"}
+[2026-04-13 10:46:53] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-13 10:46:53] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":664,"text_preview":"Ubicación:\r\n\r\nCalle de la Magdalena Nº 6\r\nCalle Cabeza nº 15\r\n28012 MADRID\r\n\r\nSuperficie parcela: 1.017 m².\r\n\r\nConstruidos: 4.395 m².\r\n\r\nUso: RESIDENCIAL (Plurifamiliar en altura).\r\nAlternativo: Hotelero / Terciario oficinas / Dotacional.\r\n\r\nAltura: IV (PB + 3) + Sótano.\r\n\r\nNorma Zonal: 1 Patrimonio histórico.\r\n\r\nPrecio INICIAL: 20.000.000 €.\r\n\r\nPrecio mínimo de cierre: 19.000.000 €.\r\n(Mínimo NO negociable)\r\n\r\nNO SE ACEPTAN OFERTAS POR UN IMPORTE MENOR.\r\n\r\nRepercusión techo: 4.323 €/m²t.\r\n\r\nPropiedad: Persona Jurídica.\r\n\r\nEl Inmueble se entrega VACÍO.\r\n\r\nPrecio de venta m² Obra Nueva en la Zona:\r\n10.923 €/m²t – 13.800 €/m²t\r\n\r\nHonorarios: + 2% (Comprador)."}
+[2026-04-13 10:46:53] PASO 3 antes duplicados | {"message_id":"CAF+o0ztVK+EJm-=153vi-C0UGBim6Jw_FjEuvauWok+bh5i8PA@mail.gmail.com","content_hash":"715b2ae4f3de6489715212746a6b818ef15c5b35968f0b63444ed876a0b154e0"}
+[2026-04-13 10:46:53] PASO 4 activo insertado o recuperado | {"asset_id":83,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-13 10:46:53] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-13 10:46:53] PASO 6 antes process() | {"asset_id":83}
+[2026-04-13 10:47:05] PASO 6B resultado process() | {"asset_id":83,"property_id_raw":48,"property_id_type":"integer"}
+[2026-04-13 10:47:05] PASO 7 propiedad creada correctamente | {"asset_id":83,"property_id":48}
+[2026-04-13 10:47:05] PASO 8 antes commit | {"asset_id":83,"property_id":48}
+[2026-04-13 10:47:05] PASO 9 commit realizado | {"asset_id":83,"property_id":48}
+[2026-04-13 10:47:05] PASO 10 antes email OK | {"sender":"practicasreglado@gmail.com","property_id":48}
+[2026-04-13 10:47:06] PASO 11 después email OK | {"sender":"practicasreglado@gmail.com","property_id":48}
+[2026-04-13 10:47:39] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-13 10:47:39] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-13 10:47:39] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-13 10:47:39] PASO 2A texto encontrado | {"source_key":"plain","text_len":4,"text_preview":"hola"}
+[2026-04-13 10:47:39] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-13 10:47:39] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":4,"text_preview":"hola"}
+[2026-04-13 10:47:39] PASO 3 antes duplicados | {"message_id":"CAF+o0zsZSpBbexf1XqW7RLpC5mGdLT=DVEizx4ni=1rMqrF-rA@mail.gmail.com","content_hash":"b221d9dbb083a7f33428d7c2a3c3198ae925614d70210e28716ccaa7cd4ddb79"}
+[2026-04-13 10:47:39] PASO 4 activo insertado o recuperado | {"asset_id":84,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-13 10:47:39] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-13 10:47:39] PASO 6 antes process() | {"asset_id":84}
+[2026-04-13 10:47:42] ERROR GLOBAL | {"message":"Campo requerido faltante en ficha_web: tipo_propiedad","file":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\processing\\ClaudeClient.php","line":79,"asset_id":84,"message_id":"CAF+o0zsZSpBbexf1XqW7RLpC5mGdLT=DVEizx4ni=1rMqrF-rA@mail.gmail.com","sender":"practicasreglado@gmail.com"}
+[2026-04-13 10:47:42] ROLLBACK EJECUTADO | {"asset_id":84}
+[2026-04-13 13:35:03] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-13 13:35:03] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-13 13:35:03] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-13 13:35:03] PASO 2A texto encontrado | {"source_key":"plain","text_len":4,"text_preview":"hola"}
+[2026-04-13 13:35:03] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-13 13:35:03] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":4,"text_preview":"hola"}
+[2026-04-13 13:35:03] PASO 3 antes duplicados | {"message_id":"CAF+o0zvutpFZwr3y32+iysaTri6iSnf3eQS+5GoWy_fMr+p-mg@mail.gmail.com","content_hash":"b221d9dbb083a7f33428d7c2a3c3198ae925614d70210e28716ccaa7cd4ddb79"}
+[2026-04-13 13:35:03] PASO 4 activo insertado o recuperado | {"asset_id":87,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-13 13:35:03] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-13 13:35:03] PASO 6 antes process() | {"asset_id":87}
+[2026-04-13 13:35:06] ERROR GLOBAL | {"message":"Campo requerido faltante en ficha_web: tipo_propiedad","file":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\processing\\ClaudeClient.php","line":79,"asset_id":87,"message_id":"CAF+o0zvutpFZwr3y32+iysaTri6iSnf3eQS+5GoWy_fMr+p-mg@mail.gmail.com","sender":"practicasreglado@gmail.com"}
+[2026-04-13 13:35:06] ROLLBACK EJECUTADO | {"asset_id":87}
+[2026-04-13 13:35:12] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-13 13:35:12] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-13 13:35:12] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-13 13:35:12] PASO 2A texto encontrado | {"source_key":"plain","text_len":664,"text_preview":"Ubicación:\r\n\r\nCalle de la Magdalena Nº 6\r\nCalle Cabeza nº 15\r\n28012 MADRID\r\n\r\nSuperficie parcela: 1.017 m².\r\n\r\nConstruidos: 4.395 m².\r\n\r\nUso: RESIDENCIAL (Plurifamiliar en altura).\r\nAlternativo: Hotelero / Terciario oficinas / Dotacional.\r\n\r\nAltura: IV (PB + 3) + Sótano.\r\n\r\nNorma Zonal: 1 Patrimonio histórico.\r\n\r\nPrecio INICIAL: 20.000.000 €.\r\n\r\nPrecio mínimo de cierre: 19.000.000 €.\r\n(Mínimo NO negociable)\r\n\r\nNO SE ACEPTAN OFERTAS POR UN IMPORTE MENOR.\r\n\r\nRepercusión techo: 4.323 €/m²t.\r\n\r\nProp"}
+[2026-04-13 13:35:12] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-13 13:35:12] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":664,"text_preview":"Ubicación:\r\n\r\nCalle de la Magdalena Nº 6\r\nCalle Cabeza nº 15\r\n28012 MADRID\r\n\r\nSuperficie parcela: 1.017 m².\r\n\r\nConstruidos: 4.395 m².\r\n\r\nUso: RESIDENCIAL (Plurifamiliar en altura).\r\nAlternativo: Hotelero / Terciario oficinas / Dotacional.\r\n\r\nAltura: IV (PB + 3) + Sótano.\r\n\r\nNorma Zonal: 1 Patrimonio histórico.\r\n\r\nPrecio INICIAL: 20.000.000 €.\r\n\r\nPrecio mínimo de cierre: 19.000.000 €.\r\n(Mínimo NO negociable)\r\n\r\nNO SE ACEPTAN OFERTAS POR UN IMPORTE MENOR.\r\n\r\nRepercusión techo: 4.323 €/m²t.\r\n\r\nPropiedad: Persona Jurídica.\r\n\r\nEl Inmueble se entrega VACÍO.\r\n\r\nPrecio de venta m² Obra Nueva en la Zona:\r\n10.923 €/m²t – 13.800 €/m²t\r\n\r\nHonorarios: + 2% (Comprador)."}
+[2026-04-13 13:35:12] PASO 3 antes duplicados | {"message_id":"CAF+o0zu7SmaniAtoMgZmQRQayeeanjKHqm36xthycvB1QMaAqQ@mail.gmail.com","content_hash":"715b2ae4f3de6489715212746a6b818ef15c5b35968f0b63444ed876a0b154e0"}
+[2026-04-13 13:35:12] PASO 4 activo insertado o recuperado | {"asset_id":88,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-13 13:35:12] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-13 13:35:12] PASO 6 antes process() | {"asset_id":88}
+[2026-04-13 13:35:25] PASO 6B resultado process() | {"asset_id":88,"property_id_raw":51,"property_id_type":"integer"}
+[2026-04-13 13:35:25] PASO 7 propiedad creada correctamente | {"asset_id":88,"property_id":51}
+[2026-04-13 13:35:25] PASO 8 antes commit | {"asset_id":88,"property_id":51}
+[2026-04-13 13:35:25] PASO 9 commit realizado | {"asset_id":88,"property_id":51}
+[2026-04-13 13:35:25] PASO 10 antes email OK | {"sender":"practicasreglado@gmail.com","property_id":51}
+[2026-04-13 13:35:26] PASO 11 después email OK | {"sender":"practicasreglado@gmail.com","property_id":51}
+[2026-04-14 07:25:41] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-14 07:25:41] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-14 07:25:41] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-14 07:25:41] PASO 2A texto encontrado | {"source_key":"plain","text_len":4,"text_preview":"hola"}
+[2026-04-14 07:25:41] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-14 07:25:41] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":4,"text_preview":"hola"}
+[2026-04-14 07:25:41] PASO 3 antes duplicados | {"message_id":"CAF+o0zuBwnUx=Fx+Kiy+6BCD1rnKSGCJqgpMt=TybA6mSKFofw@mail.gmail.com","content_hash":"b221d9dbb083a7f33428d7c2a3c3198ae925614d70210e28716ccaa7cd4ddb79"}
+[2026-04-14 07:25:41] PASO 4 activo insertado o recuperado | {"asset_id":90,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-14 07:25:41] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-14 07:25:41] PASO 6 antes process() | {"asset_id":90}
+[2026-04-14 07:25:44] ERROR GLOBAL | {"message":"Campo requerido faltante en ficha_web: tipo_propiedad","file":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\processing\\ClaudeClient.php","line":79,"asset_id":90,"message_id":"CAF+o0zuBwnUx=Fx+Kiy+6BCD1rnKSGCJqgpMt=TybA6mSKFofw@mail.gmail.com","sender":"practicasreglado@gmail.com"}
+[2026-04-14 07:25:44] ROLLBACK EJECUTADO | {"asset_id":90}
+[2026-04-14 07:26:06] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-14 07:26:06] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-14 07:26:06] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-14 07:26:06] PASO 2A texto encontrado | {"source_key":"plain","text_len":1257,"text_preview":"DOSSIER DE INVERSIÓN – EDIFICIO EN SAGRADA FAMILIA (BARCELONA)\r\nRESUMEN EJECUTIVO\r\nActivo residencial con potencial de reposicionamiento situado en una de las\r\nzonas más\r\ndemandadas de Barcelona. Operación tipo value-add con alto componente\r\nestratégico.\r\nDATOS CLAVE\r\n- Precio: 8.000.000 € (negociables)\r\n- Superficie: ~1.850 m²\r\n- Unidades: 23 viviendas + 4 locales + portería\r\n- Vacancia: 21 viviendas libres\r\nSITUACIÓN ACTUAL\r\n- 16 viviendas reformadas\r\n- 5 viviendas a reformar\r\n- 2 con rentas a"}
+[2026-04-14 07:26:06] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-14 07:26:06] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":1257,"text_preview":"DOSSIER DE INVERSIÓN – EDIFICIO EN SAGRADA FAMILIA (BARCELONA)\r\nRESUMEN EJECUTIVO\r\nActivo residencial con potencial de reposicionamiento situado en una de las\r\nzonas más\r\ndemandadas de Barcelona. Operación tipo value-add con alto componente\r\nestratégico.\r\nDATOS CLAVE\r\n- Precio: 8.000.000 € (negociables)\r\n- Superficie: ~1.850 m²\r\n- Unidades: 23 viviendas + 4 locales + portería\r\n- Vacancia: 21 viviendas libres\r\nSITUACIÓN ACTUAL\r\n- 16 viviendas reformadas\r\n- 5 viviendas a reformar\r\n- 2 con rentas antiguas\r\n- Locales 100% ocupados\r\nINGRESOS\r\n- Ingresos actuales: ~349.000 €\r\n- Ingresos potenciales: >500.000 €\r\nANÁLISIS FINANCIERO\r\n- Yield actual: ~4,3%\r\n- Yield potencial: 6–7%\r\n- CAPEX estimado: "}
+[2026-04-14 07:26:06] PASO 3 antes duplicados | {"message_id":"CAF+o0zvszQcqsN6OS7j8J=O7a=qx=g99G8hhsW-rq+b57oQ2kg@mail.gmail.com","content_hash":"840b3fa9b868befc9fbb6642c2f1355c1578fc81d2df487a45daf09e502cd2ce"}
+[2026-04-14 07:26:06] Duplicado por content_hash | {"content_hash":"840b3fa9b868befc9fbb6642c2f1355c1578fc81d2df487a45daf09e502cd2ce","existing_asset_id":89}
+[2026-04-14 07:43:45] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-14 07:43:45] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-14 07:43:45] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-14 07:43:45] PASO 2A texto encontrado | {"source_key":"plain","text_len":1257,"text_preview":"DOSSIER DE INVERSIÓN – EDIFICIO EN SAGRADA FAMILIA (BARCELONA)\r\nRESUMEN EJECUTIVO\r\nActivo residencial con potencial de reposicionamiento situado en una de las\r\nzonas más\r\ndemandadas de Barcelona. Operación tipo value-add con alto componente\r\nestratégico.\r\nDATOS CLAVE\r\n- Precio: 8.000.000 € (negociables)\r\n- Superficie: ~1.850 m²\r\n- Unidades: 23 viviendas + 4 locales + portería\r\n- Vacancia: 21 viviendas libres\r\nSITUACIÓN ACTUAL\r\n- 16 viviendas reformadas\r\n- 5 viviendas a reformar\r\n- 2 con rentas a"}
+[2026-04-14 07:43:45] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-14 07:43:45] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":1257,"text_preview":"DOSSIER DE INVERSIÓN – EDIFICIO EN SAGRADA FAMILIA (BARCELONA)\r\nRESUMEN EJECUTIVO\r\nActivo residencial con potencial de reposicionamiento situado en una de las\r\nzonas más\r\ndemandadas de Barcelona. Operación tipo value-add con alto componente\r\nestratégico.\r\nDATOS CLAVE\r\n- Precio: 8.000.000 € (negociables)\r\n- Superficie: ~1.850 m²\r\n- Unidades: 23 viviendas + 4 locales + portería\r\n- Vacancia: 21 viviendas libres\r\nSITUACIÓN ACTUAL\r\n- 16 viviendas reformadas\r\n- 5 viviendas a reformar\r\n- 2 con rentas antiguas\r\n- Locales 100% ocupados\r\nINGRESOS\r\n- Ingresos actuales: ~349.000 €\r\n- Ingresos potenciales: >500.000 €\r\nANÁLISIS FINANCIERO\r\n- Yield actual: ~4,3%\r\n- Yield potencial: 6–7%\r\n- CAPEX estimado: "}
+[2026-04-14 07:43:45] PASO 3 antes duplicados | {"message_id":"CAF+o0zt3u7ANMw8KM1aeAEnp5Qj=SZMKE4mOLiL_g9SdYxPqTw@mail.gmail.com","content_hash":"840b3fa9b868befc9fbb6642c2f1355c1578fc81d2df487a45daf09e502cd2ce"}
+[2026-04-14 07:43:45] PASO 4 activo insertado o recuperado | {"asset_id":92,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-14 07:43:45] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-14 07:43:45] PASO 6 antes process() | {"asset_id":92}
+[2026-04-14 07:43:53] PASO 6B resultado process() | {"asset_id":92,"property_id_raw":54,"property_id_type":"integer"}
+[2026-04-14 07:43:53] PASO 7 propiedad creada correctamente | {"asset_id":92,"property_id":54}
+[2026-04-14 07:43:53] PASO 8 antes commit | {"asset_id":92,"property_id":54}
+[2026-04-14 07:43:53] PASO 9 commit realizado | {"asset_id":92,"property_id":54}
+[2026-04-14 07:43:53] PASO 10 antes email OK | {"sender":"practicasreglado@gmail.com","property_id":54}
+[2026-04-14 07:43:54] PASO 11 después email OK | {"sender":"practicasreglado@gmail.com","property_id":54}
+[2026-04-14 12:06:30] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-14 12:06:30] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-14 12:06:30] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-14 12:06:30] PASO 2A texto encontrado | {"source_key":"plain","text_len":1257,"text_preview":"DOSSIER DE INVERSIÓN – EDIFICIO EN SAGRADA FAMILIA (BARCELONA)\r\nRESUMEN EJECUTIVO\r\nActivo residencial con potencial de reposicionamiento situado en una de las\r\nzonas más\r\ndemandadas de Barcelona. Operación tipo value-add con alto componente\r\nestratégico.\r\nDATOS CLAVE\r\n- Precio: 8.000.000 € (negociables)\r\n- Superficie: ~1.850 m²\r\n- Unidades: 23 viviendas + 4 locales + portería\r\n- Vacancia: 21 viviendas libres\r\nSITUACIÓN ACTUAL\r\n- 16 viviendas reformadas\r\n- 5 viviendas a reformar\r\n- 2 con rentas a"}
+[2026-04-14 12:06:30] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-14 12:06:30] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":1257,"text_preview":"DOSSIER DE INVERSIÓN – EDIFICIO EN SAGRADA FAMILIA (BARCELONA)\r\nRESUMEN EJECUTIVO\r\nActivo residencial con potencial de reposicionamiento situado en una de las\r\nzonas más\r\ndemandadas de Barcelona. Operación tipo value-add con alto componente\r\nestratégico.\r\nDATOS CLAVE\r\n- Precio: 8.000.000 € (negociables)\r\n- Superficie: ~1.850 m²\r\n- Unidades: 23 viviendas + 4 locales + portería\r\n- Vacancia: 21 viviendas libres\r\nSITUACIÓN ACTUAL\r\n- 16 viviendas reformadas\r\n- 5 viviendas a reformar\r\n- 2 con rentas antiguas\r\n- Locales 100% ocupados\r\nINGRESOS\r\n- Ingresos actuales: ~349.000 €\r\n- Ingresos potenciales: >500.000 €\r\nANÁLISIS FINANCIERO\r\n- Yield actual: ~4,3%\r\n- Yield potencial: 6–7%\r\n- CAPEX estimado: "}
+[2026-04-14 12:06:30] PASO 3 antes duplicados | {"message_id":"CAF+o0zsevCQsO0dk862dhbmMG_pmMyL1w3XS=+ByhEUtkOKDUQ@mail.gmail.com","content_hash":"840b3fa9b868befc9fbb6642c2f1355c1578fc81d2df487a45daf09e502cd2ce"}
+[2026-04-14 12:06:30] PASO 4 activo insertado o recuperado | {"asset_id":99,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-14 12:06:30] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-14 12:06:30] PASO 6 antes process() | {"asset_id":99}
+[2026-04-14 12:06:38] PASO 6B resultado process() | {"asset_id":99,"property_id_raw":61,"property_id_type":"integer"}
+[2026-04-14 12:06:38] PASO 7 propiedad creada correctamente | {"asset_id":99,"property_id":61}
+[2026-04-14 12:06:38] PASO 8 antes commit | {"asset_id":99,"property_id":61}
+[2026-04-14 12:06:38] PASO 9 commit realizado | {"asset_id":99,"property_id":61}
+[2026-04-14 12:06:38] PASO 10 antes email OK | {"sender":"practicasreglado@gmail.com","property_id":61}
+[2026-04-14 12:06:40] PASO 11 después email OK | {"sender":"practicasreglado@gmail.com","property_id":61}
+[2026-04-14 12:33:41] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-14 12:33:41] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-14 12:33:41] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-14 12:33:41] PASO 2A texto encontrado | {"source_key":"plain","text_len":664,"text_preview":"Ubicación:\r\n\r\nCalle de la Magdalena Nº 6\r\nCalle Cabeza nº 15\r\n28012 MADRID\r\n\r\nSuperficie parcela: 1.017 m².\r\n\r\nConstruidos: 4.395 m².\r\n\r\nUso: RESIDENCIAL (Plurifamiliar en altura).\r\nAlternativo: Hotelero / Terciario oficinas / Dotacional.\r\n\r\nAltura: IV (PB + 3) + Sótano.\r\n\r\nNorma Zonal: 1 Patrimonio histórico.\r\n\r\nPrecio INICIAL: 20.000.000 €.\r\n\r\nPrecio mínimo de cierre: 19.000.000 €.\r\n(Mínimo NO negociable)\r\n\r\nNO SE ACEPTAN OFERTAS POR UN IMPORTE MENOR.\r\n\r\nRepercusión techo: 4.323 €/m²t.\r\n\r\nProp"}
+[2026-04-14 12:33:41] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-14 12:33:41] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":664,"text_preview":"Ubicación:\r\n\r\nCalle de la Magdalena Nº 6\r\nCalle Cabeza nº 15\r\n28012 MADRID\r\n\r\nSuperficie parcela: 1.017 m².\r\n\r\nConstruidos: 4.395 m².\r\n\r\nUso: RESIDENCIAL (Plurifamiliar en altura).\r\nAlternativo: Hotelero / Terciario oficinas / Dotacional.\r\n\r\nAltura: IV (PB + 3) + Sótano.\r\n\r\nNorma Zonal: 1 Patrimonio histórico.\r\n\r\nPrecio INICIAL: 20.000.000 €.\r\n\r\nPrecio mínimo de cierre: 19.000.000 €.\r\n(Mínimo NO negociable)\r\n\r\nNO SE ACEPTAN OFERTAS POR UN IMPORTE MENOR.\r\n\r\nRepercusión techo: 4.323 €/m²t.\r\n\r\nPropiedad: Persona Jurídica.\r\n\r\nEl Inmueble se entrega VACÍO.\r\n\r\nPrecio de venta m² Obra Nueva en la Zona:\r\n10.923 €/m²t – 13.800 €/m²t\r\n\r\nHonorarios: + 2% (Comprador)."}
+[2026-04-14 12:33:41] PASO 3 antes duplicados | {"message_id":"CAF+o0zsocz2gmFDFZB_9Gm=kBP6gAkMy5tS6LYm2nPTFMZB4+g@mail.gmail.com","content_hash":"715b2ae4f3de6489715212746a6b818ef15c5b35968f0b63444ed876a0b154e0"}
+[2026-04-14 12:33:41] Duplicado por content_hash | {"content_hash":"715b2ae4f3de6489715212746a6b818ef15c5b35968f0b63444ed876a0b154e0","existing_asset_id":100}
+[2026-04-14 13:22:59] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-14 13:22:59] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-14 13:22:59] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-14 13:22:59] PASO 2A texto encontrado | {"source_key":"plain","text_len":1257,"text_preview":"DOSSIER DE INVERSIÓN – EDIFICIO EN SAGRADA FAMILIA (BARCELONA)\r\nRESUMEN EJECUTIVO\r\nActivo residencial con potencial de reposicionamiento situado en una de las\r\nzonas más\r\ndemandadas de Barcelona. Operación tipo value-add con alto componente\r\nestratégico.\r\nDATOS CLAVE\r\n- Precio: 8.000.000 € (negociables)\r\n- Superficie: ~1.850 m²\r\n- Unidades: 23 viviendas + 4 locales + portería\r\n- Vacancia: 21 viviendas libres\r\nSITUACIÓN ACTUAL\r\n- 16 viviendas reformadas\r\n- 5 viviendas a reformar\r\n- 2 con rentas a"}
+[2026-04-14 13:22:59] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-14 13:22:59] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":1257,"text_preview":"DOSSIER DE INVERSIÓN – EDIFICIO EN SAGRADA FAMILIA (BARCELONA)\r\nRESUMEN EJECUTIVO\r\nActivo residencial con potencial de reposicionamiento situado en una de las\r\nzonas más\r\ndemandadas de Barcelona. Operación tipo value-add con alto componente\r\nestratégico.\r\nDATOS CLAVE\r\n- Precio: 8.000.000 € (negociables)\r\n- Superficie: ~1.850 m²\r\n- Unidades: 23 viviendas + 4 locales + portería\r\n- Vacancia: 21 viviendas libres\r\nSITUACIÓN ACTUAL\r\n- 16 viviendas reformadas\r\n- 5 viviendas a reformar\r\n- 2 con rentas antiguas\r\n- Locales 100% ocupados\r\nINGRESOS\r\n- Ingresos actuales: ~349.000 €\r\n- Ingresos potenciales: >500.000 €\r\nANÁLISIS FINANCIERO\r\n- Yield actual: ~4,3%\r\n- Yield potencial: 6–7%\r\n- CAPEX estimado: "}
+[2026-04-14 13:22:59] PASO 3 antes duplicados | {"message_id":"CAF+o0ztFmffufeq+DboRPGDRptNvk3N1AbeXmTv9=zZZ9daeKg@mail.gmail.com","content_hash":"840b3fa9b868befc9fbb6642c2f1355c1578fc81d2df487a45daf09e502cd2ce"}
+[2026-04-14 13:22:59] PASO 4 activo insertado o recuperado | {"asset_id":102,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-14 13:22:59] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-14 13:22:59] PASO 6 antes process() | {"asset_id":102}
+[2026-04-14 13:23:07] PASO 6B resultado process() | {"asset_id":102,"property_id_raw":64,"property_id_type":"integer"}
+[2026-04-14 13:23:07] PASO 7 propiedad creada correctamente | {"asset_id":102,"property_id":64}
+[2026-04-14 13:23:07] PASO 8 antes commit | {"asset_id":102,"property_id":64}
+[2026-04-14 13:23:07] PASO 9 commit realizado | {"asset_id":102,"property_id":64}
+[2026-04-14 13:23:07] PASO 10 antes email OK | {"sender":"practicasreglado@gmail.com","property_id":64}
+[2026-04-14 13:23:09] PASO 11 después email OK | {"sender":"practicasreglado@gmail.com","property_id":64}
+[2026-04-14 14:36:40] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-14 14:36:40] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-14 14:36:40] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-14 14:36:40] PASO 2A texto encontrado | {"source_key":"plain","text_len":1257,"text_preview":"DOSSIER DE INVERSIÓN – EDIFICIO EN SAGRADA FAMILIA (BARCELONA)\r\nRESUMEN EJECUTIVO\r\nActivo residencial con potencial de reposicionamiento situado en una de las\r\nzonas más\r\ndemandadas de Barcelona. Operación tipo value-add con alto componente\r\nestratégico.\r\nDATOS CLAVE\r\n- Precio: 8.000.000 € (negociables)\r\n- Superficie: ~1.850 m²\r\n- Unidades: 23 viviendas + 4 locales + portería\r\n- Vacancia: 21 viviendas libres\r\nSITUACIÓN ACTUAL\r\n- 16 viviendas reformadas\r\n- 5 viviendas a reformar\r\n- 2 con rentas a"}
+[2026-04-14 14:36:40] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-14 14:36:40] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":1257,"text_preview":"DOSSIER DE INVERSIÓN – EDIFICIO EN SAGRADA FAMILIA (BARCELONA)\r\nRESUMEN EJECUTIVO\r\nActivo residencial con potencial de reposicionamiento situado en una de las\r\nzonas más\r\ndemandadas de Barcelona. Operación tipo value-add con alto componente\r\nestratégico.\r\nDATOS CLAVE\r\n- Precio: 8.000.000 € (negociables)\r\n- Superficie: ~1.850 m²\r\n- Unidades: 23 viviendas + 4 locales + portería\r\n- Vacancia: 21 viviendas libres\r\nSITUACIÓN ACTUAL\r\n- 16 viviendas reformadas\r\n- 5 viviendas a reformar\r\n- 2 con rentas antiguas\r\n- Locales 100% ocupados\r\nINGRESOS\r\n- Ingresos actuales: ~349.000 €\r\n- Ingresos potenciales: >500.000 €\r\nANÁLISIS FINANCIERO\r\n- Yield actual: ~4,3%\r\n- Yield potencial: 6–7%\r\n- CAPEX estimado: "}
+[2026-04-14 14:36:40] PASO 3 antes duplicados | {"message_id":"CAF+o0zuFqbof=mkMdpxMMJdx098+tg6OAQ3RgyXu2sXOfXG2Jg@mail.gmail.com","content_hash":"840b3fa9b868befc9fbb6642c2f1355c1578fc81d2df487a45daf09e502cd2ce"}
+[2026-04-14 14:36:40] PASO 4 activo insertado o recuperado | {"asset_id":104,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-14 14:36:40] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-14 14:36:40] PASO 6 antes process() | {"asset_id":104}
+[2026-04-14 14:36:47] PASO 6B resultado process() | {"asset_id":104,"property_id_raw":66,"property_id_type":"integer"}
+[2026-04-14 14:36:47] PASO 7 propiedad creada correctamente | {"asset_id":104,"property_id":66}
+[2026-04-14 14:36:47] PASO 8 antes commit | {"asset_id":104,"property_id":66}
+[2026-04-14 14:36:47] PASO 9 commit realizado | {"asset_id":104,"property_id":66}
+[2026-04-14 14:36:47] PASO 10 antes email OK | {"sender":"practicasreglado@gmail.com","property_id":66}
+[2026-04-14 14:36:48] PASO 11 después email OK | {"sender":"practicasreglado@gmail.com","property_id":66}
+[2026-04-14 14:38:19] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-14 14:38:19] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-14 14:38:19] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-14 14:38:19] PASO 2A texto encontrado | {"source_key":"plain","text_len":4,"text_preview":"hola"}
+[2026-04-14 14:38:19] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-14 14:38:19] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":4,"text_preview":"hola"}
+[2026-04-14 14:38:19] PASO 3 antes duplicados | {"message_id":"CAF+o0zv8aa-KGQJA=vrbtWb5mRuLBDF2bAFu2EZa5Ar21NeD7A@mail.gmail.com","content_hash":"b221d9dbb083a7f33428d7c2a3c3198ae925614d70210e28716ccaa7cd4ddb79"}
+[2026-04-14 14:38:19] PASO 4 activo insertado o recuperado | {"asset_id":105,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-14 14:38:19] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-14 14:38:19] PASO 6 antes process() | {"asset_id":105}
+[2026-04-14 14:38:22] ERROR GLOBAL | {"message":"Campo requerido faltante en ficha_web: tipo_propiedad","file":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\processing\\ClaudeClient.php","line":79,"asset_id":105,"message_id":"CAF+o0zv8aa-KGQJA=vrbtWb5mRuLBDF2bAFu2EZa5Ar21NeD7A@mail.gmail.com","sender":"practicasreglado@gmail.com"}
+[2026-04-14 14:38:22] ROLLBACK EJECUTADO | {"asset_id":105}
+[2026-04-15 07:14:12] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-15 07:14:12] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-15 07:14:12] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-15 07:14:12] PASO 2A texto encontrado | {"source_key":"plain","text_len":664,"text_preview":"Ubicación:\r\n\r\nCalle de la Magdalena Nº 6\r\nCalle Cabeza nº 15\r\n28012 MADRID\r\n\r\nSuperficie parcela: 1.017 m².\r\n\r\nConstruidos: 4.395 m².\r\n\r\nUso: RESIDENCIAL (Plurifamiliar en altura).\r\nAlternativo: Hotelero / Terciario oficinas / Dotacional.\r\n\r\nAltura: IV (PB + 3) + Sótano.\r\n\r\nNorma Zonal: 1 Patrimonio histórico.\r\n\r\nPrecio INICIAL: 20.000.000 €.\r\n\r\nPrecio mínimo de cierre: 19.000.000 €.\r\n(Mínimo NO negociable)\r\n\r\nNO SE ACEPTAN OFERTAS POR UN IMPORTE MENOR.\r\n\r\nRepercusión techo: 4.323 €/m²t.\r\n\r\nProp"}
+[2026-04-15 07:14:12] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-15 07:14:12] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":664,"text_preview":"Ubicación:\r\n\r\nCalle de la Magdalena Nº 6\r\nCalle Cabeza nº 15\r\n28012 MADRID\r\n\r\nSuperficie parcela: 1.017 m².\r\n\r\nConstruidos: 4.395 m².\r\n\r\nUso: RESIDENCIAL (Plurifamiliar en altura).\r\nAlternativo: Hotelero / Terciario oficinas / Dotacional.\r\n\r\nAltura: IV (PB + 3) + Sótano.\r\n\r\nNorma Zonal: 1 Patrimonio histórico.\r\n\r\nPrecio INICIAL: 20.000.000 €.\r\n\r\nPrecio mínimo de cierre: 19.000.000 €.\r\n(Mínimo NO negociable)\r\n\r\nNO SE ACEPTAN OFERTAS POR UN IMPORTE MENOR.\r\n\r\nRepercusión techo: 4.323 €/m²t.\r\n\r\nPropiedad: Persona Jurídica.\r\n\r\nEl Inmueble se entrega VACÍO.\r\n\r\nPrecio de venta m² Obra Nueva en la Zona:\r\n10.923 €/m²t – 13.800 €/m²t\r\n\r\nHonorarios: + 2% (Comprador)."}
+[2026-04-15 07:14:12] PASO 3 antes duplicados | {"message_id":"CAF+o0zt9sqm1DMSLVTPEwpSAYXf7qK619eH7VYgPxcfPfK5Q9w@mail.gmail.com","content_hash":"715b2ae4f3de6489715212746a6b818ef15c5b35968f0b63444ed876a0b154e0"}
+[2026-04-15 07:14:12] PASO 4 activo insertado o recuperado | {"asset_id":106,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-15 07:14:12] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-15 07:14:12] PASO 6 antes process() | {"asset_id":106}
+[2026-04-15 07:14:25] PASO 6B resultado process() | {"asset_id":106,"property_id_raw":67,"property_id_type":"integer"}
+[2026-04-15 07:14:25] PASO 7 propiedad creada correctamente | {"asset_id":106,"property_id":67}
+[2026-04-15 07:14:25] PASO 8 antes commit | {"asset_id":106,"property_id":67}
+[2026-04-15 07:14:25] PASO 9 commit realizado | {"asset_id":106,"property_id":67}
+[2026-04-15 07:14:25] PASO 10 antes email OK | {"sender":"practicasreglado@gmail.com","property_id":67}
+[2026-04-15 07:14:26] PASO 11 después email OK | {"sender":"practicasreglado@gmail.com","property_id":67}
+[2026-04-15 13:38:13] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-15 13:38:13] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-15 13:38:13] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-15 13:38:13] PASO 2A texto encontrado | {"source_key":"plain","text_len":1281,"text_preview":"DOSSIER DE INVERSIÓN – EDIFICIO EN SAGRADA FAMILIA (BARCELONA)\r\nRESUMEN EJECUTIVO\r\nActivo residencial con potencial de reposicionamiento situado en una de las\r\nzonas más\r\ndemandadas de Barcelona Carrer de València, 422. Operación tipo value-add\r\ncon alto componente estratégico.\r\nDATOS CLAVE\r\n- Precio: 8.000.000 € (negociables)\r\n- Superficie: ~1.850 m²\r\n- Unidades: 23 viviendas + 4 locales + portería\r\n- Vacancia: 21 viviendas libres\r\nSITUACIÓN ACTUAL\r\n- 16 viviendas reformadas\r\n- 5 viviendas a re"}
+[2026-04-15 13:38:13] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-15 13:38:13] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":1281,"text_preview":"DOSSIER DE INVERSIÓN – EDIFICIO EN SAGRADA FAMILIA (BARCELONA)\r\nRESUMEN EJECUTIVO\r\nActivo residencial con potencial de reposicionamiento situado en una de las\r\nzonas más\r\ndemandadas de Barcelona Carrer de València, 422. Operación tipo value-add\r\ncon alto componente estratégico.\r\nDATOS CLAVE\r\n- Precio: 8.000.000 € (negociables)\r\n- Superficie: ~1.850 m²\r\n- Unidades: 23 viviendas + 4 locales + portería\r\n- Vacancia: 21 viviendas libres\r\nSITUACIÓN ACTUAL\r\n- 16 viviendas reformadas\r\n- 5 viviendas a reformar\r\n- 2 con rentas antiguas\r\n- Locales 100% ocupados\r\nINGRESOS\r\n- Ingresos actuales: ~349.000 €\r\n- Ingresos potenciales: >500.000 €\r\nANÁLISIS FINANCIERO\r\n- Yield actual: ~4,3%\r\n- Yield potencial: "}
+[2026-04-15 13:38:13] PASO 3 antes duplicados | {"message_id":"CAF+o0zvqVAw2FCQR=UCEzUfTRT0zhHn=zfL27rgSX1ey6kOGbg@mail.gmail.com","content_hash":"51e51a191c840764d256357d42f8761c1eef84f22eaab5f1f681ce2a1e0b977e"}
+[2026-04-15 13:38:13] PASO 4 activo insertado o recuperado | {"asset_id":114,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-15 13:38:13] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-15 13:38:13] PASO 6 antes process() | {"asset_id":114}
+[2026-04-15 13:38:21] PASO 6B resultado process() | {"asset_id":114,"property_id_raw":75,"property_id_type":"integer"}
+[2026-04-15 13:38:21] PASO 7 propiedad creada correctamente | {"asset_id":114,"property_id":75}
+[2026-04-15 13:38:21] PASO 8 antes commit | {"asset_id":114,"property_id":75}
+[2026-04-15 13:38:21] PASO 9 commit realizado | {"asset_id":114,"property_id":75}
+[2026-04-15 13:38:21] PASO 10 antes email OK | {"sender":"practicasreglado@gmail.com","property_id":75}
+[2026-04-15 13:38:22] PASO 11 después email OK | {"sender":"practicasreglado@gmail.com","property_id":75}
+[2026-04-15 13:39:34] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-15 13:39:34] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-15 13:39:34] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-15 13:39:34] PASO 2A texto encontrado | {"source_key":"plain","text_len":4,"text_preview":"hola"}
+[2026-04-15 13:39:34] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-15 13:39:34] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":4,"text_preview":"hola"}
+[2026-04-15 13:39:34] PASO 3 antes duplicados | {"message_id":"CAF+o0zsK1_TNgwp1oRdf9Q7N8ijnzZjtawcqRdFt=S8s49SVoQ@mail.gmail.com","content_hash":"b221d9dbb083a7f33428d7c2a3c3198ae925614d70210e28716ccaa7cd4ddb79"}
+[2026-04-15 13:39:34] PASO 4 activo insertado o recuperado | {"asset_id":115,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-15 13:39:34] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-15 13:39:34] PASO 6 antes process() | {"asset_id":115}
+[2026-04-15 13:39:37] ERROR GLOBAL | {"message":"Campo requerido faltante en ficha_web: tipo_propiedad","file":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\processing\\ClaudeClient.php","line":79,"asset_id":115,"message_id":"CAF+o0zsK1_TNgwp1oRdf9Q7N8ijnzZjtawcqRdFt=S8s49SVoQ@mail.gmail.com","sender":"practicasreglado@gmail.com"}
+[2026-04-15 13:39:37] ROLLBACK EJECUTADO | {"asset_id":115}

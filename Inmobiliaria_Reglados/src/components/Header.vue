@@ -11,11 +11,11 @@
 
     <nav>
       <ul>
-        <li v-if="!user">
-          <button class="catalog-btn" @click="goToLogin">
-            Iniciar sesion
-          </button>
-        </li>
+        <li v-if="showLoginButton">
+  <button class="catalog-btn" @click="goToLogin">
+    Iniciar sesion
+  </button>
+</li>
 
         <li>
           <a href="http://regladogroup.com" class="grupo-link" target="_blank">
@@ -45,7 +45,9 @@
           </button>
         </li>
 
-        
+        <li v-if="user" class="notification-nav-item">
+          <NotificationBell />
+        </li>
 
         <li v-if="user" class="profile-nav-item" :class="{ 'in-profile': isInProfile }">
           <router-link
@@ -114,27 +116,63 @@ import { storeToRefs } from "pinia";
 import { useRouter, useRoute } from "vue-router";
 import { useUserStore } from "../stores/user";
 import { useProfileMenuStore } from "../stores/profileMenu";
+import NotificationBell from "./NotificationBell.vue";
+import { useNotificationsStore } from "../stores/notifications";
 
 export default {
   name: "Header",
+  components: {
+    NotificationBell,
+  },
 
   setup() {
     const userStore = useUserStore();
     const profileMenuStore = useProfileMenuStore();
     const router = useRouter();
     const route = useRoute();
+    const notificationsStore = useNotificationsStore();
     const { user, isAdmin, isReal } = storeToRefs(userStore);
     const { isOpen: isProfileMenuOpen } = storeToRefs(profileMenuStore);
 
     const isInProfile = computed(() => route.path.startsWith("/profile"));
+    const isHome = computed(() => route.path === "/");
+
+    const authRoutes = ["/login", "/register", "/forgot-password", "/reset-password"];
+    const isAuthRoute = computed(() =>
+      authRoutes.some((authPath) => route.path.startsWith(authPath))
+    );
+
+    const handleVisibilityChange = () => {
+  if (document.visibilityState === "visible") {
+    notificationsStore.loadNotifications();
+  }
+};
+
+    const showLoginButton = computed(() => !user.value && !isAuthRoute.value);
 
     const goToCatalog = () => {
-      router.push("/dashboard");
+      if (route.path !== "/dashboard") {
+        router.push("/dashboard");
+      }
     };
 
-    const goToLogin = () => {
-      router.push("/login");
+   const getCallbackUrl = () => {
+      return `${window.location.origin}/#/auth/callback`;
     };
+
+    const buildExternalAuthUrl = (path) => {
+      const base =
+        import.meta.env.VITE_GRUPO_REGLADO_BASE_URL || "http://localhost:5173";
+      const url = new URL(path, base);
+      url.searchParams.set("returnTo", getCallbackUrl());
+      return url.toString();
+    };
+
+const goToLogin = () => {
+  const loginPath =
+    import.meta.env.VITE_GRUPO_REGLADO_LOGIN_PATH || "/login";
+  window.location.href = buildExternalAuthUrl(loginPath);
+};
 
     const toggleProfileMenu = () => {
       if (!isProfileMenuOpen.value && window.innerWidth <= 768) {
@@ -154,27 +192,35 @@ export default {
 
     const getInitials = () => {
       if (!user.value) return "U";
-      const first = user.value.nombre_usuario?.charAt(0).toUpperCase() || "";
-      return first || "U";
+
+      const username =
+        user.value.nombre_usuario ||
+        user.value.username ||
+        user.value.nombre ||
+        user.value.name ||
+        "";
+
+      return username?.charAt(0)?.toUpperCase() || "U";
     };
 
-    const isHome = computed(() => route.path === "/");
     const scrolled = ref(false);
 
     const handleScroll = () => {
-      // Threshold: 20px for non-home pages
-      // For Home: Scroll threshold is roughly 90% of the viewport height (100vh hero)
       const threshold = isHome.value ? window.innerHeight * 0.9 : 20;
       scrolled.value = window.scrollY > threshold;
     };
 
     onMounted(() => {
       window.addEventListener("scroll", handleScroll);
-      handleScroll(); // Initial check
+      handleScroll();
+      notificationsStore.startAutoRefresh();
+      document.addEventListener("visibilitychange", handleVisibilityChange);
     });
 
     onUnmounted(() => {
       window.removeEventListener("scroll", handleScroll);
+      notificationsStore.stopAutoRefresh();
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     });
 
     return {
@@ -185,6 +231,7 @@ export default {
       isProfileMenuOpen,
       isHome,
       scrolled,
+      showLoginButton,
       toggleProfileMenu,
       goToCatalog,
       goToLogin,
@@ -442,6 +489,7 @@ header:not(.at-top-home) .user-avatar {
   justify-content: center;
   transition: all 0.3s ease;
   border: 1px solid transparent;
+  margin-right: 25px;
 }
 
 header.at-top-home .admin-badge {
@@ -598,5 +646,45 @@ header:not(.at-top-home) .profile-menu-trigger {
     height: 24px !important;
   }
 
+}
+.notification-nav-item,
+.profile-nav-item,
+.user-menu-container {
+  display: flex;
+  align-items: center;
+}
+
+.notification-nav-item {
+  margin-left: -4px;
+  margin-right: -4px;
+}
+
+header.at-top-home :deep(.notification-bell__button) {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+header:not(.at-top-home) :deep(.notification-bell__button) {
+  color: #1a2545;
+  background: rgba(26, 37, 69, 0.05);
+  border-color: rgba(26, 37, 69, 0.1);
+}
+
+header.at-top-home :deep(.notification-bell__button:hover) {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+header:not(.at-top-home) :deep(.notification-bell__button:hover) {
+  background: rgba(26, 37, 69, 0.1);
+}
+
+@media (max-width: 768px) {
+  .notification-nav-item :deep(.notification-bell__button) {
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+  }
 }
 </style>

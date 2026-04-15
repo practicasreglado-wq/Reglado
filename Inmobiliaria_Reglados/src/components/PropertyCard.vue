@@ -1,20 +1,50 @@
 <template>
   <article class="property-card">
-    <div class="property-card__media">
-      <img :src="property.imageUrl" :alt="property.titulo" />
-      <div class="property-card__overlay"></div>
+    <div class="property-card__media property-card__media--map">
+      <div v-if="hasMapCoordinates" class="property-card__map-full">
+        <div ref="mapContainer" class="property-card__leaflet-map"></div>
+
+        <div class="property-card__map-overlay"></div>
+
+        <div class="property-card__zone-radius-badge">
+          Zona aprox. · {{ areaRadiusLabel }}
+        </div>
+
+        <div class="property-card__location-badge">
+          <span class="property-card__location-icon">📍</span>
+          <span class="property-card__location-text">{{ approximateLocationLabel }}</span>
+        </div>
+      </div>
+
+      <div v-else class="property-card__map-fallback">
+        <div class="property-card__map-fallback-content">
+          <div class="property-card__map-fallback-icon">📍</div>
+          <div class="property-card__map-fallback-title">Ubicación no disponible</div>
+          <div class="property-card__map-fallback-text">
+            No hay datos suficientes para mostrar una ubicación aproximada.
+          </div>
+        </div>
+      </div>
 
       <div class="property-card__actions">
         <div class="property-card__top-badges">
-          <button
+          <div
             v-if="hasMatch"
-            class="match-badge"
-            type="button"
-            disabled
+            class="match-pill"
+            :style="{ transform: `scale(${matchScale})` }"
           >
-            <span class="match-badge__label">Match</span>
-            <strong class="match-badge__value">{{ formatMatch(matchValue) }}</strong>
-          </button>
+            <div class="match-pill__top">
+              <span class="match-pill__label">Match</span>
+              <strong class="match-pill__value">{{ formatMatch(animatedMatch) }}</strong>
+            </div>
+
+            <div class="match-pill__bar">
+              <div
+                class="match-pill__bar-fill"
+                :style="{ width: `${Math.max(0, Math.min(animatedMatch, 100))}%` }"
+              ></div>
+            </div>
+          </div>
 
           <button
             class="favorite-button"
@@ -54,7 +84,8 @@
       <h3>{{ property.titulo }}</h3>
 
       <div class="property-card__meta">
-        <span>{{ property.ciudad}}</span><span>{{ property.zona}}</span>
+        <span>{{ property.ciudad || "Sin ciudad" }}</span>
+        <span>{{ property.zona || "Sin zona" }}</span>
         <span>{{ formatSurface(property.metros_cuadrados) }}</span>
       </div>
 
@@ -66,25 +97,48 @@
         </router-link>
       </div>
     </div>
+
+    <div class="property-card__footer-actions">
+      <button
+        v-if="showDeleteButton"
+        class="property-card__delete-button"
+        type="button"
+        :disabled="deleteLoading"
+        @click.stop="$emit('delete-property', property)"
+      >
+        {{ deleteLoading ? "Eliminando..." : "Eliminar" }}
+      </button>
+    </div>
   </article>
 </template>
 
 <script>
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+
 export default {
   name: "PropertyCard",
 
-  emits: ["toggle-favorite", "remove-favorite"],
+  emits: ["toggle-favorite", "remove-favorite", "delete-property"],
 
   props: {
     property: {
       type: Object,
       required: true,
     },
-    showRemoveFavorite: {
+    favoriteLoading: {
       type: Boolean,
       default: false,
     },
-    favoriteLoading: {
+    showDeleteButton: {
+      type: Boolean,
+      default: false,
+    },
+    deleteLoading: {
+      type: Boolean,
+      default: false,
+    },
+    showRemoveFavorite: {
       type: Boolean,
       default: false,
     },
@@ -97,6 +151,10 @@ export default {
       animationFrame: null,
       animatedMatch: 0,
       matchScale: 1,
+      map: null,
+      mapCircle: null,
+      tileLayer: null,
+      mapHasBeenFitted: false,
     };
   },
 
@@ -119,41 +177,350 @@ export default {
         return null;
       }
 
-      return num;
+      return Math.max(0, Math.min(Math.round(num), 100));
     },
 
     hasMatch() {
       return this.matchValue !== null && this.matchValue > 0;
+    },
+
+    normalizedZona() {
+      return this.normalizeLocationPart(this.property.zona);
+    },
+
+    normalizedCiudad() {
+      return this.normalizeLocationPart(this.property.ciudad);
+    },
+
+    normalizedProvincia() {
+      return this.normalizeLocationPart(this.property.provincia);
+    },
+
+    normalizedPais() {
+      return this.normalizeLocationPart(this.property.pais) || "España";
+    },
+
+    lat() {
+      const raw =
+        this.property.map_latitud ??
+        this.property.latitud ??
+        this.property.latitude ??
+        this.property.geo_lat ??
+        null;
+
+      const value = Number(raw);
+
+      if (!Number.isFinite(value)) {
+        return null;
+      }
+
+      if (Math.abs(value) < 0.000001) {
+        return null;
+      }
+
+      return value;
+    },
+
+    lon() {
+      const raw =
+        this.property.map_longitud ??
+        this.property.longitud ??
+        this.property.longitude ??
+        this.property.geo_lng ??
+        this.property.lng ??
+        null;
+
+      const value = Number(raw);
+
+      if (!Number.isFinite(value)) {
+        return null;
+      }
+
+      if (Math.abs(value) < 0.000001) {
+        return null;
+      }
+
+      return value;
+    },
+
+    hasMapCoordinates() {
+      return this.lat !== null && this.lon !== null;
+    },
+
+    approximateLocationLabel() {
+      if (this.normalizedCiudad && this.normalizedZona) {
+        return `${this.normalizedCiudad}, ${this.normalizedZona}`;
+      }
+
+      if (this.normalizedCiudad) {
+        return this.normalizedCiudad;
+      }
+
+      if (this.normalizedZona) {
+        return this.normalizedZona;
+      }
+
+      return "Ubicación aproximada";
+    },
+
+    mapRadiusMeters() {
+      if (this.normalizedZona && this.normalizedCiudad) {
+        return 900;
+      }
+
+      if (this.normalizedCiudad && this.normalizedProvincia) {
+        return 2500;
+      }
+
+      if (this.normalizedCiudad) {
+        return 3000;
+      }
+
+      if (this.normalizedProvincia) {
+        return 6000;
+      }
+
+      return 2000;
+    },
+
+    areaRadiusLabel() {
+      const meters = this.mapRadiusMeters;
+
+      if (meters < 1000) {
+        return `${meters} m`;
+      }
+
+      return `${(meters / 1000).toLocaleString("es-ES", {
+        minimumFractionDigits: meters % 1000 === 0 ? 0 : 1,
+        maximumFractionDigits: 1,
+      })} km`;
+    },
+
+    displayCenter() {
+      if (!this.hasMapCoordinates) {
+        return null;
+      }
+
+      return this.getOffsetCoordinates(this.lat, this.lon);
+    },
+  },
+
+  mounted() {
+    if (this.hasMatch) {
+      this.animateMatch();
+    }
+
+    if (this.hasMapCoordinates) {
+      this.$nextTick(() => {
+        this.initMap();
+      });
+    }
+  },
+
+  watch: {
+    matchValue(newValue) {
+      if (Number.isFinite(newValue) && newValue > 0) {
+        this.animateMatch();
+      } else {
+        this.animatedMatch = 0;
+        this.matchScale = 1;
+      }
+    },
+
+    hasMapCoordinates(newValue) {
+      if (newValue) {
+        this.$nextTick(() => {
+          this.initMap();
+        });
+      } else {
+        this.destroyMap();
+      }
+    },
+
+    lat() {
+      this.refreshMapCircle(true);
+    },
+
+    lon() {
+      this.refreshMapCircle(true);
+    },
+
+    mapRadiusMeters() {
+      this.refreshMapCircle(true);
     },
   },
 
   beforeUnmount() {
     if (this.animationFrame) cancelAnimationFrame(this.animationFrame);
     if (this.favoritePopTimeout) clearTimeout(this.favoritePopTimeout);
+    this.destroyMap();
   },
 
   methods: {
+    normalizeLocationPart(value) {
+      const normalized = String(value ?? "").trim();
+
+      if (
+        !normalized ||
+        normalized.toLowerCase() === "null" ||
+        normalized.toLowerCase() === "undefined" ||
+        normalized.toLowerCase() === "n/a" ||
+        normalized.toLowerCase() === "-" ||
+        normalized.toLowerCase() === "sin definir"
+      ) {
+        return "";
+      }
+
+      return normalized;
+    },
+
+    getStableOffsetSeed() {
+      const base = String(
+        this.property?.id ??
+        `${this.lat ?? ""}-${this.lon ?? ""}`
+      );
+
+      let hash = 0;
+      for (let i = 0; i < base.length; i += 1) {
+        hash = (hash * 31 + base.charCodeAt(i)) >>> 0;
+      }
+
+      return hash;
+    },
+
+    getOffsetCoordinates(lat, lon) {
+      const seed = this.getStableOffsetSeed();
+
+      const offsetMeters = 400 + (seed % 90);
+      const angleDeg = seed % 360;
+      const angle = angleDeg * (Math.PI / 180);
+
+      const earthRadius = 6378137;
+
+      const dLat =
+        (offsetMeters * Math.cos(angle)) / earthRadius * (180 / Math.PI);
+
+      const dLon =
+        (offsetMeters * Math.sin(angle)) /
+        (earthRadius * Math.cos((lat * Math.PI) / 180)) *
+        (180 / Math.PI);
+
+      return [
+        lat + dLat,
+        lon + dLon,
+      ];
+    },
+
+    initMap() {
+      if (!this.$refs.mapContainer || !this.hasMapCoordinates || !this.displayCenter) {
+        return;
+      }
+
+      if (this.map) {
+        this.refreshMapCircle(false);
+        return;
+      }
+
+      this.map = L.map(this.$refs.mapContainer, {
+        zoomControl: true,
+        attributionControl: false,
+        dragging: true,
+        scrollWheelZoom: true,
+        doubleClickZoom: true,
+        boxZoom: false,
+        keyboard: false,
+        tap: true,
+        preferCanvas: true,
+      });
+
+      this.map.setView(this.displayCenter, 14);
+
+      this.tileLayer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+      });
+
+      this.tileLayer.addTo(this.map);
+
+      this.refreshMapCircle(false);
+
+      setTimeout(() => {
+        if (this.map) {
+          this.map.invalidateSize();
+        }
+      }, 300);
+    },
+
+    refreshMapCircle(resetView = false) {
+      if (!this.map || !this.hasMapCoordinates || !this.displayCenter) {
+        return;
+      }
+
+      const center = this.displayCenter;
+      const radius = this.mapRadiusMeters;
+
+      if (this.mapCircle) {
+        this.map.removeLayer(this.mapCircle);
+      }
+
+      this.mapCircle = L.circle(center, {
+        radius,
+        stroke: true,
+        color: "#2563eb",
+        weight: 2,
+        opacity: 0.9,
+        fill: true,
+        fillColor: "#2563eb",
+        fillOpacity: 0.18,
+      }).addTo(this.map);
+
+      if (!this.mapHasBeenFitted || resetView) {
+        this.map.setView(center, 14);
+        this.mapHasBeenFitted = true;
+      }
+
+      setTimeout(() => {
+        if (this.map) {
+          this.map.invalidateSize();
+        }
+      }, 50);
+    },
+
+    destroyMap() {
+      if (this.map) {
+        this.map.remove();
+        this.map = null;
+        this.mapCircle = null;
+        this.tileLayer = null;
+        this.mapHasBeenFitted = false;
+      }
+    },
+
     animateMatch() {
+      if (this.animationFrame) {
+        cancelAnimationFrame(this.animationFrame);
+      }
+
       const target = Number(this.matchValue || 0);
       const start = performance.now();
-      const duration = 1150;
+      const duration = 1200;
 
       const tick = (timestamp) => {
         const progress = Math.min((timestamp - start) / duration, 1);
         const eased = 1 - Math.pow(1 - progress, 3);
 
         this.animatedMatch = Math.round(target * eased);
-        this.matchScale = 1 + (1 - eased) * 0.18;
+        this.matchScale = 1 + (1 - eased) * 0.08;
 
         if (progress < 1) {
           this.animationFrame = requestAnimationFrame(tick);
         } else {
+          this.animatedMatch = target;
           this.matchScale = 1;
         }
       };
 
       this.animatedMatch = 0;
-      this.matchScale = 1.18;
+      this.matchScale = 1.05;
       this.animationFrame = requestAnimationFrame(tick);
     },
 
@@ -226,91 +593,214 @@ export default {
 
 .property-card__media {
   position: relative;
-  height: clamp(160px, 20vw, 240px);
+  height: clamp(190px, 22vw, 260px);
   overflow: hidden;
+  background: #dfe8f5;
 }
 
-.property-card__media img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.5s ease;
+.property-card__media--map {
+  padding: 0;
 }
 
-.property-card:hover .property-card__media img {
-  transform: scale(1.05);
-}
-
-.property-card__overlay {
+.property-card__map-full,
+.property-card__map-fallback {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, transparent, rgba(10,21,46,0.4));
+  width: 100%;
+  height: 100%;
+}
+
+.property-card__leaflet-map {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.property-card__map-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(8, 15, 35, 0.08) 0%, rgba(8, 15, 35, 0.02) 35%, rgba(8, 15, 35, 0.28) 100%);
+  pointer-events: none;
+  z-index: 401;
+}
+
+.property-card__zone-radius-badge {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  z-index: 402;
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.94);
+  color: var(--azul-principal);
+  font-size: 0.76rem;
+  font-weight: 800;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.14);
+}
+
+.property-card__location-badge {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  z-index: 402;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: calc(100% - 28px);
+  min-height: 40px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.82);
+  color: #fff;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.18);
+}
+
+.property-card__location-icon {
+  flex: 0 0 auto;
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+.property-card__location-text {
+  display: block;
+  min-width: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.property-card__map-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at top left, rgba(37, 99, 235, 0.22), transparent 35%),
+    radial-gradient(circle at bottom right, rgba(15, 23, 42, 0.18), transparent 30%),
+    linear-gradient(135deg, #eef4ff 0%, #dbeafe 100%);
+}
+
+.property-card__map-fallback-content {
+  text-align: center;
+  padding: 24px;
+  color: var(--azul-principal);
+}
+
+.property-card__map-fallback-icon {
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+
+.property-card__map-fallback-title {
+  font-size: 1rem;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+
+.property-card__map-fallback-text {
+  font-size: 0.86rem;
+  color: #4b5b77;
+  line-height: 1.4;
 }
 
 .property-card__actions {
   position: absolute;
-  top: var(--spacing-sm);
-  right: var(--spacing-sm);
-  z-index: 2;
+  top: 12px;
+  right: 12px;
+  z-index: 403;
   max-width: calc(100% - 24px);
 }
 
 .property-card__top-badges {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
   flex-wrap: wrap;
   justify-content: flex-end;
 }
 
-.match-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border-radius: 20px;
-  border: none;
-  background: rgba(31, 74, 168, 0.88);
-  backdrop-filter: blur(8px);
+.match-pill {
+  min-width: 132px;
+  padding: 8px 10px;
+  border-radius: 14px;
+  background: rgba(16, 55, 130, 0.92);
   color: #fff;
-  font-size: 0.8rem;
+  box-shadow: 0 10px 18px rgba(16, 55, 130, 0.28);
+  backdrop-filter: blur(8px);
+  transition: transform 0.2s ease;
+}
+
+.match-pill__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.match-pill__label {
+  font-size: 0.72rem;
   font-weight: 700;
-  cursor: default;
-  opacity: 1;
-}
-
-.match-badge:disabled {
-  opacity: 1;
-}
-
-.match-badge__label {
-  line-height: 1;
   opacity: 0.92;
 }
 
-.match-badge__value {
-  line-height: 1;
+.match-pill__value {
   font-size: 0.82rem;
+  line-height: 1;
+}
+
+.match-pill__bar {
+  width: 100%;
+  height: 7px;
+  margin-top: 7px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+}
+
+.match-pill__bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #8fd3ff 0%, #ffffff 100%);
+  transition: width 0.18s linear;
 }
 
 .favorite-button {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 6px 12px;
-  border-radius: 20px;
-  border: none;
-  background: rgba(255,255,255,0.2);
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: linear-gradient(180deg, rgba(255, 94, 125, 0.96), rgba(226, 35, 95, 0.96));
   backdrop-filter: blur(8px);
-  color: #fff;
-  font-size: 0.8rem;
-  font-weight: 700;
+  color: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 800;
   cursor: pointer;
-  transition: transform 0.2s ease, background 0.2s ease, opacity 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, filter 0.2s ease;
+  box-shadow: 0 10px 22px rgba(226, 35, 95, 0.32);
+}
+
+.favorite-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.03);
+  box-shadow: 0 12px 26px rgba(226, 35, 95, 0.4);
 }
 
 .favorite-button.active {
-  background: rgba(22, 101, 52, 0.85);
+  background: linear-gradient(180deg, rgba(255, 186, 73, 0.98), rgba(245, 158, 11, 0.98));
+  color: #1f2937;
+  border-color: rgba(255, 238, 186, 0.85);
+  box-shadow: 0 10px 24px rgba(245, 158, 11, 0.34);
 }
 
 .favorite-button.popping {
@@ -318,12 +808,12 @@ export default {
 }
 
 .favorite-button:disabled {
-  opacity: 0.7;
+  opacity: 0.75;
   cursor: not-allowed;
 }
 
 .favorite-icon {
-  font-size: 0.95rem;
+  font-size: 1rem;
   line-height: 1;
 }
 
@@ -335,10 +825,10 @@ export default {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 6px 12px;
-  border-radius: 20px;
+  padding: 7px 12px;
+  border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.34);
-  background: rgba(180, 35, 24, 0.78);
+  background: rgba(180, 35, 24, 0.84);
   backdrop-filter: blur(8px);
   color: #fff;
   font-size: 0.8rem;
@@ -349,7 +839,7 @@ export default {
 
 .remove-favorite-button:hover:not(:disabled) {
   transform: translateY(-1px);
-  background: rgba(180, 35, 24, 0.92);
+  background: rgba(180, 35, 24, 0.94);
 }
 
 .remove-favorite-button:disabled {
@@ -418,9 +908,37 @@ export default {
   color: #fff;
 }
 
+.property-card__footer-actions {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.property-card__delete-button {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 3px solid rgba(220, 38, 38, 0.18);
+  border-radius: 12px;
+  background: linear-gradient(180deg, #fff5f5, #fee2e2);
+  color: #b91c1c;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.property-card__delete-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 18px rgba(185, 28, 28, 0.12);
+}
+
+.property-card__delete-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
 @media (max-width: 768px) {
   .property-card__media {
-    height: 180px;
+    height: 270px;
   }
 
   .property-card__body {
@@ -444,16 +962,81 @@ export default {
 
   .favorite-button,
   .remove-favorite-button,
-  .match-badge {
-    padding: 6px 10px;
+  .match-pill {
     font-size: 0.76rem;
   }
+
+  .favorite-button {
+    padding: 7px 11px;
+  }
+
+  .remove-favorite-button {
+    padding: 6px 10px;
+  }
+
+  .match-pill {
+    min-width: 118px;
+    padding: 7px 9px;
+  }
+
+  .property-card__location-badge {
+    left: 10px;
+    bottom: 10px;
+    max-width: calc(100% - 140px);
+  }
+
+  .property-card__zone-radius-badge {
+    right: 10px;
+    bottom: 10px;
+    min-height: 34px;
+    padding: 0 11px;
+    font-size: 0.72rem;
+  }
+}
+
+:deep(.leaflet-container) {
+  width: 100%;
+  height: 100%;
+  background: #dfe8f5;
+  font-family: inherit;
+}
+
+:deep(.leaflet-pane),
+:deep(.leaflet-tile),
+:deep(.leaflet-marker-icon),
+:deep(.leaflet-marker-shadow),
+:deep(.leaflet-pane img),
+:deep(.leaflet-container img) {
+  max-width: none !important;
+  max-height: none !important;
+}
+
+:deep(.leaflet-top),
+:deep(.leaflet-bottom) {
+  z-index: 400;
+}
+
+:deep(.leaflet-pane) {
+  z-index: 200;
+}
+
+:deep(.leaflet-tile-pane) {
+  z-index: 200;
+}
+
+:deep(.leaflet-overlay-pane) {
+  z-index: 250;
 }
 
 @media (max-width: 480px) {
   .property-card__media {
-    height: 160px;
+    height: 400px;
   }
+
+  .property-card__body {
+  padding: 14px;
+  gap: 10px;
+}
 
   .property-card__body h3 {
     font-size: 1rem;
@@ -461,8 +1044,14 @@ export default {
 
   .property-card__footer {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
+    gap: 8px;
   }
+
+  .detail-link {
+  width: 100%;
+  text-align: center;
+}
 
   .property-card__footer strong {
     font-size: 1rem;
@@ -470,6 +1059,22 @@ export default {
 
   .property-card__actions {
     max-width: calc(100% - 16px);
+  }
+
+  .property-card__location-badge {
+    left: 10px;
+    bottom: 10px;
+    max-width: calc(100% - 132px);
+    min-height: 36px;
+    padding: 7px 10px;
+  }
+
+  .property-card__zone-radius-badge {
+    right: 10px;
+    bottom: 10px;
+    font-size: 0.68rem;
+    min-height: 30px;
+    padding: 0 9px;
   }
 }
 </style>

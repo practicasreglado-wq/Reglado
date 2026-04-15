@@ -90,7 +90,7 @@ export default {
 
       return [...list]
       /*50 AQUI ESTA EL PORCENTAJE DEL MATCH*/
-        .filter((property) => (property.match_percentage ?? 0) >= 50)
+        .filter((property) => (property.match_percentage ?? 0) >=50)
         .sort((a, b) => (b.match_percentage || 0) - (a.match_percentage || 0));
     },
   },

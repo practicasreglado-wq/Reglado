@@ -5,6 +5,28 @@ import edificiosImage from "../assets/edificios.png";
 import activosImage from "../assets/activos.png";
 import { backendJson } from "./backend";
 
+export async function deleteUserProperty(propertyId) {
+  if (!propertyId) {
+    throw new Error("ID de propiedad no válido.");
+  }
+
+  const response = await backendJson("api/delete_property.php", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      property_id: propertyId,
+    }),
+  });
+
+  if (!response?.success) {
+    throw new Error(response?.message || "No se pudo eliminar la propiedad.");
+  }
+
+  return response;
+}
+
 const categoryImageMap = {
   hoteles: hotelImage,
   fincas: fincaImage,

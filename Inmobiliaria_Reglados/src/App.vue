@@ -1,7 +1,6 @@
 <template>
   <div id="app">
     <Header />
-    <NotificationBell />
     <main class="main-content">
       <router-view v-slot="{ Component, route }">
         <transition
@@ -21,12 +20,11 @@
 </template>
 
 <script>
-import { computed, nextTick, onBeforeUnmount, onMounted, ref } from "vue";
+import { nextTick, onBeforeUnmount, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import Header from "./components/Header.vue";
 import Footer from "./components/Footer.vue";
 import ScrollToTop from "./components/ScrollToTop.vue";
-import NotificationBell from "./components/NotificationBell.vue";
 import { useUserStore } from "./stores/user";
 import {
   initRevealSystem,
@@ -39,7 +37,6 @@ export default {
     Header,
     Footer,
     ScrollToTop,
-    NotificationBell,
   },
 
   setup() {
@@ -59,9 +56,6 @@ export default {
     const handleRouteEntered = () => {
       refreshAnimations();
     };
-
-    const isProfileNavigation = (to, from) =>
-      to.path.startsWith("/profile") && from.path.startsWith("/profile");
 
     const consumeSkipNextTransition = () => {
       if (typeof window === "undefined") {
@@ -92,9 +86,11 @@ export default {
         next();
       });
 
-      removeAfterHook = router.afterEach((to, from) => {
+      removeAfterHook = router.afterEach(() => {
         if (userStore.isLoggedIn) {
-          userStore.initializeSession().catch(err => console.error("Error refreshing session:", err));
+          userStore.initializeSession().catch((err) =>
+            console.error("Error refreshing session:", err)
+          );
         }
 
         nextTick(() => {

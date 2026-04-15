@@ -116,3 +116,14 @@ function markUserNotificationAsRead(PDO $pdo, int $userId, int $notificationId):
     return $stmt->rowCount() > 0;
 }
 
+function createNotification(PDO $pdo, int $userId, array $data): int
+{
+    return createUserNotificationRecord($pdo, [
+        'user_id' => $userId,
+        'title' => (string) ($data['title'] ?? 'Notificación'),
+        'message' => (string) ($data['message'] ?? ''),
+        'type' => (string) ($data['type'] ?? 'info'),
+        'related_request_id' => $data['related_request_id'] ?? null,
+    ]);
+}
+

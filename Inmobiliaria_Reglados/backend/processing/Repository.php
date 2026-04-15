@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+require_once dirname(__DIR__) . '/lib/geocoding.php';
+
 class Repository
 {
     private PDO $pdo;
@@ -17,8 +19,7 @@ class Repository
         string $contentHash,
         ?string $messageId = null,
         ?array $metadata = null
-    ): array
-    {
+    ): array {
         $stmt = $this->pdo->prepare(
             "INSERT INTO activos_recibidos (
                 origen,
@@ -109,39 +110,39 @@ class Repository
     }
 
     public function getReceivedAssetStatus(int $assetId): ?string
-    {
-        $stmt = $this->pdo->prepare('SELECT procesado FROM activos_recibidos WHERE id = ? LIMIT 1');
-        $stmt->execute([$assetId]);
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        {
+            $stmt = $this->pdo->prepare('SELECT procesado FROM activos_recibidos WHERE id = ? LIMIT 1');
+            $stmt->execute([$assetId]);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        return $row['procesado'] ?? null;
-    }
-
-    public function isAssetAlreadyProcessed(int $assetId): bool
-    {
-        return $this->getReceivedAssetStatus($assetId) === 'procesado';
-    }
-
-    public function updateReceivedAssetStatus(int $assetId, string $status, ?int $captadorId = null): void
-    {
-        $stmt = $this->pdo->prepare(
-            'UPDATE activos_recibidos
-             SET procesado = ?, processed_at = CURRENT_TIMESTAMP, captador_id = ?
-             WHERE id = ?'
-        );
-
-        $result = $stmt->execute([
-            $status,
-            $captadorId,
-            $assetId
-        ]);
-
-        error_log('[UPDATE ACTIVOS FIX] captador_id=' . json_encode($captadorId) . ' assetId=' . $assetId);
-
-        if (!$result) {
-            error_log('[UPDATE ERROR] ' . json_encode($stmt->errorInfo()));
+            return $row['procesado'] ?? null;
         }
-    }
+
+        public function isAssetAlreadyProcessed(int $assetId): bool
+        {
+            return $this->getReceivedAssetStatus($assetId) === 'procesado';
+        }
+
+        public function updateReceivedAssetStatus(int $assetId, string $status, ?int $captadorId = null): void
+        {
+            $stmt = $this->pdo->prepare(
+                'UPDATE activos_recibidos
+                SET procesado = ?, processed_at = CURRENT_TIMESTAMP, captador_id = ?
+                WHERE id = ?'
+            );
+
+            $result = $stmt->execute([
+                $status,
+                $captadorId,
+                $assetId
+            ]);
+
+            error_log('[UPDATE ACTIVOS FIX] captador_id=' . json_encode($captadorId) . ' assetId=' . $assetId);
+
+            if (!$result) {
+                error_log('[UPDATE ERROR] ' . json_encode($stmt->errorInfo()));
+            }
+        }
 
     public function insertPropertyRecord(
         array $claudeData,
@@ -159,18 +160,58 @@ class Repository
         $zona = $this->trimValue($ficha['zona'] ?? '');
         $direccion = $this->trimValue($ficha['direccion'] ?? '');
         $categoria = $this->trimValue($ficha['categoria'] ?? '');
+        $provincia = $this->trimValue($ficha['provincia'] ?? '');
+        $pais = $this->trimValue($ficha['pais'] ?? 'España');
         $metros = $this->intValue($ficha['metros_cuadrados'] ?? null);
         $precio = $this->floatValue($ficha['precio'] ?? null);
 
-        if ($tipo === '') $tipo = 'propiedad';
-        if ($ciudad === '') $ciudad = 'Madrid';
-        if ($zona === '') $zona = 'Centro';
-        if ($metros === 0) $metros = 1;
-        if ($precio === null) $precio = 0;
+        if ($tipo === '') {
+            $tipo = 'propiedad';
+        }
+
+        if ($ciudad === '') {
+            $ciudad = 'Madrid';
+        }
+
+        if ($zona === '') {
+            $zona = 'Centro';
+        }
+
+        if ($pais === '') {
+            $pais = 'España';
+        }
+
+        if ($metros === 0) {
+            $metros = 1;
+        }
+
+        if ($precio === null) {
+            $precio = 0;
+        }
 
         if ($ownerUserId === null) {
             throw new RuntimeException('owner_user_id es obligatorio');
         }
+
+        $geo = geocodeApproximateLocation([
+            'zona' => $zona,
+            'ciudad' => $ciudad,
+            'provincia' => $provincia,
+            'pais' => $pais,
+        ]);
+
+        $latitud = $geo['latitud'] ?? null;
+        $longitud = $geo['longitud'] ?? null;
+
+        error_log('[GEOCODING QUERY] ' . json_encode([
+            'zona' => $zona,
+            'ciudad' => $ciudad,
+            'provincia' => $provincia,
+            'pais' => $pais,
+            'latitud' => $latitud,
+            'longitud' => $longitud,
+            'query' => $geo['query'] ?? null,
+        ], JSON_UNESCAPED_UNICODE));
 
         $stmt = $this->pdo->prepare(
             'INSERT INTO propiedades (
@@ -181,6 +222,8 @@ class Repository
                 precio,
                 direccion,
                 categoria,
+                latitud,
+                longitud,
                 captador_id,
                 caracteristicas_json,
                 owner_user_id
@@ -192,6 +235,8 @@ class Repository
                 :precio,
                 :direccion,
                 :categoria,
+                :latitud,
+                :longitud,
                 :captador_id,
                 :caracteristicas_json,
                 :owner_user_id
@@ -204,8 +249,10 @@ class Repository
             'zona' => $zona,
             'metros_cuadrados' => $metros,
             'precio' => $precio,
-            'direccion' => $direccion ?: null,
+            'direccion' => $direccion !== '' ? $direccion : null,
             'categoria' => $categoria !== '' ? $categoria : 'Captada',
+            'latitud' => $latitud,
+            'longitud' => $longitud,
             'captador_id' => $captadorId,
             'caracteristicas_json' => json_encode($dossier, JSON_UNESCAPED_UNICODE),
             'owner_user_id' => $ownerUserId,

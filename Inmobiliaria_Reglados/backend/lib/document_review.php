@@ -8,8 +8,17 @@ function createDocumentReviewToken(PDO $pdo, int $propertyId, int $buyerUserId, 
     $expires = $expiresAt ?? (new DateTimeImmutable('+7 days'));
 
     $stmt = $pdo->prepare('
-        INSERT INTO signed_document_review_tokens (property_id, buyer_user_id, token_hash, expires_at)
-        VALUES (:property_id, :buyer_user_id, :token_hash, :expires_at)
+        INSERT INTO signed_document_review_tokens (
+            property_id,
+            buyer_user_id,
+            token_hash,
+            expires_at
+        ) VALUES (
+            :property_id,
+            :buyer_user_id,
+            :token_hash,
+            :expires_at
+        )
     ');
     $stmt->execute([
         'property_id' => $propertyId,
@@ -24,6 +33,7 @@ function createDocumentReviewToken(PDO $pdo, int $propertyId, int $buyerUserId, 
 function fetchDocumentReviewByToken(PDO $pdo, string $token): ?array
 {
     $hash = hash('sha256', $token);
+
     $stmt = $pdo->prepare('
         SELECT *
         FROM signed_document_review_tokens
@@ -31,19 +41,19 @@ function fetchDocumentReviewByToken(PDO $pdo, string $token): ?array
         LIMIT 1
     ');
     $stmt->execute(['hash' => $hash]);
+
     $record = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$record) {
         return null;
     }
 
-    if (!empty($record['approved_at'])) {
-        return null;
-    }
+    $record['is_expired'] = false;
+    $record['is_already_approved'] = !empty($record['approved_at']);
 
-    $expiresAt = isset($record['expires_at']) ? strtotime($record['expires_at']) : null;
+    $expiresAt = isset($record['expires_at']) ? strtotime((string) $record['expires_at']) : null;
     if ($expiresAt !== null && $expiresAt < time()) {
-        return null;
+        $record['is_expired'] = true;
     }
 
     return $record;
@@ -63,6 +73,20 @@ function markDocumentReviewApproved(PDO $pdo, int $tokenId, ?int $approverId = n
     ]);
 }
 
+function markDocumentReviewRejected(PDO $pdo, int $tokenId, ?int $reviewerId = null): void
+{
+    $stmt = $pdo->prepare('
+        UPDATE signed_document_review_tokens
+        SET approved_at = CURRENT_TIMESTAMP,
+            approved_by = :reviewer
+        WHERE id = :id
+    ');
+    $stmt->execute([
+        'reviewer' => $reviewerId,
+        'id' => $tokenId,
+    ]);
+}
+
 function buildReviewApprovalLink(string $token): string
 {
     $base = getenv('BACKEND_APPROVAL_URL');
@@ -73,4 +97,16 @@ function buildReviewApprovalLink(string $token): string
     }
 
     return rtrim($base, '/') . '/api/approve_signed_documents.php?token=' . rawurlencode($token);
+}
+
+function buildReviewRejectLink(string $token): string
+{
+    $base = getenv('BACKEND_APPROVAL_URL');
+    if (!is_string($base) || trim($base) === '') {
+        $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+        $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+        $base = "{$scheme}://{$host}/Reglado/Inmobiliaria_Reglados/backend";
+    }
+
+    return rtrim($base, '/') . '/api/reject_signed_documents.php?token=' . rawurlencode($token);
 }

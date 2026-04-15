@@ -271,15 +271,26 @@ const documentsAccess = ref({
   nda_approved: false,
   loi_approved: false,
   dossier_unlocked: false,
+  validado_admin: 0,
+  status: "",
 });
 
 const signatureStatus = computed(() => {
+  if (
+    documentsAccess.value.validado_admin === -1 ||
+    documentsAccess.value.status === "rejected"
+  ) {
+    return "rechazado";
+  }
+
   if (documentsAccess.value.dossier_unlocked) {
     return "validado";
   }
+
   if (documentsAccess.value.nda_uploaded || documentsAccess.value.loi_uploaded) {
     return "firmado";
   }
+
   return "pendiente";
 });
 
@@ -289,6 +300,8 @@ const signatureStatusLabel = computed(() => {
       return "Firmado";
     case "validado":
       return "Validado";
+    case "rechazado":
+      return "Rechazado";
     default:
       return "Pendiente";
   }
@@ -298,9 +311,20 @@ const statusChipClass = computed(() => `signature-status signature-status--${sig
 const accessGranted = computed(() => Boolean(documentsAccess.value.dossier_unlocked));
 
 const documentSteps = computed(() => {
-  const access = documentsAccess.value;
+    const access = documentsAccess.value;
 
-  const makeState = (uploaded, approved) => {
+    const makeState = (uploaded, approved) => {
+    if (
+      documentsAccess.value.validado_admin === -1 ||
+      documentsAccess.value.status === "rejected"
+    ) {
+      return {
+        state: "rejected",
+        badge: "Rechazado",
+        detail: "Documento rechazado. Debes volver a subirlo.",
+      };
+    }
+
     if (approved) {
       return {
         state: "approved",
@@ -339,7 +363,7 @@ const documentSteps = computed(() => {
 });
 
 const canUpload = computed(() => {
-  return !uploadingDocuments.value && (!!ndaFile.value || !!loiFile.value);
+  return !uploadingDocuments.value && !!ndaFile.value && !!loiFile.value;
 });
 
 function buildDownloadUrl(fileName) {
@@ -431,10 +455,14 @@ function openSignatureModal() {
   showSignatureModal.value = true;
   modalMessage.value = "";
   downloadError.value = "";
+  ndaFile.value = null;
+  loiFile.value = null;
 }
 
 function closeSignatureModal() {
   showSignatureModal.value = false;
+  ndaFile.value = null;
+  loiFile.value = null;
 }
 
 async function triggerDownload(url, fileName) {
@@ -517,9 +545,18 @@ async function refreshAccessState() {
       nda_approved: Boolean(response.access?.nda_approved),
       loi_approved: Boolean(response.access?.loi_approved),
       dossier_unlocked: Boolean(response.access?.dossier_unlocked),
+      validado_admin: Number(response.access?.validado_admin ?? 0),
+      status: String(response.access?.status ?? ""),
     };
 
-    accessMessage.value = response.message || defaultStatusDetail;
+    if (
+      documentsAccess.value.validado_admin === -1 ||
+      documentsAccess.value.status === "rejected"
+    ) {
+      accessMessage.value = "La documentación ha sido rechazada. Debes volver a subirla.";
+    } else {
+      accessMessage.value = response.message || defaultStatusDetail;
+    }
 
     if (documentsAccess.value.dossier_unlocked && property.value?.dossier_file) {
       dossierLink.value = buildDownloadUrl(property.value.dossier_file);
@@ -533,6 +570,8 @@ async function refreshAccessState() {
       nda_approved: false,
       loi_approved: false,
       dossier_unlocked: false,
+      validado_admin: 0,
+      status: "",
     };
     accessMessage.value = err?.message || "No se pudo comprobar el acceso firmado.";
   } finally {
@@ -563,6 +602,8 @@ async function submitDocuments() {
       nda_approved: Boolean(response.access?.nda_approved),
       loi_approved: Boolean(response.access?.loi_approved),
       dossier_unlocked: Boolean(response.access?.dossier_unlocked),
+      validado_admin: Number(response.access?.validado_admin ?? 0),
+      status: String(response.access?.status ?? ""),
     };
 
     accessMessage.value =
@@ -1049,6 +1090,12 @@ watch(
   border: 1px solid #bfe8cf;
 }
 
+.signature-status--rechazado {
+  background: #fff1f2;
+  color: #b42318;
+  border: 1px solid #fecdd3;
+}
+
 .signature-status__label {
   font-size: 0.82rem;
   letter-spacing: 0.1em;
@@ -1165,6 +1212,12 @@ watch(
   background: #eceff5;
   color: #24303f;
   border-color: #d8e0ea;
+}
+
+.status-chip.status-rejected {
+  background: #ffe4e6;
+  color: #be123c;
+  border-color: #fecdd3;
 }
 
 .dossier-download-btn {

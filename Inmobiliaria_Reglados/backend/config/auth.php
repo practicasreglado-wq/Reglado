@@ -28,6 +28,7 @@ function requireAuthenticatedUser(PDO $pdo): array
     }
 
     $payload = verifyJwt($token);
+    file_put_contents(__DIR__ . '/auth_debug.txt', print_r($payload, true));
 
     return [
         'auth' => $payload,
