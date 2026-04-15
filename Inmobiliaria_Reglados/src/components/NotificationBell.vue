@@ -39,7 +39,7 @@
     </button>
 
     <Teleport to="body">
-      <div v-if="panelVisible" class="notification-bell__portal">
+      <div v-show="panelVisible" class="notification-bell__portal">
         <div
           ref="panelRef"
           class="notification-panel"
@@ -60,7 +60,7 @@
           </header>
 
           <div class="notification-panel__body">
-            <p v-if="loading" class="notification-panel__state">
+            <p v-if="loading && !notifications.length" class="notification-panel__state">
               Cargando notificaciones...
             </p>
 
@@ -123,9 +123,11 @@ import {
   ref,
   watch,
 } from "vue";
+import { storeToRefs } from "pinia";
 import { useNotificationsStore } from "../stores/notifications";
 
 const store = useNotificationsStore();
+const { notifications, unreadCount, loading, error } = storeToRefs(store);
 
 const bellRef = ref(null);
 const panelRef = ref(null);
@@ -136,11 +138,6 @@ const dateFormatter = new Intl.DateTimeFormat("es-ES", {
   dateStyle: "medium",
   timeStyle: "short",
 });
-
-const notifications = computed(() => store.orderedNotifications);
-const unreadCount = computed(() => store.unreadCount);
-const loading = computed(() => store.loading);
-const error = computed(() => store.error);
 
 const formatDate = (value) => {
   if (!value) return "";
@@ -192,7 +189,7 @@ const closePanel = () => {
 
 const openPanel = async () => {
   panelVisible.value = true;
-  await store.loadNotifications();
+  await store.loadNotifications(40, true);
   await nextTick();
   positionPanel();
 };
@@ -207,11 +204,6 @@ const togglePanel = () => {
 
 const markNotification = async (notificationId) => {
   await store.markAsRead(notificationId);
-
-  if (panelVisible.value) {
-    await nextTick();
-    positionPanel();
-  }
 };
 
 const handleDocumentClick = (event) => {
@@ -248,20 +240,9 @@ watch(panelVisible, async (value) => {
   }
 });
 
-watch(
-  () => store.notifications.length,
-  async () => {
-    if (panelVisible.value) {
-      await nextTick();
-      positionPanel();
-    }
-  }
-);
-
 onMounted(() => {
   window.addEventListener("resize", handleViewportChange);
   window.addEventListener("scroll", handleViewportChange, true);
-  store.loadNotifications();
 });
 
 onBeforeUnmount(() => {

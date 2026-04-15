@@ -117,6 +117,7 @@ import { useRouter, useRoute } from "vue-router";
 import { useUserStore } from "../stores/user";
 import { useProfileMenuStore } from "../stores/profileMenu";
 import NotificationBell from "./NotificationBell.vue";
+import { useNotificationsStore } from "../stores/notifications";
 
 export default {
   name: "Header",
@@ -129,7 +130,7 @@ export default {
     const profileMenuStore = useProfileMenuStore();
     const router = useRouter();
     const route = useRoute();
-
+    const notificationsStore = useNotificationsStore();
     const { user, isAdmin, isReal } = storeToRefs(userStore);
     const { isOpen: isProfileMenuOpen } = storeToRefs(profileMenuStore);
 
@@ -140,6 +141,12 @@ export default {
     const isAuthRoute = computed(() =>
       authRoutes.some((authPath) => route.path.startsWith(authPath))
     );
+
+    const handleVisibilityChange = () => {
+  if (document.visibilityState === "visible") {
+    notificationsStore.loadNotifications();
+  }
+};
 
     const showLoginButton = computed(() => !user.value && !isAuthRoute.value);
 
@@ -206,10 +213,14 @@ const goToLogin = () => {
     onMounted(() => {
       window.addEventListener("scroll", handleScroll);
       handleScroll();
+      notificationsStore.startAutoRefresh();
+      document.addEventListener("visibilitychange", handleVisibilityChange);
     });
 
     onUnmounted(() => {
       window.removeEventListener("scroll", handleScroll);
+      notificationsStore.stopAutoRefresh();
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     });
 
     return {

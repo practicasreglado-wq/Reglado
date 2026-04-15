@@ -85,4 +85,3 @@ switch ($method) {
             'message' => 'Método no permitido.'
         ]);
 }
-

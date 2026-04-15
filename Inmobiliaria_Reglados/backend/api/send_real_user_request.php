@@ -5,11 +5,14 @@ declare(strict_types=1);
 require_once dirname(__DIR__) . '/config/db.php';
 require_once dirname(__DIR__) . '/config/auth.php';
 require_once __DIR__ . '/../config/cors.php';
+
 applyCors();
 handlePreflight();
 
 $context = requireAuthenticatedUser($pdo);
-$auth = $context['auth'];
+$auth = $context['auth'] ?? [];
+
+$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 $input = json_decode(file_get_contents('php://input') ?: '[]', true);
 if (!is_array($input)) {
@@ -17,10 +20,42 @@ if (!is_array($input)) {
 }
 
 $message = trim((string) ($input['message'] ?? ''));
-$firstName = trim((string) (($input['name'] ?? '') ?: ($auth['first_name'] ?? '') ?: ($auth['name'] ?? '')));
-$lastName = trim((string) (($input['lastName'] ?? '') ?: ($auth['last_name'] ?? '')));
-$username = trim((string) (($input['username'] ?? '') ?: ($auth['username'] ?? '')));
-$userEmail = trim((string) (($auth['email'] ?? '') ?: ($input['email'] ?? '')));
+
+$userId = (int) (
+    $context['local']['iduser']
+    ?? $context['local']['id']
+    ?? $context['auth']['id']
+    ?? 0
+);
+
+if ($userId <= 0) {
+    respondJson(401, ['success' => false, 'message' => 'Debes iniciar sesion para enviar la solicitud.']);
+}
+
+$userStmt = $pdo->prepare("
+    SELECT
+        id,
+        email,
+        first_name,
+        last_name,
+        username
+    FROM regladousers.users
+    WHERE id = :id
+    LIMIT 1
+");
+$userStmt->execute([
+    ':id' => $userId
+]);
+$user = $userStmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$user) {
+    respondJson(404, ['success' => false, 'message' => 'No se encontro el usuario autenticado.']);
+}
+
+$firstName = trim((string) ($user['first_name'] ?? ''));
+$lastName = trim((string) ($user['last_name'] ?? ''));
+$username = trim((string) ($user['username'] ?? ''));
+$userEmail = trim((string) ($user['email'] ?? ''));
 
 if ($userEmail === '' || !filter_var($userEmail, FILTER_VALIDATE_EMAIL)) {
     respondJson(422, ['success' => false, 'message' => 'El usuario no tiene un email valido.']);
@@ -54,6 +89,7 @@ use PHPMailer\PHPMailer\PHPMailer;
 
 $subject = 'Solicitud de Usuario promocionar a Real';
 $recipient = 'practicasreglado@gmail.com';
+
 $safeFirstName = htmlspecialchars($firstName, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 $safeLastName = htmlspecialchars($lastName, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 $safeUsername = htmlspecialchars($username, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
@@ -63,8 +99,39 @@ $safeMessage = nl2br(htmlspecialchars($message, ENT_QUOTES | ENT_SUBSTITUTE, 'UT
 $token = bin2hex(random_bytes(32));
 
 try {
-    $stmt = $pdo->prepare("INSERT INTO role_promotion_requests (user_email, token, status) VALUES (?, ?, 'pending')");
-    $stmt->execute([$userEmail, $token]);
+    $stmt = $pdo->prepare("
+        INSERT INTO role_promotion_requests (
+            user_id,
+            user_email,
+            first_name,
+            last_name,
+            username,
+            message,
+            token,
+            status,
+            created_at
+        ) VALUES (
+            :user_id,
+            :user_email,
+            :first_name,
+            :last_name,
+            :username,
+            :message,
+            :token,
+            'pending',
+            NOW()
+        )
+    ");
+
+    $stmt->execute([
+        ':user_id' => $userId,
+        ':user_email' => $userEmail,
+        ':first_name' => $firstName !== '' ? $firstName : null,
+        ':last_name' => $lastName !== '' ? $lastName : null,
+        ':username' => $username !== '' ? $username : null,
+        ':message' => $message,
+        ':token' => $token,
+    ]);
 } catch (PDOException $e) {
     respondJson(500, ['success' => false, 'message' => 'No se pudo registrar la solicitud: ' . $e->getMessage()]);
 }
@@ -230,6 +297,7 @@ try {
 
     $mail->setFrom('info@regladoconsultores.com', 'Reglado Real Estate');
     $mail->addAddress($recipient);
+
     $replyToName = trim("{$firstName} {$lastName}");
     $mail->addReplyTo($userEmail, $replyToName !== '' ? $replyToName : $userEmail);
 

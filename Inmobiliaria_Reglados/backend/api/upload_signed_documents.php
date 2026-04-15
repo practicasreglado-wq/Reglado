@@ -264,17 +264,68 @@ try {
     }
 
     $checkStmt = $pdo->prepare('
-        SELECT id
-        FROM documentos_firmados
-        WHERE user_id = :user_id
-          AND propiedad_id = :propiedad_id
-        LIMIT 1
+    SELECT id
+    FROM documentos_firmados
+    WHERE user_id = :user_id
+      AND propiedad_id = :propiedad_id
+    LIMIT 1
+');
+$checkStmt->execute([
+    'user_id' => $buyerUserId,
+    'propiedad_id' => $propertyId,
+]);
+$existingRow = $checkStmt->fetch(PDO::FETCH_ASSOC);
+
+if ($existingRow) {
+    $updateStmt = $pdo->prepare('
+        UPDATE documentos_firmados
+        SET
+            nda_file_path = :nda_file_path,
+            loi_file_path = :loi_file_path,
+            nda_subido_at = NOW(),
+            loi_subido_at = NOW(),
+            nda_valido = :nda_valido,
+            loi_valido = :loi_valido,
+            validado_admin = 0,
+            updated_at = NOW()
+        WHERE id = :id
     ');
-    $checkStmt->execute([
-        'user_id' => $buyerUserId,
-        'propiedad_id' => $propertyId,
-    ]);
-    $existingRow = $checkStmt->fetch(PDO::FETCH_ASSOC);
+
+    $updateParams = [
+        'nda_file_path' => $ndaDetails['relative'] ?? null,
+        'loi_file_path' => $loiDetails['relative'] ?? null,
+        'nda_valido' => 1,
+        'loi_valido' => 1,
+        'id' => $existingRow['id'],
+    ];
+
+    $updateStmt->execute($updateParams);
+
+    uploadLog('documentos_firmados actualizado', $updateParams);
+} else {
+    $insertStmt = $pdo->prepare('
+        INSERT INTO documentos_firmados (
+            user_id,
+            propiedad_id,
+            nda_file_path,
+            loi_file_path,
+            nda_subido_at,
+            loi_subido_at,
+            nda_valido,
+            loi_valido,
+            validado_admin
+        ) VALUES (
+            :user_id,
+            :propiedad_id,
+            :nda_file_path,
+            :loi_file_path,
+            NOW(),
+            NOW(),
+            :nda_valido,
+            :loi_valido,
+            0
+        )
+    ');
 
     $insertParams = [
         'user_id' => $buyerUserId,
@@ -285,57 +336,13 @@ try {
         'loi_valido' => 1,
     ];
 
-    if ($existingRow) {
-        $updateStmt = $pdo->prepare('
-            UPDATE documentos_firmados
-            SET
-                nda_file_path = :nda_file_path,
-                loi_file_path = :loi_file_path,
-                nda_subido_at = NOW(),
-                loi_subido_at = NOW(),
-                nda_valido = :nda_valido,
-                loi_valido = :loi_valido,
-                validado_admin = 0,
-                updated_at = NOW()
-            WHERE id = :id
-        ');
+    $insertStmt->execute($insertParams);
 
-        $updateParams = $insertParams;
-        $updateParams['id'] = $existingRow['id'];
-        $updateStmt->execute($updateParams);
-
-        uploadLog('documentos_firmados actualizado', $updateParams);
-    } else {
-        $insertStmt = $pdo->prepare('
-            INSERT INTO documentos_firmados (
-                user_id,
-                propiedad_id,
-                nda_file_path,
-                loi_file_path,
-                nda_subido_at,
-                loi_subido_at,
-                nda_valido,
-                loi_valido,
-                validado_admin
-            ) VALUES (
-                :user_id,
-                :propiedad_id,
-                :nda_file_path,
-                :loi_file_path,
-                NOW(),
-                NOW(),
-                :nda_valido,
-                :loi_valido,
-                0
-            )
-        ');
-        $insertStmt->execute($insertParams);
-
-        uploadLog('documentos_firmados insertado', [
-            'lastId' => $pdo->lastInsertId(),
-            'params' => $insertParams,
-        ]);
-    }
+    uploadLog('documentos_firmados insertado', [
+        'lastId' => $pdo->lastInsertId(),
+        'params' => $insertParams,
+    ]);
+}
 
     ensureBuyerPropertyAccess($pdo, $propertyId, $buyerUserId);
 
@@ -398,6 +405,7 @@ $buyerPhone = $authUser['phone'] ?? 'No disponible';
 $buyerUsername = $authUser['username'] ?? $authUser['sub'] ?? '—';
 $buyerId = (string) ($authUser['sub'] ?? $authUser['id'] ?? '—');
 $approvalLink = buildReviewApprovalLink($token);
+$rejectLink = buildReviewRejectLink($token);
 
 $documentItems = [];
 
@@ -495,7 +503,13 @@ $emailBody = sprintf(
 
                 <div style="margin:24px 0;text-align:center;">
                     <a href="%s" style="display:inline-block;padding:12px 22px;background:#2563eb;color:#ffffff;text-decoration:none;border-radius:6px;font-size:15px;font-weight:700;">
-                        Aprobar documentos y desbloquear dossier
+                        Aprobar documentos
+                    </a>
+                </div>
+
+                <div style="margin:12px 0;text-align:center;">
+                    <a href="%s" style="display:inline-block;padding:12px 22px;background:#dc2626;color:#ffffff;text-decoration:none;border-radius:6px;font-size:15px;font-weight:700;">
+                        Rechazar documentos
                     </a>
                 </div>
 
@@ -527,7 +541,8 @@ $emailBody = sprintf(
     htmlspecialchars((string) $buyerUsername, ENT_QUOTES, 'UTF-8'),
     htmlspecialchars((string) $buyerId, ENT_QUOTES, 'UTF-8'),
     $documentList,
-    htmlspecialchars($approvalLink, ENT_QUOTES, 'UTF-8')
+    htmlspecialchars($approvalLink, ENT_QUOTES, 'UTF-8'),
+    htmlspecialchars($rejectLink, ENT_QUOTES, 'UTF-8')
 );
 
 $mailSent = false;

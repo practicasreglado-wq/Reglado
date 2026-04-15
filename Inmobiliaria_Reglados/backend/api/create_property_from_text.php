@@ -20,6 +20,25 @@ loadEnv(dirname(__DIR__) . '/.env');
 
 error_log('[SESSION EN ENDPOINT WEB TEXT] ' . json_encode($_SESSION));
 
+function columnExists(PDO $pdo, string $schema, string $table, string $column): bool
+{
+    $stmt = $pdo->prepare("
+        SELECT 1
+        FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_SCHEMA = :schema
+          AND TABLE_NAME = :table
+          AND COLUMN_NAME = :column
+        LIMIT 1
+    ");
+    $stmt->execute([
+        'schema' => $schema,
+        'table' => $table,
+        'column' => $column,
+    ]);
+
+    return (bool) $stmt->fetchColumn();
+}
+
 $user = $_SESSION['user'] ?? null;
 $jwtUser = null;
 
@@ -49,7 +68,7 @@ $senderEmail = filter_var($senderEmailRaw, FILTER_VALIDATE_EMAIL) ?: null;
 
 error_log('[USER ID WEB TEXT] ' . json_encode($ownerUserId));
 
-$data = json_decode(file_get_contents('php://input'), true);
+$data = json_decode(file_get_contents('php://input') ?: '{}', true);
 $description = trim((string) ($data['descripcion'] ?? $data['description'] ?? ''));
 
 if ($description === '') {
@@ -125,7 +144,24 @@ try {
         $ownerUserId
     );
 
-    $propertyId = $processor->process($assetId);
+    $propertyId = (int) $processor->process($assetId);
+
+    if ($propertyId <= 0) {
+        throw new RuntimeException('No se pudo obtener el ID de la propiedad creada.');
+    }
+
+    if (columnExists($pdo, 'inmobiliaria', 'propiedades', 'activo_recibido_id')) {
+        $stmtLink = $pdo->prepare("
+            UPDATE inmobiliaria.propiedades
+            SET activo_recibido_id = :activo_recibido_id
+            WHERE id = :property_id
+            LIMIT 1
+        ");
+        $stmtLink->execute([
+            'activo_recibido_id' => $assetId,
+            'property_id' => $propertyId,
+        ]);
+    }
 
     respondJson(200, [
         'success' => true,

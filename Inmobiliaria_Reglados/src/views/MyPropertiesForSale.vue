@@ -27,17 +27,58 @@
 
     <div v-else class="properties-sale__grid">
       <div
-        v-for="property in properties"
-        :key="property.id"
-        class="properties-sale__item"
-      >
-        <PropertyCard
-          :property="property"
-          :favorite-loading="pendingFavorites.has(property.id)"
-          @toggle-favorite="toggleFavorite"
-        />
+  v-for="property in properties"
+  :key="property.id"
+  class="properties-sale__item"
+>
+  <PropertyCard
+    :property="property"
+    :favorite-loading="pendingFavorites.has(property.id)"
+    :show-delete-button="true"
+    :delete-loading="deletingPropertyId === property.id"
+    @toggle-favorite="toggleFavorite"
+    @delete-property="askDelete"
+  />
+</div>
+    </div>
+
+    <teleport to="body">
+  <transition name="fade">
+    <div
+      v-if="showDeleteModal && propertyToDelete"
+      class="delete-modal-overlay"
+      @click.self="closeDeleteModal"
+    >
+      <div class="delete-modal">
+        <p class="delete-modal__eyebrow">Confirmación</p>
+        <h3>¿Eliminar propiedad?</h3>
+        <p class="delete-modal__text">
+          Vas a eliminar
+          <strong>{{ propertyToDelete.titulo || propertyToDelete.tipo_propiedad || "esta propiedad" }}</strong>.
+          Esta acción no se puede deshacer.
+        </p>
+
+        <div class="delete-modal__actions">
+          <button
+            class="modal-button modal-button--secondary"
+            :disabled="deletingPropertyId === propertyToDelete.id"
+            @click="closeDeleteModal"
+          >
+            Cancelar
+          </button>
+
+          <button
+            class="modal-button modal-button--danger"
+            :disabled="deletingPropertyId === propertyToDelete.id"
+            @click="confirmDelete"
+          >
+            {{ deletingPropertyId === propertyToDelete.id ? "Eliminando..." : "Sí, eliminar" }}
+          </button>
+        </div>
       </div>
     </div>
+  </transition>
+</teleport>
   </section>
 </template>
 
@@ -47,6 +88,7 @@ import {
   fetchUserPropertiesForSale,
   removeFavorite,
   saveFavorite,
+  deleteUserProperty,
 } from "../services/properties";
 
 export default {
@@ -61,6 +103,9 @@ export default {
       properties: [],
       loading: true,
       pendingFavorites: new Set(),
+      showDeleteModal: false,
+      propertyToDelete: null,
+      deletingPropertyId: null,
     };
   },
 
@@ -105,6 +150,51 @@ export default {
         console.error("Error actualizando favorito:", error);
       } finally {
         this.pendingFavorites.delete(property.id);
+      }
+    },
+
+    askDelete(property) {
+      if (!property?.id) {
+        return;
+      }
+
+      this.propertyToDelete = property;
+      this.showDeleteModal = true;
+    },
+
+    closeDeleteModal(force = false) {
+      if (!force && this.deletingPropertyId) {
+        return;
+      }
+
+      this.showDeleteModal = false;
+      this.propertyToDelete = null;
+    },
+
+    async confirmDelete() {
+      if (!this.propertyToDelete?.id) {
+        return;
+      }
+
+      const propertyId = this.propertyToDelete.id;
+      this.deletingPropertyId = propertyId;
+
+      try {
+        await deleteUserProperty(propertyId);
+
+        this.properties = this.properties.filter(
+          (property) => property.id !== propertyId
+        );
+
+        this.deletingPropertyId = null;
+        this.closeDeleteModal(true);
+      } catch (error) {
+        console.error("Error eliminando propiedad:", error);
+        alert(
+          error?.message ||
+          "No se pudo eliminar la propiedad. Inténtalo de nuevo."
+        );
+        this.deletingPropertyId = null;
       }
     },
   },
@@ -239,6 +329,95 @@ export default {
   gap: 22px;
 }
 
+.delete-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+
+  background: transparent; /* sin gris */
+  backdrop-filter: blur(6px); /* 🔥 solo distorsión */
+}
+
+.delete-modal {
+  width: 100%;
+  max-width: 460px;
+  padding: 26px;
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow: 0 30px 80px rgba(15, 23, 42, 0.25);
+}
+
+.delete-modal__eyebrow {
+  margin: 0 0 8px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.delete-modal h3 {
+  margin: 0 0 10px;
+  font-size: 1.4rem;
+  color: #0f172a;
+}
+
+.delete-modal__text {
+  margin: 0;
+  line-height: 1.6;
+  color: #475569;
+}
+
+.delete-modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.modal-button {
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 12px;
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modal-button--secondary {
+  background: #e2e8f0;
+  color: #1e293b;
+}
+
+.modal-button--danger {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  color: #ffffff;
+}
+
+.modal-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.modal-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.22s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
 @media (max-width: 768px) {
   .properties-sale__hero {
     grid-template-columns: 1fr;
@@ -252,6 +431,14 @@ export default {
   .properties-sale__grid {
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: 16px;
+  }
+
+  .delete-modal__actions {
+    flex-direction: column;
+  }
+
+  .modal-button {
+    width: 100%;
   }
 }
 </style>

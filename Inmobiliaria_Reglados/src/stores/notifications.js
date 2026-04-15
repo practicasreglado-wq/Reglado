@@ -7,6 +7,7 @@ export const useNotificationsStore = defineStore("notifications", {
     unreadCount: 0,
     loading: false,
     error: null,
+    intervalId: null,
   }),
 
   getters: {
@@ -20,24 +21,63 @@ export const useNotificationsStore = defineStore("notifications", {
   },
 
   actions: {
-    async loadNotifications(limit = 40) {
-      if (this.loading) {
-        return;
-      }
+    startAutoRefresh(interval = 5000) {
+      if (this.intervalId) return;
 
-      this.loading = true;
-      this.error = null;
+      this.loadNotifications();
 
-      try {
-        const payload = await backendJson(`api/notifications.php?limit=${encodeURIComponent(limit)}`);
-        this.notifications = Array.isArray(payload.notifications) ? payload.notifications : [];
-        this.unreadCount = typeof payload.unread === "number" ? payload.unread : 0;
-      } catch (error) {
-        this.error = error?.message || "No se pudieron cargar las notificaciones.";
-      } finally {
-        this.loading = false;
+      this.intervalId = setInterval(() => {
+        this.loadNotifications(40, true);
+      }, interval);
+    },
+
+    stopAutoRefresh() {
+      if (this.intervalId) {
+        clearInterval(this.intervalId);
+        this.intervalId = null;
       }
     },
+
+    async loadNotifications(limit = 40, silent = false) {
+  if (this.loading && !silent) {
+    return;
+  }
+
+  if (!silent) {
+    this.loading = true;
+  }
+
+  this.error = null;
+
+  try {
+    const payload = await backendJson(`api/notifications.php?limit=${encodeURIComponent(limit)}`);
+
+    const newNotifications = Array.isArray(payload.notifications)
+      ? payload.notifications
+      : [];
+
+    const oldIds = this.notifications.map(n => n.id).join(',');
+    const newIds = newNotifications.map(n => n.id).join(',');
+
+    if (oldIds !== newIds) {
+      this.notifications = newNotifications;
+
+      console.log("🔔 Nueva notificación");
+    }
+
+    this.unreadCount =
+      typeof payload.unread === "number"
+        ? payload.unread
+        : 0;
+
+  } catch (error) {
+    this.error = error?.message || "No se pudieron cargar las notificaciones.";
+  } finally {
+    if (!silent) {
+      this.loading = false;
+    }
+  }
+},
 
     async markAsRead(notificationId) {
       if (!notificationId || notificationId <= 0) {
