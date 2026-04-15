@@ -44,21 +44,6 @@
     </div>
 
     <div class="mobile-controls">
-      <button class="theme-toggle" @click="toggleDarkMode" :aria-label="isDarkMode ? 'Activar modo claro' : 'Activar modo oscuro'">
-        <svg v-if="isDarkMode" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="theme-icon"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-        <svg v-else xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="theme-icon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-      </button>
-
-      <RouterLink v-if="user && isAdmin" class="admin-pill mobile-admin-pill" to="/admin"
-        aria-label="Panel de administración">
-        <img :src="adminUserIcon" alt="" class="admin-icon" />
-      </RouterLink>
-
-      <RouterLink v-if="user" class="user-pill mobile-user-trigger" to="/configuracion" :title="displayUsername"
-        aria-label="Configuración de usuario">
-        <span class="user-initial" aria-hidden="true">{{ userInitial }}</span>
-      </RouterLink>
-
       <button class="mobile-menu-toggle" type="button" :aria-expanded="mobileMenuOpen ? 'true' : 'false'"
         aria-label="Abrir menú" @click="toggleMobileMenu">
         <img :src="menuIcon" alt="" class="mobile-menu-icon" />
@@ -66,6 +51,28 @@
     </div>
 
     <div v-if="mobileMenuOpen" class="mobile-menu" role="menu" aria-label="Menú principal">
+      <template v-if="user">
+        <div class="mobile-user-profile">
+          <div class="mobile-avatar">
+            <span class="user-initial">{{ userInitial }}</span>
+          </div>
+          <div class="mobile-user-info">
+            <span class="mobile-username">{{ displayUsername }}</span>
+            <span v-if="isAdmin" class="mobile-role">Administrador</span>
+          </div>
+        </div>
+
+        <div class="mobile-session">
+          <button class="mobile-session-action" type="button" role="menuitem" @click="goToSettings(); closeMobileMenu()">
+            Configuración
+          </button>
+          <button v-if="isAdmin" class="mobile-session-action" type="button" role="menuitem" @click="router.push('/admin'); closeMobileMenu()">
+            Administración
+          </button>
+        </div>
+        <div class="menu-divider" style="margin: 0.5rem 0;"></div>
+      </template>
+
       <nav class="mobile-nav">
         <a href="https://regladoconsultores.com/" @click="closeMobileMenu">
           Abogados
@@ -88,18 +95,16 @@
       </nav>
 
       <div class="mobile-session">
-        <template v-if="user">
-          <div class="menu-divider"></div>
-          <button class="mobile-session-action" type="button" role="menuitem" @click="goToSettings(); closeMobileMenu()">
-            Configuración
-          </button>
-          <button v-if="isAdmin" class="mobile-session-action" type="button" role="menuitem" @click="router.push('/admin'); closeMobileMenu()">
-            Administración
-          </button>
-          <button class="mobile-session-action danger" type="button" role="menuitem" @click="logoutAndCloseMobile">
-            Cerrar sesión
-          </button>
-        </template>
+        <div class="menu-divider" style="margin: 0.5rem 0;"></div>
+        <button class="mobile-session-action theme-mobile-item" type="button" @click="toggleDarkMode">
+          <svg v-if="isDarkMode" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+          <svg v-else xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+          <span>{{ isDarkMode ? 'Modo Claro' : 'Modo Oscuro' }}</span>
+        </button>
+
+        <button v-if="user" class="mobile-session-action danger" type="button" role="menuitem" @click="logoutAndCloseMobile">
+          Cerrar sesión
+        </button>
 
         <button v-else class="btn-primary mobile-login-btn" type="button" @click="openLoginFromMobile">
           Iniciar sesión
@@ -171,10 +176,14 @@ function toggleDarkMode() {
   isDarkMode.value = !isDarkMode.value;
   if (isDarkMode.value) {
     document.body.classList.add("dark-mode");
-    auth.setCookie("reglado_theme", "dark", 60 * 60 * 24 * 365);
+    if (auth.hasConsentCategory('preferences')) {
+      auth.setCookie("reglado_theme", "dark", 60 * 60 * 24 * 365, "Lax");
+    }
   } else {
     document.body.classList.remove("dark-mode");
-    auth.setCookie("reglado_theme", "light", 60 * 60 * 24 * 365);
+    if (auth.hasConsentCategory('preferences')) {
+      auth.setCookie("reglado_theme", "light", 60 * 60 * 24 * 365, "Lax");
+    }
   }
 }
 
@@ -562,10 +571,10 @@ function buildExternalProductUrl(baseUrl) {
     gap: 0.9rem;
     margin: 0 0.6rem;
     padding: 0.9rem;
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    border: 1px solid var(--line);
     border-radius: 16px;
-    background: linear-gradient(135deg, rgba(23, 39, 61, 0.98), rgba(39, 61, 92, 0.95));
-    box-shadow: 0 18px 34px rgba(16, 28, 47, 0.28);
+    background: var(--surface);
+    box-shadow: 0 18px 34px rgba(0, 0, 0, 0.28);
     backdrop-filter: blur(12px);
     z-index: 70;
   }
@@ -582,13 +591,13 @@ function buildExternalProductUrl(baseUrl) {
     min-height: 44px;
     border-radius: 12px;
     text-decoration: none;
-    color: rgba(241, 246, 255, 0.94);
-    background: rgba(255, 255, 255, 0.08);
+    color: var(--text);
+    background: var(--surface-soft);
     display: flex;
     align-items: center;
     gap: 0.7rem;
     padding: 0.75rem 0.9rem;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--line);
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
   }
@@ -606,14 +615,58 @@ function buildExternalProductUrl(baseUrl) {
 
   .menu-divider {
     height: 1px;
-    background: rgba(255, 255, 255, 0.12);
+    background: var(--line);
     margin: 0.4rem 0.6rem;
   }
 
   .mobile-session-action.danger {
-    color: #ff8a8a;
+    color: #ef4444;
+  }
+
+  .mobile-user-profile {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 0.2rem 0.6rem 0.5rem;
+  }
+
+  .mobile-avatar {
+    width: 46px;
+    height: 46px;
+    border-radius: 999px;
+    background: var(--surface-soft);
+    border: 1px solid var(--line);
+    display: grid;
+    place-items: center;
+  }
+
+  .mobile-avatar .user-initial {
+    font-size: 1.2rem;
+    color: var(--text);
+  }
+
+  .mobile-user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .mobile-username {
+    font-family: "Manrope", "Trebuchet MS", sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.2;
+  }
+
+  .mobile-role {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--primary, #0ea5e9);
+    letter-spacing: 0.02em;
   }
 }
+
 
 @media (max-width: 640px) {
   .topbar {
