@@ -50,12 +50,13 @@
 
         <label>
           Contraseña *
-          <PasswordField v-model="password" placeholder="" required minlength="6" />
+          <PasswordField v-model="password" placeholder="" required minlength="8" />
+          <span class="password-hint">Mínimo 8 caracteres, una mayúscula y un número.</span>
         </label>
 
         <label>
           Repetir contraseña *
-          <PasswordField v-model="passwordConfirmation" placeholder="" required minlength="6" />
+          <PasswordField v-model="passwordConfirmation" placeholder="" required minlength="8" />
         </label>
 
         <div class="privacy-note">
@@ -216,6 +217,14 @@ function resetFormState() {
   color: var(--secondary);
   text-decoration: none;
   font-weight: 600;
+}
+
+.password-hint {
+  display: block;
+  margin-top: 0.3rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-weight: 400;
 }
 </style>
 
