@@ -7,13 +7,14 @@ class MailService
 {
     public static function sendVerificationEmail(string $email, string $name, string $verificationUrl): bool
     {
-        $subject = 'Confirma tu correo electronico';
+        $subject = 'Confirma tu dirección de correo — Grupo Reglado';
         $message = self::buildEmailLayout(
             $name,
-            'Confirma tu cuenta',
-            'Para activar tu cuenta, confirma tu correo con el siguiente enlace:',
+            'Activa tu cuenta',
+            'Gracias por registrarte en Grupo Reglado. Para completar el proceso y activar tu cuenta, confirma tu dirección de correo electrónico pulsando el botón:',
             $verificationUrl,
-            'Si no solicitaste este registro, puedes ignorar este mensaje.'
+            'Confirmar mi correo',
+            'Este enlace es válido durante 24 horas. Si no solicitaste este registro, puedes ignorar este mensaje de forma segura.'
         );
 
         return self::sendHtml($email, $subject, $message);
@@ -21,13 +22,14 @@ class MailService
 
     public static function sendEmailChangeConfirmation(string $email, string $name, string $confirmationUrl): bool
     {
-        $subject = 'Confirma el cambio de correo';
+        $subject = 'Confirma el cambio de correo — Grupo Reglado';
         $message = self::buildEmailLayout(
             $name,
             'Confirma tu nuevo correo',
-            'Has solicitado cambiar el correo de tu cuenta. Confirma el cambio con el siguiente enlace:',
+            'Has solicitado cambiar la dirección de correo asociada a tu cuenta en Grupo Reglado. Para completar el cambio, confirma la nueva dirección pulsando el botón:',
             $confirmationUrl,
-            'Si no has sido tu, puedes ignorar este mensaje.'
+            'Confirmar nueva dirección',
+            'Si no has realizado esta solicitud, ignora este mensaje. Tu correo actual no se modificará.'
         );
 
         return self::sendHtml($email, $subject, $message);
@@ -35,13 +37,14 @@ class MailService
 
     public static function sendPasswordResetEmail(string $email, string $name, string $resetUrl): bool
     {
-        $subject = 'Recupera tu contrasena';
+        $subject = 'Restablece tu contraseña — Grupo Reglado';
         $message = self::buildEmailLayout(
             $name,
-            'Recupera tu contrasena',
-            'Has solicitado restablecer tu contrasena. Usa este enlace para establecer una nueva:',
+            'Restablecer contraseña',
+            'Hemos recibido una solicitud para restablecer la contraseña de tu cuenta en Grupo Reglado. Pulsa el botón para crear una nueva contraseña:',
             $resetUrl,
-            'Si no solicitaste este cambio, puedes ignorar este mensaje.'
+            'Restablecer contraseña',
+            'Este enlace es válido durante 1 hora. Si no solicitaste este cambio, puedes ignorar este mensaje. Tu contraseña actual no se verá afectada.'
         );
 
         return self::sendHtml($email, $subject, $message);
@@ -52,47 +55,80 @@ class MailService
         string $title,
         string $intro,
         string $actionUrl,
+        string $actionLabel,
         string $closing
     ): string {
-        $safeName = htmlspecialchars($name, ENT_QUOTES, 'UTF-8');
-        $safeTitle = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
-        $safeIntro = htmlspecialchars($intro, ENT_QUOTES, 'UTF-8');
-        $safeUrl = htmlspecialchars($actionUrl, ENT_QUOTES, 'UTF-8');
-        $safeClosing = htmlspecialchars($closing, ENT_QUOTES, 'UTF-8');
+        $safeName    = htmlspecialchars($name,        ENT_QUOTES, 'UTF-8');
+        $safeTitle   = htmlspecialchars($title,       ENT_QUOTES, 'UTF-8');
+        $safeIntro   = htmlspecialchars($intro,       ENT_QUOTES, 'UTF-8');
+        $safeUrl     = htmlspecialchars($actionUrl,   ENT_QUOTES, 'UTF-8');
+        $safeLabel   = htmlspecialchars($actionLabel, ENT_QUOTES, 'UTF-8');
+        $safeClosing = htmlspecialchars($closing,     ENT_QUOTES, 'UTF-8');
+        $year        = date('Y');
 
         return <<<HTML
-<html>
-  <body style="margin:0;padding:24px;background:#f4f7fb;font-family:Arial,Helvetica,sans-serif;color:#0f172a;">
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:640px;margin:0 auto;background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #dbe5f3;">
-      <tr>
-        <td style="padding:28px 32px;background:linear-gradient(135deg,#16273e 0%,#1f3553 56%,#253f62 100%);color:#ffffff;">
-          <div style="font-size:13px;letter-spacing:0.08em;text-transform:uppercase;opacity:0.82;">Grupo Reglado</div>
-          <h1 style="margin:10px 0 0;font-size:28px;line-height:1.2;">{$safeTitle}</h1>
-        </td>
-      </tr>
-      <tr>
-        <td style="padding:32px;">
-          <p style="margin:0 0 16px;font-size:16px;">Hola {$safeName},</p>
-          <p style="margin:0 0 24px;font-size:16px;line-height:1.6;">{$safeIntro}</p>
-          <p style="margin:0 0 24px;">
-            <a href="{$safeUrl}" style="display:inline-block;padding:14px 22px;border-radius:10px;background:#1f3553;color:#ffffff;text-decoration:none;font-weight:700;">
-              Abrir enlace
-            </a>
-          </p>
-          <p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:#475569;">Si el boton no funciona, copia y pega este enlace en tu navegador:</p>
-          <p style="margin:0 0 24px;font-size:14px;line-height:1.6;word-break:break-word;">
-            <a href="{$safeUrl}" style="color:#1d4ed8;text-decoration:none;">{$safeUrl}</a>
-          </p>
-          <p style="margin:0;font-size:14px;line-height:1.6;color:#475569;">{$safeClosing}</p>
-        </td>
-      </tr>
-      <tr>
-        <td style="padding:20px 32px;border-top:1px solid #e2e8f0;font-size:13px;color:#64748b;background:#f8fafc;">
-          Este mensaje ha sido enviado por Grupo Reglado.
-        </td>
-      </tr>
-    </table>
-  </body>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{$safeTitle}</title>
+</head>
+<body style="margin:0;padding:0;background:#f1f5f9;font-family:Arial,Helvetica,sans-serif;color:#0f172a;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+    <tr>
+      <td style="padding:32px 16px;">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:600px;margin:0 auto;background:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #e2e8f0;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+
+          <!-- Cabecera -->
+          <tr>
+            <td style="padding:28px 36px;background:#1f3553;">
+              <p style="margin:0;font-size:13px;letter-spacing:0.1em;text-transform:uppercase;color:#93c5fd;font-weight:600;">Grupo Reglado</p>
+              <h1 style="margin:8px 0 0;font-size:24px;font-weight:700;color:#ffffff;line-height:1.3;">{$safeTitle}</h1>
+            </td>
+          </tr>
+
+          <!-- Cuerpo -->
+          <tr>
+            <td style="padding:36px;">
+              <p style="margin:0 0 20px;font-size:16px;line-height:1.5;color:#0f172a;">Hola <strong>{$safeName}</strong>,</p>
+              <p style="margin:0 0 28px;font-size:15px;line-height:1.7;color:#334155;">{$safeIntro}</p>
+
+              <!-- Botón -->
+              <table role="presentation" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td style="border-radius:8px;background:#1f3553;">
+                    <a href="{$safeUrl}" style="display:inline-block;padding:14px 28px;border-radius:8px;background:#1f3553;color:#ffffff;text-decoration:none;font-size:15px;font-weight:700;line-height:1;">{$safeLabel}</a>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Enlace de respaldo -->
+              <p style="margin:28px 0 8px;font-size:13px;line-height:1.5;color:#64748b;">Si el botón no funciona, copia y pega este enlace en tu navegador:</p>
+              <p style="margin:0 0 28px;font-size:12px;line-height:1.6;word-break:break-all;color:#64748b;">
+                <a href="{$safeUrl}" style="color:#2563eb;text-decoration:none;">{$safeUrl}</a>
+              </p>
+
+              <hr style="border:none;border-top:1px solid #e2e8f0;margin:0 0 24px;">
+              <p style="margin:0;font-size:13px;line-height:1.6;color:#94a3b8;">{$safeClosing}</p>
+            </td>
+          </tr>
+
+          <!-- Pie -->
+          <tr>
+            <td style="padding:20px 36px;background:#f8fafc;border-top:1px solid #e2e8f0;">
+              <p style="margin:0;font-size:12px;color:#94a3b8;line-height:1.5;">
+                Este mensaje fue enviado por Grupo Reglado &mdash; regladogroup.com<br>
+                &copy; {$year} Reglado Consultores. Todos los derechos reservados.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
 </html>
 HTML;
     }
@@ -108,6 +144,7 @@ HTML;
             return self::sendWithSmtp($email, $subject, $message);
         }
 
+        error_log('[MailService] Driver "' . $driver . '" no reconocido o mail() nativo. Intentando mail() para: ' . $email);
         $from = getenv('MAIL_FROM') ?: 'no-reply@reglado.local';
         $headers = [
             'MIME-Version: 1.0',
@@ -116,7 +153,11 @@ HTML;
             'Reply-To: ' . $from,
         ];
 
-        return mail($email, $subject, $message, implode("\r\n", $headers));
+        $result = mail($email, $subject, $message, implode("\r\n", $headers));
+        if (!$result) {
+            error_log('[MailService] mail() nativo falló para: ' . $email);
+        }
+        return $result;
     }
 
     private static function sendWithSmtp(string $toEmail, string $subject, string $htmlBody): bool
@@ -130,6 +171,7 @@ HTML;
         $secure = strtolower((string) (getenv('MAIL_ENCRYPTION') ?: 'tls'));
 
         if ($host === '' || $username === '' || $password === '' || $fromEmail === '') {
+            error_log('[MailService] SMTP config incompleta: host=' . $host . ' user=' . $username . ' from=' . $fromEmail);
             return false;
         }
 
@@ -151,7 +193,9 @@ HTML;
             if ($smtpSecure !== '') {
                 $mail->SMTPSecure = $smtpSecure;
             }
-            $mail->CharSet = 'UTF-8';
+            $mail->CharSet  = 'UTF-8';
+            $mail->Encoding = 'base64';
+            $mail->XMailer  = ' ';
 
             $mail->setFrom($fromEmail, $fromName);
             $mail->addReplyTo($fromEmail, $fromName);
@@ -163,6 +207,7 @@ HTML;
 
             return $mail->send();
         } catch (Exception $e) {
+            error_log('[MailService] SMTP error al enviar a ' . $toEmail . ': ' . $e->getMessage());
             return false;
         }
     }

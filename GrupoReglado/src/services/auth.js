@@ -41,6 +41,7 @@ const AUTH_MESSAGE_MAP = {
   "email updated": "El correo se ha actualizado correctamente.",
   "current password is incorrect": "La contraseña actual no es correcta.",
   "password confirmation does not match": "Las contraseñas no coinciden.",
+  "password too weak": "La contraseña debe tener mínimo 8 caracteres, una mayúscula y un número.",
 };
 
 function authHeaders() {

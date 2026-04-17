@@ -177,8 +177,8 @@ class User
 
             $userId = (int) $db->lastInsertId();
 
-            $markPending = $db->prepare('UPDATE pending_registrations SET used_at = NOW() WHERE id = ?');
-            $markPending->execute([$pendingId]);
+            $deletePending = $db->prepare('DELETE FROM pending_registrations WHERE id = ?');
+            $deletePending->execute([$pendingId]);
 
             $user = $db->prepare('SELECT * FROM users WHERE id = ? LIMIT 1');
             $user->execute([$userId]);
