@@ -50,8 +50,8 @@ class AuthController
             Response::json(['error' => 'passwords do not match'], 422);
         }
 
-        if (strlen($password) < 6) {
-            Response::json(['error' => 'password must be at least 6 characters'], 422);
+        if (!self::isStrongPassword($password)) {
+            Response::json(['error' => 'password too weak'], 422);
         }
 
         $name = trim($firstName . ' ' . $lastName);
@@ -303,8 +303,8 @@ class AuthController
             Response::json(['error' => 'new passwords do not match'], 422);
         }
 
-        if (strlen($newPassword) < 6) {
-            Response::json(['error' => 'new password must be at least 6 characters'], 422);
+        if (!self::isStrongPassword($newPassword)) {
+            Response::json(['error' => 'password too weak'], 422);
         }
 
         $tokenHash = hash('sha256', $token);
@@ -495,8 +495,8 @@ class AuthController
             Response::json(['error' => 'new passwords do not match'], 422);
         }
 
-        if (strlen($newPassword) < 6) {
-            Response::json(['error' => 'new password must be at least 6 characters'], 422);
+        if (!self::isStrongPassword($newPassword)) {
+            Response::json(['error' => 'password too weak'], 422);
         }
 
         $user = User::findById($userId);
@@ -734,5 +734,16 @@ class AuthController
         }
 
         return $session;
+    }
+
+    /**
+     * Valida que la contraseña cumpla los requisitos mínimos de seguridad:
+     * al menos 8 caracteres, una letra mayúscula y un número.
+     */
+    private static function isStrongPassword(string $password): bool
+    {
+        return strlen($password) >= 8
+            && preg_match('/[A-Z]/', $password) === 1
+            && preg_match('/[0-9]/', $password) === 1;
     }
 }

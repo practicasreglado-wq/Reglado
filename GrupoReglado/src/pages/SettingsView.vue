@@ -117,11 +117,12 @@
           </label>
           <label>
             Nueva contraseña
-            <PasswordField v-model="passwordForm.newPassword" required minlength="6" />
+            <PasswordField v-model="passwordForm.newPassword" required minlength="8" />
+            <span class="password-hint">Mínimo 8 caracteres, una mayúscula y un número.</span>
           </label>
           <label>
             Confirmar nueva contraseña
-            <PasswordField v-model="passwordForm.newPasswordConfirmation" required minlength="6" />
+            <PasswordField v-model="passwordForm.newPasswordConfirmation" required minlength="8" />
           </label>
         </template>
 
@@ -350,5 +351,13 @@ onMounted(() => {
   margin: 0;
   color: var(--muted);
   font-size: 0.9rem;
+}
+
+.password-hint {
+  display: block;
+  margin-top: 0.3rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-weight: 400;
 }
 </style>
