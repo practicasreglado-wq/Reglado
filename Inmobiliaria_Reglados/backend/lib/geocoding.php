@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-function normalizeGeoText($value): string
+function normalizeGeoText(mixed $value): string
 {
     $text = trim((string) ($value ?? ''));
 
@@ -18,28 +18,7 @@ function normalizeGeoText($value): string
     return $text;
 }
 
-function cityLooksGenericForGeo(string $city): bool
-{
-    $city = mb_strtolower(trim($city), 'UTF-8');
-
-    return in_array($city, [
-        'tenerife',
-        'gran canaria',
-        'fuerteventura',
-        'lanzarote',
-        'la palma',
-        'la gomera',
-        'el hierro',
-        'ibiza',
-        'mallorca',
-        'menorca',
-        'canarias',
-        'islas canarias',
-        'islas baleares',
-    ], true);
-}
-
-function addLocationSegment(array &$parts, string $value): void
+function addUniquePart(array &$parts, string $value): void
 {
     $value = trim($value);
 
@@ -58,100 +37,56 @@ function addLocationSegment(array &$parts, string $value): void
     $parts[] = $value;
 }
 
-function buildStreetLine(array $property): string
+function buildGeocodingQueries(array $property): array
 {
     $direccionCompleta = normalizeGeoText($property['direccion_completa'] ?? '');
-    if ($direccionCompleta !== '') {
-        return $direccionCompleta;
-    }
-
     $direccion = normalizeGeoText($property['direccion'] ?? '');
-    if ($direccion !== '') {
-        return $direccion;
-    }
-
-    $calle = normalizeGeoText($property['calle'] ?? '');
-    $numero = normalizeGeoText($property['numero'] ?? '');
-
-    $street = trim($calle . ' ' . $numero);
-
-    return $street;
-}
-
-function buildApproximateGeocodingQuery(array $property): string
-{
-    $direccion = buildStreetLine($property);
     $codigoPostal = normalizeGeoText($property['codigo_postal'] ?? $property['cp'] ?? '');
-    $zona = normalizeGeoText($property['zona'] ?? '');
     $ciudad = normalizeGeoText($property['ciudad'] ?? '');
     $provincia = normalizeGeoText($property['provincia'] ?? '');
     $pais = normalizeGeoText($property['pais'] ?? 'España');
 
-    $parts = [];
-    $genericCity = $ciudad !== '' && cityLooksGenericForGeo($ciudad);
+    $queries = [];
 
-    if ($direccion !== '') {
-        addLocationSegment($parts, $direccion);
+    $build = static function (array $segments): string {
+        $parts = [];
+        foreach ($segments as $segment) {
+            addUniquePart($parts, $segment);
+        }
+        return implode(', ', $parts);
+    };
+
+    if ($direccionCompleta !== '') {
+        $queries[] = $build([$direccionCompleta, $pais]);
     }
 
-    if ($codigoPostal !== '') {
-        addLocationSegment($parts, $codigoPostal);
+    if ($direccion !== '' && $codigoPostal !== '' && $ciudad !== '') {
+        $queries[] = $build([$direccion, $codigoPostal, $ciudad, $pais]);
     }
 
-    if ($zona !== '') {
-        addLocationSegment($parts, $zona);
+    if ($direccion !== '' && $ciudad !== '') {
+        $queries[] = $build([$direccion, $ciudad, $pais]);
     }
 
-    if ($genericCity) {
-        if ($provincia !== '') {
-            addLocationSegment($parts, $provincia);
-        } elseif ($ciudad !== '') {
-            addLocationSegment($parts, $ciudad);
-        }
-    } else {
-        if ($ciudad !== '') {
-            addLocationSegment($parts, $ciudad);
-        }
-
-        if ($provincia !== '') {
-            addLocationSegment($parts, $provincia);
-        }
+    if ($direccion !== '' && $provincia !== '' && $ciudad !== '') {
+        $queries[] = $build([$direccion, $ciudad, $provincia, $pais]);
     }
 
-    if ($parts === []) {
-        if ($ciudad !== '') {
-            addLocationSegment($parts, $ciudad);
-        }
-
-        if ($provincia !== '') {
-            addLocationSegment($parts, $provincia);
-        }
-
-        if ($zona !== '') {
-            addLocationSegment($parts, $zona);
-        }
+    if ($codigoPostal !== '' && $ciudad !== '') {
+        $queries[] = $build([$codigoPostal, $ciudad, $pais]);
     }
 
-    if ($parts === []) {
-        return '';
+    if ($ciudad !== '') {
+        $queries[] = $build([$ciudad, $provincia, $pais]);
     }
 
-    addLocationSegment($parts, $pais !== '' ? $pais : 'España');
+    $queries = array_values(array_unique(array_filter($queries, static fn($q) => trim($q) !== '')));
 
-    return implode(', ', array_values(array_filter(
-        $parts,
-        static fn($item) => trim((string) $item) !== ''
-    )));
+    return $queries;
 }
 
-function geocodeApproximateLocation(array $property): ?array
+function callNominatim(string $query): ?array
 {
-    $query = buildApproximateGeocodingQuery($property);
-
-    if ($query === '') {
-        return null;
-    }
-
     $params = [
         'format' => 'jsonv2',
         'limit' => 1,
@@ -180,11 +115,17 @@ function geocodeApproximateLocation(array $property): ?array
         ],
     ]);
 
+    error_log('[GEOCODING URL] ' . $url);
+    error_log('[GEOCODING QUERY FINAL] ' . $query);
+
     $response = @file_get_contents($url, false, $context);
 
     if ($response === false || $response === '') {
+        error_log('[GEOCODING RESPONSE RAW] false_or_empty');
         return null;
     }
+
+    error_log('[GEOCODING RESPONSE RAW] ' . $response);
 
     $data = json_decode($response, true);
 
@@ -211,4 +152,23 @@ function geocodeApproximateLocation(array $property): ?array
         'query' => $query,
         'display_name' => (string) ($first['display_name'] ?? ''),
     ];
+}
+
+function geocodeApproximateLocation(array $property): ?array
+{
+    $queries = buildGeocodingQueries($property);
+
+    if ($queries === []) {
+        error_log('[GEOCODING] No hay queries válidas');
+        return null;
+    }
+
+    foreach ($queries as $query) {
+        $result = callNominatim($query);
+        if ($result !== null) {
+            return $result;
+        }
+    }
+
+    return null;
 }

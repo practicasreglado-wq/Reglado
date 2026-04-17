@@ -23,31 +23,28 @@ if (!in_array($role, ['admin', 'real'], true)) {
 
 try {
     $query = "
-        SELECT 
-            p.id,
-            p.tipo_propiedad,
-            p.ciudad,
-            p.zona,
-            p.metros_cuadrados,
-            p.precio,
-            p.direccion,
-            p.categoria,
-            p.caracteristicas_json,
-            p.dossier_file,
-            p.confidentiality_file,
-            p.intention_file,
-            p.captador_id,
-            p.owner_user_id,
-            p.created_at,
-            p.updated_at,
-            u.id AS owner_id,
-            u.username AS owner_username,
-            u.email AS owner_email,
-            u.first_name AS owner_first_name,
-            u.last_name AS owner_last_name
+        SELECT
+            p.*,
+
+            owner.id AS owner_id,
+            owner.username AS owner_username,
+            owner.email AS owner_email,
+            owner.first_name AS owner_first_name,
+            owner.last_name AS owner_last_name,
+            owner.phone AS owner_phone,
+
+            creator.id AS creator_id,
+            creator.username AS creator_username,
+            creator.email AS creator_email,
+            creator.first_name AS creator_first_name,
+            creator.last_name AS creator_last_name,
+            creator.phone AS creator_phone
+
         FROM inmobiliaria.propiedades p
-        LEFT JOIN regladousers.users u 
-            ON p.owner_user_id = u.id
+        LEFT JOIN regladousers.users owner
+            ON p.owner_user_id = owner.id
+        LEFT JOIN regladousers.users creator
+            ON p.created_by_user_id = creator.id
         ORDER BY p.created_at DESC
     ";
 
@@ -68,9 +65,21 @@ try {
         $ownerFullName = trim(
             (string) ($row['owner_first_name'] ?? '') . ' ' . (string) ($row['owner_last_name'] ?? '')
         );
-
         if ($ownerFullName === '') {
-            $ownerFullName = (string) ($row['owner_username'] ?? 'Sistema / Sin asignar');
+            $ownerFullName = (string) ($row['owner_username'] ?? '');
+        }
+        if ($ownerFullName === '') {
+            $ownerFullName = 'Sistema / Sin asignar';
+        }
+
+        $creatorFullName = trim(
+            (string) ($row['creator_first_name'] ?? '') . ' ' . (string) ($row['creator_last_name'] ?? '')
+        );
+        if ($creatorFullName === '') {
+            $creatorFullName = (string) ($row['creator_username'] ?? '');
+        }
+        if ($creatorFullName === '') {
+            $creatorFullName = 'Sistema';
         }
 
         $ubicacionGeneral = trim(
@@ -84,55 +93,51 @@ try {
             $ubicacionGeneral = (string) ($row['direccion'] ?? '');
         }
 
-        $properties[] = [
-            'id' => (int) ($row['id'] ?? 0),
+        $prop = $row;
 
-            // Título visual para el frontend
-            'titulo' => (string) (
-                $row['tipo_propiedad']
-                ?? $row['categoria']
-                ?? ('Propiedad #' . (int) ($row['id'] ?? 0))
-            ),
+        $prop['id'] = isset($row['id']) ? (int) $row['id'] : 0;
+        $prop['precio'] = isset($row['precio']) ? (float) $row['precio'] : 0;
+        $prop['metros_cuadrados'] = isset($row['metros_cuadrados']) ? (int) $row['metros_cuadrados'] : 0;
 
-            'tipo_propiedad' => (string) ($row['tipo_propiedad'] ?? ''),
-            'categoria' => (string) ($row['categoria'] ?? ''),
-            'ciudad' => (string) ($row['ciudad'] ?? ''),
-            'zona' => (string) ($row['zona'] ?? ''),
-            'direccion' => (string) ($row['direccion'] ?? ''),
-            'ubicacion_general' => $ubicacionGeneral,
+        $prop['titulo'] = (string) (
+            $row['titulo']
+            ?? $row['tipo_propiedad']
+            ?? $row['categoria']
+            ?? ('Propiedad #' . (int) ($row['id'] ?? 0))
+        );
 
-            'precio' => (float) ($row['precio'] ?? 0),
-            'metros_cuadrados' => (int) ($row['metros_cuadrados'] ?? 0),
+        $prop['ubicacion_general'] = $ubicacionGeneral;
+        $prop['caracteristicas'] = $caracteristicas;
 
-            // No existe en tu tabla, lo dejamos nulo para no romper
-            'imagen_principal' => null,
-
-            'caracteristicas' => $caracteristicas,
-
-            'owner_user_id' => !empty($row['owner_user_id']) ? (int) $row['owner_user_id'] : null,
-            'captador_id' => !empty($row['captador_id']) ? (int) $row['captador_id'] : null,
-
-            'owner' => [
-                'id' => !empty($row['owner_id']) ? (int) $row['owner_id'] : null,
-                'nombre' => $ownerFullName,
-                'email' => !empty($row['owner_email']) ? (string) $row['owner_email'] : '-',
-                'username' => !empty($row['owner_username']) ? (string) $row['owner_username'] : null,
-            ],
-
-            // Compatibilidad extra por si alguna vista usa estos campos planos
-            'owner_id' => !empty($row['owner_id']) ? (int) $row['owner_id'] : null,
-            'owner_name' => $ownerFullName,
-            'owner_email' => !empty($row['owner_email']) ? (string) $row['owner_email'] : '-',
-
-            'dossier_file' => $row['dossier_file'] ?? null,
-            'confidentiality_file' => $row['confidentiality_file'] ?? null,
-            'intention_file' => $row['intention_file'] ?? null,
-
-            'created_at' => $row['created_at'] ?? null,
-            'updated_at' => $row['updated_at'] ?? ($row['created_at'] ?? null),
-
-            'estado_publicacion' => 'Publicado',
+        $prop['owner'] = [
+            'id' => !empty($row['owner_id']) ? (int) $row['owner_id'] : null,
+            'nombre' => $ownerFullName,
+            'email' => !empty($row['owner_email']) ? (string) $row['owner_email'] : '-',
+            'username' => !empty($row['owner_username']) ? (string) $row['owner_username'] : null,
+            'first_name' => !empty($row['owner_first_name']) ? (string) $row['owner_first_name'] : null,
+            'last_name' => !empty($row['owner_last_name']) ? (string) $row['owner_last_name'] : null,
+            'phone' => !empty($row['owner_phone']) ? (string) $row['owner_phone'] : null,
         ];
+
+        $prop['creator'] = [
+            'id' => !empty($row['creator_id']) ? (int) $row['creator_id'] : null,
+            'nombre' => $creatorFullName,
+            'email' => !empty($row['creator_email']) ? (string) $row['creator_email'] : '-',
+            'username' => !empty($row['creator_username']) ? (string) $row['creator_username'] : null,
+            'first_name' => !empty($row['creator_first_name']) ? (string) $row['creator_first_name'] : null,
+            'last_name' => !empty($row['creator_last_name']) ? (string) $row['creator_last_name'] : null,
+            'phone' => !empty($row['creator_phone']) ? (string) $row['creator_phone'] : null,
+        ];
+
+        $prop['owner_id'] = !empty($row['owner_id']) ? (int) $row['owner_id'] : null;
+        $prop['owner_name'] = $ownerFullName;
+        $prop['owner_email'] = !empty($row['owner_email']) ? (string) $row['owner_email'] : '-';
+
+        $prop['creator_id'] = !empty($row['creator_id']) ? (int) $row['creator_id'] : null;
+        $prop['creator_name'] = $creatorFullName;
+        $prop['creator_email'] = !empty($row['creator_email']) ? (string) $row['creator_email'] : '-';
+
+        $properties[] = $prop;
     }
 
     respondJson(200, [

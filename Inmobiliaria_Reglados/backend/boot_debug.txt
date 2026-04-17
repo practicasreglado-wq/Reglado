@@ -1957,3 +1957,315 @@
 [2026-04-15 13:39:34] BOOT 24 antes send_mail.php
 [2026-04-15 13:39:34] BOOT 25 despues send_mail.php
 [2026-04-15 13:40:00] SHUTDOWN OK
+[2026-04-16 07:37:20] BOOT 1 entra al archivo | {"file":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\receive_email.php","dir":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend"}
+[2026-04-16 07:37:20] BOOT 2 antes vendor/autoload.php
+[2026-04-16 07:37:20] BOOT 3 despues vendor/autoload.php
+[2026-04-16 07:37:20] BOOT 4 antes env_loader.php
+[2026-04-16 07:37:20] BOOT 5 despues env_loader.php
+[2026-04-16 07:37:20] BOOT 6 antes check Dompdf
+[2026-04-16 07:37:20] BOOT 7 Dompdf OK
+[2026-04-16 07:37:20] BOOT 8 antes db.php
+[2026-04-16 07:37:20] BOOT 9 despues db.php
+[2026-04-16 07:37:20] BOOT 10 antes Repository.php
+[2026-04-16 07:37:20] BOOT 11 despues Repository.php
+[2026-04-16 07:37:20] BOOT 12 antes DossierService.php
+[2026-04-16 07:37:20] BOOT 13 despues DossierService.php
+[2026-04-16 07:37:20] BOOT 14 antes ClaudeClient.php
+[2026-04-16 07:37:20] BOOT 15 despues ClaudeClient.php
+[2026-04-16 07:37:20] BOOT 16 antes PdfGenerator.php
+[2026-04-16 07:37:20] BOOT 17 despues PdfGenerator.php
+[2026-04-16 07:37:20] BOOT 18 antes PropertyProcessor.php
+[2026-04-16 07:37:20] BOOT 19 despues PropertyProcessor.php
+[2026-04-16 07:37:20] BOOT 20 antes utils.php
+[2026-04-16 07:37:20] BOOT 21 despues utils.php
+[2026-04-16 07:37:20] BOOT 22 antes loadEnv
+[2026-04-16 07:37:20] BOOT 23 despues loadEnv
+[2026-04-16 07:37:20] BOOT 24 antes send_mail.php
+[2026-04-16 07:37:20] BOOT 25 despues send_mail.php
+[2026-04-16 07:37:20] SHUTDOWN OK
+[2026-04-16 07:37:31] BOOT 1 entra al archivo | {"file":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\receive_email.php","dir":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend"}
+[2026-04-16 07:37:31] BOOT 2 antes vendor/autoload.php
+[2026-04-16 07:37:31] BOOT 3 despues vendor/autoload.php
+[2026-04-16 07:37:31] BOOT 4 antes env_loader.php
+[2026-04-16 07:37:31] BOOT 5 despues env_loader.php
+[2026-04-16 07:37:31] BOOT 6 antes check Dompdf
+[2026-04-16 07:37:31] BOOT 7 Dompdf OK
+[2026-04-16 07:37:31] BOOT 8 antes db.php
+[2026-04-16 07:37:31] BOOT 9 despues db.php
+[2026-04-16 07:37:31] BOOT 10 antes Repository.php
+[2026-04-16 07:37:31] BOOT 11 despues Repository.php
+[2026-04-16 07:37:31] BOOT 12 antes DossierService.php
+[2026-04-16 07:37:31] BOOT 13 despues DossierService.php
+[2026-04-16 07:37:31] BOOT 14 antes ClaudeClient.php
+[2026-04-16 07:37:31] BOOT 15 despues ClaudeClient.php
+[2026-04-16 07:37:31] BOOT 16 antes PdfGenerator.php
+[2026-04-16 07:37:31] BOOT 17 despues PdfGenerator.php
+[2026-04-16 07:37:31] BOOT 18 antes PropertyProcessor.php
+[2026-04-16 07:37:31] BOOT 19 despues PropertyProcessor.php
+[2026-04-16 07:37:31] BOOT 20 antes utils.php
+[2026-04-16 07:37:31] BOOT 21 despues utils.php
+[2026-04-16 07:37:31] BOOT 22 antes loadEnv
+[2026-04-16 07:37:31] BOOT 23 despues loadEnv
+[2026-04-16 07:37:31] BOOT 24 antes send_mail.php
+[2026-04-16 07:37:31] BOOT 25 despues send_mail.php
+[2026-04-16 07:37:35] SHUTDOWN OK
+[2026-04-16 07:40:30] BOOT 1 entra al archivo | {"file":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\receive_email.php","dir":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend"}
+[2026-04-16 07:40:30] BOOT 2 antes vendor/autoload.php
+[2026-04-16 07:40:30] BOOT 3 despues vendor/autoload.php
+[2026-04-16 07:40:30] BOOT 4 antes env_loader.php
+[2026-04-16 07:40:30] BOOT 5 despues env_loader.php
+[2026-04-16 07:40:30] BOOT 6 antes check Dompdf
+[2026-04-16 07:40:30] BOOT 7 Dompdf OK
+[2026-04-16 07:40:30] BOOT 8 antes db.php
+[2026-04-16 07:40:30] BOOT 9 despues db.php
+[2026-04-16 07:40:30] BOOT 10 antes Repository.php
+[2026-04-16 07:40:30] BOOT 11 despues Repository.php
+[2026-04-16 07:40:30] BOOT 12 antes DossierService.php
+[2026-04-16 07:40:30] BOOT 13 despues DossierService.php
+[2026-04-16 07:40:30] BOOT 14 antes ClaudeClient.php
+[2026-04-16 07:40:30] BOOT 15 despues ClaudeClient.php
+[2026-04-16 07:40:30] BOOT 16 antes PdfGenerator.php
+[2026-04-16 07:40:30] BOOT 17 despues PdfGenerator.php
+[2026-04-16 07:40:30] BOOT 18 antes PropertyProcessor.php
+[2026-04-16 07:40:30] BOOT 19 despues PropertyProcessor.php
+[2026-04-16 07:40:30] BOOT 20 antes utils.php
+[2026-04-16 07:40:30] BOOT 21 despues utils.php
+[2026-04-16 07:40:30] BOOT 22 antes loadEnv
+[2026-04-16 07:40:30] BOOT 23 despues loadEnv
+[2026-04-16 07:40:30] BOOT 24 antes send_mail.php
+[2026-04-16 07:40:30] BOOT 25 despues send_mail.php
+[2026-04-16 07:40:30] SHUTDOWN OK
+[2026-04-16 07:42:20] BOOT 1 entra al archivo | {"file":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\receive_email.php","dir":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend"}
+[2026-04-16 07:42:20] BOOT 2 antes vendor/autoload.php
+[2026-04-16 07:42:20] BOOT 3 despues vendor/autoload.php
+[2026-04-16 07:42:20] BOOT 4 antes env_loader.php
+[2026-04-16 07:42:20] BOOT 5 despues env_loader.php
+[2026-04-16 07:42:20] BOOT 6 antes check Dompdf
+[2026-04-16 07:42:20] BOOT 7 Dompdf OK
+[2026-04-16 07:42:20] BOOT 8 antes db.php
+[2026-04-16 07:42:20] BOOT 9 despues db.php
+[2026-04-16 07:42:20] BOOT 10 antes Repository.php
+[2026-04-16 07:42:20] BOOT 11 despues Repository.php
+[2026-04-16 07:42:20] BOOT 12 antes DossierService.php
+[2026-04-16 07:42:20] BOOT 13 despues DossierService.php
+[2026-04-16 07:42:20] BOOT 14 antes ClaudeClient.php
+[2026-04-16 07:42:20] BOOT 15 despues ClaudeClient.php
+[2026-04-16 07:42:20] BOOT 16 antes PdfGenerator.php
+[2026-04-16 07:42:20] BOOT 17 despues PdfGenerator.php
+[2026-04-16 07:42:20] BOOT 18 antes PropertyProcessor.php
+[2026-04-16 07:42:20] BOOT 19 despues PropertyProcessor.php
+[2026-04-16 07:42:20] BOOT 20 antes utils.php
+[2026-04-16 07:42:20] BOOT 21 despues utils.php
+[2026-04-16 07:42:20] BOOT 22 antes loadEnv
+[2026-04-16 07:42:20] BOOT 23 despues loadEnv
+[2026-04-16 07:42:20] BOOT 24 antes send_mail.php
+[2026-04-16 07:42:20] BOOT 25 despues send_mail.php
+[2026-04-16 07:42:29] SHUTDOWN OK
+[2026-04-16 14:46:57] BOOT 1 entra al archivo | {"file":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\receive_email.php","dir":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend"}
+[2026-04-16 14:46:57] BOOT 2 antes vendor/autoload.php
+[2026-04-16 14:46:57] BOOT 3 despues vendor/autoload.php
+[2026-04-16 14:46:57] BOOT 4 antes env_loader.php
+[2026-04-16 14:46:57] BOOT 5 despues env_loader.php
+[2026-04-16 14:46:57] BOOT 6 antes check Dompdf
+[2026-04-16 14:46:57] BOOT 7 Dompdf OK
+[2026-04-16 14:46:57] BOOT 8 antes db.php
+[2026-04-16 14:46:57] BOOT 9 despues db.php
+[2026-04-16 14:46:57] BOOT 10 antes Repository.php
+[2026-04-16 14:46:57] BOOT 11 despues Repository.php
+[2026-04-16 14:46:57] BOOT 12 antes DossierService.php
+[2026-04-16 14:46:57] BOOT 13 despues DossierService.php
+[2026-04-16 14:46:57] BOOT 14 antes ClaudeClient.php
+[2026-04-16 14:46:57] BOOT 15 despues ClaudeClient.php
+[2026-04-16 14:46:57] BOOT 16 antes PdfGenerator.php
+[2026-04-16 14:46:57] BOOT 17 despues PdfGenerator.php
+[2026-04-16 14:46:57] BOOT 18 antes PropertyProcessor.php
+[2026-04-16 14:46:57] BOOT 19 despues PropertyProcessor.php
+[2026-04-16 14:46:57] BOOT 20 antes utils.php
+[2026-04-16 14:46:57] BOOT 21 despues utils.php
+[2026-04-16 14:46:57] BOOT 22 antes loadEnv
+[2026-04-16 14:46:57] BOOT 23 despues loadEnv
+[2026-04-16 14:46:57] BOOT 24 antes send_mail.php
+[2026-04-16 14:46:57] BOOT 25 despues send_mail.php
+[2026-04-16 14:47:07] SHUTDOWN OK
+[2026-04-16 14:59:13] BOOT 1 entra al archivo | {"file":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\receive_email.php","dir":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend"}
+[2026-04-16 14:59:13] BOOT 2 antes vendor/autoload.php
+[2026-04-16 14:59:13] BOOT 3 despues vendor/autoload.php
+[2026-04-16 14:59:13] BOOT 4 antes env_loader.php
+[2026-04-16 14:59:13] BOOT 5 despues env_loader.php
+[2026-04-16 14:59:13] BOOT 6 antes check Dompdf
+[2026-04-16 14:59:13] BOOT 7 Dompdf OK
+[2026-04-16 14:59:13] BOOT 8 antes db.php
+[2026-04-16 14:59:13] BOOT 9 despues db.php
+[2026-04-16 14:59:13] BOOT 10 antes Repository.php
+[2026-04-16 14:59:13] BOOT 11 despues Repository.php
+[2026-04-16 14:59:13] BOOT 12 antes DossierService.php
+[2026-04-16 14:59:13] BOOT 13 despues DossierService.php
+[2026-04-16 14:59:13] BOOT 14 antes ClaudeClient.php
+[2026-04-16 14:59:13] BOOT 15 despues ClaudeClient.php
+[2026-04-16 14:59:13] BOOT 16 antes PdfGenerator.php
+[2026-04-16 14:59:13] BOOT 17 despues PdfGenerator.php
+[2026-04-16 14:59:13] BOOT 18 antes PropertyProcessor.php
+[2026-04-16 14:59:13] BOOT 19 despues PropertyProcessor.php
+[2026-04-16 14:59:13] BOOT 20 antes utils.php
+[2026-04-16 14:59:13] BOOT 21 despues utils.php
+[2026-04-16 14:59:13] BOOT 22 antes loadEnv
+[2026-04-16 14:59:13] BOOT 23 despues loadEnv
+[2026-04-16 14:59:13] BOOT 24 antes send_mail.php
+[2026-04-16 14:59:13] BOOT 25 despues send_mail.php
+[2026-04-16 14:59:26] SHUTDOWN OK
+[2026-04-17 09:16:15] BOOT 1 entra al archivo | {"file":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\receive_email.php","dir":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend"}
+[2026-04-17 09:16:15] BOOT 2 antes vendor/autoload.php
+[2026-04-17 09:16:15] BOOT 3 despues vendor/autoload.php
+[2026-04-17 09:16:15] BOOT 4 antes env_loader.php
+[2026-04-17 09:16:15] BOOT 5 despues env_loader.php
+[2026-04-17 09:16:15] BOOT 6 antes check Dompdf
+[2026-04-17 09:16:15] BOOT 7 Dompdf OK
+[2026-04-17 09:16:15] BOOT 8 antes db.php
+[2026-04-17 09:16:15] BOOT 9 despues db.php
+[2026-04-17 09:16:15] BOOT 10 antes Repository.php
+[2026-04-17 09:16:15] BOOT 11 despues Repository.php
+[2026-04-17 09:16:15] BOOT 12 antes DossierService.php
+[2026-04-17 09:16:15] BOOT 13 despues DossierService.php
+[2026-04-17 09:16:15] BOOT 14 antes ClaudeClient.php
+[2026-04-17 09:16:15] BOOT 15 despues ClaudeClient.php
+[2026-04-17 09:16:15] BOOT 16 antes PdfGenerator.php
+[2026-04-17 09:16:15] BOOT 17 despues PdfGenerator.php
+[2026-04-17 09:16:15] BOOT 18 antes PropertyProcessor.php
+[2026-04-17 09:16:15] BOOT 19 despues PropertyProcessor.php
+[2026-04-17 09:16:15] BOOT 20 antes utils.php
+[2026-04-17 09:16:15] BOOT 21 despues utils.php
+[2026-04-17 09:16:15] BOOT 22 antes loadEnv
+[2026-04-17 09:16:15] BOOT 23 despues loadEnv
+[2026-04-17 09:16:15] BOOT 24 antes send_mail.php
+[2026-04-17 09:16:15] BOOT 25 despues send_mail.php
+[2026-04-17 09:16:26] SHUTDOWN OK
+[2026-04-17 13:47:25] BOOT 1 entra al archivo | {"file":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\receive_email.php","dir":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend"}
+[2026-04-17 13:47:25] BOOT 2 antes vendor/autoload.php
+[2026-04-17 13:47:25] BOOT 3 despues vendor/autoload.php
+[2026-04-17 13:47:25] BOOT 4 antes env_loader.php
+[2026-04-17 13:47:25] BOOT 5 despues env_loader.php
+[2026-04-17 13:47:25] BOOT 6 antes check Dompdf
+[2026-04-17 13:47:25] BOOT 7 Dompdf OK
+[2026-04-17 13:47:25] BOOT 8 antes db.php
+[2026-04-17 13:47:25] BOOT 9 despues db.php
+[2026-04-17 13:47:25] BOOT 10 antes Repository.php
+[2026-04-17 13:47:25] BOOT 11 despues Repository.php
+[2026-04-17 13:47:25] BOOT 12 antes DossierService.php
+[2026-04-17 13:47:25] BOOT 13 despues DossierService.php
+[2026-04-17 13:47:25] BOOT 14 antes ClaudeClient.php
+[2026-04-17 13:47:25] BOOT 15 despues ClaudeClient.php
+[2026-04-17 13:47:25] BOOT 16 antes PdfGenerator.php
+[2026-04-17 13:47:25] BOOT 17 despues PdfGenerator.php
+[2026-04-17 13:47:25] BOOT 18 antes PropertyProcessor.php
+[2026-04-17 13:47:25] BOOT 19 despues PropertyProcessor.php
+[2026-04-17 13:47:25] BOOT 20 antes utils.php
+[2026-04-17 13:47:25] BOOT 21 despues utils.php
+[2026-04-17 13:47:25] BOOT 22 antes loadEnv
+[2026-04-17 13:47:25] BOOT 23 despues loadEnv
+[2026-04-17 13:47:25] BOOT 24 antes send_mail.php
+[2026-04-17 13:47:25] BOOT 25 despues send_mail.php
+[2026-04-17 13:47:34] SHUTDOWN OK
+[2026-04-17 13:48:48] BOOT 1 entra al archivo | {"file":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\receive_email.php","dir":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend"}
+[2026-04-17 13:48:48] BOOT 2 antes vendor/autoload.php
+[2026-04-17 13:48:48] BOOT 3 despues vendor/autoload.php
+[2026-04-17 13:48:48] BOOT 4 antes env_loader.php
+[2026-04-17 13:48:48] BOOT 5 despues env_loader.php
+[2026-04-17 13:48:48] BOOT 6 antes check Dompdf
+[2026-04-17 13:48:48] BOOT 7 Dompdf OK
+[2026-04-17 13:48:48] BOOT 8 antes db.php
+[2026-04-17 13:48:48] BOOT 9 despues db.php
+[2026-04-17 13:48:48] BOOT 10 antes Repository.php
+[2026-04-17 13:48:48] BOOT 11 despues Repository.php
+[2026-04-17 13:48:48] BOOT 12 antes DossierService.php
+[2026-04-17 13:48:48] BOOT 13 despues DossierService.php
+[2026-04-17 13:48:48] BOOT 14 antes ClaudeClient.php
+[2026-04-17 13:48:48] BOOT 15 despues ClaudeClient.php
+[2026-04-17 13:48:48] BOOT 16 antes PdfGenerator.php
+[2026-04-17 13:48:48] BOOT 17 despues PdfGenerator.php
+[2026-04-17 13:48:48] BOOT 18 antes PropertyProcessor.php
+[2026-04-17 13:48:48] BOOT 19 despues PropertyProcessor.php
+[2026-04-17 13:48:48] BOOT 20 antes utils.php
+[2026-04-17 13:48:48] BOOT 21 despues utils.php
+[2026-04-17 13:48:48] BOOT 22 antes loadEnv
+[2026-04-17 13:48:48] BOOT 23 despues loadEnv
+[2026-04-17 13:48:48] BOOT 24 antes send_mail.php
+[2026-04-17 13:48:48] BOOT 25 despues send_mail.php
+[2026-04-17 13:48:52] SHUTDOWN OK
+[2026-04-17 13:52:59] BOOT 1 entra al archivo | {"file":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\receive_email.php","dir":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend"}
+[2026-04-17 13:52:59] BOOT 2 antes vendor/autoload.php
+[2026-04-17 13:52:59] BOOT 3 despues vendor/autoload.php
+[2026-04-17 13:52:59] BOOT 4 antes env_loader.php
+[2026-04-17 13:52:59] BOOT 5 despues env_loader.php
+[2026-04-17 13:52:59] BOOT 6 antes check Dompdf
+[2026-04-17 13:52:59] BOOT 7 Dompdf OK
+[2026-04-17 13:52:59] BOOT 8 antes db.php
+[2026-04-17 13:52:59] BOOT 9 despues db.php
+[2026-04-17 13:52:59] BOOT 10 antes Repository.php
+[2026-04-17 13:52:59] BOOT 11 despues Repository.php
+[2026-04-17 13:52:59] BOOT 12 antes DossierService.php
+[2026-04-17 13:52:59] BOOT 13 despues DossierService.php
+[2026-04-17 13:52:59] BOOT 14 antes ClaudeClient.php
+[2026-04-17 13:52:59] BOOT 15 despues ClaudeClient.php
+[2026-04-17 13:52:59] BOOT 16 antes PdfGenerator.php
+[2026-04-17 13:52:59] BOOT 17 despues PdfGenerator.php
+[2026-04-17 13:52:59] BOOT 18 antes PropertyProcessor.php
+[2026-04-17 13:52:59] BOOT 19 despues PropertyProcessor.php
+[2026-04-17 13:52:59] BOOT 20 antes utils.php
+[2026-04-17 13:52:59] BOOT 21 despues utils.php
+[2026-04-17 13:52:59] BOOT 22 antes loadEnv
+[2026-04-17 13:52:59] BOOT 23 despues loadEnv
+[2026-04-17 13:52:59] BOOT 24 antes send_mail.php
+[2026-04-17 13:52:59] BOOT 25 despues send_mail.php
+[2026-04-17 13:53:16] SHUTDOWN OK
+[2026-04-17 13:54:47] BOOT 1 entra al archivo | {"file":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\receive_email.php","dir":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend"}
+[2026-04-17 13:54:47] BOOT 2 antes vendor/autoload.php
+[2026-04-17 13:54:47] BOOT 3 despues vendor/autoload.php
+[2026-04-17 13:54:47] BOOT 4 antes env_loader.php
+[2026-04-17 13:54:47] BOOT 5 despues env_loader.php
+[2026-04-17 13:54:47] BOOT 6 antes check Dompdf
+[2026-04-17 13:54:47] BOOT 7 Dompdf OK
+[2026-04-17 13:54:47] BOOT 8 antes db.php
+[2026-04-17 13:54:47] BOOT 9 despues db.php
+[2026-04-17 13:54:47] BOOT 10 antes Repository.php
+[2026-04-17 13:54:47] BOOT 11 despues Repository.php
+[2026-04-17 13:54:47] BOOT 12 antes DossierService.php
+[2026-04-17 13:54:47] BOOT 13 despues DossierService.php
+[2026-04-17 13:54:47] BOOT 14 antes ClaudeClient.php
+[2026-04-17 13:54:47] BOOT 15 despues ClaudeClient.php
+[2026-04-17 13:54:47] BOOT 16 antes PdfGenerator.php
+[2026-04-17 13:54:47] BOOT 17 despues PdfGenerator.php
+[2026-04-17 13:54:47] BOOT 18 antes PropertyProcessor.php
+[2026-04-17 13:54:47] BOOT 19 despues PropertyProcessor.php
+[2026-04-17 13:54:47] BOOT 20 antes utils.php
+[2026-04-17 13:54:47] BOOT 21 despues utils.php
+[2026-04-17 13:54:47] BOOT 22 antes loadEnv
+[2026-04-17 13:54:47] BOOT 23 despues loadEnv
+[2026-04-17 13:54:47] BOOT 24 antes send_mail.php
+[2026-04-17 13:54:47] BOOT 25 despues send_mail.php
+[2026-04-17 13:54:59] SHUTDOWN OK
+[2026-04-17 13:56:49] BOOT 1 entra al archivo | {"file":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\receive_email.php","dir":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend"}
+[2026-04-17 13:56:49] BOOT 2 antes vendor/autoload.php
+[2026-04-17 13:56:49] BOOT 3 despues vendor/autoload.php
+[2026-04-17 13:56:49] BOOT 4 antes env_loader.php
+[2026-04-17 13:56:49] BOOT 5 despues env_loader.php
+[2026-04-17 13:56:49] BOOT 6 antes check Dompdf
+[2026-04-17 13:56:49] BOOT 7 Dompdf OK
+[2026-04-17 13:56:49] BOOT 8 antes db.php
+[2026-04-17 13:56:49] BOOT 9 despues db.php
+[2026-04-17 13:56:49] BOOT 10 antes Repository.php
+[2026-04-17 13:56:49] BOOT 11 despues Repository.php
+[2026-04-17 13:56:49] BOOT 12 antes DossierService.php
+[2026-04-17 13:56:49] BOOT 13 despues DossierService.php
+[2026-04-17 13:56:49] BOOT 14 antes ClaudeClient.php
+[2026-04-17 13:56:49] BOOT 15 despues ClaudeClient.php
+[2026-04-17 13:56:49] BOOT 16 antes PdfGenerator.php
+[2026-04-17 13:56:49] BOOT 17 despues PdfGenerator.php
+[2026-04-17 13:56:49] BOOT 18 antes PropertyProcessor.php
+[2026-04-17 13:56:49] BOOT 19 despues PropertyProcessor.php
+[2026-04-17 13:56:49] BOOT 20 antes utils.php
+[2026-04-17 13:56:49] BOOT 21 despues utils.php
+[2026-04-17 13:56:49] BOOT 22 antes loadEnv
+[2026-04-17 13:56:49] BOOT 23 despues loadEnv
+[2026-04-17 13:56:49] BOOT 24 antes send_mail.php
+[2026-04-17 13:56:49] BOOT 25 despues send_mail.php
+[2026-04-17 13:57:02] SHUTDOWN OK

@@ -344,6 +344,11 @@ if ($existingRow) {
     ]);
 }
 
+    // Subir documentos firmados implica que el usuario ya dispone de NDA+LOI.
+    // Marcamos ambas descargas para mantener compatibilidad con flujos antiguos
+    // (por ejemplo, si descargÃ³ con un enlace antiguo que no registraba progreso).
+    markBuyerPropertyAllLegalDocumentsDownloaded($pdo, $propertyId, $buyerUserId);
+
     ensureBuyerPropertyAccess($pdo, $propertyId, $buyerUserId);
 
     $access = updateBuyerPropertyAccess($pdo, $propertyId, $buyerUserId, [

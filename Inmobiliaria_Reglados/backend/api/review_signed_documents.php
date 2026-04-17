@@ -75,7 +75,9 @@ $updates[$documentType === 'nda' ? 'nda_approved' : 'loi_approved'] = $action ==
 $access = ensureBuyerPropertyAccess($pdo, $propertyId, $buyerUserId);
 $access = updateBuyerPropertyAccess($pdo, $propertyId, $buyerUserId, $updates);
 
-$dossierUnlocked = ($access['nda_approved'] && $access['loi_approved']) ? 1 : 0;
+$ndaApproved = (int) ($access['nda_approved'] ?? 0) === 1;
+$loiApproved = (int) ($access['loi_approved'] ?? 0) === 1;
+$dossierUnlocked = ($ndaApproved && $loiApproved) ? 1 : 0;
 if ((int) ($access['dossier_unlocked'] ?? 0) !== $dossierUnlocked) {
     $access = updateBuyerPropertyAccess($pdo, $propertyId, $buyerUserId, [
         'dossier_unlocked' => $dossierUnlocked,

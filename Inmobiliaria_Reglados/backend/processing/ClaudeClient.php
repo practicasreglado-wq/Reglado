@@ -67,6 +67,27 @@ class ClaudeClient
             $decoded['dossier_inversion'] = [];
         }
 
+        // Bloque opcional para asignacion automatica de usuario/propietario.
+        if (!isset($decoded['asignacion_usuario']) || !is_array($decoded['asignacion_usuario'])) {
+            $decoded['asignacion_usuario'] = [
+                'email_usuario' => null,
+                'nombre_contacto' => null,
+                'telefono_contacto' => null,
+            ];
+        } else {
+            $decoded['asignacion_usuario'] = [
+                'email_usuario' => isset($decoded['asignacion_usuario']['email_usuario'])
+                    ? trim((string) $decoded['asignacion_usuario']['email_usuario'])
+                    : null,
+                'nombre_contacto' => isset($decoded['asignacion_usuario']['nombre_contacto'])
+                    ? trim((string) $decoded['asignacion_usuario']['nombre_contacto'])
+                    : null,
+                'telefono_contacto' => isset($decoded['asignacion_usuario']['telefono_contacto'])
+                    ? trim((string) $decoded['asignacion_usuario']['telefono_contacto'])
+                    : null,
+            ];
+        }
+
         $ficha = array_map(function ($value) {
             if (is_string($value)) {
                 return trim($value);
@@ -122,6 +143,11 @@ class ClaudeClient
             "riesgos": [],
             "oportunidades": [],
             "observaciones": []
+        },
+        "asignacion_usuario": {
+            "email_usuario": string|null,
+            "nombre_contacto": string|null,
+            "telefono_contacto": string|null
         }
         }
 
@@ -135,7 +161,17 @@ class ClaudeClient
         - "direccion" debe ser corta para la ficha web.
         - "ubicacion_completa" debe ser la dirección completa de dossier.
         - "resumen_ejecutivo" debe ser breve, profesional y útil para inversión.
-
+        - "asignacion_usuario.email_usuario" debe ser el email del propietario/remitente/contacto principal al que se debe asociar el activo.
+        - Si aparecen varios emails, elige el que esté más claramente asociado al propietario, remitente o contacto principal del activo.        
+        - Si no hay un email claro, devuelve null.
+        - No inventes email, nombre ni telefono.
+        - "asignacion_usuario.nombre_contacto" y "asignacion_usuario.telefono_contacto" solo si aparecen claramente en el texto; si no, null.
+        - "ubicacion_completa" debe ser una dirección real geolocalizable (calle, número, ciudad, código postal y país si aparece).
+        - Si aparece una dirección exacta en el texto, debes copiarla íntegramente.
+        - No resumir ni generalizar la dirección.
+        - "codigo_postal" debe extraerse siempre que aparezca en el texto.
+        - Si la dirección incluye código postal, debes copiarlo exactamente.
+        - "ubicacion_completa" debe incluir el código postal si aparece en el texto.
         Texto a analizar:
         PROMPT
             . "\n" . trim($text);

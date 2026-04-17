@@ -7,20 +7,20 @@ class PropertyProcessor
     private ClaudeClient $claudeClient;
     private PdfGenerator $pdfGenerator;
     private DossierService $dossierService;
-    private ?int $ownerUserId;
+    private ?int $createdByUserId;
 
     public function __construct(
         Repository $repository,
         ClaudeClient $claudeClient,
         PdfGenerator $pdfGenerator,
         DossierService $dossierService,
-        ?int $ownerUserId
+        ?int $createdByUserId
     ) {
         $this->repository = $repository;
         $this->claudeClient = $claudeClient;
         $this->pdfGenerator = $pdfGenerator;
         $this->dossierService = $dossierService;
-        $this->ownerUserId = $ownerUserId;
+        $this->createdByUserId = $createdByUserId;
     }
 
     public function process(int $assetId): int
@@ -32,13 +32,35 @@ class PropertyProcessor
             throw new RuntimeException('Texto vacío para procesar');
         }
 
-        if ($this->ownerUserId === null) {
-            throw new RuntimeException('owner_user_id no resuelto en PropertyProcessor');
+        if ($this->createdByUserId === null) {
+            throw new RuntimeException('created_by_user_id no resuelto en PropertyProcessor');
         }
 
         $claudeData = $this->claudeClient->analyzeStructuredPropertyText($text);
 
         $this->validateClaudeResponse($claudeData);
+
+        $assignment = $claudeData['asignacion_usuario'] ?? null;
+        $rawOwnerEmail = is_array($assignment) ? ($assignment['email_usuario'] ?? null) : null;
+        $normalizedOwnerEmail = $this->normalizeEmail($rawOwnerEmail);
+
+        $resolvedOwnerUserId = null;
+        $ownerEmailPending = null;
+
+        $defaultOwnerUserId = (int) (getenv('DEFAULT_OWNER_USER_ID') ?: 1);
+        if ($defaultOwnerUserId <= 0) {
+            $defaultOwnerUserId = 1;
+        }
+
+        if ($normalizedOwnerEmail === null) {
+            $resolvedOwnerUserId = $defaultOwnerUserId;
+        } else {
+            $resolvedOwnerUserId = $this->repository->findRegladoUserIdByEmail($normalizedOwnerEmail);
+
+            if ($resolvedOwnerUserId === null) {
+                $ownerEmailPending = $normalizedOwnerEmail;
+            }
+        }
 
         $email = trim((string) ($asset['email_remitente'] ?? ''));
         $captadorId = $this->resolveCaptador($email);
@@ -49,7 +71,9 @@ class PropertyProcessor
             null,
             json_encode($claudeData, JSON_UNESCAPED_UNICODE),
             $captadorId,
-            $this->ownerUserId
+            $resolvedOwnerUserId,
+            $this->createdByUserId,
+            $ownerEmailPending
         );
 
         $documents = $this->pdfGenerator->generateDocuments(
@@ -149,5 +173,15 @@ class PropertyProcessor
         }
 
         return $count >= 5;
+    }
+
+    private function normalizeEmail(mixed $email): ?string
+    {
+        $clean = strtolower(trim((string) ($email ?? '')));
+        if ($clean === '') {
+            return null;
+        }
+
+        return filter_var($clean, FILTER_VALIDATE_EMAIL) ? $clean : null;
     }
 }

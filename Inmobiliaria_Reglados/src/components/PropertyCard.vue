@@ -92,8 +92,11 @@
       <div class="property-card__footer">
         <strong>{{ formatPrice(property.precio) }}</strong>
 
-        <router-link :to="`/property/${property.id}`" class="detail-link">
-          Ver ficha
+        <router-link
+          :to="`/property/${property.id}`"
+          :class="detailButtonClass"
+        >
+          {{ detailButtonLabel }}
         </router-link>
       </div>
     </div>
@@ -162,6 +165,70 @@ export default {
     localFavorite() {
       return !!this.property.is_favorite;
     },
+
+    documentAccessStatus() {
+      const validadoAdmin = Number(this.property.validado_admin ?? 0);
+      const status = String(this.property.status ?? "").toLowerCase();
+
+      const ndaUploaded = Boolean(
+        this.property.nda_uploaded ??
+        this.property.signed_nda_uploaded ??
+        false
+      );
+
+      const loiUploaded = Boolean(
+        this.property.loi_uploaded ??
+        this.property.signed_loi_uploaded ??
+        false
+      );
+
+      const ndaApproved = Boolean(
+        this.property.nda_approved ??
+        false
+      );
+
+      const loiApproved = Boolean(
+        this.property.loi_approved ??
+        false
+      );
+
+      const dossierUnlocked = Boolean(
+        this.property.dossier_unlocked ??
+        this.property.acceso_dossier ??
+        false
+      );
+
+      if (validadoAdmin === -1 || status === "rejected") {
+        return "rejected";
+      }
+
+      if (dossierUnlocked || (ndaApproved && loiApproved) || validadoAdmin === 1 || status === "approved") {
+        return "approved";
+      }
+
+      if (ndaUploaded || loiUploaded || status === "pending") {
+        return "pending";
+      }
+
+      return "idle";
+    },
+
+detailButtonLabel() {
+  switch (this.documentAccessStatus) {
+    case "pending":
+      return "Pendiente";
+    case "rejected":
+      return "Rechazado";
+    case "approved":
+      return "Aceptado";
+    default:
+      return "Ver ficha";
+  }
+},
+
+detailButtonClass() {
+  return `detail-link detail-link--${this.documentAccessStatus}`;
+},
 
     matchValue() {
       const raw =
@@ -570,9 +637,72 @@ export default {
     },
   },
 };
+
 </script>
 
 <style scoped>
+.detail-link {
+  padding: 6px 16px;
+  border-radius: 20px;
+  border: 1.5px solid var(--azul-principal);
+  color: var(--azul-principal);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 110px;
+}
+
+.detail-link:hover {
+  background: var(--azul-principal);
+  color: #fff;
+}
+
+.detail-link--idle {
+  border-color: var(--azul-principal);
+  color: var(--azul-principal);
+}
+
+.detail-link--idle:hover {
+  background: var(--azul-principal);
+  color: #fff;
+}
+
+.detail-link--pending {
+  border-color: #f3d37e;
+  background: #fff7db;
+  color: #92400e;
+}
+
+.detail-link--pending:hover {
+  background: #f8e7a8;
+  color: #7c2d12;
+}
+
+.detail-link--rejected {
+  border-color: #fecdd3;
+  background: #fff1f2;
+  color: #be123c;
+}
+
+.detail-link--rejected:hover {
+  background: #ffe4e6;
+  color: #9f1239;
+}
+
+.detail-link--approved {
+  border-color: #bfe8cf;
+  background: #e8f8ef;
+  color: #166534;
+}
+
+.detail-link--approved:hover {
+  background: #d9f3e4;
+  color: #14532d;
+}
 .property-card {
   position: relative;
   z-index: 1;
@@ -890,17 +1020,6 @@ export default {
 .property-card__footer strong {
   font-size: 1.1rem;
   color: var(--azul-principal);
-}
-
-.detail-link {
-  padding: 6px 16px;
-  border-radius: 20px;
-  border: 1.5px solid var(--azul-principal);
-  color: var(--azul-principal);
-  font-size: 0.85rem;
-  font-weight: 700;
-  text-decoration: none;
-  transition: all 0.2s ease;
 }
 
 .detail-link:hover {

@@ -848,3 +848,171 @@
 [2026-04-15 13:39:34] PASO 6 antes process() | {"asset_id":115}
 [2026-04-15 13:39:37] ERROR GLOBAL | {"message":"Campo requerido faltante en ficha_web: tipo_propiedad","file":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\processing\\ClaudeClient.php","line":79,"asset_id":115,"message_id":"CAF+o0zsK1_TNgwp1oRdf9Q7N8ijnzZjtawcqRdFt=S8s49SVoQ@mail.gmail.com","sender":"practicasreglado@gmail.com"}
 [2026-04-15 13:39:37] ROLLBACK EJECUTADO | {"asset_id":115}
+[2026-04-16 07:37:20] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-16 07:37:20] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-16 07:37:20] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-16 07:37:20] PASO 2A texto encontrado | {"source_key":"plain","text_len":1281,"text_preview":"DOSSIER DE INVERSIÓN – EDIFICIO EN SAGRADA FAMILIA (BARCELONA)\r\nRESUMEN EJECUTIVO\r\nActivo residencial con potencial de reposicionamiento situado en una de las\r\nzonas más\r\ndemandadas de Barcelona Carrer de València, 422. Operación tipo value-add\r\ncon alto componente estratégico.\r\nDATOS CLAVE\r\n- Precio: 8.000.000 € (negociables)\r\n- Superficie: ~1.850 m²\r\n- Unidades: 23 viviendas + 4 locales + portería\r\n- Vacancia: 21 viviendas libres\r\nSITUACIÓN ACTUAL\r\n- 16 viviendas reformadas\r\n- 5 viviendas a re"}
+[2026-04-16 07:37:20] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-16 07:37:20] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":1281,"text_preview":"DOSSIER DE INVERSIÓN – EDIFICIO EN SAGRADA FAMILIA (BARCELONA)\r\nRESUMEN EJECUTIVO\r\nActivo residencial con potencial de reposicionamiento situado en una de las\r\nzonas más\r\ndemandadas de Barcelona Carrer de València, 422. Operación tipo value-add\r\ncon alto componente estratégico.\r\nDATOS CLAVE\r\n- Precio: 8.000.000 € (negociables)\r\n- Superficie: ~1.850 m²\r\n- Unidades: 23 viviendas + 4 locales + portería\r\n- Vacancia: 21 viviendas libres\r\nSITUACIÓN ACTUAL\r\n- 16 viviendas reformadas\r\n- 5 viviendas a reformar\r\n- 2 con rentas antiguas\r\n- Locales 100% ocupados\r\nINGRESOS\r\n- Ingresos actuales: ~349.000 €\r\n- Ingresos potenciales: >500.000 €\r\nANÁLISIS FINANCIERO\r\n- Yield actual: ~4,3%\r\n- Yield potencial: "}
+[2026-04-16 07:37:20] PASO 3 antes duplicados | {"message_id":"CAF+o0ztZvpThAhQzhxqzPE-PXy5vHwP-oe8JJdPnYa8854vDJQ@mail.gmail.com","content_hash":"51e51a191c840764d256357d42f8761c1eef84f22eaab5f1f681ce2a1e0b977e"}
+[2026-04-16 07:37:20] Duplicado por content_hash | {"content_hash":"51e51a191c840764d256357d42f8761c1eef84f22eaab5f1f681ce2a1e0b977e","existing_asset_id":114}
+[2026-04-16 07:37:31] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-16 07:37:31] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-16 07:37:31] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-16 07:37:31] PASO 2A texto encontrado | {"source_key":"plain","text_len":4,"text_preview":"hola"}
+[2026-04-16 07:37:31] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-16 07:37:31] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":4,"text_preview":"hola"}
+[2026-04-16 07:37:31] PASO 3 antes duplicados | {"message_id":"CAF+o0zvka5dw3LMBK-n3wvgpkpZZXAiK-LcHt01rDB+L2s7TSA@mail.gmail.com","content_hash":"b221d9dbb083a7f33428d7c2a3c3198ae925614d70210e28716ccaa7cd4ddb79"}
+[2026-04-16 07:37:31] PASO 4 activo insertado o recuperado | {"asset_id":117,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-16 07:37:31] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-16 07:37:31] PASO 6 antes process() | {"asset_id":117}
+[2026-04-16 07:37:34] ERROR GLOBAL | {"message":"Campo requerido faltante en ficha_web: tipo_propiedad","file":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\processing\\ClaudeClient.php","line":79,"asset_id":117,"message_id":"CAF+o0zvka5dw3LMBK-n3wvgpkpZZXAiK-LcHt01rDB+L2s7TSA@mail.gmail.com","sender":"practicasreglado@gmail.com"}
+[2026-04-16 07:37:34] ROLLBACK EJECUTADO | {"asset_id":117}
+[2026-04-16 07:40:30] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-16 07:40:30] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-16 07:40:30] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-16 07:40:30] PASO 2A texto encontrado | {"source_key":"plain","text_len":1281,"text_preview":"DOSSIER DE INVERSIÓN – EDIFICIO EN SAGRADA FAMILIA (BARCELONA)\r\nRESUMEN EJECUTIVO\r\nActivo residencial con potencial de reposicionamiento situado en una de las\r\nzonas más\r\ndemandadas de Barcelona Carrer de València, 422. Operación tipo value-add\r\ncon alto componente estratégico.\r\nDATOS CLAVE\r\n- Precio: 8.000.000 € (negociables)\r\n- Superficie: ~1.850 m²\r\n- Unidades: 23 viviendas + 4 locales + portería\r\n- Vacancia: 21 viviendas libres\r\nSITUACIÓN ACTUAL\r\n- 16 viviendas reformadas\r\n- 5 viviendas a re"}
+[2026-04-16 07:40:30] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-16 07:40:30] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":1281,"text_preview":"DOSSIER DE INVERSIÓN – EDIFICIO EN SAGRADA FAMILIA (BARCELONA)\r\nRESUMEN EJECUTIVO\r\nActivo residencial con potencial de reposicionamiento situado en una de las\r\nzonas más\r\ndemandadas de Barcelona Carrer de València, 422. Operación tipo value-add\r\ncon alto componente estratégico.\r\nDATOS CLAVE\r\n- Precio: 8.000.000 € (negociables)\r\n- Superficie: ~1.850 m²\r\n- Unidades: 23 viviendas + 4 locales + portería\r\n- Vacancia: 21 viviendas libres\r\nSITUACIÓN ACTUAL\r\n- 16 viviendas reformadas\r\n- 5 viviendas a reformar\r\n- 2 con rentas antiguas\r\n- Locales 100% ocupados\r\nINGRESOS\r\n- Ingresos actuales: ~349.000 €\r\n- Ingresos potenciales: >500.000 €\r\nANÁLISIS FINANCIERO\r\n- Yield actual: ~4,3%\r\n- Yield potencial: "}
+[2026-04-16 07:40:30] PASO 3 antes duplicados | {"message_id":"CAF+o0zugSHiBWJSBXPmRrtGLFJQiE4omZsNsi95zOb75X5kO2g@mail.gmail.com","content_hash":"51e51a191c840764d256357d42f8761c1eef84f22eaab5f1f681ce2a1e0b977e"}
+[2026-04-16 07:40:30] Duplicado por content_hash | {"content_hash":"51e51a191c840764d256357d42f8761c1eef84f22eaab5f1f681ce2a1e0b977e","existing_asset_id":114}
+[2026-04-16 07:42:20] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-16 07:42:20] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-16 07:42:20] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-16 07:42:20] PASO 2A texto encontrado | {"source_key":"plain","text_len":1281,"text_preview":"DOSSIER DE INVERSIÓN – EDIFICIO EN SAGRADA FAMILIA (BARCELONA)\r\nRESUMEN EJECUTIVO\r\nActivo residencial con potencial de reposicionamiento situado en una de las\r\nzonas más\r\ndemandadas de Barcelona Carrer de València, 422. Operación tipo value-add\r\ncon alto componente estratégico.\r\nDATOS CLAVE\r\n- Precio: 8.000.000 € (negociables)\r\n- Superficie: ~1.850 m²\r\n- Unidades: 23 viviendas + 4 locales + portería\r\n- Vacancia: 21 viviendas libres\r\nSITUACIÓN ACTUAL\r\n- 16 viviendas reformadas\r\n- 5 viviendas a re"}
+[2026-04-16 07:42:20] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-16 07:42:20] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":1281,"text_preview":"DOSSIER DE INVERSIÓN – EDIFICIO EN SAGRADA FAMILIA (BARCELONA)\r\nRESUMEN EJECUTIVO\r\nActivo residencial con potencial de reposicionamiento situado en una de las\r\nzonas más\r\ndemandadas de Barcelona Carrer de València, 422. Operación tipo value-add\r\ncon alto componente estratégico.\r\nDATOS CLAVE\r\n- Precio: 8.000.000 € (negociables)\r\n- Superficie: ~1.850 m²\r\n- Unidades: 23 viviendas + 4 locales + portería\r\n- Vacancia: 21 viviendas libres\r\nSITUACIÓN ACTUAL\r\n- 16 viviendas reformadas\r\n- 5 viviendas a reformar\r\n- 2 con rentas antiguas\r\n- Locales 100% ocupados\r\nINGRESOS\r\n- Ingresos actuales: ~349.000 €\r\n- Ingresos potenciales: >500.000 €\r\nANÁLISIS FINANCIERO\r\n- Yield actual: ~4,3%\r\n- Yield potencial: "}
+[2026-04-16 07:42:20] PASO 3 antes duplicados | {"message_id":"CAF+o0zu5JYdRPizyVTuVaSi8ZjXQxTGiD1iPsvwQMBq-8Gbq=w@mail.gmail.com","content_hash":"51e51a191c840764d256357d42f8761c1eef84f22eaab5f1f681ce2a1e0b977e"}
+[2026-04-16 07:42:20] PASO 4 activo insertado o recuperado | {"asset_id":118,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-16 07:42:20] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-16 07:42:20] PASO 6 antes process() | {"asset_id":118}
+[2026-04-16 07:42:28] PASO 6B resultado process() | {"asset_id":118,"property_id_raw":77,"property_id_type":"integer"}
+[2026-04-16 07:42:28] PASO 7 propiedad creada correctamente | {"asset_id":118,"property_id":77}
+[2026-04-16 07:42:28] PASO 8 antes commit | {"asset_id":118,"property_id":77}
+[2026-04-16 07:42:28] PASO 9 commit realizado | {"asset_id":118,"property_id":77}
+[2026-04-16 07:42:28] PASO 10 antes email OK | {"sender":"practicasreglado@gmail.com","property_id":77}
+[2026-04-16 07:42:29] PASO 11 después email OK | {"sender":"practicasreglado@gmail.com","property_id":77}
+[2026-04-16 14:46:57] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-16 14:46:57] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-16 14:46:57] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-16 14:46:57] PASO 2A texto encontrado | {"source_key":"plain","text_len":1932,"text_preview":"Exclusivo activo hotelero 5★ en primera línea de playa – Sur de Tenerife\r\nAv. Marítima, 14\r\nSe ofrece en venta un activo hotelero de categoría 5 estrellas, ubicado en\r\nprimera línea de playa en el sur de Tenerife, una de las zonas turísticas\r\nmás consolidadas, demandadas y con mayor rentabilidad del mercado europeo.\r\n\r\nEl complejo se sitúa en un enclave privilegiado, con acceso directo al\r\nlitoral y vistas abiertas al océano, en un entorno caracterizado por su\r\nalta ocupación durante todo el año"}
+[2026-04-16 14:46:57] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-16 14:46:57] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":1932,"text_preview":"Exclusivo activo hotelero 5★ en primera línea de playa – Sur de Tenerife\r\nAv. Marítima, 14\r\nSe ofrece en venta un activo hotelero de categoría 5 estrellas, ubicado en\r\nprimera línea de playa en el sur de Tenerife, una de las zonas turísticas\r\nmás consolidadas, demandadas y con mayor rentabilidad del mercado europeo.\r\n\r\nEl complejo se sitúa en un enclave privilegiado, con acceso directo al\r\nlitoral y vistas abiertas al océano, en un entorno caracterizado por su\r\nalta ocupación durante todo el año gracias al clima estable de las Islas\r\nCanarias y a su potente industria turística internacional.\r\n\r\nEl activo cuenta con una configuración sólida y eficiente, compuesto por un\r\ntotal de 284 habitaci"}
+[2026-04-16 14:46:57] PASO 3 antes duplicados | {"message_id":"CAF+o0zszc_Fp96ORB_Hru33_iV_5XWCTaY7Wrm5jqBWjRbF3OQ@mail.gmail.com","content_hash":"96cab4297e2c20bb885c4480f24713e73e7c1eabf3549c8b5a9072eb5d5f73c0"}
+[2026-04-16 14:46:57] PASO 4 activo insertado o recuperado | {"asset_id":124,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-16 14:46:57] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-16 14:46:57] PASO 6 antes process() | {"asset_id":124}
+[2026-04-16 14:47:06] PASO 6B resultado process() | {"asset_id":124,"property_id_raw":83,"property_id_type":"integer"}
+[2026-04-16 14:47:06] PASO 7 propiedad creada correctamente | {"asset_id":124,"property_id":83}
+[2026-04-16 14:47:06] PASO 8 antes commit | {"asset_id":124,"property_id":83}
+[2026-04-16 14:47:06] PASO 9 commit realizado | {"asset_id":124,"property_id":83}
+[2026-04-16 14:47:06] PASO 10 antes email OK | {"sender":"practicasreglado@gmail.com","property_id":83}
+[2026-04-16 14:47:07] PASO 11 después email OK | {"sender":"practicasreglado@gmail.com","property_id":83}
+[2026-04-16 14:59:13] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-16 14:59:13] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-16 14:59:13] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-16 14:59:13] PASO 2A texto encontrado | {"source_key":"plain","text_len":1808,"text_preview":"Oportunidad de inversión única en el corazón de San Cristóbal de La Laguna\r\n(Tenerife)\r\nC. Nuñez de la Peña, 54-68\r\nSe presenta en venta un conjunto inmobiliario de gran valor estratégico,\r\ncompuesto por plazas de aparcamiento, trasteros y espacios de oficinas, con\r\nuna superficie total aproximada de 2.900 m², ubicado en una de las zonas\r\nmás demandadas y consolidadas de la ciudad.\r\n\r\nLa propiedad se sitúa en pleno centro urbano de San Cristóbal de La Laguna,\r\nen un entorno privilegiado caracter"}
+[2026-04-16 14:59:13] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-16 14:59:13] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":1808,"text_preview":"Oportunidad de inversión única en el corazón de San Cristóbal de La Laguna\r\n(Tenerife)\r\nC. Nuñez de la Peña, 54-68\r\nSe presenta en venta un conjunto inmobiliario de gran valor estratégico,\r\ncompuesto por plazas de aparcamiento, trasteros y espacios de oficinas, con\r\nuna superficie total aproximada de 2.900 m², ubicado en una de las zonas\r\nmás demandadas y consolidadas de la ciudad.\r\n\r\nLa propiedad se sitúa en pleno centro urbano de San Cristóbal de La Laguna,\r\nen un entorno privilegiado caracterizado por su alto tránsito peatonal y su\r\nrelevancia histórica y comercial. Su localización es especialmente\r\ndestacada por su proximidad a la antigua estación de autobuses y a las\r\nprincipales univer"}
+[2026-04-16 14:59:13] PASO 3 antes duplicados | {"message_id":"CAF+o0zsvvyMgQ9YRy6iov0bBjWOZF96sP6ZRR-ftbHBBr5auaA@mail.gmail.com","content_hash":"0b718b6119a1c2f9ab97bd41b7304bda228281984b8f34edec856a7a3139719e"}
+[2026-04-16 14:59:13] PASO 4 activo insertado o recuperado | {"asset_id":125,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-16 14:59:13] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-16 14:59:13] PASO 6 antes process() | {"asset_id":125}
+[2026-04-16 14:59:25] PASO 6B resultado process() | {"asset_id":125,"property_id_raw":84,"property_id_type":"integer"}
+[2026-04-16 14:59:25] PASO 7 propiedad creada correctamente | {"asset_id":125,"property_id":84}
+[2026-04-16 14:59:25] PASO 8 antes commit | {"asset_id":125,"property_id":84}
+[2026-04-16 14:59:25] PASO 9 commit realizado | {"asset_id":125,"property_id":84}
+[2026-04-16 14:59:25] PASO 10 antes email OK | {"sender":"practicasreglado@gmail.com","property_id":84}
+[2026-04-16 14:59:26] PASO 11 después email OK | {"sender":"practicasreglado@gmail.com","property_id":84}
+[2026-04-17 09:16:15] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-17 09:16:15] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-17 09:16:15] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-17 09:16:15] PASO 2A texto encontrado | {"source_key":"plain","text_len":1847,"text_preview":"Oportunidad de inversión única en el corazón de San Cristóbal de La Laguna\r\n(Tenerife)\r\nC. Nuñez de la Peña, 54, 38203 La Laguna, Santa Cruz de Tenerife Se\r\npresenta en venta un conjunto inmobiliario de gran valor estratégico,\r\ncompuesto por plazas de aparcamiento, trasteros y espacios de oficinas, con\r\nuna superficie total aproximada de 2.900 m², ubicado en una de las zonas\r\nmás demandadas y consolidadas de la ciudad.\r\n\r\nLa propiedad se sitúa en pleno centro urbano de San Cristóbal de La Laguna"}
+[2026-04-17 09:16:15] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-17 09:16:15] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":1847,"text_preview":"Oportunidad de inversión única en el corazón de San Cristóbal de La Laguna\r\n(Tenerife)\r\nC. Nuñez de la Peña, 54, 38203 La Laguna, Santa Cruz de Tenerife Se\r\npresenta en venta un conjunto inmobiliario de gran valor estratégico,\r\ncompuesto por plazas de aparcamiento, trasteros y espacios de oficinas, con\r\nuna superficie total aproximada de 2.900 m², ubicado en una de las zonas\r\nmás demandadas y consolidadas de la ciudad.\r\n\r\nLa propiedad se sitúa en pleno centro urbano de San Cristóbal de La Laguna,\r\nen un entorno privilegiado caracterizado por su alto tránsito peatonal y su\r\nrelevancia histórica y comercial. Su localización es especialmente\r\ndestacada por su proximidad a la antigua estación de"}
+[2026-04-17 09:16:15] PASO 3 antes duplicados | {"message_id":"CAF+o0zve4qCDLjo9ZiQDsbDJ6ND78JzH68_hWjP2zn3Y=3Fhtg@mail.gmail.com","content_hash":"a0b14b00d7009126ba45796b9b61ae08c6bb46525c9164d269cd5b15b1baf995"}
+[2026-04-17 09:16:15] PASO 4 activo insertado o recuperado | {"asset_id":137,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-17 09:16:15] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-17 09:16:15] PASO 6 antes process() | {"asset_id":137}
+[2026-04-17 09:16:25] PASO 6B resultado process() | {"asset_id":137,"property_id_raw":96,"property_id_type":"integer"}
+[2026-04-17 09:16:25] PASO 7 propiedad creada correctamente | {"asset_id":137,"property_id":96}
+[2026-04-17 09:16:25] PASO 8 antes commit | {"asset_id":137,"property_id":96}
+[2026-04-17 09:16:25] PASO 9 commit realizado | {"asset_id":137,"property_id":96}
+[2026-04-17 09:16:25] PASO 10 antes email OK | {"sender":"practicasreglado@gmail.com","property_id":96}
+[2026-04-17 09:16:26] PASO 11 después email OK | {"sender":"practicasreglado@gmail.com","property_id":96}
+[2026-04-17 13:47:25] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-17 13:47:25] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-17 13:47:25] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-17 13:47:25] PASO 2A texto encontrado | {"source_key":"plain","text_len":1281,"text_preview":"DOSSIER DE INVERSIÓN – EDIFICIO EN SAGRADA FAMILIA (BARCELONA)\r\nRESUMEN EJECUTIVO\r\nActivo residencial con potencial de reposicionamiento situado en una de las\r\nzonas más\r\ndemandadas de Barcelona Carrer de València, 422. Operación tipo value-add\r\ncon alto componente estratégico.\r\nDATOS CLAVE\r\n- Precio: 8.000.000 € (negociables)\r\n- Superficie: ~1.850 m²\r\n- Unidades: 23 viviendas + 4 locales + portería\r\n- Vacancia: 21 viviendas libres\r\nSITUACIÓN ACTUAL\r\n- 16 viviendas reformadas\r\n- 5 viviendas a re"}
+[2026-04-17 13:47:25] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-17 13:47:25] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":1281,"text_preview":"DOSSIER DE INVERSIÓN – EDIFICIO EN SAGRADA FAMILIA (BARCELONA)\r\nRESUMEN EJECUTIVO\r\nActivo residencial con potencial de reposicionamiento situado en una de las\r\nzonas más\r\ndemandadas de Barcelona Carrer de València, 422. Operación tipo value-add\r\ncon alto componente estratégico.\r\nDATOS CLAVE\r\n- Precio: 8.000.000 € (negociables)\r\n- Superficie: ~1.850 m²\r\n- Unidades: 23 viviendas + 4 locales + portería\r\n- Vacancia: 21 viviendas libres\r\nSITUACIÓN ACTUAL\r\n- 16 viviendas reformadas\r\n- 5 viviendas a reformar\r\n- 2 con rentas antiguas\r\n- Locales 100% ocupados\r\nINGRESOS\r\n- Ingresos actuales: ~349.000 €\r\n- Ingresos potenciales: >500.000 €\r\nANÁLISIS FINANCIERO\r\n- Yield actual: ~4,3%\r\n- Yield potencial: "}
+[2026-04-17 13:47:25] PASO 3 antes duplicados | {"message_id":"CAF+o0zsVcyUowvAEwTLHOiFbP4Wu-R=mRMLm1teHFV_gLtMgYg@mail.gmail.com","content_hash":"51e51a191c840764d256357d42f8761c1eef84f22eaab5f1f681ce2a1e0b977e"}
+[2026-04-17 13:47:25] PASO 4 activo insertado o recuperado | {"asset_id":146,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-17 13:47:25] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-17 13:47:25] PASO 6 antes process() | {"asset_id":146}
+[2026-04-17 13:47:32] PASO 6B resultado process() | {"asset_id":146,"property_id_raw":105,"property_id_type":"integer"}
+[2026-04-17 13:47:32] PASO 7 propiedad creada correctamente | {"asset_id":146,"property_id":105}
+[2026-04-17 13:47:32] PASO 8 antes commit | {"asset_id":146,"property_id":105}
+[2026-04-17 13:47:32] PASO 9 commit realizado | {"asset_id":146,"property_id":105}
+[2026-04-17 13:47:32] PASO 10 antes email OK | {"sender":"practicasreglado@gmail.com","property_id":105}
+[2026-04-17 13:47:34] PASO 11 después email OK | {"sender":"practicasreglado@gmail.com","property_id":105}
+[2026-04-17 13:48:48] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-17 13:48:48] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-17 13:48:48] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-17 13:48:48] PASO 2A texto encontrado | {"source_key":"plain","text_len":4,"text_preview":"hola"}
+[2026-04-17 13:48:48] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-17 13:48:48] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":4,"text_preview":"hola"}
+[2026-04-17 13:48:48] PASO 3 antes duplicados | {"message_id":"CAF+o0zvdyLzsugPBN_jBX8c11M+za3Viy0Z7N_63iXasA0dJ7A@mail.gmail.com","content_hash":"b221d9dbb083a7f33428d7c2a3c3198ae925614d70210e28716ccaa7cd4ddb79"}
+[2026-04-17 13:48:48] PASO 4 activo insertado o recuperado | {"asset_id":147,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-17 13:48:48] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-17 13:48:48] PASO 6 antes process() | {"asset_id":147}
+[2026-04-17 13:48:51] ERROR GLOBAL | {"message":"Campo requerido faltante en ficha_web: tipo_propiedad","file":"C:\\xampp\\htdocs\\Reglado\\Inmobiliaria_Reglados\\backend\\processing\\ClaudeClient.php","line":100,"asset_id":147,"message_id":"CAF+o0zvdyLzsugPBN_jBX8c11M+za3Viy0Z7N_63iXasA0dJ7A@mail.gmail.com","sender":"practicasreglado@gmail.com"}
+[2026-04-17 13:48:51] ROLLBACK EJECUTADO | {"asset_id":147}
+[2026-04-17 13:52:59] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-17 13:52:59] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-17 13:52:59] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-17 13:52:59] PASO 2A texto encontrado | {"source_key":"plain","text_len":3876,"text_preview":"MEMORANDO CONFIDENCIAL DE INVERSIÓN\r\nSUELO TURÍSTICO RESIDENCIAL – 5★ LUJO\r\nISLAS CANARIAS 2025.\r\nDOCUMENTO CONFIDENCIAL – SOLO PARA INVERSORES CUALIFICADOS\r\nPREPARADO CON FINES EXCLUSIVAMENTE INFORMATIVOS.\r\nNO CONSTITUYE OFERTA DE VENTA NI COMPROMISO DE INVERSIÓN.\r\nRESUMEN EJECUTIVO\r\nEl activo corresponde a un suelo turístico-residencial ubicado en primera\r\nlínea de\r\nplaya en una de las zonas más exclusivas y consolidadas del sur de\r\nTenerife. El\r\nplaneamiento vigente permite el desarrollo de u"}
+[2026-04-17 13:52:59] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-17 13:52:59] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":3876,"text_preview":"MEMORANDO CONFIDENCIAL DE INVERSIÓN\r\nSUELO TURÍSTICO RESIDENCIAL – 5★ LUJO\r\nISLAS CANARIAS 2025.\r\nDOCUMENTO CONFIDENCIAL – SOLO PARA INVERSORES CUALIFICADOS\r\nPREPARADO CON FINES EXCLUSIVAMENTE INFORMATIVOS.\r\nNO CONSTITUYE OFERTA DE VENTA NI COMPROMISO DE INVERSIÓN.\r\nRESUMEN EJECUTIVO\r\nEl activo corresponde a un suelo turístico-residencial ubicado en primera\r\nlínea de\r\nplaya en una de las zonas más exclusivas y consolidadas del sur de\r\nTenerife. El\r\nplaneamiento vigente permite el desarrollo de un complejo 5★ Gran Lujo, con\r\ncapacidad para un resort de aproximadamente 230 unidades y 460 plazas\r\nturísticas.\r\nLa parcela se sitúa en un entorno de alta demanda internacional, junto a\r\ncampos de\r\ng"}
+[2026-04-17 13:52:59] PASO 3 antes duplicados | {"message_id":"CAF+o0ztdsL2rJBeYLFMbM+BBO6u_ZXW5FbNcKhp1-kH9WFhUHA@mail.gmail.com","content_hash":"b928ca7cc64c96f3428ca5a40ee2decbea3e2510d5daf63d8be63fbb44057cd0"}
+[2026-04-17 13:52:59] PASO 4 activo insertado o recuperado | {"asset_id":149,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-17 13:52:59] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-17 13:52:59] PASO 6 antes process() | {"asset_id":149}
+[2026-04-17 13:53:14] PASO 6B resultado process() | {"asset_id":149,"property_id_raw":107,"property_id_type":"integer"}
+[2026-04-17 13:53:14] PASO 7 propiedad creada correctamente | {"asset_id":149,"property_id":107}
+[2026-04-17 13:53:14] PASO 8 antes commit | {"asset_id":149,"property_id":107}
+[2026-04-17 13:53:14] PASO 9 commit realizado | {"asset_id":149,"property_id":107}
+[2026-04-17 13:53:14] PASO 10 antes email OK | {"sender":"practicasreglado@gmail.com","property_id":107}
+[2026-04-17 13:53:16] PASO 11 después email OK | {"sender":"practicasreglado@gmail.com","property_id":107}
+[2026-04-17 13:54:47] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-17 13:54:47] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-17 13:54:47] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-17 13:54:47] PASO 2A texto encontrado | {"source_key":"plain","text_len":1932,"text_preview":"Exclusivo activo hotelero 5★ en primera línea de playa – Sur de Tenerife\r\nAv. Marítima, 14\r\nSe ofrece en venta un activo hotelero de categoría 5 estrellas, ubicado en\r\nprimera línea de playa en el sur de Tenerife, una de las zonas turísticas\r\nmás consolidadas, demandadas y con mayor rentabilidad del mercado europeo.\r\n\r\nEl complejo se sitúa en un enclave privilegiado, con acceso directo al\r\nlitoral y vistas abiertas al océano, en un entorno caracterizado por su\r\nalta ocupación durante todo el año"}
+[2026-04-17 13:54:47] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-17 13:54:47] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":1932,"text_preview":"Exclusivo activo hotelero 5★ en primera línea de playa – Sur de Tenerife\r\nAv. Marítima, 14\r\nSe ofrece en venta un activo hotelero de categoría 5 estrellas, ubicado en\r\nprimera línea de playa en el sur de Tenerife, una de las zonas turísticas\r\nmás consolidadas, demandadas y con mayor rentabilidad del mercado europeo.\r\n\r\nEl complejo se sitúa en un enclave privilegiado, con acceso directo al\r\nlitoral y vistas abiertas al océano, en un entorno caracterizado por su\r\nalta ocupación durante todo el año gracias al clima estable de las Islas\r\nCanarias y a su potente industria turística internacional.\r\n\r\nEl activo cuenta con una configuración sólida y eficiente, compuesto por un\r\ntotal de 284 habitaci"}
+[2026-04-17 13:54:47] PASO 3 antes duplicados | {"message_id":"CAF+o0zsT0GoTStpfQ_qHcOA6pEfXk4yj0bLWcFfYW6qWeTwMew@mail.gmail.com","content_hash":"96cab4297e2c20bb885c4480f24713e73e7c1eabf3549c8b5a9072eb5d5f73c0"}
+[2026-04-17 13:54:47] PASO 4 activo insertado o recuperado | {"asset_id":151,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-17 13:54:47] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-17 13:54:47] PASO 6 antes process() | {"asset_id":151}
+[2026-04-17 13:54:57] PASO 6B resultado process() | {"asset_id":151,"property_id_raw":109,"property_id_type":"integer"}
+[2026-04-17 13:54:57] PASO 7 propiedad creada correctamente | {"asset_id":151,"property_id":109}
+[2026-04-17 13:54:57] PASO 8 antes commit | {"asset_id":151,"property_id":109}
+[2026-04-17 13:54:57] PASO 9 commit realizado | {"asset_id":151,"property_id":109}
+[2026-04-17 13:54:57] PASO 10 antes email OK | {"sender":"practicasreglado@gmail.com","property_id":109}
+[2026-04-17 13:54:59] PASO 11 después email OK | {"sender":"practicasreglado@gmail.com","property_id":109}
+[2026-04-17 13:56:49] PASO 1 payload recibido | {"raw_len":0,"post_keys":["plain","html","reply_plain","headers","envelope"],"json_ok":false,"payload_keys":[]}
+[2026-04-17 13:56:49] PASO 1B usando $_POST | {"post_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-17 13:56:49] PASO 1C webhook recibido | {"method":"POST","content_type":"multipart/form-data; boundary=----cloudmailinboundry","raw_len":0,"payload_keys":["plain","html","reply_plain","headers","envelope"]}
+[2026-04-17 13:56:49] PASO 2A texto encontrado | {"source_key":"plain","text_len":1972,"text_preview":"Exclusivo complejo residencial con alto potencial de inversión en Valencia\r\ncapital en Calle del Maestro Gozalbo 6\r\n\r\nSe presenta en venta un atractivo activo inmobiliario compuesto por un\r\nedificio residencial con locales comerciales en planta baja, ubicado en una\r\nde las zonas con mayor crecimiento y revalorización de Valencia,\r\nconcretamente en el área de expansión próxima al cauce del río Turia.\r\n\r\nEl inmueble cuenta con una superficie total construida de aproximadamente\r\n3.200 m², distribui"}
+[2026-04-17 13:56:49] PASO 2D procesamiento PDF desactivado temporalmente
+[2026-04-17 13:56:49] PASO 2 texto extraído | {"sender":"practicasreglado@gmail.com","tipo_input":"text","text_len":1972,"text_preview":"Exclusivo complejo residencial con alto potencial de inversión en Valencia\r\ncapital en Calle del Maestro Gozalbo 6\r\n\r\nSe presenta en venta un atractivo activo inmobiliario compuesto por un\r\nedificio residencial con locales comerciales en planta baja, ubicado en una\r\nde las zonas con mayor crecimiento y revalorización de Valencia,\r\nconcretamente en el área de expansión próxima al cauce del río Turia.\r\n\r\nEl inmueble cuenta con una superficie total construida de aproximadamente\r\n3.200 m², distribuidos en varias plantas, y se compone de 24 viviendas\r\ncompletamente operativas, junto con 3 locales comerciales actualmente\r\narrendados, generando ingresos recurrentes desde el primer momento.\r\n\r\nLas v"}
+[2026-04-17 13:56:49] PASO 3 antes duplicados | {"message_id":"CAF+o0zvBAMu8TxYgsXW=TCtfEMk=qKdu-G5D1eYCcSY4xis3gw@mail.gmail.com","content_hash":"062d60bf69223a97b3ada6fea92fc19ca0a359003443fff759702e2e0ed13823"}
+[2026-04-17 13:56:49] PASO 4 activo insertado o recuperado | {"asset_id":152,"sender":"practicasreglado@gmail.com","is_duplicate_insert":false}
+[2026-04-17 13:56:49] PASO 5 antes de crear processor | {"default_owner_user_id":1}
+[2026-04-17 13:56:49] PASO 6 antes process() | {"asset_id":152}
+[2026-04-17 13:57:01] PASO 6B resultado process() | {"asset_id":152,"property_id_raw":110,"property_id_type":"integer"}
+[2026-04-17 13:57:01] PASO 7 propiedad creada correctamente | {"asset_id":152,"property_id":110}
+[2026-04-17 13:57:01] PASO 8 antes commit | {"asset_id":152,"property_id":110}
+[2026-04-17 13:57:01] PASO 9 commit realizado | {"asset_id":152,"property_id":110}
+[2026-04-17 13:57:01] PASO 10 antes email OK | {"sender":"practicasreglado@gmail.com","property_id":110}
+[2026-04-17 13:57:02] PASO 11 después email OK | {"sender":"practicasreglado@gmail.com","property_id":110}

@@ -29,7 +29,9 @@
       <div class="filter-group">
         <select v-model="filterCategory">
           <option value="">Todas las categorías</option>
-          <option v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</option>
+          <option v-for="cat in categories" :key="cat" :value="cat">
+            {{ cat.charAt(0).toUpperCase() + cat.slice(1) }}
+          </option>
         </select>
       </div>
     </div>
@@ -103,10 +105,20 @@
 
               <!-- Propietario -->
               <div class="details-block owner-info">
-                <h4><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Propietario</h4>
-                  <p><strong>Nombre:</strong> {{ prop.owner?.nombre }}</p>
-                  <p><strong>Email:</strong> {{ prop.owner?.email }}</p>
-                  <p><strong>ID Usuario:</strong> {{ prop.owner?.id || 'N/A' }}</p>
+                <h4>
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                  </svg>
+                  Propietario
+                </h4>
+                <ul>
+                  <li><strong>ID Usuario:</strong> <span>{{ prop.owner?.id ?? 'N/A' }}</span></li>
+                  <li><strong>Nombre:</strong> <span>{{ prop.owner?.nombre ?? '-' }}</span></li>
+                  <li><strong>Email:</strong> <span>{{ prop.owner?.email ?? '-' }}</span></li>
+                  <li><strong>Username:</strong> <span>{{ prop.owner?.username ?? '-' }}</span></li>
+                  <li><strong>Teléfono:</strong> <span>{{ prop.owner?.phone ?? '-' }}</span></li>
+                </ul>
               </div>
 
               <!-- Sistema -->
@@ -151,47 +163,119 @@
           </header>
 
           <div class="modal-body">
-            <div class="modal-section">
-              <h3><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M13 2v7h7"/></svg> Datos del Inmueble</h3>
-              <div class="modal-grid">
-                <div class="modal-field"><label>Superficie:</label> <span>{{ selectedProp.metros_cuadrados }} m²</span></div>
-                <div class="modal-field"><label>Categoría:</label> <span>{{ selectedProp.categoria }}</span></div>
-                <div class="modal-field"><label>Ubicación:</label> <span>{{ selectedProp.ubicacion_general }}</span></div>
-              </div>
-            </div>
+  <div class="modal-section">
+    <h3>
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
+        <path d="M13 2v7h7"/>
+      </svg>
+      Resumen del inmueble
+    </h3>
+    <div class="modal-grid">
+      <div class="modal-field"><label>ID:</label> <span>{{ selectedProp.id }}</span></div>
+      <div class="modal-field"><label>Título:</label> <span>{{ selectedProp.titulo }}</span></div>
+      <div class="modal-field"><label>Tipo propiedad:</label> <span>{{ selectedProp.tipo_propiedad || '-' }}</span></div>
+      <div class="modal-field"><label>Categoría:</label> <span>{{ selectedProp.categoria || '-' }}</span></div>
+      <div class="modal-field"><label>Precio:</label> <span>{{ formatPrice(selectedProp.precio || 0) }}</span></div>
+      <div class="modal-field"><label>Metros cuadrados:</label> <span>{{ selectedProp.metros_cuadrados || '-' }}</span></div>
+      <div class="modal-field"><label>Ciudad:</label> <span>{{ selectedProp.ciudad || '-' }}</span></div>
+      <div class="modal-field"><label>Zona:</label> <span>{{ selectedProp.zona || '-' }}</span></div>
+      <div class="modal-field"><label>Dirección:</label> <span>{{ selectedProp.direccion || '-' }}</span></div>
+      <div class="modal-field"><label>Ubicación general:</label> <span>{{ selectedProp.ubicacion_general || '-' }}</span></div>
+    </div>
+  </div>
 
-            <div class="modal-section">
-              <h3><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Información de Propietario</h3>
-              <div class="modal-grid">
-                <div class="modal-field"><label>Nombre:</label> <span>{{ selectedProp.owner_name || 'N/A' }}</span></div>
-                <div class="modal-field"><label>Email:</label> <span>{{ selectedProp.owner_email || 'N/A' }}</span></div>
-                <div class="modal-field"><label>ID Usuario:</label> <span>#{{ selectedProp.owner_id || 'N/A' }}</span></div>
-              </div>
-            </div>
+  <div class="modal-section">
+    <h3>
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+        <circle cx="12" cy="7" r="4"/>
+      </svg>
+      Usuario propietario
+    </h3>
+    <div class="modal-grid">
+      <div v-for="field in getUserFields(selectedProp.owner)" :key="'owner-' + field.key" class="modal-field">
+        <label>{{ field.label }}:</label>
+        <span>{{ field.value }}</span>
+      </div>
+    </div>
+  </div>
 
-            <div v-if="selectedProp.caracteristicas && Object.keys(selectedProp.caracteristicas).length > 0" class="modal-section full-width">
-              <h3><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> Características Específicas</h3>
-              <div class="modal-grid modal-grid--detailed">
-                <div v-for="(val, key) in selectedProp.caracteristicas" :key="key" class="modal-field">
-                  <label>{{ getCharacteristicLabel(key) }}:</label>
-                  <span>{{ val }}</span>
-                </div>
-              </div>
-            </div>
+  <div class="modal-section">
+    <h3>
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+        <circle cx="12" cy="7" r="4"/>
+      </svg>
+      Usuario creador del registro
+    </h3>
+    <div class="modal-grid">
+      <div v-for="field in getUserFields(selectedProp.creator)" :key="'creator-' + field.key" class="modal-field">
+        <label>{{ field.label }}:</label>
+        <span>{{ field.value }}</span>
+      </div>
+    </div>
+  </div>
 
-            <div class="modal-section full-width">
-              <h3><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Auditoría de Sistema</h3>
-              <div class="modal-grid">
-                <div class="modal-field"><label>Fecha Creación:</label> <span>{{ formatDate(selectedProp.created_at) }}</span></div>
-                <div class="modal-field"><label>Última Actización:</label> <span>{{ formatDate(selectedProp.updated_at) }}</span></div>
-              </div>
-            </div>
+  <div v-if="selectedProp.caracteristicas && Object.keys(selectedProp.caracteristicas).length > 0" class="modal-section full-width">
+    <h3>
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+      </svg>
+      Características específicas
+    </h3>
+    <div class="modal-grid modal-grid--detailed">
+      <div v-for="(val, key) in selectedProp.caracteristicas" :key="key" class="modal-field">
+        <label>{{ getCharacteristicLabel(key) }}:</label>
+        <span>{{ formatValue(val) }}</span>
+      </div>
+    </div>
+  </div>
 
-            <div v-if="selectedProp.descripcion" class="modal-section full-width">
-              <h3>Descripción</h3>
-              <p class="modal-description">{{ selectedProp.descripcion }}</p>
-            </div>
-          </div>
+  <div class="modal-section full-width">
+    <h3>
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/>
+        <polyline points="12 6 12 12 16 14"/>
+      </svg>
+      Auditoría de sistema
+    </h3>
+    <div class="modal-grid">
+      <div class="modal-field"><label>Fecha creación:</label> <span>{{ formatDate(selectedProp.created_at) }}</span></div>
+      <div class="modal-field"><label>Última actualización:</label> <span>{{ formatDate(selectedProp.updated_at) }}</span></div>
+      <div class="modal-field"><label>Owner User ID:</label> <span>{{ selectedProp.owner_user_id ?? '-' }}</span></div>
+      <div class="modal-field"><label>Created By User ID:</label> <span>{{ selectedProp.created_by_user_id ?? '-' }}</span></div>
+      <div class="modal-field"><label>Owner Email Pending:</label> <span>{{ selectedProp.owner_email_pending ?? '-' }}</span></div>
+      <div class="modal-field"><label>Captador ID:</label> <span>{{ selectedProp.captador_id ?? '-' }}</span></div>
+    </div>
+  </div>
+
+  <div class="modal-section full-width">
+    <h3>
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 3h18v18H3z"/>
+        <path d="M8 8h8M8 12h8M8 16h5"/>
+      </svg>
+      Todos los campos de la propiedad
+    </h3>
+    <div class="modal-grid modal-grid--detailed">
+      <div
+        v-for="field in getDynamicPropertyFields(selectedProp)"
+        :key="'prop-' + field.key"
+        class="modal-field"
+      >
+        <label>{{ field.label }}:</label>
+        <span class="modal-field__value">{{ field.value }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div v-if="selectedProp.descripcion" class="modal-section full-width">
+    <h3>Descripción</h3>
+    <p class="modal-description">{{ selectedProp.descripcion }}</p>
+  </div>
+</div>
         </div>
       </div>
     </transition>
@@ -211,12 +295,89 @@ export default {
     const expandedId = ref(null);
     const searchQuery = ref('');
     const filterCategory = ref('');
+
+    const ignoredDynamicKeys = new Set([
+      'owner',
+      'creator',
+      'caracteristicas',
+      'titulo',
+      'ubicacion_general',
+      'owner_name',
+      'owner_email',
+      'owner_id',
+      'creator_name',
+      'creator_email',
+      'creator_id'
+    ]);
+
+    const formatValue = (value) => {
+      if (value === null || value === undefined || value === '') return '-';
+
+      if (typeof value === 'boolean') return value ? 'Sí' : 'No';
+
+      if (typeof value === 'number') return String(value);
+
+      if (Array.isArray(value)) {
+        return value.length ? value.join(', ') : '-';
+      }
+
+      if (typeof value === 'object') {
+        try {
+          return JSON.stringify(value, null, 2);
+        } catch {
+          return '[Objeto]';
+        }
+      }
+
+      return String(value);
+    };
+
+    const formatLabel = (key) => {
+      return String(key)
+        .replace(/_/g, ' ')
+        .replace(/\b\w/g, (char) => char.toUpperCase());
+    };
+
+    const getDynamicPropertyFields = (prop) => {
+      if (!prop || typeof prop !== 'object') return [];
+
+      return Object.entries(prop)
+        .filter(([key, value]) => {
+          if (ignoredDynamicKeys.has(key)) return false;
+          if (typeof value === 'function') return false;
+          return true;
+        })
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([key, value]) => ({
+          key,
+          label: formatLabel(key),
+          value: formatValue(value)
+        }));
+    };
+
+    const getUserFields = (userObj) => {
+      if (!userObj || typeof userObj !== 'object') return [];
+
+      return Object.entries(userObj)
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([key, value]) => ({
+          key,
+          label: formatLabel(key),
+          value: formatValue(value)
+        }));
+    };
     
     // Modal state
     const showModal = ref(false);
     const selectedProp = ref(null);
 
-    const categories = ['Hoteles', 'Fincas', 'Parking', 'Edificios', 'Activos'];
+    const categories = computed(() => {
+      const values = properties.value
+        .map((p) => String(p.categoria || '').trim())
+        .filter(Boolean);
+
+      return [...new Set(values)].sort((a, b) => a.localeCompare(b, 'es'));
+    });
 
     const loadProperties = async () => {
       loading.value = true;
@@ -287,14 +448,24 @@ export default {
     };
 
     const filteredProperties = computed(() => {
-      return properties.value.filter(p => {
-        const matchesSearch = p.titulo.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-                            p.ubicacion_general.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-                            p.id.toString().includes(searchQuery.value);
-        const matchesCategory = !filterCategory.value || p.categoria === filterCategory.value;
-        return matchesSearch && matchesCategory;
-      });
-    });
+  return properties.value.filter((p) => {
+    const titulo = String(p.titulo || '').toLowerCase();
+    const ubicacion = String(p.ubicacion_general || '').toLowerCase();
+    const categoria = String(p.categoria || '').trim().toLowerCase();
+    const search = searchQuery.value.toLowerCase().trim();
+    const selectedCategory = String(filterCategory.value || '').trim().toLowerCase();
+
+    const matchesSearch =
+      titulo.includes(search) ||
+      ubicacion.includes(search) ||
+      String(p.id || '').includes(search);
+
+    const matchesCategory =
+      !selectedCategory || categoria === selectedCategory;
+
+    return matchesSearch && matchesCategory;
+  });
+});
 
     onMounted(loadProperties);
 
@@ -313,7 +484,11 @@ export default {
       selectedProp,
       openModal,
       closeModal,
-      getCharacteristicLabel
+      getCharacteristicLabel,
+      formatValue,
+      formatLabel,
+      getDynamicPropertyFields,
+      getUserFields
     };
   }
 };
@@ -602,8 +777,20 @@ export default {
   margin-bottom: 12px;
   font-size: 1rem;
   color: #1e293b;
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.details-block li strong,
+.details-block li span {
+  min-width: 0;
+}
+
+.details-block li span {
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .details-block li strong {
@@ -773,6 +960,13 @@ export default {
   font-size: 1.1rem;
 }
 
+.modal-field__value {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  line-height: 1.45;
+}
+
 .modal-header-price {
   font-size: 2rem;
   font-weight: 800;
@@ -836,7 +1030,8 @@ export default {
 .modal-field {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
+  min-width: 0;
 }
 
 .modal-field label {
@@ -850,6 +1045,33 @@ export default {
   font-size: 1rem;
   color: #1e293b;
   font-weight: 600;
+  width: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: pre-wrap;
+  line-height: 1.45;
+}
+
+.modal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+.modal-grid--detailed {
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+.modal-header-info,
+.modal-header-info h2,
+.modal-header-info p {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .modal-description {

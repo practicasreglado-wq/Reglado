@@ -23,7 +23,8 @@ if ($userId <= 0 || $propertyId <= 0) {
     ]);
 }
 
-$access = ensureBuyerPropertyAccess($pdo, $propertyId, $userId);
+// Importante: consultar estado NO debe crear accesos persistentes.
+$access = fetchBuyerPropertyAccess($pdo, $propertyId, $userId) ?? [];
 
 $documentStmt = $pdo->prepare('
     SELECT validado_admin, nda_file_path, loi_file_path

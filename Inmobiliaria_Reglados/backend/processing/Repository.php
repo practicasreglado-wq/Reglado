@@ -6,6 +6,7 @@ require_once dirname(__DIR__) . '/lib/geocoding.php';
 class Repository
 {
     private PDO $pdo;
+    private array $columnExistsCache = [];
 
     public function __construct(PDO $pdo)
     {
@@ -150,7 +151,9 @@ class Repository
         ?string $analysisSummary,
         ?string $analysisJson,
         ?int $captadorId,
-        ?int $ownerUserId
+        ?int $ownerUserId,
+        ?int $createdByUserId = null,
+        ?string $ownerEmailPending = null
     ): int {
         $ficha = $claudeData['ficha_web'] ?? [];
         $dossier = $claudeData['dossier_inversion'] ?? [];
@@ -189,12 +192,23 @@ class Repository
             $precio = 0;
         }
 
-        if ($ownerUserId === null) {
-            throw new RuntimeException('owner_user_id es obligatorio');
+        $effectiveCreatedByUserId = $createdByUserId ?? $ownerUserId;
+        $normalizedOwnerEmailPending = null;
+        if ($ownerEmailPending !== null) {
+            $normalized = strtolower(trim($ownerEmailPending));
+            if ($normalized !== '' && filter_var($normalized, FILTER_VALIDATE_EMAIL)) {
+                $normalizedOwnerEmailPending = $normalized;
+            }
         }
 
+        $direccionCompleta = $this->trimValue($dossier['ubicacion_completa'] ?? '');
+        $codigoPostal = $this->trimValue($dossier['codigo_postal'] ?? '');
+        $direccionCorta = $this->trimValue($ficha['direccion'] ?? '');
+
         $geo = geocodeApproximateLocation([
-            'zona' => $zona,
+            'direccion_completa' => $direccionCompleta,
+            'direccion' => $direccionCorta,
+            'codigo_postal' => $codigoPostal,
             'ciudad' => $ciudad,
             'provincia' => $provincia,
             'pais' => $pais,
@@ -203,8 +217,10 @@ class Repository
         $latitud = $geo['latitud'] ?? null;
         $longitud = $geo['longitud'] ?? null;
 
-        error_log('[GEOCODING QUERY] ' . json_encode([
-            'zona' => $zona,
+        error_log('[GEOCODING INPUT] ' . json_encode([
+            'direccion_completa' => $direccionCompleta,
+            'direccion' => $direccionCorta,
+            'codigo_postal' => $codigoPostal,
             'ciudad' => $ciudad,
             'provincia' => $provincia,
             'pais' => $pais,
@@ -213,35 +229,35 @@ class Repository
             'query' => $geo['query'] ?? null,
         ], JSON_UNESCAPED_UNICODE));
 
-        $stmt = $this->pdo->prepare(
-            'INSERT INTO propiedades (
-                tipo_propiedad,
-                ciudad,
-                zona,
-                metros_cuadrados,
-                precio,
-                direccion,
-                categoria,
-                latitud,
-                longitud,
-                captador_id,
-                caracteristicas_json,
-                owner_user_id
-            ) VALUES (
-                :tipo_propiedad,
-                :ciudad,
-                :zona,
-                :metros_cuadrados,
-                :precio,
-                :direccion,
-                :categoria,
-                :latitud,
-                :longitud,
-                :captador_id,
-                :caracteristicas_json,
-                :owner_user_id
-            )'
-        );
+        $columns = [
+            'tipo_propiedad',
+            'ciudad',
+            'zona',
+            'metros_cuadrados',
+            'precio',
+            'direccion',
+            'categoria',
+            'latitud',
+            'longitud',
+            'captador_id',
+            'caracteristicas_json',
+            'owner_user_id',
+        ];
+
+        $placeholders = [
+            ':tipo_propiedad',
+            ':ciudad',
+            ':zona',
+            ':metros_cuadrados',
+            ':precio',
+            ':direccion',
+            ':categoria',
+            ':latitud',
+            ':longitud',
+            ':captador_id',
+            ':caracteristicas_json',
+            ':owner_user_id',
+        ];
 
         $params = [
             'tipo_propiedad' => $tipo,
@@ -257,6 +273,23 @@ class Repository
             'caracteristicas_json' => json_encode($dossier, JSON_UNESCAPED_UNICODE),
             'owner_user_id' => $ownerUserId,
         ];
+
+        // Campos nuevos (opcionales) para no romper instalaciones que aun no han migrado la tabla.
+        if ($effectiveCreatedByUserId !== null && $this->columnExists('propiedades', 'created_by_user_id')) {
+            $columns[] = 'created_by_user_id';
+            $placeholders[] = ':created_by_user_id';
+            $params['created_by_user_id'] = $effectiveCreatedByUserId;
+        }
+
+        if ($this->columnExists('propiedades', 'owner_email_pending')) {
+            $columns[] = 'owner_email_pending';
+            $placeholders[] = ':owner_email_pending';
+            $params['owner_email_pending'] = $normalizedOwnerEmailPending;
+        }
+
+        $stmt = $this->pdo->prepare(
+            'INSERT INTO propiedades (' . implode(', ', $columns) . ') VALUES (' . implode(', ', $placeholders) . ')'
+        );
 
         error_log('[INSERT PARAMS] ' . json_encode($params, JSON_UNESCAPED_UNICODE));
 
@@ -281,6 +314,25 @@ class Repository
         error_log('[INSERT OK] ID: ' . $propertyId);
 
         return $propertyId;
+    }
+
+    public function findRegladoUserIdByEmail(string $email): ?int
+    {
+        $normalized = strtolower(trim($email));
+
+        if ($normalized === '' || !filter_var($normalized, FILTER_VALIDATE_EMAIL)) {
+            return null;
+        }
+
+        $stmt = $this->pdo->prepare('SELECT id FROM regladousers.users WHERE LOWER(email) = :email LIMIT 1');
+        $stmt->execute(['email' => $normalized]);
+        $id = $stmt->fetchColumn();
+
+        if ($id === false || $id === null) {
+            return null;
+        }
+
+        return (int) $id;
     }
 
     public function updatePropertyDocuments(int $propertyId, array $documents): void
@@ -345,5 +397,31 @@ class Repository
     private function floatValue(mixed $value): ?float
     {
         return is_numeric($value) ? (float) $value : null;
+    }
+
+    private function columnExists(string $table, string $column): bool
+    {
+        $cacheKey = $table . '.' . $column;
+        if (array_key_exists($cacheKey, $this->columnExistsCache)) {
+            return (bool) $this->columnExistsCache[$cacheKey];
+        }
+
+        $stmt = $this->pdo->prepare('
+            SELECT 1
+            FROM INFORMATION_SCHEMA.COLUMNS
+            WHERE TABLE_SCHEMA = DATABASE()
+              AND TABLE_NAME = :table
+              AND COLUMN_NAME = :column
+            LIMIT 1
+        ');
+
+        $stmt->execute([
+            'table' => $table,
+            'column' => $column,
+        ]);
+
+        $exists = (bool) $stmt->fetchColumn();
+        $this->columnExistsCache[$cacheKey] = $exists;
+        return $exists;
     }
 }

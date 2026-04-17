@@ -45,6 +45,7 @@ import {
   fetchProperties,
   removeFavorite,
   saveFavorite,
+  checkSignedAccess,
 } from "../services/properties";
 import { useUserStore } from "../stores/user";
 
@@ -107,10 +108,39 @@ export default {
       try {
         const rawProperties = await fetchProperties();
 
-        this.properties = rawProperties.map((property) => ({
-          ...property,
-          match_percentage: this.calculateMatchPercentage(property),
-        }));
+        const enrichedProperties = await Promise.all(
+          rawProperties.map(async (property) => {
+            try {
+              const accessResponse = await checkSignedAccess(property.id);
+
+              return {
+                ...property,
+                match_percentage: this.calculateMatchPercentage(property),
+                nda_uploaded: Boolean(accessResponse.access?.nda_uploaded),
+                loi_uploaded: Boolean(accessResponse.access?.loi_uploaded),
+                nda_approved: Boolean(accessResponse.access?.nda_approved),
+                loi_approved: Boolean(accessResponse.access?.loi_approved),
+                dossier_unlocked: Boolean(accessResponse.access?.dossier_unlocked),
+                validado_admin: Number(accessResponse.access?.validado_admin ?? 0),
+                status: String(accessResponse.access?.status ?? ""),
+              };
+            } catch (error) {
+              return {
+                ...property,
+                match_percentage: this.calculateMatchPercentage(property),
+                nda_uploaded: false,
+                loi_uploaded: false,
+                nda_approved: false,
+                loi_approved: false,
+                dossier_unlocked: false,
+                validado_admin: 0,
+                status: "",
+              };
+            }
+          })
+        );
+
+        this.properties = enrichedProperties;
       } catch (error) {
         console.error("Error cargando propiedades:", error);
         this.properties = [];

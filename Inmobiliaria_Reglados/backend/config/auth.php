@@ -1,5 +1,7 @@
 <?php
 
+require_once dirname(__DIR__) . '/lib/property_owner_linking.php';
+
 function applyAuthCors(): void
 {
     $origin = $_SERVER['HTTP_ORIGIN'] ?? null;
@@ -29,6 +31,18 @@ function requireAuthenticatedUser(PDO $pdo): array
 
     $payload = verifyJwt($token);
     file_put_contents(__DIR__ . '/auth_debug.txt', print_r($payload, true));
+
+    // Enlaza automaticamente propiedades pendientes por email cuando el usuario entra autenticado.
+    // No debe romper si aun no existe la migracion: la funcion ya valida columnas.
+    try {
+        $userId = (int) ($payload['sub'] ?? 0);
+        $email = (string) ($payload['email'] ?? '');
+        if ($userId > 0 && $email !== '') {
+            linkPendingPropertiesToUser($pdo, $userId, $email);
+        }
+    } catch (Throwable $e) {
+        // Silencioso: la autenticacion debe seguir funcionando aunque el enlace falle.
+    }
 
     return [
         'auth' => $payload,

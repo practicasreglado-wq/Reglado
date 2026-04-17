@@ -151,7 +151,7 @@
           v-if="property.confidentiality_file"
           type="button"
           class="download-link"
-          @click="downloadDocument(property.confidentiality_file)"
+          @click="downloadLegalDocument('nda', property.confidentiality_file)"
         >
           Descargar NDA
         </button>
@@ -160,23 +160,77 @@
           v-if="property.intention_file"
           type="button"
           class="download-link"
-          @click="downloadDocument(property.intention_file)"
+          @click="downloadLegalDocument('loi', property.intention_file)"
         >
           Descargar LOI
         </button>
       </div>
 
       <div class="upload-section">
-        <label>
-          NDA firmado
+      <label>
+        NDA firmado
+        <div class="file-validation-field">
           <input type="file" accept=".pdf" @change="handleFileChange('nda', $event)" />
-        </label>
 
-        <label>
-          LOI firmado
-          <input type="file" accept=".pdf" @change="handleFileChange('loi', $event)" />
-        </label>
-      </div>
+          <span
+            v-if="ndaValidation.checking"
+            class="file-validation-badge file-validation-badge--checking"
+          >
+            Comprobando...
+          </span>
+
+          <span
+            v-else-if="ndaValidation.valid === true"
+            class="file-validation-badge file-validation-badge--valid"
+          >
+            ✅ Válido
+          </span>
+
+          <span
+            v-else-if="ndaValidation.valid === false"
+            class="file-validation-badge file-validation-badge--invalid"
+          >
+            ❌ No válido
+          </span>
+        </div>
+
+        <small v-if="ndaValidation.message" class="file-validation-message">
+          {{ ndaValidation.message }}
+        </small>
+      </label>
+
+  <label>
+    LOI firmado
+    <div class="file-validation-field">
+      <input type="file" accept=".pdf" @change="handleFileChange('loi', $event)" />
+
+      <span
+        v-if="loiValidation.checking"
+        class="file-validation-badge file-validation-badge--checking"
+      >
+        Comprobando...
+      </span>
+
+      <span
+        v-else-if="loiValidation.valid === true"
+        class="file-validation-badge file-validation-badge--valid"
+      >
+        ✅ Válido
+      </span>
+
+      <span
+        v-else-if="loiValidation.valid === false"
+        class="file-validation-badge file-validation-badge--invalid"
+      >
+        ❌ No válido
+      </span>
+    </div>
+
+    <small v-if="loiValidation.message" class="file-validation-message">
+      {{ loiValidation.message }}
+    </small>
+  </label>
+    </div>
 
       <button
         class="primary-btn"
@@ -225,6 +279,7 @@
 import { computed, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useUserStore } from "../stores/user";
+import { auth } from "../services/auth";
 import {
   fetchPropertyDetail,
   uploadSignedDocuments,
@@ -254,6 +309,18 @@ const ndaFile = ref(null);
 const loiFile = ref(null);
 const uploadingDocuments = ref(false);
 const modalMessage = ref("");
+
+const ndaValidation = ref({
+  checking: false,
+  valid: null,
+  message: "",
+});
+
+const loiValidation = ref({
+  checking: false,
+  valid: null,
+  message: "",
+});
 
 const defaultStatusDetail = "Documentos pendientes de firma.";
 const accessMessage = ref(defaultStatusDetail);
@@ -363,7 +430,13 @@ const documentSteps = computed(() => {
 });
 
 const canUpload = computed(() => {
-  return !uploadingDocuments.value && !!ndaFile.value && !!loiFile.value;
+  return (
+    !uploadingDocuments.value &&
+    !!ndaFile.value &&
+    !!loiFile.value &&
+    ndaValidation.value.valid === true &&
+    loiValidation.value.valid === true
+  );
 });
 
 function buildDownloadUrl(fileName) {
@@ -375,6 +448,22 @@ function buildDownloadUrl(fileName) {
   ).replace(/\/+$/, "");
 
   return `${apiBase}/download_document.php?file=${encodeURIComponent(fileName)}`;
+}
+
+function buildLegalDownloadUrl(type) {
+  const apiBase = (
+    import.meta.env.VITE_API_BASE_URL ||
+    "http://localhost/Reglado/Inmobiliaria_Reglados/backend/api"
+  ).replace(/\/+$/, "");
+
+  const normalized = String(type || "").trim().toLowerCase();
+  if (!propertyId.value || (normalized !== "nda" && normalized !== "loi")) {
+    return "";
+  }
+
+  return `${apiBase}/download_legal_document.php?property_id=${encodeURIComponent(
+    String(propertyId.value)
+  )}&type=${encodeURIComponent(normalized)}`;
 }
 
 const uploadsUrl = (fileName) => buildDownloadUrl(fileName);
@@ -441,13 +530,71 @@ async function loadProperty() {
   }
 }
 
-function handleFileChange(field, event) {
+async function validateSelectedDocument(type, file) {
+  const target = type === "nda" ? ndaValidation.value : loiValidation.value;
+
+  target.checking = true;
+  target.valid = null;
+  target.message = "Comprobando firma...";
+
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("type", type);
+    formData.append("property_id", String(propertyId.value || 0));
+
+    const apiBase = (
+      import.meta.env.VITE_API_BASE_URL ||
+      "http://localhost/Reglado/Inmobiliaria_Reglados/backend/api"
+    ).replace(/\/+$/, "");
+
+    const response = await fetch(`${apiBase}/validate_signed_document.php`, {
+      method: "POST",
+      credentials: "include",
+      body: formData,
+    });
+
+    const data = await response.json();
+
+    if (!response.ok || data?.success === false) {
+      throw new Error(data?.message || "No se pudo validar el documento.");
+    }
+
+    target.valid = Boolean(data.accepted);
+    target.message = data.reason || (data.accepted ? "Documento válido." : "Documento no válido.");
+  } catch (error) {
+    target.valid = false;
+    target.message = error?.message || "Error comprobando el documento.";
+  } finally {
+    target.checking = false;
+  }
+}
+
+async function handleFileChange(field, event) {
   const file = event.target.files?.[0] ?? null;
 
   if (field === "nda") {
     ndaFile.value = file;
+    ndaValidation.value = {
+      checking: false,
+      valid: null,
+      message: "",
+    };
+
+    if (file) {
+      await validateSelectedDocument("nda", file);
+    }
   } else if (field === "loi") {
     loiFile.value = file;
+    loiValidation.value = {
+      checking: false,
+      valid: null,
+      message: "",
+    };
+
+    if (file) {
+      await validateSelectedDocument("loi", file);
+    }
   }
 }
 
@@ -457,12 +604,36 @@ function openSignatureModal() {
   downloadError.value = "";
   ndaFile.value = null;
   loiFile.value = null;
+
+  ndaValidation.value = {
+    checking: false,
+    valid: null,
+    message: "",
+  };
+
+  loiValidation.value = {
+    checking: false,
+    valid: null,
+    message: "",
+  };
 }
 
 function closeSignatureModal() {
   showSignatureModal.value = false;
   ndaFile.value = null;
   loiFile.value = null;
+
+  ndaValidation.value = {
+    checking: false,
+    valid: null,
+    message: "",
+  };
+
+  loiValidation.value = {
+    checking: false,
+    valid: null,
+    message: "",
+  };
 }
 
 async function triggerDownload(url, fileName) {
@@ -472,6 +643,7 @@ async function triggerDownload(url, fileName) {
     const response = await fetch(url, {
       method: "GET",
       credentials: "include",
+      headers: auth.authHeaders(),
     });
 
     if (!response.ok) {
@@ -518,6 +690,29 @@ async function openDossier() {
 }
 
 async function downloadDocument(fileName) {
+  const ndaFile = property.value?.confidentiality_file || "";
+  const loiFile = property.value?.intention_file || "";
+
+  const normalized = String(fileName || "");
+  const isNda = normalized && ndaFile && normalized === ndaFile;
+  const isLoi = normalized && loiFile && normalized === loiFile;
+
+  if ((isNda || isLoi) && propertyId.value) {
+    const docType = isNda ? "nda" : "loi";
+    const apiBase = (
+      import.meta.env.VITE_API_BASE_URL ||
+      "http://localhost/Reglado/Inmobiliaria_Reglados/backend/api"
+    ).replace(/\/+$/, "");
+
+    const url = `${apiBase}/download_legal_document.php?property_id=${encodeURIComponent(
+      String(propertyId.value)
+    )}&type=${encodeURIComponent(docType)}`;
+
+    const finalName = normalized.split("/").pop() || `${docType}.pdf`;
+    await triggerDownload(url, finalName);
+    return;
+  }
+
   const url = uploadsUrl(fileName);
   if (!url) {
     downloadError.value = "No se encontró la URL del documento.";
@@ -525,6 +720,21 @@ async function downloadDocument(fileName) {
   }
 
   const finalName = fileName.split("/").pop() || "documento.pdf";
+  await triggerDownload(url, finalName);
+}
+
+async function downloadLegalDocument(type, fileName) {
+  const url = buildLegalDownloadUrl(type);
+  if (!url) {
+    downloadError.value = "No se encontrÃ³ la URL del documento.";
+    return;
+  }
+
+  const safeName = String(fileName || "");
+  const finalName =
+    safeName.split("/").pop() ||
+    (String(type || "").trim().toLowerCase() === "loi" ? "loi.pdf" : "nda.pdf");
+
   await triggerDownload(url, finalName);
 }
 
@@ -1570,6 +1780,52 @@ watch(
   outline: none;
   border-color: #3654ae;
   box-shadow: 0 0 0 4px rgba(54, 84, 174, 0.10);
+}
+
+.file-validation-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.file-validation-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+
+.file-validation-badge--checking {
+  background: #eef3ff;
+  color: #1b3a7a;
+  border-color: #d8e3ff;
+}
+
+.file-validation-badge--valid {
+  background: #e8f8ef;
+  color: #0c6b34;
+  border-color: #bfe8cf;
+}
+
+.file-validation-badge--invalid {
+  background: #fff1f2;
+  color: #b42318;
+  border-color: #fecdd3;
+}
+
+.file-validation-message {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.84rem;
+  color: #475569;
+  line-height: 1.4;
 }
 
 @media (max-width: 768px) {

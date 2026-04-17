@@ -62,11 +62,11 @@ if (!$user || empty($user['id'])) {
     ]);
 }
 
-$ownerUserId = (int) $user['id'];
+$createdByUserId = (int) $user['id'];
 $senderEmailRaw = $user['email'] ?? null;
 $senderEmail = filter_var($senderEmailRaw, FILTER_VALIDATE_EMAIL) ?: null;
 
-error_log('[USER ID WEB TEXT] ' . json_encode($ownerUserId));
+error_log('[USER ID WEB TEXT] ' . json_encode($createdByUserId));
 
 $data = json_decode(file_get_contents('php://input') ?: '{}', true);
 $description = trim((string) ($data['descripcion'] ?? $data['description'] ?? ''));
@@ -80,7 +80,7 @@ if ($description === '') {
 
 $metadata = [
     'origin' => 'web_text',
-    'user_sub' => $jwtUser['sub'] ?? $ownerUserId,
+    'user_sub' => $jwtUser['sub'] ?? $createdByUserId,
     'tipo_input' => 'text',
     'original_email_text' => $description,
 ];
@@ -141,7 +141,7 @@ try {
         $claudeClient,
         $pdfGenerator,
         $dossierService,
-        $ownerUserId
+        $createdByUserId
     );
 
     $propertyId = (int) $processor->process($assetId);

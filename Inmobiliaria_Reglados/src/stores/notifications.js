@@ -21,13 +21,13 @@ export const useNotificationsStore = defineStore("notifications", {
   },
 
   actions: {
-    startAutoRefresh(interval = 5000) {
+    startAutoRefresh(interval = 15000) {
       if (this.intervalId) return;
 
-      this.loadNotifications();
+      this.loadUnreadCount(true);
 
       this.intervalId = setInterval(() => {
-        this.loadNotifications(40, true);
+        this.loadUnreadCount(true);
       }, interval);
     },
 
@@ -38,46 +38,60 @@ export const useNotificationsStore = defineStore("notifications", {
       }
     },
 
-    async loadNotifications(limit = 40, silent = false) {
-  if (this.loading && !silent) {
-    return;
-  }
-
-  if (!silent) {
-    this.loading = true;
-  }
-
-  this.error = null;
-
-  try {
-    const payload = await backendJson(`api/notifications.php?limit=${encodeURIComponent(limit)}`);
-
-    const newNotifications = Array.isArray(payload.notifications)
-      ? payload.notifications
-      : [];
-
-    const oldIds = this.notifications.map(n => n.id).join(',');
-    const newIds = newNotifications.map(n => n.id).join(',');
-
-    if (oldIds !== newIds) {
-      this.notifications = newNotifications;
-
-      console.log("🔔 Nueva notificación");
-    }
-
-    this.unreadCount =
-      typeof payload.unread === "number"
-        ? payload.unread
-        : 0;
-
-  } catch (error) {
-    this.error = error?.message || "No se pudieron cargar las notificaciones.";
-  } finally {
-    if (!silent) {
+     resetState() {
+      this.notifications = [];
+      this.unreadCount = 0;
       this.loading = false;
-    }
-  }
-},
+      this.error = null;
+    },
+
+    async loadUnreadCount(silent = false) {
+      if (!silent) {
+        this.error = null;
+      }
+
+      try {
+        const payload = await backendJson("api/notifications_unread_count.php");
+        this.unreadCount = typeof payload.unread === "number" ? payload.unread : 0;
+      } catch (error) {
+        if (!silent) {
+          this.error = error?.message || "No se pudo actualizar el contador de notificaciones.";
+        }
+      }
+    },
+
+    async loadNotifications(limit = 20, silent = false) {
+      if (this.loading && !silent) {
+        return;
+      }
+
+      if (!silent) {
+        this.loading = true;
+      }
+
+      this.error = null;
+
+      try {
+        const payload = await backendJson(`api/notifications.php?limit=${encodeURIComponent(limit)}`);
+
+        const newNotifications = Array.isArray(payload.notifications)
+          ? payload.notifications
+          : [];
+        this.notifications = newNotifications;
+
+        this.unreadCount =
+          typeof payload.unread === "number"
+            ? payload.unread
+            : 0;
+
+      } catch (error) {
+        this.error = error?.message || "No se pudieron cargar las notificaciones.";
+      } finally {
+        if (!silent) {
+          this.loading = false;
+        }
+      }
+    },
 
     async markAsRead(notificationId) {
       if (!notificationId || notificationId <= 0) {

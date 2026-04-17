@@ -25,13 +25,17 @@ $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
 switch ($method) {
     case 'GET':
-        $limit = (int) ($_GET['limit'] ?? 40);
-        if ($limit < 1) {
-            $limit = 40;
-        }
-        $limit = min(100, $limit);
+        $limit = (int) ($_GET['limit'] ?? 20);
+        $offset = (int) ($_GET['offset'] ?? 0);
 
-        $notifications = fetchUserNotifications($pdo, $userId, $limit);
+        if ($limit < 1) {
+            $limit = 20;
+        }
+
+        $limit = min(100, $limit);
+        $offset = max(0, $offset);
+
+        $notifications = fetchUserNotifications($pdo, $userId, $limit, $offset);
         $unread = countUserUnreadNotifications($pdo, $userId);
 
         respondJson(200, [

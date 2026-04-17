@@ -143,10 +143,10 @@ export default {
     );
 
     const handleVisibilityChange = () => {
-  if (document.visibilityState === "visible") {
-    notificationsStore.loadNotifications();
-  }
-};
+      if (document.visibilityState === "visible" && user.value) {
+        notificationsStore.loadUnreadCount(true);
+      }
+    };
 
     const showLoginButton = computed(() => !user.value && !isAuthRoute.value);
 
@@ -190,6 +190,22 @@ const goToLogin = () => {
       }
     );
 
+    watch(
+      () => Boolean(user.value),
+      (isAuthenticated) => {
+        if (isAuthenticated) {
+          notificationsStore.startAutoRefresh();
+          notificationsStore.loadUnreadCount(true);
+          return;
+        }
+
+        // 🔽 AÑADE ESTA LÍNEA
+        notificationsStore.stopAutoRefresh();
+        notificationsStore.resetState();
+      },
+      { immediate: true }
+    );
+
     const getInitials = () => {
       if (!user.value) return "U";
 
@@ -213,7 +229,6 @@ const goToLogin = () => {
     onMounted(() => {
       window.addEventListener("scroll", handleScroll);
       handleScroll();
-      notificationsStore.startAutoRefresh();
       document.addEventListener("visibilitychange", handleVisibilityChange);
     });
 
