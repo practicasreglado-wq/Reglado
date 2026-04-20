@@ -8,6 +8,9 @@ import Contacto from "@/pages/Contacto.vue";
 import AreaClientes from "@/pages/AreaClientes.vue";
 import Admin from "@/pages/Admin.vue";
 import AuthCallback from "@/pages/AuthCallback.vue";
+import LegalNotice from "@/pages/LegalNotice.vue";
+import PrivacyPolicy from "@/pages/PrivacyPolicy.vue";
+import CookiePolicy from "@/pages/CookiePolicy.vue";
 import NotFound from "@/pages/NotFound.vue";
 
 const routes = [
@@ -19,6 +22,9 @@ const routes = [
   { path: "/area-clientes", component: AreaClientes, meta: { requiresAuth: true } },
   { path: "/admin", component: Admin, meta: { requiresAuth: true, requiresAdmin: true } },
   { path: "/auth/callback", component: AuthCallback },
+  { path: "/aviso-legal", component: LegalNotice },
+  { path: "/politica-privacidad", component: PrivacyPolicy },
+  { path: "/politica-cookies", component: CookiePolicy },
   { path: "/:pathMatch(.*)*", component: NotFound },
 ];
 

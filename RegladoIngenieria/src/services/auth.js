@@ -75,7 +75,7 @@ async function logout() {
   }
 }
 
-export const auth = { state, setSession, clearSession, initialize, logout };
+export const auth = { state, setSession, clearSession, initialize, logout, getCookie, setCookie };
 
 function setCookie(name, value, maxAge) {
   document.cookie = `${name}=${encodeURIComponent(value)}; Max-Age=${maxAge}; Path=/; SameSite=Lax`;

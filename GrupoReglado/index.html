@@ -55,5 +55,95 @@
   <body>
     <div id="app"></div>
     <script type="module" src="/src/main.js"></script>
+
+    <!-- Chatbot Reglado -->
+    <script>
+      window.ChatbotRegladoConfig = {
+        apiUrl: "http://localhost:3000/chat",
+        title: "Asistente Reglado Group",
+        greeting: "¡Hola! Soy el asistente de Reglado Group. ¿En qué puedo ayudarte?",
+        primaryColor: "#273d5c", // Azul corporativo Group
+        placeholder: "Escribe tu duda aquí...",
+        sendButtonLabel: "Enviar",
+      };
+    </script>
+    <style>
+      /* Chatbot Design for Reglado Group */
+      .cr-chat-window {
+        border: 1px solid rgba(39, 61, 92, 0.2) !important;
+        background: radial-gradient(circle at 10% 10%, rgba(39, 61, 92, 0.04), transparent 50%),
+                    radial-gradient(circle at 90% 0%, rgba(220, 194, 143, 0.05), transparent 50%),
+                    #ffffff !important;
+        backdrop-filter: blur(15px) !important;
+        border-radius: 18px !important;
+        box-shadow: 0 20px 50px rgba(16, 28, 47, 0.15) !important;
+      }
+      body.dark-mode .cr-chat-window {
+        background: #1e293b !important;
+        border-color: rgba(255, 255, 255, 0.1) !important;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4) !important;
+      }
+      .cr-chat-header {
+        background: linear-gradient(135deg, #273d5c, #1a2b43) !important;
+        color: #ffffff !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 17px 17px 0 0 !important;
+      }
+      .cr-chat-messages {
+        background: transparent !important;
+      }
+      .cr-chat-bubble {
+        font-family: "Outfit", sans-serif !important;
+        border-radius: 12px !important;
+      }
+      .cr-chat-row.bot .cr-chat-bubble {
+        background: #f1f5f9 !important;
+        color: #1e293b !important;
+        border: 1px solid #e2e8f0 !important;
+      }
+      body.dark-mode .cr-chat-row.bot .cr-chat-bubble {
+        background: rgba(255, 255, 255, 0.05) !important;
+        color: #f1f5f9 !important;
+        border-color: rgba(255, 255, 255, 0.1) !important;
+      }
+      .cr-chat-footer {
+        background: transparent !important;
+        border-top: 1px solid rgba(0, 0, 0, 0.05) !important;
+      }
+      body.dark-mode .cr-chat-footer {
+        border-top-color: rgba(255, 255, 255, 0.08) !important;
+      }
+      .cr-chat-input-wrapper {
+        background: #ffffff !important;
+        border: 1px solid #d1d5db !important;
+        border-radius: 12px !important;
+      }
+      body.dark-mode .cr-chat-input-wrapper {
+        background: rgba(0, 0, 0, 0.2) !important;
+        border-color: rgba(255, 255, 255, 0.1) !important;
+      }
+      .cr-chat-input-wrapper:focus-within {
+        border-color: #273d5c !important;
+        box-shadow: 0 0 0 3px rgba(39, 61, 92, 0.1) !important;
+      }
+      body.dark-mode .cr-chat-input-wrapper:focus-within {
+        border-color: #60a5fa !important;
+        box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.15) !important;
+      }
+      .cr-chat-submit {
+        background: #273d5c !important;
+        border-radius: 10px !important;
+        border: none !important;
+        transition: all 0.2s ease !important;
+      }
+      .cr-chat-submit:hover:not(:disabled) {
+        background: #1a2b43 !important;
+        transform: translateY(-1px) !important;
+      }
+      .cr-chat-typing span {
+        background: #273d5c !important;
+      }
+    </style>
+    <script src="http://localhost:3000/widget/chatbotReglado.js"></script>
   </body>
 </html>
