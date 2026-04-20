@@ -38,7 +38,7 @@ onMounted(async () => {
 
     if (!auth.state.user) throw new Error("No se pudo validar la sesión.");
 
-    await router.replace("/area-clientes");
+    window.location.href = "/";
   } catch (err) {
     auth.clearSession();
     error.value = err instanceof Error ? err.message : "No se pudo iniciar sesión.";

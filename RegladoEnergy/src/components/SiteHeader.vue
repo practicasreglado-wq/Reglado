@@ -66,6 +66,11 @@
               <span class="user-initial" aria-hidden="true">{{ userInitial }}</span>
             </button>
             <div v-if="userMenuOpen" class="user-menu" role="menu" aria-label="Menu de usuario">
+              <div class="user-menu-info">
+                <span class="user-menu-name">{{ user.name }}</span>
+                <span class="user-menu-email">{{ user.email }}</span>
+              </div>
+              <div class="user-menu-divider"></div>
               <button class="user-menu-item" type="button" role="menuitem" @click="goToSettings">
                 Configuración
               </button>
@@ -159,8 +164,21 @@
         <router-link @click="closeMobileMenu" to="/contacto" class="btn primary glow mobile-action" v-glow>
           Solicitar análisis
         </router-link>
+        
         <template v-if="user">
-          <button @click="handleMobileLogout" class="btn mobile-action">Salir</button>
+          <div class="m-user-profile">
+            <div class="m-user-avatar">
+              <span class="user-initial">{{ userInitial }}</span>
+            </div>
+            <div class="m-user-info">
+              <span class="m-user-name">{{ user.name }}</span>
+              <span class="m-user-email">{{ user.email }}</span>
+            </div>
+          </div>
+          <div class="m-user-actions">
+            <button @click="handleMobileSettings" class="m-action-btn">Configuración</button>
+            <button @click="handleMobileLogout" class="m-action-btn danger">Cerrar sesión</button>
+          </div>
         </template>
 
         <template v-else>
@@ -379,13 +397,19 @@ onBeforeUnmount(() => {
   height: 38px;
   padding: 0;
   font-size: 12px;
-  color: rgba(233,238,246,.9);
+  color: #ffffff;
   background: rgba(255,255,255,.03);
   display: grid;
   place-items: center;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.user-pill:hover {
+  transform: scale(1.05);
+  background: rgba(255,255,255,.08);
+  border-color: rgba(242,197,61,.35);
 }
 .user-initial{
-  color: rgba(233,238,246,.95);
+  color: inherit;
   font-size: 0.98rem;
   font-weight: 800;
   line-height: 1;
@@ -409,6 +433,28 @@ onBeforeUnmount(() => {
   display: grid;
   gap: 4px;
   z-index: 90;
+}
+.user-menu-info {
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.user-menu-name {
+  font-weight: 700;
+  font-size: 14px;
+  color: rgba(233,238,246,.95);
+  line-height: 1.2;
+}
+.user-menu-email {
+  font-size: 11px;
+  color: rgba(233,238,246,.55);
+  word-break: break-all;
+}
+.user-menu-divider {
+  height: 1px;
+  background: rgba(255,255,255,.08);
+  margin: 4px 8px;
 }
 .user-menu-item{
   width: 100%;
@@ -525,5 +571,71 @@ onBeforeUnmount(() => {
   .burger{ display:block; }
   .mobile-admin-pill,
   .mobile-user-trigger{ display:grid; }
+  
+  /* Mobile User Profile */
+  .m-user-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.08);
+    margin-top: 8px;
+  }
+  .m-user-avatar {
+    width: 44px;
+    height: 44px;
+    background: rgba(255,255,255,.03);
+    border: 1px solid rgba(255,255,255,.18);
+    color: #ffffff;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+  }
+  .m-user-avatar .user-initial {
+    font-size: 1.1rem;
+  }
+  .m-user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+  }
+  .m-user-name {
+    font-weight: 700;
+    font-size: 14px;
+    color: white;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .m-user-email {
+    font-size: 11px;
+    color: rgba(233,238,246,0.6);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .m-user-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 4px;
+  }
+  .m-action-btn {
+    padding: 10px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    color: white;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .m-action-btn.danger {
+    color: #ffb7b7;
+    border-color: rgba(255, 183, 183, 0.2);
+  }
 }
 </style>

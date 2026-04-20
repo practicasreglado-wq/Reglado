@@ -31,6 +31,11 @@
           </button>
 
           <div v-if="userMenuOpen" class="user-menu" role="menu" aria-label="Menú de usuario">
+            <div class="user-menu-info">
+              <span class="user-menu-name">{{ user.name }}</span>
+              <span class="user-menu-email">{{ user.email }}</span>
+            </div>
+            <div class="user-menu-divider"></div>
             <button class="user-menu-item" type="button" role="menuitem" @click="goToSettings">
               Configuración
             </button>
@@ -443,7 +448,7 @@ function buildExternalProductUrl(baseUrl) {
 }
 
 .user-pill {
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.26);
   border-radius: 999px;
   width: 39px;
   height: 39px;
@@ -453,19 +458,14 @@ function buildExternalProductUrl(baseUrl) {
   place-items: center;
   text-decoration: none;
   -webkit-tap-highlight-color: transparent;
+  transition: transform .2s ease, background-color .2s ease;
 }
-
-.user-menu-trigger {
-  cursor: pointer;
-  outline: none;
-}
-
 .user-pill:hover {
+  transform: translateY(-1px);
   background: rgba(255, 255, 255, 0.16);
 }
-
 .user-initial {
-  color: #f6f8fc;
+  color: #fff;
   font-family: "Manrope", "Trebuchet MS", sans-serif;
   font-size: 0.98rem;
   font-weight: 800;
@@ -486,6 +486,28 @@ function buildExternalProductUrl(baseUrl) {
   gap: 0.25rem;
   z-index: 60;
   transition: background-color 0.4s ease;
+}
+.user-menu-info {
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.user-menu-name {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.2;
+}
+.user-menu-email {
+  font-size: 11px;
+  color: var(--text-muted, #888);
+  word-break: break-all;
+}
+.user-menu-divider {
+  height: 1px;
+  background: var(--line);
+  margin: 4px 8px;
 }
 
 .user-menu-item {
