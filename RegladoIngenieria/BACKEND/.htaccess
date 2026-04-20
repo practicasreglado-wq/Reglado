@@ -1,0 +1,9 @@
+Options -Indexes
+<FilesMatch "^\.env">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+<Files "*.php">
+    Order allow,deny
+    Allow from all
+</Files>

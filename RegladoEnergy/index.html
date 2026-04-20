@@ -1,27 +1,51 @@
 <!doctype html>
 <html lang="es">
-    <head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>Reglado Energy | Consultoría energética independiente</title>
-    <meta name="description" content="Consultoría energética independiente especializada en optimización y gestión de contratos de luz y gas. Análisis gratuito de facturas." />
+    <meta
+      name="description"
+      content="Consultoría energética independiente especializada en optimización y gestión de contratos de luz y gas. Análisis gratuito de facturas."
+    />
     <meta name="robots" content="index, follow" />
     <meta name="author" content="Reglado Energy" />
-    <meta name="keywords" content="consultoría energética, optimización contratos luz, optimización gas, auditoría factura eléctrica, potencia contratada, energía reactiva, ahorro energético empresas, sector público energía" />
+    <meta
+      name="keywords"
+      content="consultoría energética, optimización contratos luz, optimización gas, auditoría factura eléctrica, potencia contratada, energía reactiva, ahorro energético empresas, sector público energía"
+    />
 
     <!-- Open Graph / Social -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Reglado Energy" />
-    <meta property="og:title" content="Reglado Energy | Consultoría energética independiente" />
-    <meta property="og:description" content="Optimización de contratos de luz y gas con criterio técnico y económico." />
+    <meta
+      property="og:title"
+      content="Reglado Energy | Consultoría energética independiente"
+    />
+    <meta
+      property="og:description"
+      content="Optimización de contratos de luz y gas con criterio técnico y económico."
+    />
     <meta property="og:url" content="https://regladoenergy.com/" />
-    <meta property="og:image" content="https://regladoenergy.com/og-image.png" />
+    <meta
+      property="og:image"
+      content="https://regladoenergy.com/og-image.png"
+    />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Reglado Energy | Consultoría energética independiente" />
-    <meta name="twitter:description" content="Optimización de contratos de luz y gas con criterio técnico y económico." />
-    <meta name="twitter:image" content="https://regladoenergy.com/og-image.png" />
+    <meta
+      name="twitter:title"
+      content="Reglado Energy | Consultoría energética independiente"
+    />
+    <meta
+      name="twitter:description"
+      content="Optimización de contratos de luz y gas con criterio técnico y económico."
+    />
+    <meta
+      name="twitter:image"
+      content="https://regladoenergy.com/og-image.png"
+    />
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="/favicon.png" />
@@ -33,18 +57,91 @@
 
     <!-- Schema.org Organization -->
     <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      "name": "Reglado Energy",
-      "url": "https://regladoenergy.com/",
-      "logo": "https://regladoenergy.com/logo.png",
-      "description": "Consultoría energética independiente especializada en la optimización y gestión de contratos de luz y gas."
-    }
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Reglado Energy",
+        "url": "https://regladoenergy.com/",
+        "logo": "https://regladoenergy.com/logo.png",
+        "description": "Consultoría energética independiente especializada en la optimización y gestión de contratos de luz y gas."
+      }
     </script>
   </head>
   <body>
     <div id="app"></div>
     <script type="module" src="/src/main.js"></script>
+    <!-- Chatbot Reglado -->
+    <script>
+      window.ChatbotRegladoConfig = {
+        apiUrl: "http://localhost:3000/chat",
+        title: "Asistente Energy",
+        greeting: "¡Hola! Soy el asistente de Reglado Energy. ¿En qué puedo ayudarte?",
+        primaryColor: "#c5a021", // Dorado oscuro premium
+        placeholder: "Escribe tu duda aquí...",
+        sendButtonLabel: "Enviar",
+      };
+    </script>
+    <style>
+      /* Sobrescribir diseño del Chatbot para Energy - Versión Consolidada */
+      .cr-chat-window {
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        background: radial-gradient(900px 420px at 12% 10%, rgba(242, 197, 61, 0.05), transparent 60%),
+                    radial-gradient(900px 420px at 88% 0%, rgba(27, 92, 142, 0.05), transparent 62%),
+                    #0b0d10 !important; /* Fondo oscuro de Energy */
+        backdrop-filter: blur(20px) !important;
+        border-radius: 20px !important;
+        box-shadow: 0 26px 80px rgba(0, 0, 0, 0.6) !important;
+      }
+      .cr-chat-header {
+        background: linear-gradient(135deg, rgba(197, 160, 33, 0.2), rgba(11, 13, 16, 0.8)) !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+      }
+      .cr-chat-messages {
+        background: transparent !important;
+      }
+      .cr-chat-bubble {
+        font-family: "Century Gothic", sans-serif !important;
+        border-radius: 14px !important;
+      }
+      .cr-chat-row.bot .cr-chat-bubble {
+        background: rgba(255, 255, 255, 0.05) !important;
+        color: #e9eef6 !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+      }
+      .cr-chat-footer {
+        background: transparent !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+      }
+      .cr-chat-input-wrapper {
+        background: rgba(255, 255, 255, 0.05) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 12px !important;
+      }
+      .cr-chat-input-wrapper:focus-within {
+        border-color: #c5a021 !important;
+        box-shadow: 0 0 0 3px rgba(197, 160, 33, 0.12) !important;
+      }
+      .cr-chat-input {
+        color: #e9eef6 !important;
+      }
+      .cr-chat-submit {
+        background: linear-gradient(135deg, #c5a021, #8b6d11) !important;
+        box-shadow: 0 4px 12px rgba(197, 160, 33, 0.25) !important;
+        border-radius: 12px !important;
+        border: none !important;
+      }
+      .cr-chat-submit:hover:not(:disabled) {
+        box-shadow: 0 6px 16px rgba(197, 160, 33, 0.35) !important;
+        transform: translateY(-1px) !important;
+      }
+      .cr-chat-typing span {
+        background: #c5a021 !important;
+      }
+      .cr-chat-input-wrapper:focus-within {
+        border-color: #c5a021 !important;
+        box-shadow: 0 0 0 3px rgba(197, 160, 33, 0.12) !important;
+      }
+    </style>
+    <script src="http://localhost:3000/widget/chatbotReglado.js"></script>
   </body>
 </html>

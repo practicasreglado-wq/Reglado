@@ -93,9 +93,9 @@ if (isset($_FILES['pdf']) && (int) $_FILES['pdf']['error'] !== UPLOAD_ERR_NO_FIL
         respond(422, ['ok' => false, 'message' => 'La extension del archivo no coincide con su tipo real.']);
     }
 
-    $uploadsDir = __DIR__ . DIRECTORY_SEPARATOR . 'uploads';
+    $uploadsDir = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'private_storage' . DIRECTORY_SEPARATOR . 'uploads';
     if (!is_dir($uploadsDir) && !mkdir($uploadsDir, 0755, true) && !is_dir($uploadsDir)) {
-        throw new RuntimeException('No se pudo crear la carpeta de uploads.');
+        throw new RuntimeException('No se pudo crear la carpeta de uploads privados.');
     }
 
     $generatedFileName = date('Ymd_His') . '_' . bin2hex(random_bytes(16)) . '.' . extensionFromMime($mime);

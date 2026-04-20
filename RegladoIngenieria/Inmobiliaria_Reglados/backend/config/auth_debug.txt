@@ -1,0 +1,14 @@
+Array
+(
+    [iss] => reglado-auth
+    [iat] => 1776229678
+    [exp] => 1776316078
+    [sub] => 1
+    [email] => practicasreglado@gmail.com
+    [username] => estiven
+    [first_name] => estiven
+    [last_name] => davila
+    [phone] => 555555555555555
+    [name] => estiven davila
+    [role] => user
+)

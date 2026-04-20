@@ -274,7 +274,6 @@ function goToSettings() {
 async function handleLogout() {
   userMenuOpen.value = false;
   await auth.logout();
-  window.location.reload();
 }
 
 function handleMobileLogin() {
@@ -291,7 +290,6 @@ async function handleMobileLogout() {
   closeMobileMenu();
   userMenuOpen.value = false;
   await auth.logout();
-  window.location.reload();
 }
 
 onMounted(() => {
