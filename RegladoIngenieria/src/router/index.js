@@ -4,7 +4,6 @@ import Home from "@/pages/Home.vue";
 import Servicios from "@/pages/Servicios.vue";
 import Proyectos from "@/pages/Proyectos.vue";
 import Nosotros from "@/pages/Nosotros.vue";
-import Contacto from "@/pages/Contacto.vue";
 import AreaClientes from "@/pages/AreaClientes.vue";
 import Admin from "@/pages/Admin.vue";
 import AuthCallback from "@/pages/AuthCallback.vue";
@@ -18,7 +17,6 @@ const routes = [
   { path: "/servicios", component: Servicios },
   { path: "/proyectos", component: Proyectos },
   { path: "/nosotros", component: Nosotros },
-  { path: "/contacto", component: Contacto },
   { path: "/area-clientes", component: AreaClientes, meta: { requiresAuth: true } },
   { path: "/admin", component: Admin, meta: { requiresAuth: true, requiresAdmin: true } },
   { path: "/auth/callback", component: AuthCallback },

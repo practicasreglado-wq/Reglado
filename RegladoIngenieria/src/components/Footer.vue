@@ -30,7 +30,6 @@
             <router-link to="/servicios" class="nav-link">Servicios</router-link>
             <router-link to="/proyectos" class="nav-link">Proyectos</router-link>
             <router-link to="/nosotros" class="nav-link">Nosotros</router-link>
-            <router-link to="/contacto" class="nav-link">Contacto</router-link>
             <router-link to="/area-clientes" class="nav-link">Área Clientes</router-link>
           </nav>
         </div>
@@ -71,24 +70,17 @@ const currentYear = computed(() => new Date().getFullYear());
 .reglado-group-footer {
   position: relative;
   z-index: 10;
-  background: linear-gradient(145deg, #0f172a, #1e293b);
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--bg-soft);
+  border-top: 1px solid var(--border);
   padding: 4rem 1.5rem 1.5rem;
-  color: #e2e8f0;
+  color: var(--text);
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   overflow: hidden;
 }
 
-/* Efecto sutil de brillo en la parte superior del footer */
+/* Efecto sutil de brillo en la parte superior del footer (removido) */
 .reglado-group-footer::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(74, 158, 255, 0.4), transparent);
+  display: none;
 }
 
 .footer-container {
@@ -112,28 +104,28 @@ const currentYear = computed(() => new Date().getFullYear());
   align-items: center;
   justify-content: center;
   padding: 0.5rem 1.25rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--steel-light);
+  border: 1px solid rgba(74, 158, 255, 0.2);
   border-radius: 8px;
   font-size: 0.85rem;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #f8fafc;
+  color: var(--steel-dark);
   margin-bottom: 1.5rem;
-  backdrop-filter: blur(8px);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
 .brand-description {
   margin-bottom: 1.5rem;
   max-width: 380px;
+  color: var(--text-muted);
 }
 
 .brand-company-data {
   font-size: 0.85rem;
   line-height: 1.5;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-muted);
   margin-bottom: 2rem;
 }
 
@@ -148,19 +140,19 @@ const currentYear = computed(() => new Date().getFullYear());
   justify-content: center;
   width: 38px;
   height: 38px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--bg);
+  border: 1px solid var(--border);
   border-radius: 50%;
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--text-muted);
   text-decoration: none;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .social-icon-wrapper:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--bg);
   transform: translateY(-3px);
-  color: #fff;
-  border-color: rgba(74, 158, 255, 0.5);
+  color: var(--steel-dark);
+  border-color: var(--steel);
   box-shadow: 0 4px 12px rgba(74, 158, 255, 0.15);
 }
 
@@ -169,16 +161,15 @@ const currentYear = computed(() => new Date().getFullYear());
   align-items: center;
   justify-content: center;
   padding: 0.5rem 1.25rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--steel-light);
+  border: 1px solid rgba(74, 158, 255, 0.2);
   border-radius: 8px;
   font-size: 0.85rem;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #f8fafc;
+  color: var(--steel-dark);
   margin-bottom: 1.5rem;
-  backdrop-filter: blur(8px);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
@@ -189,7 +180,7 @@ const currentYear = computed(() => new Date().getFullYear());
 }
 
 .nav-link {
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--text-muted);
   text-decoration: none;
   font-size: 0.95rem;
   transition: all 0.2s ease;
@@ -204,12 +195,12 @@ const currentYear = computed(() => new Date().getFullYear());
   height: 1px;
   bottom: -2px;
   left: 0;
-  background-color: #60a5fa;
+  background-color: var(--steel);
   transition: width 0.3s ease;
 }
 
 .nav-link:hover {
-  color: #f8fafc;
+  color: var(--steel-dark);
   transform: translateX(4px);
 }
 
@@ -219,17 +210,17 @@ const currentYear = computed(() => new Date().getFullYear());
 
 .nav-link.router-link-active,
 .nav-link.router-link-exact-active {
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--steel-dark);
 }
 
 .contact-info p {
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--text-muted);
   font-size: 0.95rem;
   margin: 0;
 }
 
 .contact-info strong {
-  color: #e2e8f0;
+  color: var(--text);
   font-weight: 600;
 }
 
@@ -239,13 +230,13 @@ const currentYear = computed(() => new Date().getFullYear());
   align-items: center;
   justify-content: space-between;
   padding-top: 1.5rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid var(--border);
   gap: 1rem;
 }
 
 .copyright {
   font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-muted);
   margin: 0;
 }
 
@@ -257,23 +248,23 @@ const currentYear = computed(() => new Date().getFullYear());
 }
 
 .legal-link {
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-muted);
   text-decoration: none;
   font-size: 0.85rem;
   transition: color 0.2s ease;
 }
 
 .legal-link:hover {
-  color: #f8fafc;
+  color: var(--steel-dark);
 }
 
 .legal-link.router-link-active,
 .legal-link.router-link-exact-active {
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--steel-dark);
 }
 
 .separator {
-  color: rgba(255, 255, 255, 0.2);
+  color: var(--border);
 }
 
 /* Responsive adjustments */

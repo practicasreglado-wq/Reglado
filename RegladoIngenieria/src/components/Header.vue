@@ -10,7 +10,6 @@
         <router-link to="/servicios">Servicios</router-link>
         <router-link to="/proyectos">Proyectos</router-link>
         <router-link to="/nosotros">Nosotros</router-link>
-        <router-link to="/contacto">Contacto</router-link>
       </nav>
 
       <div class="header-actions">
@@ -69,7 +68,6 @@
       <router-link to="/servicios" @click="mobileOpen = false">Servicios</router-link>
       <router-link to="/proyectos" @click="mobileOpen = false">Proyectos</router-link>
       <router-link to="/nosotros" @click="mobileOpen = false">Nosotros</router-link>
-      <router-link to="/contacto" @click="mobileOpen = false">Contacto</router-link>
       <template v-if="auth.state.user">
         <router-link v-if="isAdmin" to="/admin" @click="mobileOpen = false">Administración</router-link>
         <router-link to="/area-clientes" @click="mobileOpen = false">Área Clientes</router-link>
