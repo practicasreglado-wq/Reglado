@@ -1,8 +1,18 @@
-<IfModule mod_rewrite.c>
-  RewriteEngine On
-  RewriteBase /
-  RewriteRule ^index\.html$ - [L]
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteRule . /index.html [L]
-</IfModule>
+Options -Indexes
+RewriteEngine On
+
+# Preserve Authorization header for PHP when requests are rewritten.
+RewriteCond %{HTTP:Authorization} .
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%0]
+
+# Send API/auth endpoints to ApiLoging backend under the same domain.
+RewriteRule ^auth(/.*)?$ api_backend/index.php [QSA,L]
+RewriteRule ^api/profile$ api_backend/index.php [QSA,L]
+
+# Serve existing files/directories as-is.
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# SPA fallback (Vue Router history mode).
+RewriteRule ^ index.html [L]

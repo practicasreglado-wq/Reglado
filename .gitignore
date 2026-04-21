@@ -11,6 +11,4 @@ SkillsClaude/
 .claude/
 scripts/RegladoIngenieria/
 SkillsClaude/
-
-# Releases - solo el código, nunca los zips (pueden llevar .env embebidos)
-ReleasesEstables/*.zip
+ReleasesEstables/

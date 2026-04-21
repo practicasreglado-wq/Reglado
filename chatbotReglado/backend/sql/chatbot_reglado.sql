@@ -1,23 +1,17 @@
 -- =====================================================================
 -- chatbotReglado — Schema MySQL
--- Genera la base de datos `chatbot_reglado` con todas sus tablas.
--- Importable desde phpMyAdmin: Import -> seleccionar este archivo -> Go.
+-- Crea las 5 tablas necesarias. NO crea ni selecciona base de datos.
 --
--- Fuente de verdad: backend/services/database.js (incluye migraciones
--- ALTER que este dump ya consolida en los CREATE).
+-- Uso en phpMyAdmin (Hostinger): seleccionar PRIMERO la DB destino en el
+-- panel izquierdo, luego Import -> este archivo -> Go.
+-- Uso local (XAMPP): el backend crea y usa la DB automáticamente en
+-- initDB(); no hace falta ejecutar este SQL manualmente.
+--
+-- Fuente de verdad: backend/services/database.js
 -- =====================================================================
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
-
--- ---------------------------------------------------------------------
--- Base de datos
--- ---------------------------------------------------------------------
-CREATE DATABASE IF NOT EXISTS `chatbot_reglado`
-  DEFAULT CHARACTER SET utf8mb4
-  COLLATE utf8mb4_general_ci;
-
-USE `chatbot_reglado`;
 
 -- ---------------------------------------------------------------------
 -- Tabla: usuarios

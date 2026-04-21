@@ -248,6 +248,43 @@ app.get('/health', (_req, res) => {
   res.json({ ok: true, service: 'chatbotReglado', model: MODEL });
 });
 
+// Endpoint temporal de diagnóstico. Retirar cuando todo funcione.
+app.get('/diag', async (_req, res) => {
+  const result = {
+    env: {
+      db_host: process.env.DB_HOST,
+      db_user: process.env.DB_USER,
+      db_name: process.env.DB_NAME,
+      anthropic_key_set: Boolean(process.env.ANTHROPIC_API_KEY),
+      notion_key_set: Boolean(process.env.NOTION_API_KEY),
+      allowed_origins: process.env.ALLOWED_ORIGINS
+    }
+  };
+  try {
+    const mysql = (await import('mysql2/promise')).default;
+    const conn = await mysql.createConnection({
+      host: process.env.DB_HOST,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASS,
+      database: process.env.DB_NAME
+    });
+    const [tables] = await conn.query('SHOW TABLES');
+    result.mysql = { ok: true, tables: tables.map(r => Object.values(r)[0]) };
+    try {
+      await conn.query("INSERT INTO conversaciones (session_id, estado) VALUES ('__diag_test__', 'IA') ON DUPLICATE KEY UPDATE last_active = NOW()");
+      const [rows] = await conn.query("SELECT * FROM conversaciones WHERE session_id = '__diag_test__'");
+      result.mysql.insert_test = rows.length > 0 ? 'OK' : 'FAIL';
+      await conn.query("DELETE FROM conversaciones WHERE session_id = '__diag_test__'");
+    } catch (e) {
+      result.mysql.insert_test = `FAIL: ${e.message}`;
+    }
+    await conn.end();
+  } catch (e) {
+    result.mysql = { ok: false, error: e.message, code: e.code };
+  }
+  res.json(result);
+});
+
 // Endpoint para subir archivos
 app.post('/api/upload', uploadLimiter, upload.single('archivo'), async (req, res) => {
   try {
