@@ -1,5 +1,6 @@
 ---
-description: Implementación de la Política de Privacidad RGPD de Reglado Group
+name: skill-privacidad
+description: Implementación de la Política de Privacidad RGPD de Reglado Group usando PrivacidadTemplate.vue. Datos de responsable fijos (REGLADO GROUP S.L, CIF B23982762) y cláusulas ARCO-POL obligatorias.
 ---
 
 # Skill: Reglado Group Privacidad Estandarizada

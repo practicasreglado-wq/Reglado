@@ -1,5 +1,6 @@
 ---
-description: Implementación y estandarización del Footer Corporativo de Reglado Group
+name: skill-footer-standar
+description: Estandariza el Footer Corporativo de Reglado Group al maquetar un proyecto nuevo o reconstruir uno existente. Usa RegladoFooterTemplate.vue, adapta paleta del proyecto conservando glassmorphism, datos fiscales fijos (CIF B23982762).
 ---
 
 # Skill: Reglado Group Footer Estandarizado
