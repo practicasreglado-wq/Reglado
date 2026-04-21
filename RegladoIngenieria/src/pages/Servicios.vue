@@ -23,13 +23,6 @@
       </div>
     </section>
 
-    <section class="section-sm">
-      <div class="container" style="text-align:center">
-        <h2 class="h2">¿Necesitas un servicio personalizado?</h2>
-        <p class="lead" style="margin-top:12px">Contacta con nosotros y analizamos tu caso concreto.</p>
-        <router-link to="/contacto" class="btn primary" style="margin-top:24px">Solicitar información</router-link>
-      </div>
-    </section>
   </main>
 </template>
 

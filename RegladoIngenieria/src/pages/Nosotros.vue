@@ -29,13 +29,6 @@
       </div>
     </section>
 
-    <section class="section-sm">
-      <div class="container" style="text-align:center">
-        <h2 class="h2">¿Trabajamos juntos?</h2>
-        <p class="lead" style="margin-top:12px">Cuéntanos tu proyecto y te damos una respuesta técnica en 48 horas.</p>
-        <router-link to="/contacto" class="btn primary" style="margin-top:24px">Contactar</router-link>
-      </div>
-    </section>
   </main>
 </template>
 

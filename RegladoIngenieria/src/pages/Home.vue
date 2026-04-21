@@ -7,7 +7,6 @@
         <h1 class="h1 hero-title">Soluciones técnicas<br><span class="accent">para la industria</span></h1>
         <p class="lead hero-lead">Consultoría especializada en ingeniería industrial. Análisis técnicos precisos, proyectos a medida y soluciones para empresas del sector.</p>
         <div class="hero-cta">
-          <router-link to="/contacto" class="btn primary">Solicitar consulta</router-link>
           <router-link to="/servicios" class="btn outline">Ver servicios</router-link>
         </div>
       </div>
@@ -52,16 +51,6 @@
       </div>
     </section>
 
-    <!-- CTA final -->
-    <section class="section-sm bg-soft">
-      <div class="container">
-        <div class="cta-box card">
-          <h2 class="h2">¿Tienes un proyecto industrial?</h2>
-          <p class="lead" style="margin-top:12px">Cuéntanos tu necesidad y te ofrecemos una consulta inicial sin compromiso.</p>
-          <router-link to="/contacto" class="btn primary" style="margin-top:24px">Contactar ahora</router-link>
-        </div>
-      </div>
-    </section>
   </main>
 </template>
 
