@@ -55,7 +55,7 @@
       window.crPollingInterval = setInterval(async () => {
         try {
           const params = new URLSearchParams({ sessionId });
-          const url = `${options.apiUrl.replace('/chat', '/api/poll_messages')}?${params.toString()}`;
+          const url = `${options.apiUrl.replace(/\/chat$/, '/api/poll_messages')}?${params.toString()}`;
           const response = await fetch(url);
           if (!response.ok) return;
           const data = await response.json();
@@ -369,7 +369,7 @@
       }
 
       try {
-        const response = await fetch(options.apiUrl.replace('/chat', '/api/upload'), {
+        const response = await fetch(options.apiUrl.replace(/\/chat$/, '/api/upload'), {
           method: 'POST',
           body: formData
         });
