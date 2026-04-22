@@ -1,21 +1,24 @@
 <?php
 declare(strict_types=1);
 
+require_once dirname(__DIR__) . '/lib/env_loader.php';
 require_once dirname(__DIR__) . '/lib/notifications_helper.php';
+require_once dirname(__DIR__) . '/lib/audit.php';
 
-$userEmail = trim((string) ($_GET['email'] ?? ''));
+loadEnv(dirname(__DIR__) . '/.env');
+
 $token = trim((string) ($_GET['token'] ?? ''));
 
-if ($userEmail === '' || !filter_var($userEmail, FILTER_VALIDATE_EMAIL) || $token === '') {
+if ($token === '') {
     http_response_code(400);
-    echo "<h1 style='color:red;font-family:sans-serif;'>Error: Email o token inválido o no proporcionado.</h1>";
+    echo "<h1 style='color:red;font-family:sans-serif;'>Error: Token inválido o no proporcionado.</h1>";
     exit;
 }
 
-$host = '127.0.0.1';
-$port = '3306';
-$dbUser = 'root';
-$dbPass = '';
+$host = (string) getenv('DB_HOST');
+$port = (string) getenv('DB_PORT');
+$dbUser = (string) getenv('DB_USER');
+$dbPass = (string) getenv('DB_PASS');
 
 $pdoInmo = null;
 $pdoAuth = null;
@@ -44,16 +47,19 @@ try {
     $pdoInmo->beginTransaction();
     $pdoAuth->beginTransaction();
 
+    $tokenHash = hash('sha256', $token);
+
     $stmtCheck = $pdoInmo->prepare("
-        SELECT id
+        SELECT id, user_email
         FROM role_promotion_requests
-        WHERE user_email = ?
-          AND token = ?
+        WHERE token_hash = ?
           AND status = 'pending'
         LIMIT 1
     ");
-    $stmtCheck->execute([$userEmail, $token]);
+    $stmtCheck->execute([$tokenHash]);
     $request = $stmtCheck->fetch();
+
+    $userEmail = $request ? (string) $request['user_email'] : '';
 
     if (!$request) {
         $pdoAuth->rollBack();
@@ -91,6 +97,13 @@ try {
 
     $pdoAuth->commit();
     $pdoInmo->commit();
+
+    auditLog($pdoInmo, 'role.promotion.reject', [
+        'user_email'    => $userEmail,
+        'resource_type' => 'role_promotion_request',
+        'resource_id'   => (string) ($request['id'] ?? ''),
+        'metadata'      => ['target_user_id' => $userRow ? (int) $userRow['id'] : null]
+    ]);
 
 } catch (Throwable $e) {
     if ($pdoAuth instanceof PDO && $pdoAuth->inTransaction()) {
@@ -249,16 +262,16 @@ try {
     $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
     $mail->CharSet = 'UTF-8';
     $mail->isSMTP();
-    $mail->Host = 'smtp.hostinger.com';
+    $mail->Host = (string) getenv('SMTP_HOST');
     $mail->SMTPAuth = true;
-    $mail->Username = 'info@regladoconsultores.com';
-    $mail->Password = 'Reglado130891.*';
+    $mail->Username = (string) getenv('SMTP_USER');
+    $mail->Password = (string) getenv('SMTP_PASS');
     $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
-    $mail->Port = 587;
+    $mail->Port = (int) getenv('SMTP_PORT');
 
-    $mail->setFrom('info@regladoconsultores.com', 'Reglado Real Estate');
+    $mail->setFrom((string) getenv('SMTP_FROM'), (string) getenv('SMTP_FROM_NAME'));
     $mail->addAddress($userEmail);
-    $mail->addReplyTo('info@regladoconsultores.com', 'Reglado Real Estate');
+    $mail->addReplyTo((string) getenv('SMTP_FROM'), (string) getenv('SMTP_FROM_NAME'));
 
     $mail->isHTML(true);
     $mail->Subject = $subject;

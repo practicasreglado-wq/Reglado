@@ -1,6 +1,13 @@
 <?php
 
+require_once dirname(__DIR__, 2) . '/vendor/autoload.php';
+require_once dirname(__DIR__) . '/lib/env_loader.php';
 require_once dirname(__DIR__) . '/lib/property_owner_linking.php';
+
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+
+loadEnv(dirname(__DIR__) . '/.env');
 
 function applyAuthCors(): void
 {
@@ -30,12 +37,30 @@ function requireAuthenticatedUser(PDO $pdo): array
     }
 
     $payload = verifyJwt($token);
-    file_put_contents(__DIR__ . '/auth_debug.txt', print_r($payload, true));
 
-    // Enlaza automaticamente propiedades pendientes por email cuando el usuario entra autenticado.
-    // No debe romper si aun no existe la migracion: la funcion ya valida columnas.
+    $userId = (int) ($payload['sub'] ?? 0);
+    if ($userId > 0) {
+        try {
+            $statusStmt = $pdo->prepare('SELECT is_blocked, last_token_invalidated_at FROM user_inmo_status WHERE user_id = :uid LIMIT 1');
+            $statusStmt->execute(['uid' => $userId]);
+            $status = $statusStmt->fetch(PDO::FETCH_ASSOC);
+            if ($status) {
+                if ((int) $status['is_blocked'] === 1) {
+                    respondJson(403, ["success" => false, "message" => "Tu acceso a Inmobiliaria ha sido revocado por un administrador."]);
+                }
+                if (!empty($status['last_token_invalidated_at']) && isset($payload['iat'])) {
+                    $invalidatedAt = strtotime((string) $status['last_token_invalidated_at']);
+                    if ($invalidatedAt !== false && (int) $payload['iat'] < $invalidatedAt) {
+                        respondJson(401, ["success" => false, "message" => "Tu sesión ha caducado. Vuelve a iniciar sesión."]);
+                    }
+                }
+            }
+        } catch (Throwable $e) {
+            error_log('[auth] user_inmo_status check failed: ' . $e->getMessage());
+        }
+    }
+
     try {
-        $userId = (int) ($payload['sub'] ?? 0);
         $email = (string) ($payload['email'] ?? '');
         if ($userId > 0 && $email !== '') {
             linkPendingPropertiesToUser($pdo, $userId, $email);
@@ -66,45 +91,19 @@ function extractBearerToken(): ?string
 
 function verifyJwt(string $token): array
 {
-    $parts = explode('.', $token);
+    $secret = $_ENV['JWT_SECRET'];
 
-    if (count($parts) !== 3) {
+    if ($secret === '') {
+        respondJson(500, ["success" => false, "message" => "Configuración JWT incompleta"]);
+    }
+
+    try {
+        $decoded = JWT::decode($token, new Key($secret, 'HS256'));
+        return (array) $decoded;
+    } catch (\Throwable $e) {
         respondJson(401, ["success" => false, "message" => "Token inválido"]);
+        return [];
     }
-
-    [$header, $payload, $signature] = $parts;
-
-    $secret = "change-this-secret"; // 🔥 mismo que login externo
-
-    $validSignature = base64UrlEncode(
-        hash_hmac('sha256', "$header.$payload", $secret, true)
-    );
-
-    if (!hash_equals($validSignature, $signature)) {
-        respondJson(401, ["success" => false, "message" => "Token inválido"]);
-    }
-
-    $decoded = json_decode(base64UrlDecode($payload), true);
-
-    if (!$decoded) {
-        respondJson(401, ["success" => false, "message" => "Token inválido"]);
-    }
-
-    if (isset($decoded['exp']) && $decoded['exp'] < time()) {
-        respondJson(401, ["success" => false, "message" => "Token expirado"]);
-    }
-
-    return $decoded;
-}
-
-function base64UrlDecode($data)
-{
-    return base64_decode(strtr($data, '-_', '+/'));
-}
-
-function base64UrlEncode($data)
-{
-    return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
 }
 
 function respondJson($code, $data)

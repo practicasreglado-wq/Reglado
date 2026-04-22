@@ -263,4 +263,77 @@ WHERE created_by_user_id IS NULL
   AND owner_user_id IS NOT NULL;
 
 
+-- =========================================
+-- 13. TABLA: buyer_property_document_download_progress
+-- =========================================
+CREATE TABLE IF NOT EXISTS buyer_property_document_download_progress (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    property_id INT NOT NULL,
+    buyer_user_id INT NOT NULL,
+
+    nda_downloaded TINYINT(1) NOT NULL DEFAULT 0,
+    loi_downloaded TINYINT(1) NOT NULL DEFAULT 0,
+    nda_downloaded_at DATETIME NULL,
+    loi_downloaded_at DATETIME NULL,
+
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    UNIQUE KEY uniq_buyer_property_download_progress (property_id, buyer_user_id),
+    INDEX idx_download_progress_property (property_id),
+    INDEX idx_download_progress_buyer (buyer_user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =========================================
+-- 14. OPTIMIZACIÓN DE ÍNDICES PARA CONSULTAS DE NOTIFICACIONES
+-- =========================================
+
+SET @schema_name := DATABASE();
+
+SET @idx_user_exists := (
+  SELECT COUNT(1)
+  FROM information_schema.statistics
+  WHERE table_schema = @schema_name
+    AND table_name = 'notifications'
+    AND index_name = 'idx_notifications_user'
+);
+
+SET @sql_idx_user := IF(
+  @idx_user_exists = 0,
+  'ALTER TABLE notifications ADD INDEX idx_notifications_user (user_id)',
+  'SELECT ''idx_notifications_user ya existe'''
+);
+
+PREPARE stmt FROM @sql_idx_user;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @idx_user_created_exists := (
+  SELECT COUNT(1)
+  FROM information_schema.statistics
+  WHERE table_schema = @schema_name
+    AND table_name = 'notifications'
+    AND index_name = 'idx_notifications_user_created_at'
+);
+
+SET @sql_idx_user_created := IF(
+  @idx_user_created_exists = 0,
+  'ALTER TABLE notifications ADD INDEX idx_notifications_user_created_at (user_id, created_at)',
+  'SELECT ''idx_notifications_user_created_at ya existe'''
+);
+
+PREPARE stmt FROM @sql_idx_user_created;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+-- =========================================
+-- 15. ACTUALIZACIÓN DE DATOS EXISTENTES
+-- =========================================
+ALTER TABLE propiedades
+ADD COLUMN estado VARCHAR(30) NOT NULL DEFAULT 'disponible' AFTER categoria;
+
+ALTER TABLE signed_document_review_tokens
+    ADD COLUMN reviewer_email VARCHAR(255) NULL
+    AFTER buyer_user_id;
+
 COMMIT;

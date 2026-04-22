@@ -359,6 +359,29 @@ $body .= '
 
     purchaseLog('EMAIL ENVIADO OK');
 
+    try {
+        $stmtPurchase = $pdo->prepare('
+            INSERT INTO purchase_requests
+                (buyer_user_id, buyer_email, buyer_name, buyer_phone,
+                 property_id, property_title, status)
+            VALUES
+                (:buyer_user_id, :buyer_email, :buyer_name, :buyer_phone,
+                 :property_id, :property_title, "pending")
+        ');
+        $stmtPurchase->execute([
+            'buyer_user_id'  => $buyerUserId,
+            'buyer_email'    => $buyerEmail ?: ($buyer['email'] ?? ''),
+            'buyer_name'     => $buyerFullName !== '' ? $buyerFullName : ($buyer['username'] ?? null),
+            'buyer_phone'    => $buyerPhone ?: null,
+            'property_id'    => $propertyId,
+            'property_title' => (string) ($property['tipo_propiedad'] ?? ''),
+        ]);
+    } catch (Throwable $insertException) {
+        purchaseLog('REGISTRO PURCHASE_REQUESTS FALLÓ', [
+            'message' => $insertException->getMessage(),
+        ]);
+    }
+
     respondJson(200, [
         'success' => true,
         'message' => 'Solicitud enviada. Nuestro equipo te contactará pronto.',

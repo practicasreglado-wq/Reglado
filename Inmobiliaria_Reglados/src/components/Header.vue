@@ -50,27 +50,53 @@
         </li>
 
         <li v-if="user" class="profile-nav-item" :class="{ 'in-profile': isInProfile }">
-          <router-link
-            v-if="isAdmin"
-            to="/admin/properties"
-            class="admin-badge"
-            title="Panel de administracion"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              width="20"
-              height="20"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2.5"
+          <div v-if="isAdmin" ref="adminDropdownRef" class="admin-dropdown">
+            <button
+              class="admin-badge"
+              :class="{ open: isAdminMenuOpen }"
+              type="button"
+              title="Panel de administracion"
+              @click="toggleAdminMenu"
             >
-              <path
-                d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
-          </router-link>
+              <svg
+                viewBox="0 0 24 24"
+                width="20"
+                height="20"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <path
+                  d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </button>
+
+            <ul v-show="isAdminMenuOpen" class="admin-menu">
+              <li>
+                <router-link to="/admin/properties" @click="closeAdminMenu">
+                  Propiedades
+                </router-link>
+              </li>
+              <li>
+                <router-link to="/admin/audit" @click="closeAdminMenu">
+                  Registro de auditoría
+                </router-link>
+              </li>
+              <li>
+                <router-link to="/admin/pending-requests" @click="closeAdminMenu">
+                  Solicitudes pendientes
+                </router-link>
+              </li>
+              <li>
+                <router-link to="/admin/users" @click="closeAdminMenu">
+                  Usuarios
+                </router-link>
+              </li>
+            </ul>
+          </div>
 
           <div class="user-menu-container">
             <router-link
@@ -137,7 +163,7 @@ export default {
     const isInProfile = computed(() => route.path.startsWith("/profile"));
     const isHome = computed(() => route.path === "/");
 
-    const authRoutes = ["/login", "/register", "/forgot-password", "/reset-password"];
+    const authRoutes = ["/login", "/register"];
     const isAuthRoute = computed(() =>
       authRoutes.some((authPath) => route.path.startsWith(authPath))
     );
@@ -157,7 +183,7 @@ export default {
     };
 
    const getCallbackUrl = () => {
-      return `${window.location.origin}/#/auth/callback`;
+      return `${window.location.origin}/auth/callback`;
     };
 
     const buildExternalAuthUrl = (path) => {
@@ -219,6 +245,29 @@ const goToLogin = () => {
       return username?.charAt(0)?.toUpperCase() || "U";
     };
 
+    const isAdminMenuOpen = ref(false);
+    const adminDropdownRef = ref(null);
+    const toggleAdminMenu = () => {
+      isAdminMenuOpen.value = !isAdminMenuOpen.value;
+    };
+    const closeAdminMenu = () => {
+      isAdminMenuOpen.value = false;
+    };
+
+    const handleAdminClickOutside = (event) => {
+      if (!isAdminMenuOpen.value) return;
+      if (adminDropdownRef.value && !adminDropdownRef.value.contains(event.target)) {
+        isAdminMenuOpen.value = false;
+      }
+    };
+
+    watch(
+      () => route.path,
+      () => {
+        isAdminMenuOpen.value = false;
+      }
+    );
+
     const scrolled = ref(false);
 
     const handleScroll = () => {
@@ -230,12 +279,14 @@ const goToLogin = () => {
       window.addEventListener("scroll", handleScroll);
       handleScroll();
       document.addEventListener("visibilitychange", handleVisibilityChange);
+      document.addEventListener("mousedown", handleAdminClickOutside);
     });
 
     onUnmounted(() => {
       window.removeEventListener("scroll", handleScroll);
       notificationsStore.stopAutoRefresh();
       document.removeEventListener("visibilitychange", handleVisibilityChange);
+      document.removeEventListener("mousedown", handleAdminClickOutside);
     });
 
     return {
@@ -251,6 +302,10 @@ const goToLogin = () => {
       goToCatalog,
       goToLogin,
       getInitials,
+      isAdminMenuOpen,
+      toggleAdminMenu,
+      closeAdminMenu,
+      adminDropdownRef,
     };
   },
 };
@@ -495,6 +550,11 @@ header:not(.at-top-home) .user-avatar {
   transform: rotate(180deg) scale(1.1);
 }
 
+.admin-dropdown {
+  position: relative;
+  margin-right: 25px;
+}
+
 .admin-badge {
   width: 44px;
   height: 44px;
@@ -504,7 +564,64 @@ header:not(.at-top-home) .user-avatar {
   justify-content: center;
   transition: all 0.3s ease;
   border: 1px solid transparent;
-  margin-right: 25px;
+  cursor: pointer;
+  background: transparent;
+}
+
+.admin-dropdown .admin-badge {
+  margin-right: 0;
+}
+
+.admin-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+  padding: 6px 0;
+  min-width: 240px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+  border: 2px solid #0f172a;
+  z-index: 1100;
+  gap: 0;
+}
+
+.admin-menu::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  left: 0;
+  right: 0;
+  height: 8px;
+}
+
+.admin-menu li {
+  width: 100%;
+  display: block;
+}
+
+.admin-menu li a {
+  display: block;
+  padding: 10px 16px;
+  font-size: 14px;
+  color: #1a2545;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+
+.admin-menu li a:hover {
+  background: #f3f4f6;
+}
+
+.admin-menu li a.router-link-active {
+  background: rgba(11, 61, 145, 0.08);
+  color: #0b3d91;
 }
 
 header.at-top-home .admin-badge {

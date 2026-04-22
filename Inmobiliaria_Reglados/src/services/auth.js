@@ -117,7 +117,46 @@ function setCookie(name, value, maxAgeSeconds) {
 }
 
 function clearCookie(name) {
-  document.cookie = `${name}=; Max-Age=0; Path=/; SameSite=Lax`;
+  // Borrado agresivo — intenta múltiples combinaciones path/domain
+  // por si la cookie fue puesta por otro proyecto del grupo con otros atributos
+  const combinations = [
+    `${name}=; Max-Age=0; Path=/; SameSite=Lax`,
+    `${name}=; Max-Age=0; Path=/; SameSite=None; Secure`,
+    `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; Path=/`,
+    `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; Path=/; Domain=${window.location.hostname}`,
+    `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; Path=/; Domain=.${window.location.hostname}`,
+  ];
+  for (const c of combinations) {
+    document.cookie = c;
+  }
+}
+
+export function clearAllAuthArtifacts() {
+  // Limpieza agresiva de todo lo relacionado con auth: cookies, localStorage, sessionStorage
+  clearCookie(COOKIE_TOKEN_KEY);
+  clearCookie("reglado_session");
+  clearCookie("reglado_auth");
+
+  try {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem("user");
+    localStorage.removeItem("auth_token");
+    localStorage.removeItem("token");
+    localStorage.removeItem("jwt");
+    localStorage.removeItem("selectedCategory");
+    localStorage.removeItem("preferences");
+    // Borra cualquier clave que parezca de auth
+    Object.keys(localStorage).forEach((key) => {
+      const lower = key.toLowerCase();
+      if (lower.includes("token") || lower.includes("auth") || lower.includes("jwt") || lower.includes("session")) {
+        localStorage.removeItem(key);
+      }
+    });
+  } catch {}
+
+  try {
+    sessionStorage.clear();
+  } catch {}
 }
 
 function getCookie(name) {

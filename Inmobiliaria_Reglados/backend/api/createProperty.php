@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-require_once "../config/session.php";
 require_once __DIR__ . '/../config/cors.php';
-require_once "../config/db.php";
+require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../config/auth.php';
 require_once dirname(__DIR__) . '/lib/geocoding.php';
 
 applyCors();
@@ -11,22 +11,17 @@ handlePreflight();
 
 header('Content-Type: application/json; charset=utf-8');
 
-if (!isset($_SESSION["user"])) {
-    echo json_encode([
-        "success" => false,
-        "error" => "No logueado"
-    ], JSON_UNESCAPED_UNICODE);
-    exit;
+$context = requireAuthenticatedUser($pdo);
+$userId = (int) ($context['local']['iduser'] ?? $context['auth']['sub'] ?? 0);
+
+if ($userId <= 0) {
+    respondJson(401, ['success' => false, 'error' => 'Usuario inválido']);
 }
 
 $data = json_decode(file_get_contents("php://input") ?: '{}', true);
 
 if (!is_array($data)) {
-    echo json_encode([
-        "success" => false,
-        "error" => "Solicitud no válida"
-    ], JSON_UNESCAPED_UNICODE);
-    exit;
+    respondJson(400, ['success' => false, 'error' => 'Solicitud no válida']);
 }
 
 $nombre = trim((string) ($data["nombre"] ?? ""));
@@ -35,21 +30,7 @@ $precio = (float) ($data["precio"] ?? 0);
 $tipo = trim((string) ($data["tipo"] ?? ""));
 
 if ($nombre === "" || $ubicacion === "" || $tipo === "") {
-    echo json_encode([
-        "success" => false,
-        "error" => "Datos incompletos"
-    ], JSON_UNESCAPED_UNICODE);
-    exit;
-}
-
-$userId = (int) ($_SESSION["user"]["id"] ?? 0);
-
-if ($userId <= 0) {
-    echo json_encode([
-        "success" => false,
-        "error" => "Usuario inválido"
-    ], JSON_UNESCAPED_UNICODE);
-    exit;
+    respondJson(422, ['success' => false, 'error' => 'Datos incompletos']);
 }
 
 $zona = '';

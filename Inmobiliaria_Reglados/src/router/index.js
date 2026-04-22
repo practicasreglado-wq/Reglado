@@ -17,8 +17,6 @@ import PropertiesForSale from "../views/PropertiesForSale.vue";
 import MyPropertiesForSale from "../views/MyPropertiesForSale.vue";
 import CreateProperty from "../views/CreateProperty.vue";
 import SearchHistory from "../views/SearchHistory.vue";
-import ForgotPassword from "../views/ForgotPassword.vue";
-import ResetPassword from "../views/ResetPassword.vue";
 import AuthCallback from "../views/AuthCallback.vue";
 import RestrictedAccessView from "../views/RestrictedAccessView.vue";
 import PropertyDetail from "../views/PropertyDetail.vue";
@@ -29,8 +27,6 @@ const routes = [
   { path: "/login", component: Login },
   { path: "/register", component: Register },
   { path: "/auth/callback", component: AuthCallback },
-  { path: "/forgot-password", component: ForgotPassword },
-  { path: "/reset-password", component: ResetPassword },
   { path: "/dashboard", component: Dashboard, meta: { requiresAuth: true, requiresReal: true } },
   {
     path: "/profile",
@@ -53,10 +49,25 @@ const routes = [
   { path: "/give-info", component: GiveInfo },
   { path: "/contribute-assets", component: ContributeAssets, meta: { requiresAuth: true, requiresReal: true } },
   { path: "/restricted", component: RestrictedAccessView, meta: { requiresAuth: true } },
-  { 
-    path: "/admin/properties", 
-    component: () => import("../views/AdminPropertiesView.vue"), 
-    meta: { requiresAuth: true, requiresAdmin: true } 
+  {
+    path: "/admin/properties",
+    component: () => import("../views/AdminPropertiesView.vue"),
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  {
+    path: "/admin/audit",
+    component: () => import("../views/AdminAuditView.vue"),
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  {
+    path: "/admin/pending-requests",
+    component: () => import("../views/AdminPendingRequestsView.vue"),
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  {
+    path: "/admin/users",
+    component: () => import("../views/AdminUsersView.vue"),
+    meta: { requiresAuth: true, requiresAdmin: true }
   },
   { path: "/admin/restricted", component: () => import("../views/RestrictedAdminView.vue"), meta: { requiresAuth: true } },
   { path: "/property/:id", component: PropertyDetail, meta: { requiresAuth: true, requiresReal: true } },
@@ -90,21 +101,24 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const userStore = useUserStore();
 
+  const isAuthRoute = to.path === "/login" || to.path === "/register";
+
   if (to.meta.requiresAuth && !userStore.isLoggedIn) {
-    next("/login");
-    return;
+    return next("/login");
+  }
+
+  if (isAuthRoute && userStore.isLoggedIn) {
+    return next(userStore.isAdmin ? "/admin/properties" : "/dashboard");
   }
 
   // Admin based protection
   if (to.meta.requiresAdmin && !userStore.isAdmin) {
-    next("/admin/restricted");
-    return;
+    return next("/admin/restricted");
   }
 
   // Role based protection
   if (to.meta.requiresReal && !userStore.isReal) {
-    next("/restricted");
-    return;
+    return next("/restricted");
   }
 
   next();
