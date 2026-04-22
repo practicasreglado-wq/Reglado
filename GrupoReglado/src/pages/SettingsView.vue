@@ -96,6 +96,10 @@
             Nuevo correo
             <input v-model.trim="emailForm.newEmail" type="email" required />
           </label>
+          <label>
+            Contraseña actual
+            <PasswordField v-model="emailForm.currentPassword" required />
+          </label>
           <p class="small-note">Te enviaremos un correo de confirmación al nuevo correo.</p>
         </template>
 
@@ -149,7 +153,7 @@ const activeModal = ref("");
 
 const usernameForm = reactive({ username: "" });
 const nameForm = reactive({ firstName: "", lastName: "" });
-const emailForm = reactive({ newEmail: "" });
+const emailForm = reactive({ newEmail: "", currentPassword: "" });
 const phoneForm = reactive({ phone: "" });
 const passwordForm = reactive({
   currentPassword: "",
@@ -194,6 +198,7 @@ function openModal(type) {
 
   if (type === "email") {
     emailForm.newEmail = "";
+    emailForm.currentPassword = "";
   }
 
   if (type === "phone") {
@@ -232,7 +237,7 @@ async function submitActiveModal() {
     }
 
     if (activeModal.value === "email") {
-      await auth.requestEmailChange(emailForm.newEmail);
+      await auth.requestEmailChange(emailForm.newEmail, emailForm.currentPassword);
       success.value = "Te enviamos un correo para confirmar el cambio de correo";
     }
 

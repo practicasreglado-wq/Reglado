@@ -42,16 +42,27 @@ class JwtService
 
     /**
      * Verifica la validez de un token JWT.
-     * 
+     *
+     * Además de la firma y la expiración (que valida la librería), comprueba
+     * que el `iss` coincida con el emisor configurado: si el secret se
+     * compartiera por error con otro servicio, sus tokens no servirían aquí.
+     *
      * @param string $token Token a verificar
      * @return array Payload decodificado
-     * @throws Exception Si el token es inválido o ha expirado
+     * @throws Exception Si el token es inválido, ha expirado o tiene mal `iss`
      */
     public static function verify(string $token): array
     {
         $secret = getenv('JWT_SECRET') ?: 'change-this-secret';
-        $decoded = JWT::decode($token, new Key($secret, 'HS256'));
+        $expectedIssuer = getenv('JWT_ISSUER') ?: 'reglado-auth';
 
-        return (array) $decoded;
+        $decoded = (array) JWT::decode($token, new Key($secret, 'HS256'));
+
+        $issuer = (string) ($decoded['iss'] ?? '');
+        if ($issuer !== $expectedIssuer) {
+            throw new RuntimeException('jwt issuer mismatch');
+        }
+
+        return $decoded;
     }
 }
