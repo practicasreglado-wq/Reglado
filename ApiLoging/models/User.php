@@ -211,6 +211,31 @@ class User
         $stmt->execute([$role, $userId]);
     }
 
+    public static function banUser(int $userId, int $adminId): void
+    {
+        $db = Database::connect();
+        $stmt = $db->prepare(
+            'UPDATE users SET banned_at = NOW(), banned_by = ?, sessions_invalidated_at = NOW() WHERE id = ?'
+        );
+        $stmt->execute([$adminId, $userId]);
+    }
+
+    public static function unbanUser(int $userId): void
+    {
+        // Nota: sessions_invalidated_at NO se limpia a propósito. Los JWTs que
+        // el usuario tuviera antes del ban deben seguir siendo inválidos.
+        $db = Database::connect();
+        $stmt = $db->prepare('UPDATE users SET banned_at = NULL, banned_by = NULL WHERE id = ?');
+        $stmt->execute([$userId]);
+    }
+
+    public static function invalidateSessions(int $userId): void
+    {
+        $db = Database::connect();
+        $stmt = $db->prepare('UPDATE users SET sessions_invalidated_at = NOW() WHERE id = ?');
+        $stmt->execute([$userId]);
+    }
+
     public static function updateName(int $userId, string $firstName, string $lastName): void
     {
         $db = Database::connect();
@@ -236,22 +261,30 @@ class User
     }
 
     /**
-     * Devuelve el timestamp UNIX del último cambio de contraseña, o null si
-     * la cuenta nunca cambió la contraseña original (registros antiguos).
+     * Devuelve el estado de seguridad del usuario: timestamps de último cambio
+     * de contraseña, ban activo e invalidación masiva de sesiones. Lo usa el
+     * middleware para decidir si un JWT dado sigue siendo válido.
+     *
+     * @return array{password_changed_at: ?int, banned_at: ?int, sessions_invalidated_at: ?int}
      */
-    public static function getPasswordChangedAt(int $userId): ?int
+    public static function getSecurityState(int $userId): array
     {
         $db = Database::connect();
-        $stmt = $db->prepare('SELECT password_changed_at FROM users WHERE id = ? LIMIT 1');
+        $stmt = $db->prepare('SELECT password_changed_at, banned_at, sessions_invalidated_at FROM users WHERE id = ? LIMIT 1');
         $stmt->execute([$userId]);
         $row = $stmt->fetch();
 
-        if (!$row || empty($row['password_changed_at'])) {
-            return null;
-        }
+        $toTs = static function ($value): ?int {
+            if (empty($value)) return null;
+            $ts = strtotime((string) $value);
+            return $ts !== false ? $ts : null;
+        };
 
-        $ts = strtotime((string) $row['password_changed_at']);
-        return $ts !== false ? $ts : null;
+        return [
+            'password_changed_at' => $toTs($row['password_changed_at'] ?? null),
+            'banned_at' => $toTs($row['banned_at'] ?? null),
+            'sessions_invalidated_at' => $toTs($row['sessions_invalidated_at'] ?? null),
+        ];
     }
 
     /**
@@ -412,7 +445,7 @@ class User
     {
         $db = Database::connect();
         $stmt = $db->query(
-            'SELECT id, username, email, name, first_name, last_name, phone, role, is_email_verified, email_verified_at, created_at
+            'SELECT id, username, email, name, first_name, last_name, phone, role, is_email_verified, email_verified_at, banned_at, banned_by, created_at
              FROM users
              ORDER BY created_at DESC, id DESC'
         );
