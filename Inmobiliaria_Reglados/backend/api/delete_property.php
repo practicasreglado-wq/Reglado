@@ -5,6 +5,7 @@ declare(strict_types=1);
 require_once dirname(__DIR__) . '/config/db.php';
 require_once dirname(__DIR__) . '/config/auth.php';
 require_once __DIR__ . '/../config/cors.php';
+require_once dirname(__DIR__) . '/lib/audit.php';
 
 applyCors();
 handlePreflight();
@@ -191,8 +192,8 @@ function collectPropertyFiles(PDO $pdo, int $propertyId): array
 
         if (!empty($fileColumns)) {
             $selectCols = implode(', ', array_map(static fn($c) => "`$c`", $fileColumns));
-
             $propertyColumn = getExistingColumn($pdo, 'inmobiliaria', 'documentos_firmados', ['propiedad_id', 'property_id']);
+
             if ($propertyColumn !== null) {
                 $signedStmt = $pdo->prepare("
                     SELECT {$selectCols}
@@ -246,6 +247,7 @@ $auth = $context['auth'] ?? [];
 
 $userId = (int) ($context['local']['iduser'] ?? 0);
 $role = strtolower((string) ($auth['role'] ?? ''));
+$isAdmin = ($role === 'admin');
 
 $input = json_decode(file_get_contents('php://input') ?: '{}', true);
 
@@ -274,6 +276,7 @@ if ($propertyId <= 0) {
 
 try {
     $selectFields = ['id', 'owner_user_id', 'captador_id'];
+
     if (columnExists($pdo, 'inmobiliaria', 'propiedades', 'activo_recibido_id')) {
         $selectFields[] = 'activo_recibido_id';
     }
@@ -298,7 +301,6 @@ try {
     }
 
     $ownerUserId = (int) ($property['owner_user_id'] ?? 0);
-    $isAdmin = in_array($role, ['admin', 'real'], true);
     $activoRecibidoId = (int) ($property['activo_recibido_id'] ?? 0);
 
     if (!$isAdmin && $ownerUserId !== $userId) {
@@ -357,6 +359,15 @@ try {
     $pdo->commit();
 
     deleteCollectedFiles($filesToDelete);
+
+    auditLog($pdo, 'property.delete', array_merge(
+        auditContextFromAuth($auth, $userId),
+        [
+            'resource_type' => 'property',
+            'resource_id'   => (string) $propertyId,
+            'metadata'      => ['owner_user_id' => $ownerUserId, 'as_admin' => $isAdmin]
+        ]
+    ));
 
     respondJson(200, [
         'success' => true,

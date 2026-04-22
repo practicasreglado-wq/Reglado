@@ -1,13 +1,13 @@
 <?php
 declare(strict_types=1);
 
-function fetchUserNotifications(PDO $pdo, int $userId, int $limit = 50, int $offset = 0): array
+function fetchUserNotifications(PDO $pdo, int $userId, int $limit = 30, int $offset = 0): array
 {
     $stmt = $pdo->prepare(
         'SELECT id, title, message, type, is_read, related_request_id, created_at
          FROM notifications
          WHERE user_id = :user_id
-         ORDER BY created_at DESC
+         ORDER BY is_read ASC, created_at DESC
          LIMIT :limit
          OFFSET :offset'
     );

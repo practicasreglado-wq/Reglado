@@ -15,7 +15,7 @@ function bootLog(string $message, array $context = []): void
         }
     }
 
-    file_put_contents(__DIR__ . '/boot_debug.txt', $line . PHP_EOL, FILE_APPEND);
+    error_log('[boot] ' . $line);
 }
 
 register_shutdown_function(function () {
@@ -31,8 +31,6 @@ bootLog('BOOT 1 entra al archivo', [
     'file' => __FILE__,
     'dir' => __DIR__,
 ]);
-
-file_put_contents(__DIR__ . '/webhook_hit.txt', date('Y-m-d H:i:s') . " HIT\n", FILE_APPEND);
 
 bootLog('BOOT 2 antes vendor/autoload.php');
 require_once __DIR__ . '/../vendor/autoload.php';
@@ -99,7 +97,6 @@ function webhookLog(string $message, array $context = []): void
         }
     }
 
-    file_put_contents(__DIR__ . '/cloudmailin_debug.txt', $line . PHP_EOL, FILE_APPEND);
     error_log($line);
 }
 

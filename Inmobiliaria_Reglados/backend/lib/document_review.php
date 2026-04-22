@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-function createDocumentReviewToken(PDO $pdo, int $propertyId, int $buyerUserId, ?DateTimeImmutable $expiresAt = null): string
+function createDocumentReviewToken(PDO $pdo, int $propertyId, int $buyerUserId, string $reviewerEmail = '', ?DateTimeImmutable $expiresAt = null): string
 {
     $token = bin2hex(random_bytes(24));
     $hash = hash('sha256', $token);
@@ -11,20 +11,23 @@ function createDocumentReviewToken(PDO $pdo, int $propertyId, int $buyerUserId, 
         INSERT INTO signed_document_review_tokens (
             property_id,
             buyer_user_id,
+            reviewer_email,
             token_hash,
             expires_at
         ) VALUES (
             :property_id,
             :buyer_user_id,
+            :reviewer_email,
             :token_hash,
             :expires_at
         )
     ');
     $stmt->execute([
-        'property_id' => $propertyId,
-        'buyer_user_id' => $buyerUserId,
-        'token_hash' => $hash,
-        'expires_at' => $expires->format('Y-m-d H:i:s'),
+        'property_id'    => $propertyId,
+        'buyer_user_id'  => $buyerUserId,
+        'reviewer_email' => $reviewerEmail !== '' ? $reviewerEmail : null,
+        'token_hash'     => $hash,
+        'expires_at'     => $expires->format('Y-m-d H:i:s'),
     ]);
 
     return $token;
@@ -87,7 +90,7 @@ function markDocumentReviewRejected(PDO $pdo, int $tokenId, ?int $reviewerId = n
     ]);
 }
 
-function buildReviewApprovalLink(string $token): string
+function buildReviewApprovalLink(string $token, string $reviewerEmail = ''): string
 {
     $base = getenv('BACKEND_APPROVAL_URL');
     if (!is_string($base) || trim($base) === '') {
@@ -99,7 +102,7 @@ function buildReviewApprovalLink(string $token): string
     return rtrim($base, '/') . '/api/approve_signed_documents.php?token=' . rawurlencode($token);
 }
 
-function buildReviewRejectLink(string $token): string
+function buildReviewRejectLink(string $token, string $reviewerEmail = ''): string
 {
     $base = getenv('BACKEND_APPROVAL_URL');
     if (!is_string($base) || trim($base) === '') {

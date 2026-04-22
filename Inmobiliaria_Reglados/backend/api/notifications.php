@@ -25,11 +25,11 @@ $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
 switch ($method) {
     case 'GET':
-        $limit = (int) ($_GET['limit'] ?? 20);
+        $limit = (int) ($_GET['limit'] ?? 30);
         $offset = (int) ($_GET['offset'] ?? 0);
 
         if ($limit < 1) {
-            $limit = 20;
+            $limit = 30;
         }
 
         $limit = min(100, $limit);

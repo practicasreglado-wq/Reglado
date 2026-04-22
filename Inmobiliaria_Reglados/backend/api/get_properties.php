@@ -151,6 +151,7 @@ function hydratePropertyCard(array $row, array $favorites): array
     return [
         'id' => (int) $row['id'],
         'categoria' => $row['categoria'] ?? '',
+        'estado' => !empty($row['estado']) ? (string) $row['estado'] : 'disponible',
         'titulo' => $row['titulo'] ?? '',
         'ubicacion_general' => $row['ubicacion_general'] ?? '',
         'tipo_propiedad' => $row['tipo_propiedad'] ?? '',
@@ -190,6 +191,7 @@ function hydratePropertyDetail(array $row, array $favorites): array
     return [
         'id' => (int) $row['id'],
         'categoria' => $row['categoria'] ?? '',
+        'estado' => !empty($row['estado']) ? (string) $row['estado'] : 'disponible',
         'titulo' => $row['titulo'] ?? '',
         'ubicacion_general' => '',
         'tipo_propiedad' => $row['tipo_propiedad'] ?? '',

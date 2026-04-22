@@ -97,6 +97,7 @@ $safeEmail = htmlspecialchars($userEmail, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 $safeMessage = nl2br(htmlspecialchars($message, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'));
 
 $token = bin2hex(random_bytes(32));
+$tokenHash = hash('sha256', $token);
 
 try {
     $stmt = $pdo->prepare("
@@ -107,7 +108,7 @@ try {
             last_name,
             username,
             message,
-            token,
+            token_hash,
             status,
             created_at
         ) VALUES (
@@ -117,7 +118,7 @@ try {
             :last_name,
             :username,
             :message,
-            :token,
+            :token_hash,
             'pending',
             NOW()
         )
@@ -130,14 +131,14 @@ try {
         ':last_name' => $lastName !== '' ? $lastName : null,
         ':username' => $username !== '' ? $username : null,
         ':message' => $message,
-        ':token' => $token,
+        ':token_hash' => $tokenHash,
     ]);
 } catch (PDOException $e) {
     respondJson(500, ['success' => false, 'message' => 'No se pudo registrar la solicitud: ' . $e->getMessage()]);
 }
 
-$approveUrl = "http://localhost/Reglado/Inmobiliaria_Reglados/backend/api/approve_real_role.php?email=" . urlencode($userEmail) . "&token=" . $token;
-$rejectUrl = "http://localhost/Reglado/Inmobiliaria_Reglados/backend/api/reject_user.php?email=" . urlencode($userEmail) . "&token=" . $token;
+$approveUrl = "http://localhost/Reglado/Inmobiliaria_Reglados/backend/api/approve_real_role.php?token=" . rawurlencode($token);
+$rejectUrl = "http://localhost/Reglado/Inmobiliaria_Reglados/backend/api/reject_user.php?token=" . rawurlencode($token);
 
 $body = <<<HTML
 <!DOCTYPE html>
@@ -288,14 +289,14 @@ $altBody = trim(
 try {
     $mail = new PHPMailer(true);
     $mail->isSMTP();
-    $mail->Host = 'smtp.hostinger.com';
+    $mail->Host = (string) getenv('SMTP_HOST');
     $mail->SMTPAuth = true;
-    $mail->Username = 'info@regladoconsultores.com';
-    $mail->Password = 'Reglado130891.*';
+    $mail->Username = (string) getenv('SMTP_USER');
+    $mail->Password = (string) getenv('SMTP_PASS');
     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-    $mail->Port = 587;
+    $mail->Port = (int) getenv('SMTP_PORT');
 
-    $mail->setFrom('info@regladoconsultores.com', 'Reglado Real Estate');
+    $mail->setFrom((string) getenv('SMTP_FROM'), (string) getenv('SMTP_FROM_NAME'));
     $mail->addAddress($recipient);
 
     $replyToName = trim("{$firstName} {$lastName}");

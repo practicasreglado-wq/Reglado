@@ -4,32 +4,17 @@ declare(strict_types=1);
 require_once __DIR__ . '/../config/cors.php';
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../config/auth.php';
-require_once __DIR__ . '/../config/session.php';
 
 applyCors();
 handlePreflight();
 
-$userId = 0;
-
-try {
-    $context = requireAuthenticatedUser($pdo);
-
-    $userId = (int) (
-        $context['local']['id']
-        ?? $context['local']['iduser']
-        ?? $context['user']['id']
-        ?? $context['user']['iduser']
-        ?? 0
-    );
-} catch (\Throwable $error) {
-    $userId = (int) (
-        $_SESSION['user']['id']
-        ?? $_SESSION['user']['iduser']
-        ?? $_SESSION['id']
-        ?? $_SESSION['iduser']
-        ?? 0
-    );
-}
+$context = requireAuthenticatedUser($pdo);
+$userId = (int) (
+    $context['local']['id']
+    ?? $context['local']['iduser']
+    ?? $context['auth']['sub']
+    ?? 0
+);
 
 if ($userId <= 0) {
     respondJson(401, [
@@ -126,6 +111,7 @@ function hydrateMyPropertyCard(array $row): array
     return [
         'id' => (int) $row['id'],
         'categoria' => $row['categoria'] ?? '',
+        'estado' => !empty($row['estado']) ? (string) $row['estado'] : 'disponible',
         'titulo' => $row['titulo'] ?? $row['nombre'] ?? '',
         'ubicacion_general' => $row['ubicacion_general'] ?? '',
         'tipo_propiedad' => $row['tipo_propiedad'] ?? '',

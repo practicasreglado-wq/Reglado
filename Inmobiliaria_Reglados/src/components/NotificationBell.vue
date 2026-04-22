@@ -189,7 +189,7 @@ const closePanel = () => {
 
 const openPanel = async () => {
   panelVisible.value = true;
-  await store.loadNotifications(20);
+  await store.loadNotifications(30);
   await nextTick();
   positionPanel();
 };

@@ -1,6 +1,6 @@
 <?php
 
-ini_set('session.cookie_samesite', 'Lax');
+ini_set('session.cookie_samesite', 'Strict');
 ini_set('session.cookie_httponly', 1);
 ini_set('session.cookie_secure', 0);
 
@@ -10,7 +10,7 @@ session_set_cookie_params([
     'domain' => 'localhost',
     'secure' => false,
     'httponly' => true,
-    'samesite' => 'Lax'
+    'samesite' => 'Strict'
 ]);
 
 session_start();

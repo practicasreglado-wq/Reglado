@@ -15,7 +15,6 @@ if ($relative === '') {
 
 $relative = str_replace('\\', '/', $relative);
 $relative = ltrim($relative, '/');
-$relative = str_replace('../', '', $relative);
 
 $baseDir = realpath(__DIR__ . '/../uploads');
 
@@ -40,7 +39,7 @@ if ($filePath === false || !is_file($filePath) || !is_readable($filePath)) {
     exit('Archivo no encontrado.');
 }
 
-if (!str_starts_with($filePath, $baseDir)) {
+if (!str_starts_with($filePath, $baseDir . DIRECTORY_SEPARATOR)) {
     http_response_code(403);
     exit('Acceso denegado.');
 }

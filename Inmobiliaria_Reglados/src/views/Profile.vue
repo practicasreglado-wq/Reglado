@@ -62,7 +62,7 @@
   </svg>
 </button>
 <span class="sidebar-kicker">Area privada</span>
-<div class="sidebar-profile-chip">
+<div v-if="user" class="sidebar-profile-chip">
 <div class="sidebar-avatar" :class="avatarClass">{{ userInitials }}</div>
 <div>
 <h2>Hola {{ user.nombre_usuario }}</h2>
