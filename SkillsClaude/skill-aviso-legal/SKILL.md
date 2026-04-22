@@ -1,5 +1,6 @@
 ---
-description: Implementación del Aviso Legal Corporativo de Reglado Group
+name: skill-aviso-legal
+description: Implementación del Aviso Legal Corporativo de Reglado Group cumpliendo LSSICE. Usa AvisoLegalTemplate.vue con datos fiscales fijos (REGLADO GROUP S.L, CIF B23982762) y fallback corporativo para proyecto/teléfono/email.
 ---
 
 # Skill: Reglado Group Aviso Legal Estandarizado

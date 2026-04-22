@@ -18,11 +18,14 @@ function applySecurityHeaders(): void
 function applyCorsHeaders(array $methods, string $headers = 'Content-Type, Authorization', bool $json = true): void
 {
     $origin = $_SERVER['HTTP_ORIGIN'] ?? null;
-    if (is_string($origin) && isAllowedOrigin($origin)) {
-        header('Access-Control-Allow-Origin: ' . $origin);
-        header('Vary: Origin');
-    } elseif (is_string($origin) && $origin !== '') {
-        respondSecurityJson(403, ['ok' => false, 'message' => 'Origen no permitido.']);
+    if (is_string($origin) && $origin !== '') {
+        if (isAllowedOrigin($origin)) {
+            header('Access-Control-Allow-Origin: ' . $origin);
+            header('Vary: Origin');
+            header('Access-Control-Allow-Credentials: true');
+        } else {
+            respondSecurityJson(403, ['ok' => false, 'message' => 'Origen no permitido: ' . $origin]);
+        }
     }
 
     header('Access-Control-Allow-Methods: ' . implode(', ', $methods));

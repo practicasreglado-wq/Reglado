@@ -58,14 +58,23 @@ class AuthController
         $hash = password_hash($password, PASSWORD_BCRYPT);
         [$plainToken, $tokenHash, $expiresAt] = self::buildVerificationToken();
 
+        // Respuesta genérica común: si email/username ya existen no lo decimos
+        // al cliente (impide enumeración). El usuario legítimo conoce su estado
+        // y puede usar /resend-verification o /request-password-reset; un
+        // atacante no aprende nada.
+        $genericResponse = [
+            'message' => 'if the data is valid, a verification email has been sent',
+        ];
+
         try {
             if (User::findByEmail($email) || User::findByUsername($username)) {
                 SecurityLogger::log('register_conflict', null, ['email' => $email, 'username' => $username]);
-                Response::json(['error' => 'email or username already exists'], 409);
+                Response::json($genericResponse, 202);
             }
 
             if (User::findPendingRegistrationConflict($email, $username)) {
-                Response::json(['error' => 'there is already a pending registration for this email or username'], 409);
+                SecurityLogger::log('register_pending_conflict', null, ['email' => $email, 'username' => $username]);
+                Response::json($genericResponse, 202);
             }
 
             $pendingId = User::createPendingRegistration($username, $email, $hash, $name, $firstName, $lastName, $phone, $tokenHash, $expiresAt);
@@ -78,13 +87,11 @@ class AuthController
                 Response::json(['error' => 'verification email could not be sent'], 500);
             }
 
-            Response::json([
-                'message' => 'verification email sent, confirm your email to complete registration',
-            ], 201);
+            Response::json($genericResponse, 201);
         } catch (PDOException $e) {
             if ((int) $e->getCode() === 23000) {
                 SecurityLogger::log('register_conflict', null, ['email' => $email, 'username' => $username]);
-                Response::json(['error' => 'email or username already exists'], 409);
+                Response::json($genericResponse, 202);
             }
             Response::json(['error' => 'could not create user'], 500);
         }
@@ -92,6 +99,16 @@ class AuthController
 
     /**
      * Inicia sesión verificando credenciales y estado del email.
+     *
+     * Defensa en profundidad contra fuerza bruta:
+     *   1. Throttling por IP+email (5/15 min): limita la tasa de intentos
+     *      desde una misma IP contra una misma cuenta.
+     *   2. Throttling global por email (20/15 min): corta ataques distribuidos
+     *      que rotan IPs contra un mismo email.
+     *   3. Account lockout (5 fallos/30 min): bloquea temporalmente la cuenta
+     *      tras 5 credenciales inválidas consecutivas, independientemente de
+     *      la IP. Se resetea al entrar correctamente.
+     *
      * Si las credenciales son válidas, emite un token JWT con la identidad del usuario.
      */
     public static function login(): void
@@ -99,7 +116,11 @@ class AuthController
         $data = self::getJsonInput();
         $email = trim((string) ($data['email'] ?? ''));
         $password = (string) ($data['password'] ?? '');
-        RateLimiter::enforce('login', Security::getClientIp() . '|' . strtolower($email), 10, 900);
+        $normalizedEmail = strtolower($email);
+
+        RateLimiter::enforce('login', Security::getClientIp() . '|' . $normalizedEmail, 5, 900);
+        RateLimiter::enforce('login_email', $normalizedEmail, 20, 900);
+        RateLimiter::checkFailureLockout('login_lockout', $normalizedEmail, 5, 1800);
 
         if ($email === '' || $password === '') {
             Response::json(['error' => 'email and password are required'], 422);
@@ -108,6 +129,7 @@ class AuthController
         $user = User::findByEmail($email);
 
         if (!$user || !password_verify($password, $user['password'])) {
+            RateLimiter::recordFailure('login_lockout', $normalizedEmail, 1800);
             SecurityLogger::log('login_failed', $user ? (int) $user['id'] : null, ['email' => $email]);
             Response::json(['error' => 'invalid credentials'], 401);
         }
@@ -117,6 +139,7 @@ class AuthController
             Response::json(['error' => 'email not verified'], 403);
         }
 
+        RateLimiter::resetFailure('login_lockout', $normalizedEmail);
         $token = JwtService::generate($user);
         SecurityLogger::log('login_success', (int) $user['id']);
 
@@ -390,13 +413,26 @@ class AuthController
         }
     }
 
+    /**
+     * Solicita cambio del email asociado a la cuenta. Exige re-autenticación
+     * con la contraseña actual: sin esto, un JWT robado bastaría para tomar
+     * la cuenta (cambio de email -> reset de password -> takeover total).
+     *
+     * Las respuestas son intencionalmente genéricas para no permitir que un
+     * usuario logueado enumere otros emails registrados en el sistema.
+     */
     public static function requestEmailChange(): void
     {
         $session = AuthMiddleware::handle();
         $userId = (int) ($session['sub'] ?? 0);
         $data = self::getJsonInput();
         $newEmail = trim((string) ($data['new_email'] ?? ''));
+        $currentPassword = (string) ($data['current_password'] ?? '');
         RateLimiter::enforce('request_email_change', Security::getClientIp() . '|' . $userId, 5, 900);
+
+        if ($currentPassword === '') {
+            Response::json(['error' => 'current_password is required'], 422);
+        }
 
         if (!filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
             Response::json(['error' => 'invalid email'], 422);
@@ -407,12 +443,23 @@ class AuthController
             Response::json(['error' => 'user not found'], 404);
         }
 
+        if (!password_verify($currentPassword, (string) $currentUser['password'])) {
+            SecurityLogger::log('email_change_bad_password', $userId);
+            Response::json(['error' => 'current password is incorrect'], 401);
+        }
+
         if (strcasecmp((string) $currentUser['email'], $newEmail) === 0) {
             Response::json(['error' => 'new email must be different from current email'], 422);
         }
 
+        // Mensaje único: si el email ya está en uso por otro, devolvemos lo
+        // mismo que si todo fue OK. El destinatario legítimo recibirá (o no)
+        // el correo; el atacante no puede saber qué emails están registrados.
+        $genericResponse = ['message' => 'if the email is available, a confirmation has been sent'];
+
         if (User::findByEmail($newEmail)) {
-            Response::json(['error' => 'email already exists'], 409);
+            SecurityLogger::log('email_change_target_exists', $userId, ['new_email' => $newEmail]);
+            Response::json($genericResponse);
         }
 
         [$plainToken, $tokenHash, $expiresAt] = self::buildVerificationToken();
@@ -427,7 +474,7 @@ class AuthController
             }
 
             SecurityLogger::log('email_change_requested', $userId, ['new_email' => $newEmail]);
-            Response::json(['message' => 'email change confirmation sent']);
+            Response::json($genericResponse);
         } catch (Throwable $e) {
             Response::json(['error' => 'could not request email change'], 500);
         }
@@ -562,18 +609,33 @@ class AuthController
 
     public static function adminUpdateRole(): void
     {
-        self::requireAdmin();
+        $session = self::requireAdmin();
+        $adminId = (int) ($session['sub'] ?? 0);
 
         $data = self::getJsonInput();
         $userId = (int) ($data['user_id'] ?? 0);
         $role = trim((string) ($data['role'] ?? ''));
+        $currentPassword = (string) ($data['current_password'] ?? '');
 
         if ($userId <= 0 || $role === '') {
             Response::json(['error' => 'user_id and role are required'], 422);
         }
 
+        if ($currentPassword === '') {
+            Response::json(['error' => 'current_password is required'], 422);
+        }
+
         if (!in_array($role, ['user', 'real', 'admin'])) {
             Response::json(['error' => 'invalid role'], 422);
+        }
+
+        // Reautenticación con la contraseña del admin actual: si su JWT estuviera
+        // comprometido, el atacante todavía no podría escalar privilegios sin
+        // conocer también la contraseña.
+        $adminUser = User::findById($adminId);
+        if (!$adminUser || !password_verify($currentPassword, (string) $adminUser['password'])) {
+            SecurityLogger::log('admin_role_change_bad_password', $adminId);
+            Response::json(['error' => 'current password is incorrect'], 401);
         }
 
         $targetUser = User::findById($userId);
@@ -581,9 +643,16 @@ class AuthController
             Response::json(['error' => 'user not found'], 404);
         }
 
+        // Salvaguarda contra lockout administrativo: si bajamos al último admin
+        // se quedaría el sistema sin nadie capaz de gestionar roles.
+        $isDemotingAdmin = ($targetUser['role'] ?? '') === 'admin' && $role !== 'admin';
+        if ($isDemotingAdmin && User::countAdmins() <= 1) {
+            Response::json(['error' => 'cannot demote the last remaining admin'], 409);
+        }
+
         try {
             User::updateRole($userId, $role);
-            SecurityLogger::log('admin_updated_user_role', $userId, ['new_role' => $role]);
+            SecurityLogger::log('admin_updated_user_role', $userId, ['new_role' => $role, 'by_admin' => $adminId]);
 
             $freshUser = User::findById($userId);
             if ($freshUser) {
@@ -602,14 +671,21 @@ class AuthController
 
     public static function adminSyncNotion(): void
     {
-        self::requireAdmin();
+        $session = self::requireAdmin();
+        $adminId = (int) ($session['sub'] ?? 0);
+
+        // Endpoint pesado (clear + re-sync de toda la BBDD contra una API
+        // externa con su propio rate limit). Throttle por admin para evitar
+        // que un admin malicioso o un script accidental disparen tormentas.
+        RateLimiter::enforce('admin_sync_notion', (string) $adminId, 5, 3600);
 
         $users = User::listAll();
 
         try {
             $clearError = NotionService::clearDatabase();
             if ($clearError !== '') {
-                Response::json(['error' => 'Error al limpiar Notion: ' . $clearError], 500);
+                error_log('[AuthController] adminSyncNotion clear error: ' . $clearError);
+                Response::json(['error' => 'could not synchronize notion'], 500);
             }
 
             $syncedCount = 0;
@@ -619,7 +695,7 @@ class AuthController
                 }
             }
 
-            SecurityLogger::log('admin_synced_notion', null, ['synced' => $syncedCount]);
+            SecurityLogger::log('admin_synced_notion', $adminId, ['synced' => $syncedCount]);
 
             Response::json([
                 'message' => 'Notion synchronized successfully',
@@ -627,8 +703,9 @@ class AuthController
                 'total_users' => count($users)
             ]);
         } catch (Throwable $e) {
+            // Detalles solo en log del servidor; al cliente, mensaje genérico.
             error_log('[AuthController] adminSyncNotion Error: ' . $e->getMessage());
-            Response::json(['error' => 'could not synchronize notion: ' . $e->getMessage()], 500);
+            Response::json(['error' => 'could not synchronize notion'], 500);
         }
     }
 
@@ -640,11 +717,26 @@ class AuthController
             Response::json(['error' => 'unauthorized'], 401);
         }
 
+        // Verificación de firma ANTES de tocar la BBDD: impide que un atacante
+        // sature `revoked_tokens` enviando bearers basura (DoS lento que
+        // degrada cada request autenticada por el SELECT del middleware).
         try {
-            $db = Database::connect();
-            $stmt = $db->prepare('INSERT INTO revoked_tokens(token) VALUES(?)');
-            $stmt->execute([$token]);
             $decoded = JwtService::verify($token);
+        } catch (Throwable $e) {
+            SecurityLogger::log('logout_invalid_token', null);
+            Response::json(['error' => 'invalid token'], 401);
+        }
+
+        // Rate limit por IP también (defensa adicional aunque el JWT sea válido).
+        RateLimiter::enforce('logout', Security::getClientIp(), 30, 60);
+
+        try {
+            // Solo se persiste el hash del token: si la BBDD se filtra, los
+            // JWTs (incluso revocados) no quedan expuestos en plano.
+            $tokenHash = hash('sha256', $token);
+            $db = Database::connect();
+            $stmt = $db->prepare('INSERT INTO revoked_tokens(token_hash) VALUES(?)');
+            $stmt->execute([$tokenHash]);
             SecurityLogger::log('logout', isset($decoded['sub']) ? (int) $decoded['sub'] : null);
             Response::json(['message' => 'logged out']);
         } catch (Throwable $e) {
@@ -672,25 +764,52 @@ class AuthController
 
     private static function buildVerificationUrl(string $plainToken): string
     {
-        $base = getenv('EMAIL_VERIFY_URL_BASE') ?: 'http://localhost:8000/auth/verify-email';
-        $separator = str_contains($base, '?') ? '&' : '?';
-
-        return $base . $separator . 'token=' . urlencode($plainToken);
+        return self::buildUrlFromEnv(
+            'EMAIL_VERIFY_URL_BASE',
+            'http://localhost:8000/auth/verify-email',
+            $plainToken
+        );
     }
 
     private static function buildEmailChangeUrl(string $plainToken): string
     {
-        $base = getenv('EMAIL_CHANGE_VERIFY_URL_BASE') ?: 'http://localhost:8000/auth/confirm-email-change';
-        $separator = str_contains($base, '?') ? '&' : '?';
-
-        return $base . $separator . 'token=' . urlencode($plainToken);
+        return self::buildUrlFromEnv(
+            'EMAIL_CHANGE_VERIFY_URL_BASE',
+            'http://localhost:8000/auth/confirm-email-change',
+            $plainToken
+        );
     }
 
     private static function buildPasswordResetUrl(string $plainToken): string
     {
-        $base = getenv('PASSWORD_RESET_URL_BASE') ?: 'http://localhost:5173/restablecer-contrasena';
-        $separator = str_contains($base, '?') ? '&' : '?';
+        return self::buildUrlFromEnv(
+            'PASSWORD_RESET_URL_BASE',
+            'http://localhost:5173/restablecer-contrasena',
+            $plainToken
+        );
+    }
 
+    /**
+     * Construye una URL pública con un token. En `local` permite el fallback
+     * a `http://localhost...` para no romper la DX, pero en cualquier otro
+     * entorno (staging, production) exige que la env var esté definida: así
+     * un despliegue mal configurado no envía emails con enlaces a localhost
+     * que pueden parecer phishing o llevar al sitio equivocado.
+     */
+    private static function buildUrlFromEnv(string $envKey, string $localFallback, string $plainToken): string
+    {
+        $base = (string) (getenv($envKey) ?: '');
+        $appEnv = strtolower((string) (getenv('APP_ENV') ?: 'local'));
+
+        if ($base === '') {
+            if ($appEnv !== 'local') {
+                error_log('AuthController: ' . $envKey . ' no definida en APP_ENV=' . $appEnv);
+                Response::json(['error' => 'service misconfigured'], 500);
+            }
+            $base = $localFallback;
+        }
+
+        $separator = str_contains($base, '?') ? '&' : '?';
         return $base . $separator . 'token=' . urlencode($plainToken);
     }
 

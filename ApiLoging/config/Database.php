@@ -21,6 +21,9 @@ class Database
         $pdo = new PDO($dsn, $user, $pass, [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            // Prepares reales en el servidor (no emulados): elimina la
+            // superficie de ataque por charsets exóticos y multi-statement.
+            PDO::ATTR_EMULATE_PREPARES => false,
         ]);
 
         return $pdo;

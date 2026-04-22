@@ -1,5 +1,6 @@
 ---
-description: Implementación de la Política de Cookies de Reglado Group
+name: skill-cookies
+description: Implementación de la Política de Cookies de Reglado Group usando CookiesTemplate.vue. Cubre cookies técnicas, de personalización y de análisis; recuerda sugerir CookieBanner global.
 ---
 
 # Skill: Reglado Group Cookies Estandarizada

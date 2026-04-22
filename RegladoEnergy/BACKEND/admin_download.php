@@ -98,7 +98,7 @@ if ($generalCsvHandle === false) {
 
 fputcsv($generalCsvHandle, $columns, ';');
 
-$uploadsRoot = realpath(__DIR__ . DIRECTORY_SEPARATOR . 'uploads');
+$uploadsRoot = realpath(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'private_storage' . DIRECTORY_SEPARATOR . 'uploads');
 $clients = [];
 $usedFolderNames = [];
 $totalFilesAdded = 0;
@@ -134,7 +134,9 @@ foreach ($rows as $row) {
         continue;
     }
 
-    $absolutePdfPath = realpath(__DIR__ . DIRECTORY_SEPARATOR . $pdfRelativePath);
+    // Corregimos la resolución de la ruta absoluta para el almacenamiento privado
+    $absolutePdfPath = realpath($uploadsRoot . DIRECTORY_SEPARATOR . basename($pdfRelativePath));
+
     if ($absolutePdfPath === false || !str_starts_with($absolutePdfPath, $uploadsRoot) || !is_file($absolutePdfPath)) {
         continue;
     }
@@ -159,7 +161,7 @@ if (!is_string($generalCsvContent)) {
     respondJson(500, ['ok' => false, 'message' => 'No se pudo leer el CSV general generado.']);
 }
 
-$zip->addFromString('datos_formulario/solicitudes.csv', $generalCsvContent);
+$zip->addFromString('solicitudes.csv', $generalCsvContent);
 
 foreach ($clients as $clientData) {
     $folderName = (string) $clientData['folder'];
@@ -209,7 +211,7 @@ $summary = sprintf(
     $totalFilesAdded,
     date('Y-m-d H:i:s')
 );
-$zip->addFromString('datos_formulario/resumen.txt', $summary);
+$zip->addFromString('resumen_descarga.txt', $summary);
 $zip->close();
 
 $downloadName = 'solicitudes_' . date('Ymd_His') . '.zip';

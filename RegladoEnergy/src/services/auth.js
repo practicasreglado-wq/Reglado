@@ -124,10 +124,7 @@ async function logout() {
     }
   } finally {
     clearSession();
-    const mainHub = import.meta.env.VITE_AUTH_API_URL && import.meta.env.VITE_AUTH_API_URL.includes("regladogroup.com") 
-      ? "https://regladogroup.com" 
-      : "http://localhost:5173";
-    window.location.href = mainHub;
+    window.location.href = "/";
   }
 }
 

@@ -24,7 +24,7 @@
       </form>
 
       <button
-        v-if="canResend"
+        v-if="error"
         class="btn-link"
         type="button"
         :disabled="loading"
@@ -60,7 +60,6 @@ const email = ref("");
 const password = ref("");
 const error = ref("");
 const success = ref("");
-const canResend = ref(false);
 const loading = ref(false);
 
 const returnTo = computed(() => {
@@ -88,7 +87,6 @@ function redirectIfAlreadyAuthenticated() {
 async function submitLogin() {
   error.value = "";
   success.value = "";
-  canResend.value = false;
   loading.value = true;
 
   try {
@@ -102,7 +100,6 @@ async function submitLogin() {
   } catch (err) {
     const message = err instanceof Error ? err.message : "No fue posible iniciar sesión";
     error.value = message;
-    canResend.value = message === "email not verified";
   } finally {
     loading.value = false;
   }

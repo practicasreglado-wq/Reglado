@@ -1,5 +1,6 @@
 ---
-description: Guía Maestra de Arquitectura de Software para el Ecosistema Reglado
+name: skill-reglado-master
+description: Guía Maestra de Arquitectura de Software para el Ecosistema Reglado. Úsala al iniciar cualquier nuevo proyecto del ecosistema Reglado para establecer stack (Vue 3 + Vite, PHP 8 MVC), estética (glassmorphism, Outfit/Inter) y decisiones de auth.
 ---
 
 # Skill: Reglado Master Architect

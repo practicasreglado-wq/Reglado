@@ -27,6 +27,12 @@ class Security
         header('Referrer-Policy: no-referrer');
         header("Permissions-Policy: geolocation=(), microphone=(), camera=()");
         header("Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; base-uri 'none'");
+
+        // HSTS solo si la petición ya viene por HTTPS (de lo contrario el
+        // navegador lo ignora y en local rompería el flujo de desarrollo).
+        if (self::isHttpsRequest()) {
+            header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
+        }
     }
 
     public static function enforceProductionTransport(): void
@@ -46,11 +52,21 @@ class Security
         $secret = (string) (getenv('JWT_SECRET') ?: '');
         $appEnv = strtolower((string) (getenv('APP_ENV') ?: 'local'));
 
-        if ($secret === '' || strlen($secret) < 32 || $secret === 'change-this-secret') {
-            if (in_array($appEnv, ['production', 'prod'], true)) {
-                Response::json(['error' => 'jwt secret is not configured securely'], 500);
-            }
+        $isWeak = $secret === '' || strlen($secret) < 32 || $secret === 'change-this-secret';
+        if (!$isWeak) {
+            return;
         }
+
+        // En local se tolera el secret débil para no romper la DX, pero se
+        // registra para que quede rastro. En cualquier otro entorno (staging,
+        // production o valores desconocidos) la API se niega a arrancar:
+        // tomar la decisión por el usuario aquí es lo más seguro.
+        if ($appEnv === 'local') {
+            error_log('JWT_SECRET débil en APP_ENV=local — válido solo para desarrollo.');
+            return;
+        }
+
+        Response::json(['error' => 'jwt secret is not configured securely'], 500);
     }
 
     public static function getClientIp(): string

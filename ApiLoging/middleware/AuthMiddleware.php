@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Middleware de autenticación: extrae el Bearer, verifica la firma del JWT,
+ * comprueba que no esté revocado y que sea posterior al último cambio de
+ * contraseña del usuario. Si cualquiera de estas comprobaciones falla,
+ * responde 401 sin que la petición alcance al controlador.
+ */
 class AuthMiddleware
 {
     public static function handle(): array
@@ -12,20 +18,47 @@ class AuthMiddleware
 
         try {
             $decoded = JwtService::verify($token);
+        } catch (Throwable $e) {
+            SecurityLogger::log('invalid_token_attempt', null, ['message' => 'invalid token']);
+            Response::json(['error' => 'invalid token'], 401);
+        }
+
+        try {
+            // Lookup O(1) por hash: revoked_tokens.token (TEXT) ya no se consulta.
+            $tokenHash = hash('sha256', $token);
             $db = Database::connect();
-            $stmt = $db->prepare('SELECT id FROM revoked_tokens WHERE token = ? LIMIT 1');
-            $stmt->execute([$token]);
+            $stmt = $db->prepare('SELECT id FROM revoked_tokens WHERE token_hash = ? LIMIT 1');
+            $stmt->execute([$tokenHash]);
 
             if ($stmt->fetch()) {
                 SecurityLogger::log('token_revoked_attempt', isset($decoded['sub']) ? (int) $decoded['sub'] : null);
                 Response::json(['error' => 'token revoked'], 401);
             }
 
+            // Invalidación masiva tras cambio de contraseña: si el usuario cambió
+            // su clave después de emitir este JWT, lo rechazamos. Esto convierte
+            // changePassword/resetPassword en un mecanismo de "log out everywhere"
+            // sin necesidad de listar todos los tokens activos.
+            $userId = isset($decoded['sub']) ? (int) $decoded['sub'] : 0;
+            $iat = isset($decoded['iat']) ? (int) $decoded['iat'] : 0;
+            if ($userId > 0 && $iat > 0) {
+                $passwordChangedAt = User::getPasswordChangedAt($userId);
+                if ($passwordChangedAt !== null && $passwordChangedAt > $iat) {
+                    SecurityLogger::log('token_invalidated_by_password_change', $userId);
+                    Response::json(['error' => 'session expired'], 401);
+                }
+            }
+
             return $decoded;
         } catch (Throwable $e) {
-            SecurityLogger::log('invalid_token_attempt', null, ['message' => 'invalid token']);
-            Response::json(['error' => 'invalid token'], 401);
+            // Cualquier fallo inesperado (BBDD caída, etc.) durante las
+            // comprobaciones post-firma: fail-closed para no servir contenido
+            // protegido bajo condiciones desconocidas.
+            error_log('AUTH_MIDDLEWARE_ERROR message=' . $e->getMessage());
+            Response::json(['error' => 'unauthorized'], 401);
         }
+
+        return [];
     }
 
     public static function extractBearerToken(): ?string

@@ -62,8 +62,8 @@
             </div>
 
             <div class="field" v-reveal="{ from: 'up', delay: 310 }">
-              <label>Facturas (PDF o imagen) (opcional)</label>
-              <input ref="fileInput" type="file" accept="application/pdf,image/*" @change="onFile" class="file" multiple />
+              <label>Factura (PDF o imagen) (opcional)</label>
+              <input ref="fileInput" type="file" accept="application/pdf,image/*" @change="onFile" class="file" />
             </div>
 
             <div class="alert" style="margin: 10px auto; padding: 10px; border: 1px solid #f39c12; background-color: rgba(242, 197, 61, 0.26); color: rgb(187, 185, 185); border-radius: 8px; display: flex; align-items: center; max-width: 90%;">
@@ -96,7 +96,7 @@ import { auth } from "../services/auth";
 
 const API_ENDPOINT =
   import.meta.env.VITE_CONTACT_ENDPOINT ||
-  "http://localhost/Reglado/RegladoEnergy/BACKEND/contact.php";
+  "http://localhost:8001/contact.php";
 
 const f = reactive({ name: "", phone: "", email: "", msg: "", file: null });
 const fileInput = ref(null);
@@ -146,30 +146,33 @@ function resetForm() {
 function onFile(e) {
   errorMsg.value = "";
   successMsg.value = "";
-  const selectedFiles = e.target.files || [];
+  const files = e.target.files || [];
+  if (files.length === 0) {
+    f.file = null;
+    return;
+  }
 
-  const maxBytes = 100 * 1024 * 1024; // LÍMITE -> 100 MB
+  const file = files[0];
+  const maxBytes = 10 * 1024 * 1024; // LÍMITE -> 10 MB (Sincronizado con Backend)
   const allowedTypes = ["application/pdf", "image/jpeg", "image/png", "image/gif"];
 
-  f.files = Array.from(selectedFiles).filter((file) => {
-    console.log(`Archivo: ${file.name}, Tamaño: ${file.size} bytes`); // Debug: Verificar tamaño del archivo
+  console.log(`Archivo: ${file.name}, Tamaño: ${file.size} bytes`);
 
-    if (!allowedTypes.includes(file.type)) {
-      errorMsg.value = "Algunos archivos tienen un formato no permitido.";
-      return false;
-    }
-
-    if (maxBytes > 0 && file.size > maxBytes) {
-      errorMsg.value = `El archivo "${file.name}" supera el límite de 100 MB.`;
-      return false;
-    }
-
-    return true;
-  });
-
-  if (f.files.length === 0) {
+  if (!allowedTypes.includes(file.type)) {
+    errorMsg.value = "Formato de archivo no permitido. Solo PDF o imágenes.";
+    f.file = null;
     e.target.value = "";
+    return;
   }
+
+  if (file.size > maxBytes) {
+    errorMsg.value = `El archivo supera el límite de 10 MB.`;
+    f.file = null;
+    e.target.value = "";
+    return;
+  }
+
+  f.file = file;
 }
 
 function onPhoneInput(e) {
@@ -199,10 +202,8 @@ async function submit() {
   formData.append("email", f.email.trim());
   formData.append("mensaje", f.msg.trim());
 
-  if (f.files && f.files.length > 0) {
-    f.files.forEach((file, index) => {
-      formData.append(`file_${index + 1}`, file);
-    });
+  if (f.file) {
+    formData.append("pdf", f.file);
   }
 
   try {
