@@ -603,6 +603,8 @@ class AuthController
                     'email' => $user['email'] ?? null,
                     'is_email_verified' => (int) ($user['is_email_verified'] ?? 0),
                     'email_verified_at' => $user['email_verified_at'] ?? null,
+                    'banned_at' => $user['banned_at'] ?? null,
+                    'banned_by' => isset($user['banned_by']) ? (int) $user['banned_by'] : null,
                     'created_at' => $user['created_at'] ?? null,
                 ];
             },
@@ -711,6 +713,54 @@ class AuthController
             // Detalles solo en log del servidor; al cliente, mensaje genérico.
             error_log('[AuthController] adminSyncNotion Error: ' . $e->getMessage());
             Response::json(['error' => 'could not synchronize notion'], 500);
+        }
+    }
+
+    /**
+     * Cierra todas las sesiones activas del usuario objetivo invalidando sus
+     * JWTs anteriores al timestamp actual (el middleware los rechazará).
+     * Requiere re-auth con la contraseña del admin.
+     */
+    public static function adminForceLogout(): void
+    {
+        ['adminId' => $adminId, 'targetUser' => $targetUser] = self::requireAdminForUserMutation();
+        $userId = (int) $targetUser['id'];
+
+        try {
+            User::invalidateSessions($userId);
+            SecurityLogger::log('admin_forced_logout', $userId, ['by_admin' => $adminId]);
+            Response::json(['message' => 'sessions invalidated']);
+        } catch (Throwable $e) {
+            Response::json(['error' => 'could not force logout'], 500);
+        }
+    }
+
+    /**
+     * Aplica o revoca un ban sobre un usuario. Requiere re-auth con la
+     * contraseña del admin. Al banear también invalida sesiones vivas.
+     */
+    public static function adminSetBan(): void
+    {
+        ['adminId' => $adminId, 'targetUser' => $targetUser, 'data' => $data] = self::requireAdminForUserMutation();
+        $userId = (int) $targetUser['id'];
+
+        if (!array_key_exists('banned', $data)) {
+            Response::json(['error' => 'banned flag is required'], 422);
+        }
+        $banned = (bool) $data['banned'];
+
+        try {
+            if ($banned) {
+                User::banUser($userId, $adminId);
+                SecurityLogger::log('admin_banned_user', $userId, ['by_admin' => $adminId]);
+                Response::json(['message' => 'user banned']);
+            } else {
+                User::unbanUser($userId);
+                SecurityLogger::log('admin_unbanned_user', $userId, ['by_admin' => $adminId]);
+                Response::json(['message' => 'user unbanned']);
+            }
+        } catch (Throwable $e) {
+            Response::json(['error' => 'could not update ban state'], 500);
         }
     }
 
@@ -858,6 +908,49 @@ class AuthController
         }
 
         return $session;
+    }
+
+    /**
+     * Verifica password del admin + valida user_id objetivo + devuelve
+     * adminId, target user y el payload parseado (para que los callers puedan
+     * leer campos adicionales sin releer `php://input`).
+     *
+     * @return array{adminId: int, targetUser: array, data: array}
+     */
+    private static function requireAdminForUserMutation(): array
+    {
+        $session = self::requireAdmin();
+        $adminId = (int) ($session['sub'] ?? 0);
+        RateLimiter::enforce('admin_mutate', (string) $adminId, 30, 60);
+
+        $data = self::getJsonInput();
+        $userId = (int) ($data['user_id'] ?? 0);
+        $currentPassword = (string) ($data['current_password'] ?? '');
+
+        if ($userId <= 0) {
+            Response::json(['error' => 'user_id is required'], 422);
+        }
+
+        if ($currentPassword === '') {
+            Response::json(['error' => 'current_password is required'], 422);
+        }
+
+        if ($userId === $adminId) {
+            Response::json(['error' => 'cannot target self'], 422);
+        }
+
+        $adminUser = User::findById($adminId);
+        if (!$adminUser || !password_verify($currentPassword, (string) $adminUser['password'])) {
+            SecurityLogger::log('admin_mutation_bad_password', $adminId, ['target' => $userId]);
+            Response::json(['error' => 'current password is incorrect'], 401);
+        }
+
+        $targetUser = User::findById($userId);
+        if (!$targetUser) {
+            Response::json(['error' => 'user not found'], 404);
+        }
+
+        return ['adminId' => $adminId, 'targetUser' => $targetUser, 'data' => $data];
     }
 
     /**

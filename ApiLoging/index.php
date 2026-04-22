@@ -102,6 +102,14 @@ if ($uri === '/auth/admin/sync-notion' && $method === 'POST') {
     AuthController::adminSyncNotion();
 }
 
+if ($uri === '/auth/admin/force-logout' && $method === 'POST') {
+    AuthController::adminForceLogout();
+}
+
+if ($uri === '/auth/admin/set-ban' && $method === 'POST') {
+    AuthController::adminSetBan();
+}
+
 if ($uri === '/auth/logout' && $method === 'POST') {
     AuthController::logout();
 }
