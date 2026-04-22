@@ -35,16 +35,28 @@ class AuthMiddleware
                 Response::json(['error' => 'token revoked'], 401);
             }
 
-            // Invalidación masiva tras cambio de contraseña: si el usuario cambió
-            // su clave después de emitir este JWT, lo rechazamos. Esto convierte
-            // changePassword/resetPassword en un mecanismo de "log out everywhere"
-            // sin necesidad de listar todos los tokens activos.
+            // Validación centralizada del estado de seguridad del usuario:
+            // 1. Cambio de contraseña -> invalida JWTs anteriores.
+            // 2. Ban activo -> rechaza cualquier JWT (independiente del iat).
+            // 3. Sessions invalidated -> rechaza JWTs emitidos antes del
+            //    timestamp (usado por force-logout y también por el ban).
             $userId = isset($decoded['sub']) ? (int) $decoded['sub'] : 0;
             $iat = isset($decoded['iat']) ? (int) $decoded['iat'] : 0;
             if ($userId > 0 && $iat > 0) {
-                $passwordChangedAt = User::getPasswordChangedAt($userId);
-                if ($passwordChangedAt !== null && $passwordChangedAt > $iat) {
+                $state = User::getSecurityState($userId);
+
+                if ($state['password_changed_at'] !== null && $state['password_changed_at'] > $iat) {
                     SecurityLogger::log('token_invalidated_by_password_change', $userId);
+                    Response::json(['error' => 'session expired'], 401);
+                }
+
+                if ($state['banned_at'] !== null) {
+                    SecurityLogger::log('token_banned_account', $userId);
+                    Response::json(['error' => 'account banned'], 401);
+                }
+
+                if ($state['sessions_invalidated_at'] !== null && $state['sessions_invalidated_at'] > $iat) {
+                    SecurityLogger::log('token_session_invalidated', $userId);
                     Response::json(['error' => 'session expired'], 401);
                 }
             }
