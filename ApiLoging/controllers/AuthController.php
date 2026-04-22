@@ -139,6 +139,11 @@ class AuthController
             Response::json(['error' => 'email not verified'], 403);
         }
 
+        if (!empty($user['banned_at'])) {
+            SecurityLogger::log('login_blocked_banned', (int) $user['id'], ['email' => $email]);
+            Response::json(['error' => 'account banned'], 403);
+        }
+
         RateLimiter::resetFailure('login_lockout', $normalizedEmail);
         $token = JwtService::generate($user);
         SecurityLogger::log('login_success', (int) $user['id']);
