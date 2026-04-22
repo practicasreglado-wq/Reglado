@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS users (
   username VARCHAR(100) UNIQUE,
   email VARCHAR(255) NOT NULL UNIQUE,
   password VARCHAR(255) NOT NULL,
+  password_changed_at DATETIME NULL,
   name VARCHAR(255) NOT NULL,
   first_name VARCHAR(100),
   last_name VARCHAR(100),
@@ -72,10 +73,12 @@ CREATE INDEX idx_password_reset_expiry ON password_reset_tokens (expires_at);
 
 CREATE TABLE IF NOT EXISTS revoked_tokens (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  token TEXT NOT NULL,
+  token TEXT NULL,
+  token_hash CHAR(64) NULL,
   revoked_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE INDEX idx_revoked_token_hash ON revoked_tokens (token_hash);
 CREATE INDEX idx_revoked_token_prefix ON revoked_tokens (token(255));
 
 CREATE TABLE IF NOT EXISTS rate_limits (

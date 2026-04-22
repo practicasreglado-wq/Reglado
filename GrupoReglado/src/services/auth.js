@@ -196,11 +196,11 @@ async function updatePhone(phone) {
   return applySessionPayload(payload);
 }
 
-async function requestEmailChange(newEmail) {
+async function requestEmailChange(newEmail, currentPassword) {
   return request("/auth/request-email-change", {
     method: "POST",
     headers: authHeaders(),
-    body: JSON.stringify({ new_email: newEmail }),
+    body: JSON.stringify({ new_email: newEmail, current_password: currentPassword }),
   });
 }
 
@@ -249,11 +249,11 @@ async function adminUsers() {
   });
 }
 
-async function adminUpdateRole(userId, role) {
+async function adminUpdateRole(userId, role, currentPassword) {
   return request("/auth/admin/update-role", {
     method: "POST",
     headers: authHeaders(),
-    body: JSON.stringify({ user_id: userId, role }),
+    body: JSON.stringify({ user_id: userId, role, current_password: currentPassword }),
   });
 }
 

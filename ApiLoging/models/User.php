@@ -228,9 +228,43 @@ class User
 
     public static function updatePasswordHash(int $userId, string $passwordHash): void
     {
+        // password_changed_at se actualiza junto al hash: el middleware lo usa
+        // para invalidar JWTs emitidos antes del cambio (ver AuthMiddleware).
         $db = Database::connect();
-        $stmt = $db->prepare('UPDATE users SET password = ? WHERE id = ?');
+        $stmt = $db->prepare('UPDATE users SET password = ?, password_changed_at = NOW() WHERE id = ?');
         $stmt->execute([$passwordHash, $userId]);
+    }
+
+    /**
+     * Devuelve el timestamp UNIX del último cambio de contraseña, o null si
+     * la cuenta nunca cambió la contraseña original (registros antiguos).
+     */
+    public static function getPasswordChangedAt(int $userId): ?int
+    {
+        $db = Database::connect();
+        $stmt = $db->prepare('SELECT password_changed_at FROM users WHERE id = ? LIMIT 1');
+        $stmt->execute([$userId]);
+        $row = $stmt->fetch();
+
+        if (!$row || empty($row['password_changed_at'])) {
+            return null;
+        }
+
+        $ts = strtotime((string) $row['password_changed_at']);
+        return $ts !== false ? $ts : null;
+    }
+
+    /**
+     * Cuenta cuántos usuarios tienen rol admin. Se usa para impedir que un
+     * admin se rebaje a sí mismo (o a otro) y deje el sistema sin admins.
+     */
+    public static function countAdmins(): int
+    {
+        $db = Database::connect();
+        $stmt = $db->query("SELECT COUNT(*) AS n FROM users WHERE role = 'admin'");
+        $row = $stmt->fetch();
+
+        return (int) ($row['n'] ?? 0);
     }
 
     public static function createVerificationToken(int $userId, string $tokenHash, string $expiresAt): void

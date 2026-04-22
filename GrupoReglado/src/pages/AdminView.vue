@@ -207,9 +207,17 @@ async function handleSyncNotion() {
 
 async function updateUserRole(userId, newRole) {
   error.value = "";
+
+  // El backend exige reautenticación con la contraseña del admin para
+  // mitigar escalada de privilegios desde un JWT robado.
+  const currentPassword = prompt("Confirma tu contraseña para cambiar el rol:");
+  if (!currentPassword) {
+    await loadUsers();
+    return;
+  }
+
   try {
-    await auth.adminUpdateRole(userId, newRole);
-    // Notificamos que se cambio el rol visualmente si gustamos
+    await auth.adminUpdateRole(userId, newRole, currentPassword);
   } catch (err) {
     const message = err instanceof Error ? err.message : "No fue posible actualizar el rol.";
     error.value = message;
