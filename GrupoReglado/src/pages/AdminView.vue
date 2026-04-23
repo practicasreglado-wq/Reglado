@@ -37,7 +37,7 @@
             <th>Verificado</th>
             <th>Estado</th>
             <th>Alta</th>
-            <th class="col-actions">Acciones</th>
+            <th class="col-actions" aria-label="Acciones"></th>
           </tr>
         </thead>
         <tbody>
