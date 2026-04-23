@@ -731,6 +731,7 @@ class AuthController
 
         try {
             User::invalidateSessions($userId);
+            User::clearSession($userId);
             SecurityLogger::log('admin_forced_logout', $userId, ['by_admin' => $adminId]);
             Response::json(['message' => 'sessions invalidated']);
         } catch (Throwable $e) {
@@ -795,7 +796,11 @@ class AuthController
             $db = Database::connect();
             $stmt = $db->prepare('INSERT INTO revoked_tokens(token_hash) VALUES(?)');
             $stmt->execute([$tokenHash]);
-            SecurityLogger::log('logout', isset($decoded['sub']) ? (int) $decoded['sub'] : null);
+            $userId = isset($decoded['sub']) ? (int) $decoded['sub'] : 0;
+            if ($userId > 0) {
+                User::clearSession($userId);
+            }
+            SecurityLogger::log('logout', $userId > 0 ? $userId : null);
             Response::json(['message' => 'logged out']);
         } catch (Throwable $e) {
             Response::json(['error' => 'could not logout'], 500);
