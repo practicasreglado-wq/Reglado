@@ -215,7 +215,7 @@ class User
     {
         $db = Database::connect();
         $stmt = $db->prepare(
-            'UPDATE users SET banned_at = NOW(), banned_by = ?, sessions_invalidated_at = NOW() WHERE id = ?'
+            'UPDATE users SET banned_at = NOW(), banned_by = ?, sessions_invalidated_at = NOW(), current_session_id = NULL WHERE id = ?'
         );
         $stmt->execute([$adminId, $userId]);
     }
@@ -233,6 +233,31 @@ class User
     {
         $db = Database::connect();
         $stmt = $db->prepare('UPDATE users SET sessions_invalidated_at = NOW() WHERE id = ?');
+        $stmt->execute([$userId]);
+    }
+
+    /**
+     * Genera un nuevo session id para el usuario y lo persiste. Devuelve el
+     * sid para incluirlo en el JWT recién emitido. La sesión anterior queda
+     * invalidada en el middleware por no coincidir con el sid guardado.
+     */
+    public static function rotateSession(int $userId): string
+    {
+        $sid = bin2hex(random_bytes(32));
+        $db = Database::connect();
+        $stmt = $db->prepare('UPDATE users SET current_session_id = ? WHERE id = ?');
+        $stmt->execute([$sid, $userId]);
+        return $sid;
+    }
+
+    /**
+     * Elimina la sesión activa del usuario. Los JWTs existentes dejarán de
+     * validar en el middleware al no coincidir su sid con NULL.
+     */
+    public static function clearSession(int $userId): void
+    {
+        $db = Database::connect();
+        $stmt = $db->prepare('UPDATE users SET current_session_id = NULL WHERE id = ?');
         $stmt->execute([$userId]);
     }
 
@@ -262,15 +287,15 @@ class User
 
     /**
      * Devuelve el estado de seguridad del usuario: timestamps de último cambio
-     * de contraseña, ban activo e invalidación masiva de sesiones. Lo usa el
-     * middleware para decidir si un JWT dado sigue siendo válido.
+     * de contraseña, ban activo, invalidación masiva de sesiones y session id
+     * actual. Lo usa el middleware para decidir si un JWT sigue siendo válido.
      *
-     * @return array{password_changed_at: ?int, banned_at: ?int, sessions_invalidated_at: ?int}
+     * @return array{password_changed_at: ?int, banned_at: ?int, sessions_invalidated_at: ?int, current_session_id: ?string}
      */
     public static function getSecurityState(int $userId): array
     {
         $db = Database::connect();
-        $stmt = $db->prepare('SELECT password_changed_at, banned_at, sessions_invalidated_at FROM users WHERE id = ? LIMIT 1');
+        $stmt = $db->prepare('SELECT password_changed_at, banned_at, sessions_invalidated_at, current_session_id FROM users WHERE id = ? LIMIT 1');
         $stmt->execute([$userId]);
         $row = $stmt->fetch();
 
@@ -284,6 +309,7 @@ class User
             'password_changed_at' => $toTs($row['password_changed_at'] ?? null),
             'banned_at' => $toTs($row['banned_at'] ?? null),
             'sessions_invalidated_at' => $toTs($row['sessions_invalidated_at'] ?? null),
+            'current_session_id' => $row['current_session_id'] ?? null,
         ];
     }
 
