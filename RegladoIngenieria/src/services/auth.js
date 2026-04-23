@@ -22,6 +22,14 @@ async function request(path, options = {}) {
   });
   let payload = {};
   try { payload = await response.json(); } catch { payload = {}; }
+
+  if (response.status === 401 && state.token) {
+    // Sesión invalidada server-side (login en otro dispositivo, password
+    // change, ban, admin force-logout). Limpiamos el token local; el estado
+    // reactivo y los guards del router se encargan del resto.
+    clearSession();
+  }
+
   if (!response.ok) throw new Error(payload.error || payload.message || "La solicitud no se pudo completar.");
   return payload;
 }
