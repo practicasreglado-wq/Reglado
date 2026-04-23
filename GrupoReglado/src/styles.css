@@ -672,6 +672,18 @@ body.dark-mode .feedback.success {
   background: rgba(6, 78, 59, 0.2);
 }
 
+.feedback.info {
+  border: 1px solid rgba(123, 150, 185, 0.4);
+  color: #27436b;
+  background: rgba(123, 150, 185, 0.14);
+}
+
+body.dark-mode .feedback.info {
+  border-color: rgba(123, 150, 185, 0.5);
+  color: #c5d3e5;
+  background: rgba(38, 54, 75, 0.4);
+}
+
 .btn-link {
   border: none;
   background: transparent;

@@ -15,6 +15,7 @@
           <PasswordField v-model="password" placeholder="********" required />
         </label>
 
+        <p v-if="info" class="feedback info">{{ info }}</p>
         <p v-if="error" class="feedback error">{{ error }}</p>
         <p v-if="success" class="feedback success">{{ success }}</p>
 
@@ -57,6 +58,7 @@ const email = ref("");
 const password = ref("");
 const error = ref("");
 const success = ref("");
+const info = ref("");
 const loading = ref(false);
 
 const returnTo = computed(() => {
@@ -123,6 +125,11 @@ async function resendMail() {
 }
 
 onMounted(async () => {
+  const reason = typeof route.query.reason === "string" ? route.query.reason.trim() : "";
+  if (reason) {
+    info.value = auth.translateMessage(decodeURIComponent(reason));
+  }
+
   if (!returnTo.value) {
     return;
   }

@@ -74,6 +74,17 @@ async function request(path, options = {}) {
     payload = {};
   }
 
+  if (response.status === 401 && state.token) {
+    // Sesión invalidada server-side (login en otro dispositivo, password
+    // change, ban, admin force-logout). Limpiamos estado local y redirigimos
+    // al login con el motivo para que LoginView pueda mostrar el aviso.
+    const reason = encodeURIComponent(payload.error || "session expired");
+    clearSession();
+    if (typeof window !== "undefined" && !window.location.pathname.startsWith("/login")) {
+      window.location.replace(`/login?reason=${reason}`);
+    }
+  }
+
   if (!response.ok) {
     const message = translateAuthMessage(payload.error || payload.message || "request failed");
     throw new Error(message);
