@@ -42,6 +42,16 @@ const AUTH_MESSAGE_MAP = {
   "current password is incorrect": "La contraseña actual no es correcta.",
   "password confirmation does not match": "Las contraseñas no coinciden.",
   "password too weak": "La contraseña debe tener mínimo 8 caracteres, una mayúscula y un número.",
+  "account banned": "Esta cuenta está suspendida. Contacta con el administrador.",
+  "session expired": "Tu sesión ha caducado. Vuelve a iniciar sesión.",
+  "cannot target self": "No puedes aplicar esta acción sobre tu propia cuenta.",
+  "sessions invalidated": "Sesiones del usuario cerradas.",
+  "user banned": "Usuario baneado.",
+  "user unbanned": "Usuario desbaneado.",
+  "could not force logout": "No se pudo cerrar la sesión del usuario.",
+  "could not update ban state": "No se pudo actualizar el estado de baneo.",
+  "banned flag is required": "Falta indicar la acción (banear o desbanear).",
+  "user_id is required": "Falta el identificador del usuario.",
 };
 
 function authHeaders() {
@@ -62,6 +72,17 @@ async function request(path, options = {}) {
     payload = await response.json();
   } catch {
     payload = {};
+  }
+
+  if (response.status === 401 && state.token) {
+    // Sesión invalidada server-side (login en otro dispositivo, password
+    // change, ban, admin force-logout). Limpiamos estado local y redirigimos
+    // al login con el motivo para que LoginView pueda mostrar el aviso.
+    const reason = encodeURIComponent(payload.error || "session expired");
+    clearSession();
+    if (typeof window !== "undefined" && !window.location.pathname.startsWith("/login")) {
+      window.location.replace(`/login?reason=${reason}`);
+    }
   }
 
   if (!response.ok) {
@@ -264,6 +285,22 @@ async function adminSyncNotion() {
   });
 }
 
+async function adminForceLogout(userId, currentPassword) {
+  return request("/auth/admin/force-logout", {
+    method: "POST",
+    headers: authHeaders(),
+    body: JSON.stringify({ user_id: userId, current_password: currentPassword }),
+  });
+}
+
+async function adminSetBan(userId, banned, currentPassword) {
+  return request("/auth/admin/set-ban", {
+    method: "POST",
+    headers: authHeaders(),
+    body: JSON.stringify({ user_id: userId, banned, current_password: currentPassword }),
+  });
+}
+
 async function logout() {
   try {
     if (state.token) {
@@ -295,7 +332,8 @@ export const auth = {
   adminUsers,
   adminUpdateRole,
   adminSyncNotion,
-  adminSyncNotion,
+  adminForceLogout,
+  adminSetBan,
   logout,
   translateMessage: translateAuthMessage,
   setCookie,

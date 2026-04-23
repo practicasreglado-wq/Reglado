@@ -49,6 +49,13 @@ async function request(path, options = {}) {
     payload = {};
   }
 
+  if (response.status === 401 && state.token) {
+    // Sesión invalidada server-side (login en otro dispositivo, password
+    // change, ban, admin force-logout). Limpiamos el token local; el estado
+    // reactivo y el LoginModal se encargan de prompted al usuario a re-loguear.
+    clearSession();
+  }
+
   if (!response.ok) {
     throw new Error(translateAuthMessage(payload.error || payload.message || "request failed"));
   }

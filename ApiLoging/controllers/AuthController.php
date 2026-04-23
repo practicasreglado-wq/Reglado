@@ -139,8 +139,14 @@ class AuthController
             Response::json(['error' => 'email not verified'], 403);
         }
 
+        if (!empty($user['banned_at'])) {
+            SecurityLogger::log('login_blocked_banned', (int) $user['id'], ['email' => $email]);
+            Response::json(['error' => 'account banned'], 403);
+        }
+
         RateLimiter::resetFailure('login_lockout', $normalizedEmail);
-        $token = JwtService::generate($user);
+        $sid = User::rotateSession((int) $user['id']);
+        $token = JwtService::generate($user, $sid);
         SecurityLogger::log('login_success', (int) $user['id']);
 
         Response::json([
@@ -195,7 +201,8 @@ class AuthController
                 }
             }
 
-            $jwt = JwtService::generate($freshUser);
+            $sid = User::rotateSession((int) $freshUser['id']);
+            $jwt = JwtService::generate($freshUser, $sid);
             $redirectBase = getenv('EMAIL_VERIFY_REDIRECT_URL') ?: '';
 
             if ($redirectBase !== '' && Security::isAllowedAbsoluteUrl($redirectBase, 'REDIRECT_ALLOWED_ORIGINS')) {
@@ -346,7 +353,7 @@ class AuthController
             User::updatePasswordHash((int) $user['id'], password_hash($newPassword, PASSWORD_BCRYPT));
             User::markPasswordResetAsUsed((int) $user['reset_id']);
             SecurityLogger::log('password_reset_completed', (int) $user['id']);
-            Response::json(['message' => 'password updated']);
+            self::respondWithRotatedSession((int) $user['id'], 'password updated');
         } catch (Throwable $e) {
             Response::json(['error' => 'could not reset password'], 500);
         }
@@ -505,7 +512,8 @@ class AuthController
                 Response::json(['error' => 'could not load updated user'], 500);
             }
 
-            $jwt = JwtService::generate($freshUser);
+            $sid = User::rotateSession((int) $freshUser['id']);
+            $jwt = JwtService::generate($freshUser, $sid);
             $redirectBase = getenv('EMAIL_CHANGE_REDIRECT_URL') ?: '';
 
             if ($redirectBase !== '' && Security::isAllowedAbsoluteUrl($redirectBase, 'REDIRECT_ALLOWED_ORIGINS')) {
@@ -558,7 +566,7 @@ class AuthController
         try {
             User::updatePasswordHash($userId, password_hash($newPassword, PASSWORD_BCRYPT));
             SecurityLogger::log('password_changed', $userId);
-            self::respondWithFreshSession($userId, 'password updated');
+            self::respondWithRotatedSession($userId, 'password updated');
         } catch (Throwable $e) {
             Response::json(['error' => 'could not update password'], 500);
         }
@@ -598,6 +606,8 @@ class AuthController
                     'email' => $user['email'] ?? null,
                     'is_email_verified' => (int) ($user['is_email_verified'] ?? 0),
                     'email_verified_at' => $user['email_verified_at'] ?? null,
+                    'banned_at' => $user['banned_at'] ?? null,
+                    'banned_by' => isset($user['banned_by']) ? (int) $user['banned_by'] : null,
                     'created_at' => $user['created_at'] ?? null,
                 ];
             },
@@ -709,6 +719,55 @@ class AuthController
         }
     }
 
+    /**
+     * Cierra todas las sesiones activas del usuario objetivo invalidando sus
+     * JWTs anteriores al timestamp actual (el middleware los rechazará).
+     * Requiere re-auth con la contraseña del admin.
+     */
+    public static function adminForceLogout(): void
+    {
+        ['adminId' => $adminId, 'targetUser' => $targetUser] = self::requireAdminForUserMutation();
+        $userId = (int) $targetUser['id'];
+
+        try {
+            User::invalidateSessions($userId);
+            User::clearSession($userId);
+            SecurityLogger::log('admin_forced_logout', $userId, ['by_admin' => $adminId]);
+            Response::json(['message' => 'sessions invalidated']);
+        } catch (Throwable $e) {
+            Response::json(['error' => 'could not force logout'], 500);
+        }
+    }
+
+    /**
+     * Aplica o revoca un ban sobre un usuario. Requiere re-auth con la
+     * contraseña del admin. Al banear también invalida sesiones vivas.
+     */
+    public static function adminSetBan(): void
+    {
+        ['adminId' => $adminId, 'targetUser' => $targetUser, 'data' => $data] = self::requireAdminForUserMutation();
+        $userId = (int) $targetUser['id'];
+
+        if (!array_key_exists('banned', $data)) {
+            Response::json(['error' => 'banned flag is required'], 422);
+        }
+        $banned = (bool) $data['banned'];
+
+        try {
+            if ($banned) {
+                User::banUser($userId, $adminId);
+                SecurityLogger::log('admin_banned_user', $userId, ['by_admin' => $adminId]);
+                Response::json(['message' => 'user banned']);
+            } else {
+                User::unbanUser($userId);
+                SecurityLogger::log('admin_unbanned_user', $userId, ['by_admin' => $adminId]);
+                Response::json(['message' => 'user unbanned']);
+            }
+        } catch (Throwable $e) {
+            Response::json(['error' => 'could not update ban state'], 500);
+        }
+    }
+
     public static function logout(): void
     {
         $token = AuthMiddleware::extractBearerToken();
@@ -737,7 +796,11 @@ class AuthController
             $db = Database::connect();
             $stmt = $db->prepare('INSERT INTO revoked_tokens(token_hash) VALUES(?)');
             $stmt->execute([$tokenHash]);
-            SecurityLogger::log('logout', isset($decoded['sub']) ? (int) $decoded['sub'] : null);
+            $userId = isset($decoded['sub']) ? (int) $decoded['sub'] : 0;
+            if ($userId > 0) {
+                User::clearSession($userId);
+            }
+            SecurityLogger::log('logout', $userId > 0 ? $userId : null);
             Response::json(['message' => 'logged out']);
         } catch (Throwable $e) {
             Response::json(['error' => 'could not logout'], 500);
@@ -813,6 +876,29 @@ class AuthController
         return $base . $separator . 'token=' . urlencode($plainToken);
     }
 
+    /**
+     * Idéntico a respondWithFreshSession pero rota el session id. Úsalo desde
+     * flujos que crean una sesión nueva (cambio de contraseña, verificación
+     * de email). respondWithFreshSession conserva el sid existente, para
+     * updates de perfil que no reinician la sesión.
+     */
+    private static function respondWithRotatedSession(int $userId, string $message): void
+    {
+        $user = User::findById($userId);
+        if (!$user) {
+            Response::json(['error' => 'user not found'], 404);
+        }
+
+        $sid = User::rotateSession($userId);
+        $token = JwtService::generate($user, $sid);
+
+        Response::json([
+            'message' => $message,
+            'token' => $token,
+            'user' => self::mapUser($user),
+        ]);
+    }
+
     private static function respondWithFreshSession(int $userId, string $message): void
     {
         $user = User::findById($userId);
@@ -820,8 +906,15 @@ class AuthController
             Response::json(['error' => 'user not found'], 404);
         }
 
-        // Cada cambio de perfil devuelve un JWT nuevo para no dejar datos obsoletos en cliente.
-        $token = JwtService::generate($user);
+        $currentSid = $user['current_session_id'] ?? null;
+        if (empty($currentSid)) {
+            // Caso borde: el admin forzó logout (o baneo) mientras el usuario
+            // estaba editando su perfil. No reemitimos sesión sin mandato;
+            // que vuelva a loguear.
+            Response::json(['error' => 'session expired'], 401);
+        }
+
+        $token = JwtService::generate($user, (string) $currentSid);
 
         Response::json([
             'message' => $message,
@@ -853,6 +946,49 @@ class AuthController
         }
 
         return $session;
+    }
+
+    /**
+     * Verifica password del admin + valida user_id objetivo + devuelve
+     * adminId, target user y el payload parseado (para que los callers puedan
+     * leer campos adicionales sin releer `php://input`).
+     *
+     * @return array{adminId: int, targetUser: array, data: array}
+     */
+    private static function requireAdminForUserMutation(): array
+    {
+        $session = self::requireAdmin();
+        $adminId = (int) ($session['sub'] ?? 0);
+        RateLimiter::enforce('admin_mutate', (string) $adminId, 30, 60);
+
+        $data = self::getJsonInput();
+        $userId = (int) ($data['user_id'] ?? 0);
+        $currentPassword = (string) ($data['current_password'] ?? '');
+
+        if ($userId <= 0) {
+            Response::json(['error' => 'user_id is required'], 422);
+        }
+
+        if ($currentPassword === '') {
+            Response::json(['error' => 'current_password is required'], 422);
+        }
+
+        if ($userId === $adminId) {
+            Response::json(['error' => 'cannot target self'], 422);
+        }
+
+        $adminUser = User::findById($adminId);
+        if (!$adminUser || !password_verify($currentPassword, (string) $adminUser['password'])) {
+            SecurityLogger::log('admin_mutation_bad_password', $adminId, ['target' => $userId]);
+            Response::json(['error' => 'current password is incorrect'], 401);
+        }
+
+        $targetUser = User::findById($userId);
+        if (!$targetUser) {
+            Response::json(['error' => 'user not found'], 404);
+        }
+
+        return ['adminId' => $adminId, 'targetUser' => $targetUser, 'data' => $data];
     }
 
     /**
