@@ -724,12 +724,15 @@ function handleVideoEnded() {
   overflow: hidden;
   min-height: 460px;
   box-shadow: var(--card-shadow);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
   transition: transform 0.23s ease, box-shadow 0.23s ease, background-color 0.4s ease;
 }
 
 .company-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 16px 30px rgba(15, 32, 57, 0.16);
+  transform: translateY(-5px) translateZ(0);
+  box-shadow: var(--card-shadow-hover);
 }
 
 .company-image-wrap {
