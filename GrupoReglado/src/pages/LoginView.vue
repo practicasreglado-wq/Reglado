@@ -96,6 +96,11 @@ async function submitLogin() {
       window.location.href = appendToken(returnTo.value, payload.token);
       return;
     }
+
+    // Navegación dura a home: garantiza que cualquier estado stale
+    // (cookies/localStorage/componentes) se reinicialice con la nueva sesión.
+    window.location.href = "/";
+    return;
   } catch (err) {
     const message = err instanceof Error ? err.message : "No fue posible iniciar sesión";
     error.value = message;
