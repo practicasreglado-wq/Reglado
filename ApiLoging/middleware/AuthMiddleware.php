@@ -59,6 +59,15 @@ class AuthMiddleware
                     SecurityLogger::log('token_session_invalidated', $userId);
                     Response::json(['error' => 'session expired'], 401);
                 }
+
+                // Single-session enforcement: el sid del token debe coincidir
+                // con users.current_session_id. Si no coincide (o el usuario
+                // no tiene sesión activa) rechazamos sin considerar el iat.
+                $tokenSid = isset($decoded['sid']) ? (string) $decoded['sid'] : '';
+                if ($state['current_session_id'] === null || $tokenSid === '' || !hash_equals((string) $state['current_session_id'], $tokenSid)) {
+                    SecurityLogger::log('token_session_mismatch', $userId);
+                    Response::json(['error' => 'session expired'], 401);
+                }
             }
 
             return $decoded;
