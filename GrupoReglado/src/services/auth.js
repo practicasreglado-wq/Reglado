@@ -52,6 +52,7 @@ const AUTH_MESSAGE_MAP = {
   "could not update ban state": "No se pudo actualizar el estado de baneo.",
   "banned flag is required": "Falta indicar la acción (banear o desbanear).",
   "user_id is required": "Falta el identificador del usuario.",
+  "password reset required": "Por seguridad, necesitas cambiar tu contraseña. Te hemos enviado un email con las instrucciones.",
 };
 
 function authHeaders() {
@@ -301,6 +302,14 @@ async function adminSetBan(userId, banned, currentPassword) {
   });
 }
 
+async function confirmLoginLocation(token, decision) {
+  // Endpoint público (se autentica por el token en el body, no por JWT).
+  return request("/auth/confirm-login-location", {
+    method: "POST",
+    body: JSON.stringify({ token, decision }),
+  });
+}
+
 async function logout() {
   try {
     if (state.token) {
@@ -334,6 +343,7 @@ export const auth = {
   adminSyncNotion,
   adminForceLogout,
   adminSetBan,
+  confirmLoginLocation,
   logout,
   translateMessage: translateAuthMessage,
   setCookie,

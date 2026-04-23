@@ -118,8 +118,11 @@ class AuthController
         $password = (string) ($data['password'] ?? '');
         $normalizedEmail = strtolower($email);
 
-        RateLimiter::enforce('login', Security::getClientIp() . '|' . $normalizedEmail, 5, 900);
-        RateLimiter::enforce('login_email', $normalizedEmail, 20, 900);
+        // Throttling unificado: un solo contador de fallos por email (5/30min).
+        // Los scopes `login` y `login_email` se eliminaron porque (a) se
+        // incrementaban también con logins legítimos y (b) eran redundantes
+        // con login_lockout: éste ya cubre fuerza bruta single-IP y distribuida
+        // al ser per-email cross-IP, y su gatillo es más estricto.
         RateLimiter::checkFailureLockout('login_lockout', $normalizedEmail, 5, 1800);
 
         if ($email === '' || $password === '') {
@@ -144,10 +147,26 @@ class AuthController
             Response::json(['error' => 'account banned'], 403);
         }
 
+        if ((int) ($user['require_password_reset'] ?? 0) === 1) {
+            // Emitimos un token de reset y lo enviamos por email; el usuario
+            // sigue bloqueado hasta que complete /auth/reset-password.
+            [$plainToken, $tokenHash, $expiresAt] = self::buildVerificationToken();
+            User::createPasswordResetToken((int) $user['id'], $tokenHash, $expiresAt);
+            $resetUrl = self::buildPasswordResetUrl($plainToken);
+            $sent = MailService::sendPasswordResetEmail((string) $user['email'], (string) $user['name'], $resetUrl);
+            SecurityLogger::log('login_blocked_reset_required', (int) $user['id']);
+            if (!$sent) {
+                Response::json(['error' => 'could not send password reset email'], 500);
+            }
+            Response::json(['error' => 'password reset required'], 403);
+        }
+
         RateLimiter::resetFailure('login_lockout', $normalizedEmail);
         $sid = User::rotateSession((int) $user['id']);
         $token = JwtService::generate($user, $sid);
         SecurityLogger::log('login_success', (int) $user['id']);
+
+        self::handleLoginLocation((int) $user['id'], Security::getClientIp(), (string) ($_SERVER['HTTP_USER_AGENT'] ?? ''));
 
         Response::json([
             'token' => $token,
@@ -352,6 +371,7 @@ class AuthController
         try {
             User::updatePasswordHash((int) $user['id'], password_hash($newPassword, PASSWORD_BCRYPT));
             User::markPasswordResetAsUsed((int) $user['reset_id']);
+            User::setRequirePasswordReset((int) $user['id'], false);
             SecurityLogger::log('password_reset_completed', (int) $user['id']);
             self::respondWithRotatedSession((int) $user['id'], 'password updated');
         } catch (Throwable $e) {
@@ -1000,5 +1020,137 @@ class AuthController
         return strlen($password) >= 8
             && preg_match('/[A-Z]/', $password) === 1
             && preg_match('/[0-9]/', $password) === 1;
+    }
+
+    /**
+     * Evalúa si el login viene de un país distinto al último legítimo y, si
+     * procede, dispara un email de alerta con dos botones.
+     *
+     * Todo envuelto en try/catch: a estas alturas el JWT ya fue emitido al
+     * usuario, y cualquier Response::json de error mataría el script antes
+     * de que la respuesta llegue. La alerta es best-effort; si falla por
+     * cualquier motivo (geo caído, mail caído, config ausente), se registra
+     * como neutral y seguimos.
+     */
+    private static function handleLoginLocation(int $userId, string $ip, string $userAgent): void
+    {
+        try {
+            $geo = GeoLocationService::lookup($ip);
+            $countryCode = $geo['country_code'] ?? null;
+            $countryName = $geo['country_name'] ?? null;
+
+            $lastLegitCountry = User::getLastLegitLoginCountry($userId);
+
+            $isNewCountry = $countryCode !== null
+                         && $lastLegitCountry !== null
+                         && $countryCode !== $lastLegitCountry;
+
+            if (!$isNewCountry) {
+                User::recordLoginLocation($userId, $ip, $countryCode, $countryName, $userAgent, 'neutral');
+                return;
+            }
+
+            $alertUrlBase = self::resolveLoginAlertBaseUrl();
+            if ($alertUrlBase === null) {
+                error_log('LOGIN_ALERT_URL_BASE missing, falling back to neutral');
+                User::recordLoginLocation($userId, $ip, $countryCode, $countryName, $userAgent, 'neutral');
+                return;
+            }
+
+            [$plainToken, $tokenHash, $expiresAt] = self::buildLoginAlertToken();
+            User::recordLoginLocation(
+                $userId, $ip, $countryCode, $countryName, $userAgent,
+                'pending', $tokenHash, $expiresAt
+            );
+
+            $user = User::findById($userId);
+            if (!$user) {
+                return;
+            }
+            $yesUrl = self::appendQuery($alertUrlBase, ['token' => $plainToken, 'decision' => 'me']);
+            $noUrl  = self::appendQuery($alertUrlBase, ['token' => $plainToken, 'decision' => 'not-me']);
+            MailService::sendLoginAlert($user, $countryName, $ip, $yesUrl, $noUrl);
+            SecurityLogger::log('login_alert_sent', $userId, [
+                'country' => $countryCode, 'ip' => $ip,
+            ]);
+        } catch (Throwable $e) {
+            error_log('LOGIN_ALERT_FAIL user=' . $userId . ' message=' . $e->getMessage());
+        }
+    }
+
+    private static function buildLoginAlertToken(): array
+    {
+        $ttlSeconds = 7 * 24 * 3600;
+        $plainToken = bin2hex(random_bytes(32));
+        $tokenHash = hash('sha256', $plainToken);
+        $expiresAt = date('Y-m-d H:i:s', time() + $ttlSeconds);
+        return [$plainToken, $tokenHash, $expiresAt];
+    }
+
+    private static function resolveLoginAlertBaseUrl(): ?string
+    {
+        // La URL de confirmación apunta al FRONTEND (GrupoReglado), que
+        // recibe el clic del email y hace el POST al backend. Así la UI
+        // es consistente con el resto del portal.
+        $base = (string) (getenv('LOGIN_ALERT_FRONTEND_URL_BASE') ?: '');
+        if ($base !== '') return $base;
+        $appEnv = strtolower((string) (getenv('APP_ENV') ?: 'local'));
+        return $appEnv === 'local' ? 'http://localhost:5173/confirmar-acceso' : null;
+    }
+
+    private static function appendQuery(string $url, array $params): string
+    {
+        $sep = str_contains($url, '?') ? '&' : '?';
+        return $url . $sep . http_build_query($params);
+    }
+
+    /**
+     * Endpoint público JSON que procesa la decisión del usuario sobre una
+     * alerta de login. Se invoca desde la SPA de GrupoReglado, que es quien
+     * recibe el clic del email y renderiza la UI. Respuesta siempre 200 con
+     * un campo `state` (confirmed|rejected|expired|invalid) salvo que el
+     * body no sea parseable.
+     */
+    public static function confirmLoginLocation(): void
+    {
+        $data = self::getJsonInput();
+        $token = trim((string) ($data['token'] ?? ''));
+        $decision = trim((string) ($data['decision'] ?? ''));
+
+        if ($token === '' || !in_array($decision, ['me', 'not-me'], true)) {
+            Response::json(['state' => 'invalid']);
+        }
+
+        $tokenHash = hash('sha256', $token);
+        $location = User::findLoginLocationByTokenHash($tokenHash);
+
+        $expired = $location
+            && (
+                $location['status'] !== 'pending'
+                || $location['token_used_at'] !== null
+                || strtotime((string) ($location['token_expires_at'] ?? '')) < time()
+            );
+
+        if (!$location || $expired) {
+            Response::json(['state' => 'expired']);
+        }
+
+        $userId = (int) $location['user_id'];
+
+        if ($decision === 'me') {
+            User::updateLoginLocationStatus((int) $location['id'], 'confirmed');
+            SecurityLogger::log('login_location_confirmed', $userId);
+            Response::json(['state' => 'confirmed']);
+        }
+
+        // decision === 'not-me'
+        User::updateLoginLocationStatus((int) $location['id'], 'rejected');
+        User::clearSession($userId);
+        User::setRequirePasswordReset($userId, true);
+        SecurityLogger::log('login_location_rejected', $userId, [
+            'ip' => $location['ip'],
+            'country' => $location['country_code'],
+        ]);
+        Response::json(['state' => 'rejected']);
     }
 }

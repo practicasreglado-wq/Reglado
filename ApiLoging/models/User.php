@@ -478,4 +478,80 @@ class User
 
         return $stmt->fetchAll() ?: [];
     }
+
+    /**
+     * Devuelve el country_code del último login legítimo (status neutral o
+     * confirmed). Los pending y rejected se excluyen a propósito: así una
+     * alerta no respondida o una rechazada no envenena la referencia del
+     * siguiente login.
+     */
+    public static function getLastLegitLoginCountry(int $userId): ?string
+    {
+        $db = Database::connect();
+        $stmt = $db->prepare(
+            "SELECT country_code FROM login_locations
+             WHERE user_id = ?
+               AND status IN ('neutral', 'confirmed')
+               AND country_code IS NOT NULL
+             ORDER BY created_at DESC, id DESC
+             LIMIT 1"
+        );
+        $stmt->execute([$userId]);
+        $row = $stmt->fetch();
+        return $row ? (string) $row['country_code'] : null;
+    }
+
+    /**
+     * Inserta un registro de login_locations. status puede ser 'neutral' o
+     * 'pending'. En pending, se persisten token_hash y token_expires_at.
+     * Devuelve el id del registro creado.
+     */
+    public static function recordLoginLocation(
+        int $userId,
+        string $ip,
+        ?string $countryCode,
+        ?string $countryName,
+        string $userAgent,
+        string $status,
+        ?string $tokenHash = null,
+        ?string $tokenExpiresAt = null
+    ): int {
+        $db = Database::connect();
+        $stmt = $db->prepare(
+            'INSERT INTO login_locations
+               (user_id, ip, country_code, country_name, user_agent, status, token_hash, token_expires_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+        );
+        $stmt->execute([
+            $userId, $ip, $countryCode, $countryName,
+            mb_substr($userAgent, 0, 512),
+            $status, $tokenHash, $tokenExpiresAt,
+        ]);
+        return (int) $db->lastInsertId();
+    }
+
+    public static function findLoginLocationByTokenHash(string $tokenHash): ?array
+    {
+        $db = Database::connect();
+        $stmt = $db->prepare('SELECT * FROM login_locations WHERE token_hash = ? LIMIT 1');
+        $stmt->execute([$tokenHash]);
+        $row = $stmt->fetch();
+        return $row ?: null;
+    }
+
+    public static function updateLoginLocationStatus(int $locationId, string $status): void
+    {
+        $db = Database::connect();
+        $stmt = $db->prepare(
+            'UPDATE login_locations SET status = ?, token_used_at = NOW() WHERE id = ?'
+        );
+        $stmt->execute([$status, $locationId]);
+    }
+
+    public static function setRequirePasswordReset(int $userId, bool $required): void
+    {
+        $db = Database::connect();
+        $stmt = $db->prepare('UPDATE users SET require_password_reset = ? WHERE id = ?');
+        $stmt->execute([$required ? 1 : 0, $userId]);
+    }
 }

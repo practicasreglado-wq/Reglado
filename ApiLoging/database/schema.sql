@@ -1,3 +1,20 @@
+-- Esquema canónico de ApiLoging.
+--
+-- Instalación limpia:
+--   mysql -u root < schema.sql
+-- Para aplicar este esquema sobre una BBDD existente (no vacía), revisa
+-- primero si tus tablas coinciden con la definición actual; las cláusulas
+-- `CREATE TABLE IF NOT EXISTS` no recrearán tablas antiguas con columnas
+-- faltantes — en ese caso hay que migrar manualmente o desde `git log` de
+-- la carpeta database/ (las migraciones históricas se eliminaron del repo,
+-- pero quedan en el historial).
+
+CREATE DATABASE IF NOT EXISTS regladousers
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci;
+
+USE regladousers;
+
 CREATE TABLE IF NOT EXISTS users (
   id INT AUTO_INCREMENT PRIMARY KEY,
   username VARCHAR(100) UNIQUE,
@@ -14,6 +31,7 @@ CREATE TABLE IF NOT EXISTS users (
   banned_by INT NULL,
   sessions_invalidated_at DATETIME NULL,
   current_session_id CHAR(64) NULL,
+  require_password_reset TINYINT(1) NOT NULL DEFAULT 0,
   email_verified_at DATETIME NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_users_banned_by FOREIGN KEY (banned_by) REFERENCES users(id) ON DELETE SET NULL
@@ -112,3 +130,21 @@ CREATE TABLE IF NOT EXISTS security_events (
 
 CREATE INDEX idx_security_events_type_created ON security_events (event_type, created_at);
 CREATE INDEX idx_security_events_user_created ON security_events (user_id, created_at);
+
+CREATE TABLE IF NOT EXISTS login_locations (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  ip VARCHAR(45) NOT NULL,
+  country_code CHAR(2) NULL,
+  country_name VARCHAR(100) NULL,
+  user_agent VARCHAR(512) NULL,
+  status VARCHAR(20) NOT NULL DEFAULT 'neutral',
+  token_hash CHAR(64) NULL,
+  token_expires_at DATETIME NULL,
+  token_used_at DATETIME NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_login_locations_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_login_locations_user_created ON login_locations (user_id, created_at);
+CREATE INDEX idx_login_locations_token_hash ON login_locations (token_hash);

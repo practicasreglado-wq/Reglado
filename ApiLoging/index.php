@@ -18,6 +18,7 @@ require_once __DIR__ . '/services/MailService.php';
 require_once __DIR__ . '/services/NotionService.php';
 require_once __DIR__ . '/services/RateLimiter.php';
 require_once __DIR__ . '/services/SecurityLogger.php';
+require_once __DIR__ . '/services/GeoLocationService.php';
 require_once __DIR__ . '/models/User.php';
 require_once __DIR__ . '/middleware/AuthMiddleware.php';
 require_once __DIR__ . '/controllers/AuthController.php';
@@ -108,6 +109,10 @@ if ($uri === '/auth/admin/force-logout' && $method === 'POST') {
 
 if ($uri === '/auth/admin/set-ban' && $method === 'POST') {
     AuthController::adminSetBan();
+}
+
+if ($uri === '/auth/confirm-login-location' && $method === 'POST') {
+    AuthController::confirmLoginLocation();
 }
 
 if ($uri === '/auth/logout' && $method === 'POST') {
