@@ -13,12 +13,14 @@ CREATE TABLE IF NOT EXISTS users (
   banned_at DATETIME NULL,
   banned_by INT NULL,
   sessions_invalidated_at DATETIME NULL,
+  current_session_id CHAR(64) NULL,
   email_verified_at DATETIME NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_users_banned_by FOREIGN KEY (banned_by) REFERENCES users(id) ON DELETE SET NULL
 );
 
 CREATE INDEX idx_users_banned_at ON users (banned_at);
+CREATE INDEX idx_users_current_session_id ON users (current_session_id);
 
 CREATE TABLE IF NOT EXISTS pending_registrations (
   id INT AUTO_INCREMENT PRIMARY KEY,
