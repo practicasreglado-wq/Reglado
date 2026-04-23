@@ -145,7 +145,8 @@ class AuthController
         }
 
         RateLimiter::resetFailure('login_lockout', $normalizedEmail);
-        $token = JwtService::generate($user);
+        $sid = User::rotateSession((int) $user['id']);
+        $token = JwtService::generate($user, $sid);
         SecurityLogger::log('login_success', (int) $user['id']);
 
         Response::json([
@@ -200,7 +201,8 @@ class AuthController
                 }
             }
 
-            $jwt = JwtService::generate($freshUser);
+            $sid = User::rotateSession((int) $freshUser['id']);
+            $jwt = JwtService::generate($freshUser, $sid);
             $redirectBase = getenv('EMAIL_VERIFY_REDIRECT_URL') ?: '';
 
             if ($redirectBase !== '' && Security::isAllowedAbsoluteUrl($redirectBase, 'REDIRECT_ALLOWED_ORIGINS')) {
@@ -351,7 +353,7 @@ class AuthController
             User::updatePasswordHash((int) $user['id'], password_hash($newPassword, PASSWORD_BCRYPT));
             User::markPasswordResetAsUsed((int) $user['reset_id']);
             SecurityLogger::log('password_reset_completed', (int) $user['id']);
-            Response::json(['message' => 'password updated']);
+            self::respondWithRotatedSession((int) $user['id'], 'password updated');
         } catch (Throwable $e) {
             Response::json(['error' => 'could not reset password'], 500);
         }
@@ -510,7 +512,8 @@ class AuthController
                 Response::json(['error' => 'could not load updated user'], 500);
             }
 
-            $jwt = JwtService::generate($freshUser);
+            $sid = User::rotateSession((int) $freshUser['id']);
+            $jwt = JwtService::generate($freshUser, $sid);
             $redirectBase = getenv('EMAIL_CHANGE_REDIRECT_URL') ?: '';
 
             if ($redirectBase !== '' && Security::isAllowedAbsoluteUrl($redirectBase, 'REDIRECT_ALLOWED_ORIGINS')) {
@@ -563,7 +566,7 @@ class AuthController
         try {
             User::updatePasswordHash($userId, password_hash($newPassword, PASSWORD_BCRYPT));
             SecurityLogger::log('password_changed', $userId);
-            self::respondWithFreshSession($userId, 'password updated');
+            self::respondWithRotatedSession($userId, 'password updated');
         } catch (Throwable $e) {
             Response::json(['error' => 'could not update password'], 500);
         }
@@ -868,6 +871,29 @@ class AuthController
         return $base . $separator . 'token=' . urlencode($plainToken);
     }
 
+    /**
+     * Idéntico a respondWithFreshSession pero rota el session id. Úsalo desde
+     * flujos que crean una sesión nueva (cambio de contraseña, verificación
+     * de email). respondWithFreshSession conserva el sid existente, para
+     * updates de perfil que no reinician la sesión.
+     */
+    private static function respondWithRotatedSession(int $userId, string $message): void
+    {
+        $user = User::findById($userId);
+        if (!$user) {
+            Response::json(['error' => 'user not found'], 404);
+        }
+
+        $sid = User::rotateSession($userId);
+        $token = JwtService::generate($user, $sid);
+
+        Response::json([
+            'message' => $message,
+            'token' => $token,
+            'user' => self::mapUser($user),
+        ]);
+    }
+
     private static function respondWithFreshSession(int $userId, string $message): void
     {
         $user = User::findById($userId);
@@ -875,8 +901,15 @@ class AuthController
             Response::json(['error' => 'user not found'], 404);
         }
 
-        // Cada cambio de perfil devuelve un JWT nuevo para no dejar datos obsoletos en cliente.
-        $token = JwtService::generate($user);
+        $currentSid = $user['current_session_id'] ?? null;
+        if (empty($currentSid)) {
+            // Caso borde: el admin forzó logout (o baneo) mientras el usuario
+            // estaba editando su perfil. No reemitimos sesión sin mandato;
+            // que vuelva a loguear.
+            Response::json(['error' => 'session expired'], 401);
+        }
+
+        $token = JwtService::generate($user, (string) $currentSid);
 
         Response::json([
             'message' => $message,
