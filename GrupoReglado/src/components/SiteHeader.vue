@@ -1,8 +1,8 @@
 <template>
   <header ref="headerRef" class="topbar" :class="{ 'topbar-scrolled': isScrolled || isInternalRoute }">
     <RouterLink class="brand-link" to="/" aria-label="Ir al inicio">
-      <img :src="logoSrc" alt="Reglado Energy" class="brand-logo" />
-      <span class="brand">Grupo Reglado</span>
+      <img :src="logoSrc" alt="Reglado Group" class="brand-logo" />
+      <span class="brand">Reglado Group</span>
     </RouterLink>
 
     <nav class="menu desktop-menu">

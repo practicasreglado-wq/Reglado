@@ -95,7 +95,7 @@
   <Teleport to="body">
     <div class="custom-detached-dropdown" v-if="openDropdownId" :style="dropdownStyle">
       <ul>
-        <li @click="selectRole('user')" :class="{ active: activeRole === 'user' }">User</li>
+        <li @click="selectRole('user')" :class="{ active: activeRole === 'user' }">Usuario</li>
         <li @click="selectRole('real')" :class="{ active: activeRole === 'real' }">Real</li>
       </ul>
     </div>
@@ -150,7 +150,7 @@ const filteredUsers = computed(() => {
 
 function getRoleName(role) {
   if (role === "admin") return "Administrador";
-  if (role === "user") return "User";
+  if (role === "user") return "Usuario";
   if (role === "real") return "Real";
   return role || "-";
 }

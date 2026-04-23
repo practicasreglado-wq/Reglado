@@ -15,6 +15,7 @@
             <li>Tramitar el envío de la información que nos soliciten a través de los diversos formularios de contacto.</li>
             <li>Prestar los servicios contratados por el usuario (energía, inmobiliaria, consultoría).</li>
             <li>Remitir comunicaciones comerciales sobre nuestros servicios cuando el usuario lo haya autorizado.</li>
+            <li>Detectar accesos sospechosos a la cuenta del usuario para protegerla (ver sección 8).</li>
           </ul>
 
           <p><strong>3. ¿POR CUÁNTO TIEMPO CONSERVAREMOS SUS DATOS?</strong></p>
@@ -40,6 +41,10 @@
 
           <p><strong>7. PROCEDENCIA DE LOS DATOS</strong></p>
           <p>Los datos personales que tratamos en REGLADO GROUP S.L han sido facilitados directamente por el interesado a través de los formularios de registro y contacto del sitio web.</p>
+
+          <p><strong>8. SEGURIDAD DEL INICIO DE SESIÓN</strong></p>
+          <p>Con el fin de proteger tu cuenta frente a accesos no autorizados, registramos la dirección IP y el país desde los que inicias sesión. Si detectamos un inicio de sesión desde un país distinto al habitual, te enviaremos un correo electrónico para que confirmes si has sido tú; de este modo puedes cerrar sesiones sospechosas y forzar un cambio de contraseña si fuese necesario.</p>
+          <p>La IP se conserva únicamente asociada a cada evento de inicio de sesión y se gestiona de acuerdo con los plazos de conservación indicados en la sección 3. La base legal de este tratamiento es el interés legítimo en garantizar la seguridad de tu cuenta.</p>
         </div>
       </div>
     </div>

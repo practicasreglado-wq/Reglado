@@ -10,6 +10,7 @@ import AdminView from "../pages/AdminView.vue";
 import AvisoLegalView from "../pages/AvisoLegalView.vue";
 import PoliticaCookiesView from "../pages/PoliticaCookiesView.vue";
 import PoliticaPrivacidadView from "../pages/PoliticaPrivacidadView.vue";
+import ConfirmarAccesoView from "../pages/ConfirmarAccesoView.vue";
 
 const routes = [
   { path: "/", name: "portal", component: PortalView, meta: { title: "Reglado Group | Portal Empresarial" } },
@@ -32,6 +33,12 @@ const routes = [
     name: "politica-privacidad",
     component: PoliticaPrivacidadView,
     meta: { title: "Política de Privacidad | Reglado Group" },
+  },
+  {
+    path: "/confirmar-acceso",
+    name: "confirmar-acceso",
+    component: ConfirmarAccesoView,
+    meta: { title: "Confirmar acceso | Reglado Group" },
   },
 ];
 

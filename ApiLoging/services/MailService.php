@@ -50,6 +50,97 @@ class MailService
         return self::sendHtml($email, $subject, $message);
     }
 
+    public static function sendLoginAlert(
+        array $user,
+        ?string $countryName,
+        string $ip,
+        string $yesUrl,
+        string $noUrl
+    ): bool {
+        // Subject informativo y no alarmista, ayuda a que Outlook/Gmail no lo
+        // marquen como "security alert phishing" en el primer envío.
+        $subject = 'Actividad reciente en tu cuenta Reglado';
+        $message = self::buildLoginAlertLayout(
+            (string) ($user['name'] ?? ''),
+            $countryName ?? 'desconocido',
+            $ip,
+            $yesUrl,
+            $noUrl
+        );
+        return self::sendHtml((string) $user['email'], $subject, $message);
+    }
+
+    private static function buildLoginAlertLayout(
+        string $name,
+        string $country,
+        string $ip,
+        string $yesUrl,
+        string $noUrl
+    ): string {
+        $safeName    = htmlspecialchars($name,    ENT_QUOTES, 'UTF-8');
+        $safeCountry = htmlspecialchars($country, ENT_QUOTES, 'UTF-8');
+        $safeIp      = htmlspecialchars($ip,      ENT_QUOTES, 'UTF-8');
+        $safeYesUrl  = htmlspecialchars($yesUrl,  ENT_QUOTES, 'UTF-8');
+        $safeNoUrl   = htmlspecialchars($noUrl,   ENT_QUOTES, 'UTF-8');
+        $when        = htmlspecialchars(date('d/m/Y H:i'), ENT_QUOTES, 'UTF-8');
+        $year        = date('Y');
+
+        return <<<HTML
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Nueva ubicación detectada</title>
+</head>
+<body style="margin:0;padding:0;background:#f1f5f9;font-family:Arial,Helvetica,sans-serif;color:#0f172a;">
+  <div style="display:none;max-height:0;overflow:hidden;font-size:1px;line-height:1px;color:#f1f5f9;mso-hide:all;">
+    Inicio de sesión desde {$safeCountry}. Si has sido tú, no tienes que hacer nada.
+  </div>
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+    <tr>
+      <td style="padding:32px 16px;">
+        <table role="presentation" align="center" width="560" cellspacing="0" cellpadding="0" style="background:#ffffff;border-radius:12px;box-shadow:0 4px 24px rgba(15,23,42,.08);overflow:hidden;">
+          <tr>
+            <td style="padding:32px 40px 8px;">
+              <h1 style="margin:0 0 16px;font-size:22px;color:#0f172a;">Actividad reciente en tu cuenta</h1>
+              <p style="margin:0 0 16px;line-height:1.55;">Hola, {$safeName}:</p>
+              <p style="margin:0 0 16px;line-height:1.55;">Hemos registrado un inicio de sesión en tu cuenta Reglado desde un país distinto al habitual:</p>
+              <table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;margin:16px 0;font-size:14px;">
+                <tr><td style="padding:4px 12px 4px 0;color:#64748b;">País:</td><td style="padding:4px 0;font-weight:600;">{$safeCountry}</td></tr>
+                <tr><td style="padding:4px 12px 4px 0;color:#64748b;">IP:</td><td style="padding:4px 0;font-family:monospace;">{$safeIp}</td></tr>
+                <tr><td style="padding:4px 12px 4px 0;color:#64748b;">Fecha:</td><td style="padding:4px 0;">{$when}</td></tr>
+              </table>
+              <p style="margin:24px 0 16px;line-height:1.55;font-weight:600;">¿Has sido tú?</p>
+              <table role="presentation" cellspacing="0" cellpadding="0" style="margin:16px 0;">
+                <tr>
+                  <td style="padding-right:12px;">
+                    <a href="{$safeYesUrl}" style="display:inline-block;padding:12px 24px;background:#16a34a;color:#ffffff;text-decoration:none;border-radius:8px;font-weight:600;">Sí, he sido yo</a>
+                  </td>
+                  <td>
+                    <a href="{$safeNoUrl}" style="display:inline-block;padding:12px 24px;background:#dc2626;color:#ffffff;text-decoration:none;border-radius:8px;font-weight:600;">No, no he sido yo</a>
+                  </td>
+                </tr>
+              </table>
+              <p style="margin:24px 0 8px;line-height:1.55;font-size:13px;color:#475569;">Si no fuiste tú, pulsa "No, no he sido yo" y cerraremos esa sesión. La próxima vez que accedas te pediremos cambiar la contraseña por seguridad.</p>
+              <p style="margin:8px 0 0;line-height:1.55;font-size:13px;color:#475569;">Si sí fuiste tú, no hace falta que hagas nada — este aviso es solo informativo.</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:16px 40px 32px;border-top:1px solid #e2e8f0;font-size:12px;color:#94a3b8;">
+              Este aviso se envía automáticamente cuando detectamos logins desde un país nuevo.<br>
+              &copy; {$year} Reglado Group
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+HTML;
+    }
+
     private static function buildEmailLayout(
         string $name,
         string $title,
