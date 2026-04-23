@@ -3,7 +3,7 @@
 **Fecha**: 2026-04-23
 **Proyecto**: ApiLoging + frontends del ecosistema Reglado
 **Estado**: Diseño aprobado
-**Fuera de alcance**: `Inmobiliaria_Reglados` (mantenimiento de otro equipo).
+**Fuera de alcance**: `Inmobiliaria_Reglados` (mantenimiento de otro equipo) y `RegladoBienesRaices` (no se toca en esta iteración).
 
 ## Contexto
 
@@ -140,7 +140,7 @@ User::clearSession($userId);
 
 ## Cambios en frontends
 
-Afectados: `GrupoReglado`, `RegladoBienesRaices`, `RegladoEnergy`, `RegladoIngenieria`, `RegladoMaps`. El parche es **idéntico** en todos (cada uno tiene su copia de `src/services/auth.js`).
+Afectados: `GrupoReglado`, `RegladoEnergy`, `RegladoIngenieria`, `RegladoMaps`. El parche es **idéntico** en todos (cada uno tiene su copia de `src/services/auth.js`).
 
 ### Interceptor 401 en `auth.js`
 
@@ -211,6 +211,7 @@ Los estilos `.feedback.info` reutilizan la paleta neutra del proyecto (azul suav
 - **Flujo de `initialize()`** en `auth.js`: ya limpia sesión al fallar `/auth/me`, no necesita cambios.
 - **`chatbotReglado`**: usa su propia tabla `usuarios`, no ApiLoging. No afectado.
 - **`Inmobiliaria_Reglados`**: fuera de alcance (mantenimiento de otro equipo).
+- **`RegladoBienesRaices`**: fuera de alcance en esta iteración. Si usa ApiLoging, seguirá emitiendo JWTs sin `sid` y recibirá 401 hasta que se aplique el parche del interceptor y el spec completo en una iteración futura.
 
 ## Seguridad y límites
 
@@ -281,7 +282,6 @@ Los estilos `.feedback.info` reutilizan la paleta neutra del proyecto (azul suav
 **Frontends** (misma edit en cada `src/services/auth.js` y `src/views/LoginView.vue`):
 - `GrupoReglado/src/services/auth.js`
 - `GrupoReglado/src/pages/LoginView.vue` (o `src/views/LoginView.vue`, a confirmar cuando se edite)
-- `RegladoBienesRaices/src/services/auth.js` + LoginView
 - `RegladoEnergy/src/services/auth.js` + LoginView
 - `RegladoIngenieria/src/services/auth.js` + LoginView
 - `RegladoMaps/src/services/auth.js` + LoginView
