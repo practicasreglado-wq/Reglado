@@ -137,7 +137,15 @@ onUnmounted(() => {
   height: 64px;
 }
 .logo { display: flex; align-items: center; gap: 4px; }
-.logo-img { height: 40px; width: auto; }
+.logo-img { 
+  height: 40px; 
+  width: auto; 
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), filter 0.4s ease;
+}
+.logo:hover .logo-img {
+  transform: rotate(180deg) scale(1.05);
+  filter: drop-shadow(0 0.35rem 0.8rem rgba(0, 0, 0, 0.15));
+}
 .logo-text { font-size: 1.25rem; color: var(--text); }
 .logo-text strong { color: var(--steel); }
 .nav-desktop { display: flex; gap: 28px; margin-right: auto; }
