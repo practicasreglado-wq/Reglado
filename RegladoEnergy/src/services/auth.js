@@ -6,6 +6,7 @@
  * y solicita el perfil del usuario a ApiLoging para hidratar el estado local.
  */
 import { reactive } from "vue";
+import { redirectToLogout } from "./ssoClient";
 
 const API_BASE = import.meta.env.VITE_AUTH_API_URL || "http://localhost:8000";
 const TOKEN_KEY = "energy_auth_token";
@@ -126,21 +127,26 @@ async function initialize() {
 async function syncWithCookie() {
   const cookieToken = getCookie(COOKIE_TOKEN_KEY);
 
-  if (cookieToken === state.token && state.user) {
+  // Si la cookie del propio dominio desapareció (logout desde otra pestaña
+  // de este mismo dominio), cerramos localmente y salimos.
+  if (!cookieToken && state.token) {
+    clearSession();
     return;
   }
 
-  if (!cookieToken) {
-    if (state.token) {
-      clearSession();
-    }
-    return;
-  }
-
-  if (cookieToken !== state.token) {
+  // Si la cookie cambió (login desde otra pestaña del mismo dominio),
+  // adoptamos el token nuevo antes de revalidar.
+  if (cookieToken && cookieToken !== state.token) {
     setToken(cookieToken);
   }
 
+  // Si tras lo anterior no hay token, no hay nada que validar.
+  if (!state.token) return;
+
+  // Revalidación siempre contra /auth/me: cubre el caso en el que el
+  // servidor haya invalidado el token server-side (logout en otro dominio
+  // vía hub, ban, admin force-logout, password change). Si el middleware
+  // devuelve 401, el interceptor en request() limpia la sesión.
   state.loading = true;
   try {
     const payload = await request("/auth/me", {
@@ -223,7 +229,9 @@ async function logout() {
     }
   } finally {
     clearSession();
-    window.location.href = "/";
+    // Redirige al hub (Grupo) para que también limpie su almacenamiento
+    // local. El hub acabará devolviéndonos al home con la sesión cerrada.
+    redirectToLogout();
   }
 }
 

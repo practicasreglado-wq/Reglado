@@ -80,6 +80,7 @@
 <script setup>
 import { ref, watch } from "vue";
 import { auth } from "../services/auth";
+import { redirectToStore } from "../services/ssoClient";
 
 const props = defineProps({
   modelValue: {
@@ -124,6 +125,11 @@ async function handleLogin() {
     success.value = "Sesión iniciada";
     emit("success");
     closeModal();
+    // Propaga el token al hub (Grupo) para que el ecosistema comparta la
+    // sesión. Usamos origin+pathname (sin query/hash) para que al volver
+    // no arrastremos flags sobrantes tipo ?sso_failed=1.
+    const returnUrl = window.location.origin + window.location.pathname;
+    redirectToStore(auth.state.token, returnUrl);
   } catch (err) {
     error.value = err instanceof Error ? err.message : "No fue posible iniciar sesión";
   } finally {

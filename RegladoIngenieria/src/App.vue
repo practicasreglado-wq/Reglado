@@ -16,6 +16,14 @@ import Header from "@/components/Header.vue";
 import Footer from "@/components/Footer.vue";
 import CookieBanner from "@/components/CookieBanner.vue";
 import LoginModal from "@/components/LoginModal.vue";
+import {
+  consumeTokenFromFragment,
+  wasSsoHandshakeFailed,
+  clearSsoFailedFlag,
+  clearHandshakeAttempt,
+  wasHandshakeAttempted,
+  redirectToHandshake,
+} from "@/services/ssoClient.js";
 
 const route = useRoute();
 const router = useRouter();
@@ -35,8 +43,15 @@ function handleLoginSuccess() {
 }
 
 function handleVisibilityChange() {
-  if (document.visibilityState === "visible") {
+  if (document.visibilityState !== "visible") return;
+
+  if (auth.state.user) {
+    // Revalida contra /auth/me por si el backend invalidó mientras oculta.
     auth.syncWithCookie();
+  } else if (!wasHandshakeAttempted()) {
+    // Sin sesión local y cooldown expirado: posiblemente el usuario acaba
+    // de loguear en otro dominio. Reintentamos handshake.
+    redirectToHandshake();
   }
 }
 
@@ -53,8 +68,30 @@ watch(
   { immediate: true }
 );
 
+async function bootstrapAuth() {
+  // 1. Token cedido por el hub via fragmento (#token=...).
+  const fragmentToken = consumeTokenFromFragment();
+  if (fragmentToken) {
+    auth.setSession(fragmentToken, null);
+    clearHandshakeAttempt();
+  }
+
+  // 2. Limpiar flag sso_failed de la URL pero mantener la marca de intento.
+  if (wasSsoHandshakeFailed()) {
+    clearSsoFailedFlag();
+  }
+
+  // 3. Inicialización normal con token local.
+  await auth.initialize();
+
+  // 4. Si no hay sesión y no hemos preguntado al hub aún, handshake.
+  if (!auth.state.user && !wasHandshakeAttempted()) {
+    redirectToHandshake();
+  }
+}
+
 onMounted(() => {
-  auth.initialize();
+  bootstrapAuth();
   document.addEventListener("visibilitychange", handleVisibilityChange);
 });
 

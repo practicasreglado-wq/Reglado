@@ -26,6 +26,7 @@
 import { onMounted, onUnmounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { auth } from "@/services/auth.js";
+import { redirectToStore } from "@/services/ssoClient.js";
 
 const route = useRoute();
 const router = useRouter();
@@ -42,7 +43,8 @@ function startAutoRedirect() {
   }, 1000);
 
   redirectTimeout = setTimeout(() => {
-    router.replace("/");
+    // Propaga la sesión recién verificada al hub antes de enviar al home.
+    redirectToStore(auth.state.token, window.location.origin + "/");
   }, 5000);
 }
 

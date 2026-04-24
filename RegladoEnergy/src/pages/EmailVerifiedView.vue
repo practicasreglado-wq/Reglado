@@ -26,6 +26,7 @@
 import { onMounted, onUnmounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { auth } from "../services/auth";
+import { redirectToStore } from "../services/ssoClient";
 
 const route = useRoute();
 const router = useRouter();
@@ -44,7 +45,9 @@ function startAutoRedirect() {
   }, 1000);
 
   redirectTimeout = setTimeout(() => {
-    router.replace("/");
+    // Tras verificar email, propaga la sesión recién creada al hub para
+    // que el resto del ecosistema la herede sin pedir nuevo login.
+    redirectToStore(auth.state.token, window.location.origin + "/");
   }, 5000);
 }
 

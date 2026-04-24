@@ -22,6 +22,7 @@
 
 <script>
 import { auth } from "../services/auth";
+import { redirectToStore } from "../services/ssoClient";
 
 export default {
   name: "EmailVerifiedView",
@@ -70,7 +71,8 @@ export default {
       }, 1000);
 
       this.redirectTimeout = setTimeout(() => {
-        this.$router.replace("/");
+        // Propaga la sesión recién verificada al hub antes de enviar al home.
+        redirectToStore(auth.state.token, window.location.origin + "/");
       }, 5000);
     },
   },

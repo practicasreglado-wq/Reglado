@@ -203,6 +203,14 @@ import LPFooter from './components/LPFooter.vue'
 import CookieBanner from './components/CookieBanner.vue'
 import LoginModal from './components/LoginModal.vue'
 import { auth } from './services/auth'
+import {
+  consumeTokenFromFragment,
+  wasSsoHandshakeFailed,
+  clearSsoFailedFlag,
+  clearHandshakeAttempt,
+  wasHandshakeAttempted,
+  redirectToHandshake,
+} from './services/ssoClient'
 
 export default {
   name: 'App',
@@ -300,8 +308,37 @@ export default {
       }
     },
     handleVisibilityChange() {
-      if (document.visibilityState === 'visible') {
+      if (document.visibilityState !== 'visible') return;
+
+      if (auth.state.user) {
+        // Revalida contra /auth/me por si el backend invalidó mientras oculta.
         auth.syncWithCookie();
+      } else if (!wasHandshakeAttempted()) {
+        // Sin sesión local y cooldown expirado: posiblemente el usuario
+        // acaba de loguear en otro dominio. Reintentamos handshake.
+        redirectToHandshake();
+      }
+    },
+    async bootstrapAuth() {
+      // 1. Token cedido por el hub via fragmento (#token=...)
+      const fragmentToken = consumeTokenFromFragment();
+      if (fragmentToken) {
+        auth.setSession(fragmentToken, null);
+        clearHandshakeAttempt();
+      }
+
+      // 2. Limpiar flag sso_failed de la URL pero mantener la marca de
+      //    intento en sessionStorage para no entrar en bucle.
+      if (wasSsoHandshakeFailed()) {
+        clearSsoFailedFlag();
+      }
+
+      // 3. Inicialización con token local (recién seteado, localStorage o cookie).
+      await auth.initialize();
+
+      // 4. Si no hay sesión y no hemos preguntado al hub aún, handshake.
+      if (!auth.state.user && !wasHandshakeAttempted()) {
+        redirectToHandshake();
       }
     }
   },
@@ -311,9 +348,8 @@ export default {
     hijos y ahorrar cálculo de scroll manual.
   */
   mounted() {
-    // Inicialización del estado de autenticación centralizado.
-    // Intenta recuperar el token de la cookie compartida 'reglado_auth_token'.
-    auth.initialize().catch(err => console.warn('Auth INIT Error:', err));
+    // Bootstrap de auth: integra el protocolo SSO hub. Ver docs/ECOSYSTEM_AUTH_SSO_HUB.md
+    this.bootstrapAuth().catch(err => console.warn('Auth INIT Error:', err));
 
     // Detecta logins/logouts hechos en otra pestaña del ecosistema al
     // volver a Maps (ver auth.syncWithCookie).

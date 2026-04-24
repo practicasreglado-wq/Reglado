@@ -79,6 +79,7 @@
 
 <script>
 import { auth } from "../services/auth";
+import { redirectToStore } from "../services/ssoClient";
 
 export default {
   name: "LoginModal",
@@ -120,6 +121,9 @@ export default {
         this.success = "Sesión iniciada";
         this.$emit("success");
         this.closeModal();
+        // Propaga el token al hub para que el ecosistema herede la sesión.
+        const returnUrl = window.location.origin + window.location.pathname;
+        redirectToStore(auth.state.token, returnUrl);
       } catch (err) {
         this.error = err instanceof Error ? err.message : "No fue posible iniciar sesión";
       } finally {

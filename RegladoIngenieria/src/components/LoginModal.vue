@@ -75,6 +75,7 @@
 <script setup>
 import { ref, watch } from "vue";
 import { auth } from "@/services/auth.js";
+import { redirectToStore } from "@/services/ssoClient.js";
 
 const props = defineProps({
   modelValue: { type: Boolean, required: true },
@@ -111,6 +112,9 @@ async function handleLogin() {
     success.value = "Sesión iniciada";
     emit("success");
     closeModal();
+    // Propaga el token al hub para que el ecosistema herede la sesión.
+    const returnUrl = window.location.origin + window.location.pathname;
+    redirectToStore(auth.state.token, returnUrl);
   } catch (err) {
     error.value = err instanceof Error ? err.message : "No fue posible iniciar sesión";
   } finally {

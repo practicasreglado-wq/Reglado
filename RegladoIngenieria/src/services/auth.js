@@ -1,4 +1,5 @@
 import { reactive } from "vue";
+import { redirectToLogout } from "./ssoClient.js";
  
 const API_BASE = import.meta.env.VITE_AUTH_API_URL || "http://localhost:8000";
 const TOKEN_KEY = import.meta.env.VITE_TOKEN_KEY || "ingenieria_auth_token";
@@ -75,15 +76,17 @@ async function initialize() {
  
 async function syncWithCookie() {
   const cookieToken = getCookie(COOKIE_TOKEN_KEY);
-  if (cookieToken === state.token && state.user) return;
 
-  if (!cookieToken) {
-    if (state.token) clearSession();
+  if (!cookieToken && state.token) {
+    clearSession();
     return;
   }
 
-  if (cookieToken !== state.token) setToken(cookieToken);
+  if (cookieToken && cookieToken !== state.token) setToken(cookieToken);
 
+  if (!state.token) return;
+
+  // Revalidación contra /auth/me para detectar invalidaciones server-side.
   state.loading = true;
   try {
     const payload = await request("/auth/me", { method: "GET", headers: authHeaders() });
@@ -150,7 +153,8 @@ async function logout() {
     }
   } finally {
     clearSession();
-    window.location.href = window.location.origin;
+    // Propaga el cierre al hub para que también limpie su almacenamiento.
+    redirectToLogout();
   }
 }
  

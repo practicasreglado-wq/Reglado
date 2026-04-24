@@ -11,6 +11,9 @@ import AvisoLegalView from "../pages/AvisoLegalView.vue";
 import PoliticaCookiesView from "../pages/PoliticaCookiesView.vue";
 import PoliticaPrivacidadView from "../pages/PoliticaPrivacidadView.vue";
 import ConfirmarAccesoView from "../pages/ConfirmarAccesoView.vue";
+import SsoHandshakeView from "../pages/SsoHandshakeView.vue";
+import SsoStoreView from "../pages/SsoStoreView.vue";
+import SsoLogoutView from "../pages/SsoLogoutView.vue";
 
 const routes = [
   { path: "/", name: "portal", component: PortalView, meta: { title: "Reglado Group | Portal Empresarial" } },
@@ -40,6 +43,9 @@ const routes = [
     component: ConfirmarAccesoView,
     meta: { title: "Confirmar acceso | Reglado Group" },
   },
+  { path: "/sso-handshake", name: "sso-handshake", component: SsoHandshakeView, meta: { title: "Sincronizando | Reglado Group" } },
+  { path: "/sso-store", name: "sso-store", component: SsoStoreView, meta: { title: "Sincronizando | Reglado Group" } },
+  { path: "/sso-logout", name: "sso-logout", component: SsoLogoutView, meta: { title: "Cerrando sesión | Reglado Group" } },
 ];
 
 const router = createRouter({
