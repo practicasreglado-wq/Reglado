@@ -156,6 +156,28 @@ async function syncWithCookie() {
 }
 
 /**
+ * Autentica al usuario contra ApiLoging y, si tiene éxito, persiste el
+ * token en el estado local y en la cookie compartida con el resto del
+ * ecosistema (mismo flujo que GrupoReglado).
+ */
+async function login(email, password) {
+  const payload = await request("/auth/login", {
+    method: "POST",
+    body: JSON.stringify({ email, password }),
+  });
+
+  setSession(payload.token, payload.user || null);
+  return payload;
+}
+
+async function resendVerification(email) {
+  return request("/auth/resend-verification", {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  });
+}
+
+/**
  * Cierra la sesión activa revocando el token en el backend y borrando
  * los datos locales. Tras ello, devuelve al usuario al portal principal.
  */
@@ -179,6 +201,8 @@ export const auth = {
   clearSession,
   initialize,
   syncWithCookie,
+  login,
+  resendVerification,
   logout,
 };
 

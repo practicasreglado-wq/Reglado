@@ -1,6 +1,6 @@
 <template>
   <div class="app-shell">
-    <SiteHeader :user="auth.state.user" />
+    <SiteHeader :user="auth.state.user" @open-login="showLogin = true" />
     <main class="main">
       <div class="page-wrapper">
         <router-view v-slot="{ Component, route }">
@@ -22,6 +22,7 @@
     <CTASticky @close="isCTAClosed = true" />
     <ScrollTopButton :isCTAClosed="isCTAClosed" />
     <CookieBanner />
+    <LoginModal v-model="showLogin" />
   </div>
 </template>
 
@@ -32,9 +33,11 @@ import SiteFooter from "./components/SiteFooter.vue";
 import CTASticky from "./components/CTASticky.vue";
 import ScrollTopButton from "./components/ScrollTopButton.vue";
 import CookieBanner from "./components/CookieBanner.vue";
+import LoginModal from "./components/LoginModal.vue";
 import { auth } from "./services/auth";
 
 const isCTAClosed = ref(false);
+const showLogin = ref(false);
 
 function handleVisibilityChange() {
   if (document.visibilityState === "visible") {
