@@ -14,6 +14,8 @@ require_once dirname(__DIR__) . '/processing/DossierService.php';
 require_once dirname(__DIR__) . '/processing/ClaudeClient.php';
 require_once dirname(__DIR__) . '/processing/PdfGenerator.php';
 require_once dirname(__DIR__) . '/processing/PropertyProcessor.php';
+require_once dirname(__DIR__) . '/lib/audit.php';
+require_once dirname(__DIR__) . '/lib/error_reporting.php';
 
 loadEnv(dirname(__DIR__) . '/.env');
 
@@ -108,6 +110,18 @@ try {
         throw new RuntimeException('No se pudo obtener el ID de la propiedad creada.');
     }
 
+    auditLog($pdo, 'property.create_from_text', array_merge(
+        auditContextFromAuth($context['auth'] ?? [], $createdByUserId),
+        [
+            'resource_type' => 'property',
+            'resource_id'   => (string) $propertyId,
+            'metadata'      => [
+                'asset_id'       => $assetId,
+                'duplicate_asset' => $isDuplicateInsert ?? null,
+            ],
+        ]
+    ));
+
     respondJson(200, [
         'success' => true,
         'assetId' => $assetId,
@@ -119,11 +133,11 @@ try {
         $repository->updateReceivedAssetStatus($assetId, 'error');
     }
 
-    error_log('[ERROR REAL WEB TEXT] ' . $exception->getMessage());
+    $errorId = logAndReferenceError('create_property_from_text', $exception);
 
     respondJson(500, [
         'success' => false,
-        'message' => $exception->getMessage(),
+        'message' => 'No se pudo procesar la solicitud. Referencia: ' . $errorId,
     ]);
 }
 

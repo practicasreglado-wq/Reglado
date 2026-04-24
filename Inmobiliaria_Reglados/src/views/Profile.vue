@@ -157,7 +157,7 @@ mode="out-in"
         <div class="notice-content">
           <h4>Acceso Limitado</h4>
           <p>Tu cuenta actualmente tiene acceso limitado.</p>
-          <p>Para acceder al catalogo completo de propiedades y a todas las herramientas de la plataforma necesitas una cuenta <strong>REAL</strong>.</p>
+          <p>Para acceder al catalogo completo de propiedades y a todas las herramientas de la plataforma necesitas una cuenta <strong>PREMIUM</strong>.</p>
           <p class="notice-footer">Ponte en contacto con nosotros para activar todos los servicios.</p>
           <button class="contact-upgrade-btn" @click="$router.push('/contacto')">Contactar ahora</button>
         </div>

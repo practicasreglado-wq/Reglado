@@ -1,5 +1,5 @@
 <template>
-  <header :class="{ 'is-scrolled': scrolled && !isInProfile, 'at-top-home': isHome && !scrolled }">
+  <header class="site-header" :class="{ 'is-scrolled': scrolled && !isInProfile, 'at-top-home': isHome && !scrolled }">
     <div class="logo">
       <router-link to="/" class="logo-link">
         <div class="logo-wrapper">
@@ -50,12 +50,15 @@
         </li>
 
         <li v-if="user" class="profile-nav-item" :class="{ 'in-profile': isInProfile }">
-          <div v-if="isAdmin" ref="adminDropdownRef" class="admin-dropdown">
+          <div v-if="isAdmin" class="admin-dropdown">
             <button
+              ref="adminAnchorRef"
               class="admin-badge"
               :class="{ open: isAdminMenuOpen }"
               type="button"
-              title="Panel de administracion"
+              :aria-expanded="isAdminMenuOpen"
+              aria-haspopup="menu"
+              :title="pendingTotal > 0 ? `Panel de administracion - ${pendingTotal} solicitud(es) pendiente(s)` : 'Panel de administracion'"
               @click="toggleAdminMenu"
             >
               <svg
@@ -72,30 +75,68 @@
                   stroke-linejoin="round"
                 />
               </svg>
+
+              <span
+                v-if="pendingTotal > 0"
+                class="admin-badge__count"
+                role="status"
+                aria-live="polite"
+              >
+                {{ pendingTotal > 99 ? '99+' : pendingTotal }}
+              </span>
             </button>
 
-            <ul v-show="isAdminMenuOpen" class="admin-menu">
-              <li>
-                <router-link to="/admin/properties" @click="closeAdminMenu">
-                  Propiedades
-                </router-link>
-              </li>
-              <li>
-                <router-link to="/admin/audit" @click="closeAdminMenu">
-                  Registro de auditoría
-                </router-link>
-              </li>
-              <li>
-                <router-link to="/admin/pending-requests" @click="closeAdminMenu">
-                  Solicitudes pendientes
-                </router-link>
-              </li>
-              <li>
-                <router-link to="/admin/users" @click="closeAdminMenu">
-                  Usuarios
-                </router-link>
-              </li>
-            </ul>
+            <Teleport to="body">
+              <div v-show="isAdminMenuOpen" class="admin-panel__portal">
+                <div
+                  ref="adminPanelRef"
+                  class="admin-panel"
+                  :style="adminPanelStyle"
+                  role="menu"
+                  aria-label="Panel de administracion"
+                >
+                  <div class="admin-panel__header">
+                    <span>Administración</span>
+                    <button
+                      type="button"
+                      class="admin-panel__close"
+                      @click="closeAdminMenu"
+                      aria-label="Cerrar panel"
+                    >
+                      ×
+                    </button>
+                  </div>
+
+                  <div class="admin-panel__body">
+                    <ul class="admin-panel__list">
+                      <li>
+                        <router-link to="/admin/properties" class="admin-panel__item" @click="closeAdminMenu">
+                          Propiedades
+                        </router-link>
+                      </li>
+                      <li>
+                        <router-link to="/admin/audit" class="admin-panel__item" @click="closeAdminMenu">
+                          Registro de auditoría
+                        </router-link>
+                      </li>
+                      <li>
+                        <router-link to="/admin/pending-requests" class="admin-panel__item" @click="closeAdminMenu">
+                          <span>Solicitudes pendientes</span>
+                          <span v-if="pendingTotal > 0" class="admin-panel__item-badge">
+                            {{ pendingTotal > 99 ? '99+' : pendingTotal }}
+                          </span>
+                        </router-link>
+                      </li>
+                      <li>
+                        <router-link to="/admin/users" class="admin-panel__item" @click="closeAdminMenu">
+                          Usuarios
+                        </router-link>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </Teleport>
           </div>
 
           <div class="user-menu-container">
@@ -143,6 +184,8 @@ import { useRouter, useRoute } from "vue-router";
 import { useUserStore } from "../stores/user";
 import { useProfileMenuStore } from "../stores/profileMenu";
 import NotificationBell from "./NotificationBell.vue";
+import { useAnchoredPanel } from "../composables/useAnchoredPanel";
+import { usePendingCountsStore } from "../stores/pendingCounts";
 import { useNotificationsStore } from "../stores/notifications";
 
 export default {
@@ -157,6 +200,8 @@ export default {
     const router = useRouter();
     const route = useRoute();
     const notificationsStore = useNotificationsStore();
+    const pendingCountsStore = usePendingCountsStore();
+    const { total: pendingTotal } = storeToRefs(pendingCountsStore);
     const { user, isAdmin, isReal } = storeToRefs(userStore);
     const { isOpen: isProfileMenuOpen } = storeToRefs(profileMenuStore);
 
@@ -232,6 +277,19 @@ const goToLogin = () => {
       { immediate: true }
     );
 
+    watch(
+      () => isAdmin.value,
+      (adminNow) => {
+        if (adminNow) {
+          pendingCountsStore.startAutoRefresh();
+          return;
+        }
+        pendingCountsStore.stopAutoRefresh();
+        pendingCountsStore.resetState();
+      },
+      { immediate: true }
+    );
+
     const getInitials = () => {
       if (!user.value) return "U";
 
@@ -245,26 +303,19 @@ const goToLogin = () => {
       return username?.charAt(0)?.toUpperCase() || "U";
     };
 
-    const isAdminMenuOpen = ref(false);
-    const adminDropdownRef = ref(null);
-    const toggleAdminMenu = () => {
-      isAdminMenuOpen.value = !isAdminMenuOpen.value;
-    };
-    const closeAdminMenu = () => {
-      isAdminMenuOpen.value = false;
-    };
-
-    const handleAdminClickOutside = (event) => {
-      if (!isAdminMenuOpen.value) return;
-      if (adminDropdownRef.value && !adminDropdownRef.value.contains(event.target)) {
-        isAdminMenuOpen.value = false;
-      }
-    };
+    const {
+      anchorRef: adminAnchorRef,
+      panelRef: adminPanelRef,
+      visible: isAdminMenuOpen,
+      panelStyle: adminPanelStyle,
+      close: closeAdminMenu,
+      toggle: toggleAdminMenu,
+    } = useAnchoredPanel();
 
     watch(
       () => route.path,
       () => {
-        isAdminMenuOpen.value = false;
+        closeAdminMenu();
       }
     );
 
@@ -279,14 +330,13 @@ const goToLogin = () => {
       window.addEventListener("scroll", handleScroll);
       handleScroll();
       document.addEventListener("visibilitychange", handleVisibilityChange);
-      document.addEventListener("mousedown", handleAdminClickOutside);
     });
 
     onUnmounted(() => {
       window.removeEventListener("scroll", handleScroll);
       notificationsStore.stopAutoRefresh();
+      pendingCountsStore.stopAutoRefresh();
       document.removeEventListener("visibilitychange", handleVisibilityChange);
-      document.removeEventListener("mousedown", handleAdminClickOutside);
     });
 
     return {
@@ -305,7 +355,10 @@ const goToLogin = () => {
       isAdminMenuOpen,
       toggleAdminMenu,
       closeAdminMenu,
-      adminDropdownRef,
+      adminAnchorRef,
+      adminPanelRef,
+      adminPanelStyle,
+      pendingTotal,
     };
   },
 };
@@ -556,6 +609,7 @@ header:not(.at-top-home) .user-avatar {
 }
 
 .admin-badge {
+  position: relative;
   width: 44px;
   height: 44px;
   border-radius: 50%;
@@ -568,59 +622,126 @@ header:not(.at-top-home) .user-avatar {
   background: transparent;
 }
 
+.admin-badge__count {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: #ec3d3d;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.03em;
+  box-shadow: 0 0 0 2px #fff;
+}
+
 .admin-dropdown .admin-badge {
   margin-right: 0;
 }
 
-.admin-menu {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  margin-top: 8px;
+.admin-panel__portal {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  pointer-events: none;
+}
+
+.admin-panel {
+  position: fixed;
+  pointer-events: auto;
+  padding: 0;
+  background: #fff;
+  border-radius: 18px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  box-shadow: 0 32px 60px rgba(15, 23, 42, 0.24);
+  max-height: calc(100vh - 32px);
+  overflow: hidden;
+  min-width: 260px;
+  width: 320px;
+}
+
+.admin-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  font-weight: 700;
+  color: #0f172a;
+  background: #f8fafc;
+}
+
+.admin-panel__close {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: #475569;
+  cursor: pointer;
+}
+
+.admin-panel__body {
+  padding: 12px 16px 16px;
+  max-height: calc(100vh - 110px);
+  overflow-y: auto;
+}
+
+.admin-panel__list {
   display: flex;
   flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
   list-style: none;
-  padding: 6px 0;
-  min-width: 240px;
-  background: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
-  border: 2px solid #0f172a;
-  z-index: 1100;
-  gap: 0;
 }
 
-.admin-menu::before {
-  content: "";
-  position: absolute;
-  top: -8px;
-  left: 0;
-  right: 0;
-  height: 8px;
-}
-
-.admin-menu li {
-  width: 100%;
-  display: block;
-}
-
-.admin-menu li a {
-  display: block;
-  padding: 10px 16px;
-  font-size: 14px;
-  color: #1a2545;
+.admin-panel__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  background: #f8fafc;
+  color: #0f172a;
+  font-size: 0.95rem;
+  font-weight: 600;
   text-decoration: none;
-  font-weight: 500;
-  transition: background 0.15s;
-  white-space: nowrap;
+  transition: background 0.15s, border-color 0.15s, transform 0.15s;
 }
 
-.admin-menu li a:hover {
-  background: #f3f4f6;
+.admin-panel__item-badge {
+  min-width: 22px;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: #ec3d3d;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.03em;
+  flex-shrink: 0;
 }
 
-.admin-menu li a.router-link-active {
+.admin-panel__item:hover {
+  background: #eef2f7;
+  border-color: rgba(15, 23, 42, 0.25);
+  transform: translateY(-1px);
+}
+
+.admin-panel__item.router-link-active {
   background: rgba(11, 61, 145, 0.08);
+  border-color: rgba(11, 61, 145, 0.3);
   color: #0b3d91;
 }
 

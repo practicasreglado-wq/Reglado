@@ -27,7 +27,7 @@
 
     <div class="contacto-card">
       <h2>Contactanos</h2>
-      <p class="subject-pill">Asunto: Solicitud de Usuario promocionar a Real</p>
+      <p class="subject-pill">Asunto: Solicitud de Usuario promocionar a Premium</p>
 
       <form class="formulario" @submit.prevent="submitRequest">
         <div class="row">
@@ -60,7 +60,7 @@
             id="contact-message"
             v-model.trim="message"
             rows="5"
-            placeholder="Cuentanos por que quieres solicitar acceso como usuario real"
+            placeholder="Cuentanos por que quieres solicitar acceso como usuario Premium"
             :disabled="isSubmitting || !isLoggedIn"
           ></textarea>
         </div>

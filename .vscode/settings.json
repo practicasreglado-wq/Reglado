@@ -1,0 +1,33 @@
+{
+  "files.exclude": {
+    "**/vendor": false,
+    "**/node_modules": true
+  },
+  "files.watcherExclude": {
+    "**/vendor/**": true,
+    "**/node_modules/**": true
+  },
+  "search.exclude": {
+    "**/vendor": true,
+    "**/node_modules": true
+  },
+
+  "intelephense.files.exclude": [
+    "**/vendor/**",
+    "**/node_modules/**",
+    "**/.git/**"
+  ],
+  "intelephense.diagnostics.enable": true,
+  "intelephense.diagnostics.undefinedTypes": false,
+  "intelephense.diagnostics.undefinedConstants": false,
+
+  "php.validate.enable": true,
+  "php.validate.run": "onType",
+
+  "eslint.options": {
+    "ignorePattern": [
+      "**/vendor/**",
+      "**/node_modules/**"
+    ]
+  }
+}

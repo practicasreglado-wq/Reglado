@@ -6,12 +6,14 @@ require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../config/auth.php';
 require_once __DIR__ . '/../lib/env_loader.php';
 require_once __DIR__ . '/../lib/document_access.php';
+require_once __DIR__ . '/../lib/audit.php';
 
 applyAuthCors();
 handlePreflight();
 loadEnv(__DIR__ . '/../.env');
 
 $context = requireAuthenticatedUser($pdo);
+$auth = $context['auth'] ?? [];
 $reviewerId = (int) (
     $context['local']['iduser']
     ?? $context['local']['id']
@@ -19,6 +21,18 @@ $reviewerId = (int) (
     ?? $context['auth']['sub']
     ?? 0
 );
+$reviewerRole = strtolower((string) ($auth['role'] ?? ''));
+
+// Solo admins pueden aprobar/rechazar documentos firmados de otros usuarios.
+// Sin este check, cualquier usuario autenticado podría alterar el estado de
+// las firmas de cualquier otro usuario y desbloquear dossiers ajenos.
+if ($reviewerRole !== 'admin') {
+    respondJson(403, [
+        'success' => false,
+        'message' => 'Acceso restringido. Solo administradores pueden revisar documentos firmados.',
+    ]);
+}
+
 $propertyId = (int) ($_POST['property_id'] ?? 0);
 $buyerUserId = (int) ($_POST['buyer_user_id'] ?? 0);
 $documentType = strtolower(trim((string) ($_POST['document_type'] ?? '')));
@@ -85,6 +99,21 @@ if ((int) ($access['dossier_unlocked'] ?? 0) !== $dossierUnlocked) {
 }
 
 $pdo->commit();
+
+auditLog($pdo, 'document.review.' . $action, array_merge(
+    auditContextFromAuth($auth, $reviewerId),
+    [
+        'resource_type' => 'document',
+        'resource_id'   => $documentType . ':' . $propertyId,
+        'metadata'      => [
+            'document_type'      => $documentType,
+            'property_id'        => $propertyId,
+            'buyer_user_id'      => $buyerUserId,
+            'new_status'         => $newStatus,
+            'dossier_unlocked'   => (int) ($access['dossier_unlocked'] ?? 0) === 1,
+        ],
+    ]
+));
 
 respondJson(200, [
     'success' => true,

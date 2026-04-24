@@ -5,6 +5,9 @@ require_once __DIR__ . '/../config/cors.php';
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../config/auth.php';
 require_once dirname(__DIR__) . '/lib/geocoding.php';
+require_once dirname(__DIR__) . '/lib/audit.php';
+require_once dirname(__DIR__) . '/lib/address_hash.php';
+require_once dirname(__DIR__) . '/lib/buyer_intents.php';
 
 applyCors();
 handlePreflight();
@@ -60,48 +63,117 @@ $geo = geocodeApproximateLocation([
 $latitud = $geo['latitud'] ?? null;
 $longitud = $geo['longitud'] ?? null;
 
-$stmt = $pdo->prepare("
-    INSERT INTO inmobiliaria.propiedades (
-        categoria,
-        titulo,
-        ubicacion_general,
-        zona,
-        ciudad,
-        provincia,
-        pais,
-        latitud,
-        longitud,
-        precio,
-        metros_cuadrados,
-        imagen_principal,
-        caracteristicas_json,
-        owner_user_id,
-        activo_recibido_id
-    )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-");
+$addressHash = buildPropertyAddressHash([
+    'ubicacion' => $ubicacion,
+    'ciudad'    => $ciudad,
+    'provincia' => $provincia,
+    'pais'      => $pais,
+]);
 
-$stmt->execute([
-    $tipo,
-    $nombre,
-    $ubicacion,
+$addressHashColumnExists = false;
+try {
+    $colCheck = $pdo->prepare("
+        SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_SCHEMA = 'inmobiliaria'
+          AND TABLE_NAME = 'propiedades'
+          AND COLUMN_NAME = 'address_hash'
+        LIMIT 1
+    ");
+    $colCheck->execute();
+    $addressHashColumnExists = (bool) $colCheck->fetchColumn();
+} catch (Throwable $e) {
+    $addressHashColumnExists = false;
+}
+
+// Dedup pre-INSERT: si ya existe una propiedad con el mismo address_hash,
+// devolvemos su id sin duplicar.
+if ($addressHash !== null && $addressHashColumnExists) {
+    $dupStmt = $pdo->prepare('SELECT id FROM inmobiliaria.propiedades WHERE address_hash = :h LIMIT 1');
+    $dupStmt->execute(['h' => $addressHash]);
+    $existing = $dupStmt->fetchColumn();
+
+    if ($existing !== false) {
+        echo json_encode([
+            "success"    => true,
+            "propertyId" => (int) $existing,
+            "duplicate"  => true,
+            "message"    => "Esta propiedad ya estaba registrada. Se ha reutilizado la existente.",
+        ], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+}
+
+$columns = ['categoria', 'titulo', 'ubicacion_general', 'zona', 'ciudad',
+            'provincia', 'pais', 'latitud', 'longitud', 'precio',
+            'metros_cuadrados', 'imagen_principal', 'caracteristicas_json',
+            'owner_user_id', 'activo_recibido_id'];
+
+$values = [
+    $tipo, $nombre, $ubicacion,
     $zona !== '' ? $zona : null,
     $ciudad !== '' ? $ciudad : null,
     $provincia !== '' ? $provincia : null,
-    $pais,
-    $latitud,
-    $longitud,
-    $precio,
-    0,
-    null,
-    json_encode(new stdClass(), JSON_UNESCAPED_UNICODE),
-    $userId,
-    null,
+    $pais, $latitud, $longitud, $precio,
+    0, null, json_encode(new stdClass(), JSON_UNESCAPED_UNICODE),
+    $userId, null,
+];
+
+if ($addressHash !== null && $addressHashColumnExists) {
+    $columns[] = 'address_hash';
+    $values[] = $addressHash;
+}
+
+$placeholders = implode(', ', array_fill(0, count($columns), '?'));
+$stmt = $pdo->prepare(
+    'INSERT INTO inmobiliaria.propiedades (' . implode(', ', $columns) . ') VALUES (' . $placeholders . ')'
+);
+
+try {
+    $stmt->execute($values);
+} catch (PDOException $e) {
+    // Race condition: otra petición insertó la misma propiedad entre el
+    // SELECT y este INSERT.
+    if ((string) $e->getCode() === '23000' && $addressHash !== null && $addressHashColumnExists) {
+        $recover = $pdo->prepare('SELECT id FROM inmobiliaria.propiedades WHERE address_hash = :h LIMIT 1');
+        $recover->execute(['h' => $addressHash]);
+        $existingId = $recover->fetchColumn();
+        if ($existingId !== false) {
+            echo json_encode([
+                "success"    => true,
+                "propertyId" => (int) $existingId,
+                "duplicate"  => true,
+                "message"    => "Esta propiedad ya estaba registrada. Se ha reutilizado la existente.",
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+    }
+    throw $e;
+}
+
+$newPropertyId = (int) $pdo->lastInsertId();
+
+auditLog($pdo, 'property.create', array_merge(
+    auditContextFromAuth($context['auth'] ?? [], $userId),
+    [
+        'resource_type' => 'property',
+        'resource_id'   => (string) $newPropertyId,
+        'metadata'      => [
+            'tipo'      => $tipo,
+            'titulo'    => $nombre,
+            'ubicacion' => $ubicacion,
+            'precio'    => $precio,
+        ],
+    ]
+));
+
+processNewPropertyMatching($pdo, $newPropertyId, [
+    'categoria'        => $tipo,
+    'ciudad'           => $ciudad,
+    'precio'           => $precio,
+    'metros_cuadrados' => 0,
 ]);
 
 echo json_encode([
     "success" => true,
-    "propertyId" => (int) $pdo->lastInsertId(),
-    "latitud" => $latitud,
-    "longitud" => $longitud,
+    "propertyId" => $newPropertyId,
 ], JSON_UNESCAPED_UNICODE);

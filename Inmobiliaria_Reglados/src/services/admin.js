@@ -5,7 +5,7 @@ const API_BASE =
   import.meta.env.VITE_API_BASE_URL ||
   "http://localhost/Reglado/Inmobiliaria_Reglados/backend/api";
 
-export async function updatePropertyStatus(propertyId, estado) {
+export async function updatePropertyStatus(propertyId, estado, adminPassword) {
   const response = await fetch(`${API_BASE}/update_property_status.php`, {
     method: "POST",
     credentials: "include",
@@ -16,13 +16,14 @@ export async function updatePropertyStatus(propertyId, estado) {
     body: JSON.stringify({
       property_id: propertyId,
       estado,
+      admin_password: adminPassword,
     }),
   });
 
   return response.json();
 }
 
-export async function deletePropertyAsAdmin(propertyId) {
+export async function deletePropertyAsAdmin(propertyId, adminPassword) {
   const response = await fetch(`${API_BASE}/delete_property.php`, {
     method: "POST",
     credentials: "include",
@@ -32,6 +33,7 @@ export async function deletePropertyAsAdmin(propertyId) {
     },
     body: JSON.stringify({
       property_id: propertyId,
+      admin_password: adminPassword,
     }),
   });
 
@@ -39,7 +41,6 @@ export async function deletePropertyAsAdmin(propertyId) {
 }
 export async function fetchAllProperties() {
   const payload = await backendJson("api/get_all_properties.php");
-  console.log("PAYLOAD ADMIN:", payload);
 
   if (payload.success && Array.isArray(payload.properties)) {
     return payload.properties;
@@ -56,7 +57,7 @@ export async function fetchPendingRequests() {
   return payload;
 }
 
-export async function approvePendingRequest(requestId) {
+export async function approvePendingRequest(requestId, adminPassword) {
   const response = await fetch(`${API_BASE}/approve_pending_request.php`, {
     method: "POST",
     credentials: "include",
@@ -64,12 +65,12 @@ export async function approvePendingRequest(requestId) {
       "Content-Type": "application/json",
       ...auth.authHeaders(),
     },
-    body: JSON.stringify({ request_id: requestId }),
+    body: JSON.stringify({ request_id: requestId, admin_password: adminPassword }),
   });
   return response.json();
 }
 
-export async function rejectPendingRequest(requestId) {
+export async function rejectPendingRequest(requestId, adminPassword) {
   const response = await fetch(`${API_BASE}/reject_pending_request.php`, {
     method: "POST",
     credentials: "include",
@@ -77,7 +78,7 @@ export async function rejectPendingRequest(requestId) {
       "Content-Type": "application/json",
       ...auth.authHeaders(),
     },
-    body: JSON.stringify({ request_id: requestId }),
+    body: JSON.stringify({ request_id: requestId, admin_password: adminPassword }),
   });
   return response.json();
 }
@@ -90,7 +91,7 @@ export async function fetchPendingDocumentReviews() {
   return payload;
 }
 
-export async function approveDocumentReviewAsAdmin(reviewId) {
+export async function approveDocumentReviewAsAdmin(reviewId, adminPassword) {
   const response = await fetch(`${API_BASE}/approve_document_review_admin.php`, {
     method: "POST",
     credentials: "include",
@@ -98,12 +99,12 @@ export async function approveDocumentReviewAsAdmin(reviewId) {
       "Content-Type": "application/json",
       ...auth.authHeaders(),
     },
-    body: JSON.stringify({ review_id: reviewId }),
+    body: JSON.stringify({ review_id: reviewId, admin_password: adminPassword }),
   });
   return response.json();
 }
 
-export async function rejectDocumentReviewAsAdmin(reviewId) {
+export async function rejectDocumentReviewAsAdmin(reviewId, adminPassword) {
   const response = await fetch(`${API_BASE}/reject_document_review_admin.php`, {
     method: "POST",
     credentials: "include",
@@ -111,7 +112,7 @@ export async function rejectDocumentReviewAsAdmin(reviewId) {
       "Content-Type": "application/json",
       ...auth.authHeaders(),
     },
-    body: JSON.stringify({ review_id: reviewId }),
+    body: JSON.stringify({ review_id: reviewId, admin_password: adminPassword }),
   });
   return response.json();
 }
@@ -125,7 +126,7 @@ export async function fetchPurchaseRequests(onlyPending = false) {
   return payload;
 }
 
-export async function updatePurchaseRequestStatus(requestId, status, notes = "") {
+export async function updatePurchaseRequestStatus(requestId, status, adminPassword, notes = "") {
   const response = await fetch(`${API_BASE}/update_purchase_request_status.php`, {
     method: "POST",
     credentials: "include",
@@ -133,7 +134,96 @@ export async function updatePurchaseRequestStatus(requestId, status, notes = "")
       "Content-Type": "application/json",
       ...auth.authHeaders(),
     },
-    body: JSON.stringify({ request_id: requestId, status, notes }),
+    body: JSON.stringify({
+      request_id: requestId,
+      status,
+      admin_password: adminPassword,
+      notes,
+    }),
+  });
+  return response.json();
+}
+
+export async function fetchScheduledAppointments(status = "scheduled") {
+  const payload = await backendJson(`api/get_scheduled_appointments.php?status=${encodeURIComponent(status)}`);
+  if (!payload.success) {
+    throw new Error(payload.message || "Error al cargar las citas");
+  }
+  return payload;
+}
+
+export async function updateAppointmentStatus(appointmentId, status, adminPassword, adminNotes = "") {
+  const response = await fetch(`${API_BASE}/update_appointment_status.php`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      ...auth.authHeaders(),
+    },
+    body: JSON.stringify({
+      appointment_id: appointmentId,
+      status,
+      admin_password: adminPassword,
+      admin_notes: adminNotes,
+    }),
+  });
+  return response.json();
+}
+
+export async function fetchPendingPropertyDeletions() {
+  const payload = await backendJson("api/get_pending_property_deletions.php");
+  if (!payload.success) {
+    throw new Error(payload.message || "Error al cargar las solicitudes de eliminación");
+  }
+  return payload;
+}
+
+export async function approvePropertyDeletion(requestId, adminPassword, adminNotes = "") {
+  const response = await fetch(`${API_BASE}/approve_property_deletion.php`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      ...auth.authHeaders(),
+    },
+    body: JSON.stringify({
+      request_id: requestId,
+      admin_password: adminPassword,
+      admin_notes: adminNotes,
+    }),
+  });
+  return response.json();
+}
+
+export async function rejectPropertyDeletion(requestId, adminPassword, adminNotes = "") {
+  const response = await fetch(`${API_BASE}/reject_property_deletion.php`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      ...auth.authHeaders(),
+    },
+    body: JSON.stringify({
+      request_id: requestId,
+      admin_password: adminPassword,
+      admin_notes: adminNotes,
+    }),
+  });
+  return response.json();
+}
+
+export async function deleteAppointment(appointmentId, adminPassword) {
+  const response = await fetch(`${API_BASE}/delete_appointment.php`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      ...auth.authHeaders(),
+    },
+    body: JSON.stringify({
+      appointment_id: appointmentId,
+      admin_password: adminPassword,
+    }),
   });
   return response.json();
 }
@@ -146,42 +236,12 @@ export async function fetchInmoUsers(mode = "active") {
   return payload;
 }
 
-export async function updateUserRole(userId, newRole) {
+export async function updateUserRole(userId, newRole, adminPassword) {
   const response = await fetch(`${API_BASE}/update_user_role.php`, {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json", ...auth.authHeaders() },
-    body: JSON.stringify({ user_id: userId, role: newRole }),
-  });
-  return response.json();
-}
-
-export async function blockInmoUser(userId, notes = "") {
-  const response = await fetch(`${API_BASE}/block_inmo_user.php`, {
-    method: "POST",
-    credentials: "include",
-    headers: { "Content-Type": "application/json", ...auth.authHeaders() },
-    body: JSON.stringify({ user_id: userId, notes }),
-  });
-  return response.json();
-}
-
-export async function unblockInmoUser(userId) {
-  const response = await fetch(`${API_BASE}/unblock_inmo_user.php`, {
-    method: "POST",
-    credentials: "include",
-    headers: { "Content-Type": "application/json", ...auth.authHeaders() },
-    body: JSON.stringify({ user_id: userId }),
-  });
-  return response.json();
-}
-
-export async function forceUserRelogin(userId) {
-  const response = await fetch(`${API_BASE}/force_user_relogin.php`, {
-    method: "POST",
-    credentials: "include",
-    headers: { "Content-Type": "application/json", ...auth.authHeaders() },
-    body: JSON.stringify({ user_id: userId }),
+    body: JSON.stringify({ user_id: userId, role: newRole, admin_password: adminPassword }),
   });
   return response.json();
 }

@@ -20,114 +20,45 @@ function pdfSeemsSigned(string $uploadedPath, ?string $originalPath = null): arr
         return ['accepted' => false, 'reason' => 'No se pudo leer el PDF subido'];
     }
 
-    $uploadedSize = filesize($uploadedPath) ?: 0;
     $uploadedHash = hash_file('sha256', $uploadedPath);
 
-    $original = null;
-    $originalSize = 0;
-    $originalHash = null;
     if ($originalPath && is_file($originalPath) && is_readable($originalPath)) {
-        $original = @file_get_contents($originalPath);
-        if ($original !== false && $original !== '') {
-            $originalSize = filesize($originalPath) ?: 0;
-            $originalHash = hash_file('sha256', $originalPath);
+        $originalHash = hash_file('sha256', $originalPath);
+        if ($originalHash && hash_equals($uploadedHash, $originalHash)) {
+            return ['accepted' => false, 'reason' => 'El documento es idéntico al original'];
         }
     }
 
-    if ($originalHash !== null && hash_equals($uploadedHash, $originalHash)) {
-        return ['accepted' => false, 'reason' => 'El documento es idéntico al original'];
-    }
-
-    $strongPatterns = [
-        '/\/Sig\b/i',
-        '/\/AcroForm\b/i',
-        '/\/Widget\b/i',
-        '/\/FT\s*\/Sig\b/i',
-        '/adbe\.pkcs7/i',
-        '/ETSI\.CAdES/i',
-        '/DocuSign/i',
-        '/Adobe Acrobat Sign/i',
+    // Patrones que SOLO aparecen en PDFs con firma digital real. Descartados a
+    // propósito /AcroForm, /Widget, /Annots, /XObject, /Subtype /Image,
+    // /Subtype /Form y la heurística de tamaño — están presentes en cualquier
+    // PDF con formularios o imágenes y no demuestran nada sobre la firma.
+    $signaturePatterns = [
+        'sig_field'        => '/\/FT\s*\/Sig\b/i',   // Campo de formulario con tipo firma
+        'sig_dict'         => '/\/Sig\b/i',           // Diccionario Signature
+        'sig_flags'        => '/\/SigFlags\b/i',      // Bandera de AcroForm indicando firma
+        'pkcs7'            => '/adbe\.pkcs7/i',       // SubFilter Adobe PKCS#7
+        'cades'            => '/ETSI\.CAdES/i',       // SubFilter ETSI CAdES (firma española)
+        'docusign'         => '/DocuSign/i',
+        'adobe_sign'       => '/Adobe Acrobat Sign/i',
     ];
 
-    $mediumPatterns = [
-        '/\/Annots\b/i',
-        '/\/AP\b/i',
-        '/\/XObject\b/i',
-        '/\/Subtype\s*\/Image\b/i',
-        '/\/Subtype\s*\/Form\b/i',
-        '/\/SigFlags\b/i',
-    ];
-
-    $strongHits = 0;
-    foreach ($strongPatterns as $pattern) {
+    $matched = [];
+    foreach ($signaturePatterns as $name => $pattern) {
         if (preg_match($pattern, $uploaded)) {
-            $strongHits++;
+            $matched[] = $name;
         }
     }
 
-    $mediumHits = 0;
-    foreach ($mediumPatterns as $pattern) {
-        if (preg_match($pattern, $uploaded)) {
-            $mediumHits++;
-        }
-    }
-
-    $sizeDelta = 0;
-    $sizeReason = '';
-    if ($originalSize > 0) {
-        $sizeDelta = abs($uploadedSize - $originalSize);
-        $ratio = $sizeDelta / max($originalSize, 1);
-        if ($ratio >= 0.08) {
-            $sizeReason = sprintf('diferencia de tamaño %.1f%%', $ratio * 100);
-            $strongHits++;
-        } elseif ($ratio >= 0.035) {
-            $mediumHits++;
-        }
-    }
-
-    $hasIncrementalUpdate = false;
-    if ($original !== null && strlen($uploaded) > strlen($original)) {
-        $tail = substr($uploaded, max(0, strlen($uploaded) - 3000));
-        $hasIncrementalUpdate = stripos($tail, 'startxref') !== false;
-        if ($hasIncrementalUpdate) {
-            $mediumHits++;
-        }
-    }
-
-    $accepted = false;
-    $reasonParts = [];
-
-    if ($strongHits >= 1) {
-        $accepted = true;
-        $reasonParts[] = 'patrones fuertes detectados';
-    }
-
-    if ($accepted === false && $original !== null) {
-        if ($sizeDelta === 0 && $mediumHits <= 1 && !$hasIncrementalUpdate) {
-            return ['accepted' => false, 'reason' => 'sin diferencias con el original ni indicios claros'];
-        }
-
-        if ($sizeDelta >= 500 && ($mediumHits >= 1 || $hasIncrementalUpdate)) {
-            $accepted = true;
-            $reasonParts[] = 'tamano significativamente distinto';
-        }
-    }
-
-    if ($accepted === false && $mediumHits >= 2) {
-        $accepted = true;
-        $reasonParts[] = 'varias anotaciones detectadas';
-    }
-
-    if ($accepted === false) {
-        return ['accepted' => false, 'reason' => 'no se encontraron indicios suficientes de firma'];
-    }
-
-    if ($sizeReason !== '') {
-        $reasonParts[] = $sizeReason;
+    if (empty($matched)) {
+        return [
+            'accepted' => false,
+            'reason'   => 'el PDF no contiene marcadores de firma digital',
+        ];
     }
 
     return [
         'accepted' => true,
-        'reason' => implode(', ', array_filter($reasonParts)),
+        'reason'   => 'marcadores de firma detectados: ' . implode(', ', $matched),
     ];
 }

@@ -4,6 +4,8 @@ declare(strict_types=1);
 require_once dirname(__DIR__) . '/lib/env_loader.php';
 require_once dirname(__DIR__) . '/lib/notifications_helper.php';
 require_once dirname(__DIR__) . '/lib/audit.php';
+require_once dirname(__DIR__) . '/lib/email_layout.php';
+require_once dirname(__DIR__) . '/lib/error_reporting.php';
 
 loadEnv(dirname(__DIR__) . '/.env');
 
@@ -90,7 +92,7 @@ try {
         'user_id'    => $userRow ? (int) $userRow['id'] : null,
         'user_email' => $userEmail,
         'title'      => 'Solicitud rechazada',
-        'message'    => 'Tu solicitud para acceder como usuario real ha sido revisada y no ha sido aprobada en este momento. Puedes volver a solicitarla más adelante.',
+        'message'    => 'Tu solicitud para acceder como usuario Premium ha sido revisada y no ha sido aprobada en este momento. Puedes volver a solicitarla más adelante.',
         'type'       => 'warning',
         'link'       => '/profile',
     ]);
@@ -114,8 +116,9 @@ try {
         $pdoInmo->rollBack();
     }
 
+    $errorId = logAndReferenceError('reject_user.db', $e);
     http_response_code(500);
-    echo "<h1 style='color:red;font-family:sans-serif;'>Error de base de datos: " . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8') . "</h1>";
+    echo "<h1 style='color:red;font-family:sans-serif;'>Error interno. Referencia: " . htmlspecialchars($errorId, ENT_QUOTES, 'UTF-8') . "</h1>";
     exit;
 }
 
@@ -140,115 +143,44 @@ if ($autoloadPath === null) {
 
 require_once $autoloadPath;
 
-$subject = 'Solicitud de acceso como usuario real - Rechazada';
+$subject = 'Solicitud de acceso Premium - Rechazada';
 
-$body = <<<HTML
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Solicitud rechazada</title>
-</head>
-<body style="margin:0;padding:0;background-color:#f4f6f8;font-family:Arial,Helvetica,sans-serif;color:#1f2937;">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f4f6f8;margin:0;padding:0;">
-    <tr>
-      <td align="center" style="padding:32px 16px;">
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:640px;background-color:#ffffff;border-radius:18px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,0.08);">
-          
-          <tr>
-            <td style="background:linear-gradient(135deg,#0b3d91 0%,#123f7a 100%);padding:32px 36px;text-align:center;">
-              <div style="display:inline-block;background-color:rgba(255,255,255,0.12);color:#ffffff;font-size:12px;font-weight:bold;letter-spacing:0.08em;text-transform:uppercase;padding:8px 14px;border-radius:999px;">
-                Reglado Real Estate
-              </div>
-              <h1 style="margin:18px 0 8px 0;font-size:30px;line-height:1.2;color:#ffffff;font-weight:700;">
-                Solicitud revisada
-              </h1>
-              <p style="margin:0;font-size:15px;line-height:1.6;color:black;">
-                Resultado de su solicitud de acceso como usuario real
-              </p>
-            </td>
-          </tr>
+$panelUrl = htmlspecialchars(
+    rtrim((string) (getenv('FRONTEND_URL') ?: 'http://localhost:5175'), '/') . '/profile',
+    ENT_QUOTES,
+    'UTF-8'
+);
 
-          <tr>
-            <td style="padding:36px 36px 20px 36px;">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-                <tr>
-                  <td>
-                    <div style="display:inline-block;background-color:#fff4e5;color:#b45309;font-size:13px;font-weight:700;padding:8px 14px;border-radius:999px;margin-bottom:20px;">
-                      Solicitud no aprobada
-                    </div>
-
-                    <p style="margin:0 0 16px 0;font-size:16px;line-height:1.7;color:#374151;">
-                      <strong>Estimado/a,</strong>
-                    </p>
-
-                    <p style="margin:0 0 16px 0;font-size:16px;line-height:1.7;color:#374151;">
-                      Le agradecemos su interés en formar parte de nuestra plataforma como <strong>usuario real</strong>.
-                    </p>
-
-                    <p style="margin:0 0 16px 0;font-size:16px;line-height:1.7;color:#374151;">
-                      Tras revisar su solicitud, lamentamos informarle de que en este momento <strong>no ha sido posible aprobar su acceso</strong> bajo dicha condición.
-                    </p>
-
-                    <p style="margin:0 0 16px 0;font-size:16px;line-height:1.7;color:#374151;">
-                      Esta decisión responde a nuestros criterios internos de validación y control de perfiles dentro de la plataforma.
-                    </p>
-
-                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:24px 0;background-color:#f9fafb;border:1px solid #e5e7eb;border-radius:14px;">
-                      <tr>
-                        <td style="padding:20px 22px;">
-                          <p style="margin:0 0 10px 0;font-size:15px;line-height:1.6;color:#111827;font-weight:700;">
-                            Puede seguir utilizando su cuenta actual con normalidad
-                          </p>
-                          <p style="margin:0;font-size:15px;line-height:1.7;color:#4b5563;">
-                            Además, si lo desea, podrá volver a solicitar este acceso en el futuro.
-                          </p>
-                        </td>
-                      </tr>
-                    </table>
-
-                    <p style="margin:0 0 24px 0;font-size:16px;line-height:1.7;color:#374151;">
-                      Quedamos a su disposición para cualquier consulta adicional.
-                    </p>
-
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-
-          <tr>
-            <td style="padding:8px 36px 32px 36px;">
-              <div style="height:1px;background-color:#e5e7eb;margin-bottom:22px;"></div>
-              <p style="margin:0 0 6px 0;font-size:15px;line-height:1.6;color:#111827;font-weight:700;">
-                Atentamente,
-              </p>
-              <p style="margin:0;font-size:15px;line-height:1.6;color:#4b5563;">
-                <strong>Reglado Real Estate</strong><br>
-                realstate@regladoconsultores.com
-              </p>
-            </td>
-          </tr>
-
-          <tr>
-            <td style="background-color:#f9fafb;padding:18px 24px;text-align:center;border-top:1px solid #e5e7eb;">
-              <p style="margin:0;font-size:12px;line-height:1.6;color:#6b7280;">
-                Este correo ha sido enviado automáticamente desde la plataforma de Reglado Real Estate.
-              </p>
-            </td>
-          </tr>
-
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>
-HTML;
+$body = renderEmailLayout(
+    'Solicitud revisada',
+    'Resultado de su solicitud de acceso Premium',
+    <<<HTML
+<div style="display:inline-block;background-color:#fff4e5;color:#b45309;font-size:13px;font-weight:700;padding:8px 14px;border-radius:999px;margin-bottom:20px;">Solicitud no aprobada</div>
+<p style="margin:0 0 16px 0;"><strong>Estimado/a,</strong></p>
+<p style="margin:0 0 16px 0;">Le agradecemos su interés en formar parte de nuestra plataforma como <strong>usuario Premium</strong>.</p>
+<p style="margin:0 0 16px 0;">Tras revisar su solicitud, lamentamos informarle de que en este momento <strong>no ha sido posible aprobar su acceso</strong> bajo dicha condición.</p>
+<p style="margin:0 0 16px 0;">Esta decisión responde a nuestros criterios internos de validación y control de perfiles dentro de la plataforma.</p>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:24px 0;background-color:#f9fafb;border:1px solid #e5e7eb;border-radius:14px;">
+  <tr>
+    <td style="padding:20px 22px;">
+      <p style="margin:0 0 10px 0;font-size:15px;line-height:1.6;color:#111827;font-weight:700;">Puede seguir utilizando su cuenta actual con normalidad</p>
+      <p style="margin:0;font-size:15px;line-height:1.7;color:#4b5563;">Además, si lo desea, podrá volver a solicitar este acceso en el futuro.</p>
+    </td>
+  </tr>
+</table>
+<div style="text-align:center;margin:24px 0;">
+<a href="{$panelUrl}" target="_blank" rel="noopener" style="background:#0b3d91;color:#ffffff;padding:12px 24px;text-decoration:none;border-radius:8px;font-size:14px;font-weight:bold;display:inline-block;">Acceder a mi cuenta</a>
+</div>
+<p style="margin:0 0 24px 0;">Quedamos a su disposición para cualquier consulta adicional.</p>
+<div style="height:1px;background-color:#e5e7eb;margin:8px 0 22px;"></div>
+<p style="margin:0 0 6px 0;font-weight:700;color:#111827;">Atentamente,</p>
+<p style="margin:0;color:#4b5563;"><strong>Reglado Real Estate</strong><br>realstate@regladoconsultores.com</p>
+HTML
+);
 
 $altBody = trim(
     "Estimado/a,\n\n" .
-    "Le agradecemos su interés en formar parte de nuestra plataforma como usuario real.\n\n" .
+    "Le agradecemos su interés en formar parte de nuestra plataforma como usuario Premium.\n\n" .
     "Tras revisar su solicitud, lamentamos informarle de que en este momento no ha sido posible aprobar su acceso bajo dicha condición.\n\n" .
     "Esta decisión responde a nuestros criterios internos de validación y control de perfiles dentro de la plataforma.\n\n" .
     "Puede seguir utilizando su cuenta actual con normalidad y volver a solicitar este acceso en el futuro si lo desea.\n\n" .
@@ -287,6 +219,7 @@ try {
     echo "</div>";
 
 } catch (Throwable $e) {
+    $errorId = logAndReferenceError('reject_user.mail', $e);
     http_response_code(500);
-    echo "<h1 style='color:red;font-family:sans-serif;'>La solicitud se rechazó correctamente, pero falló el envío del correo: " . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8') . "</h1>";
+    echo "<h1 style='color:red;font-family:sans-serif;'>La solicitud se rechazó correctamente, pero falló el envío del correo. Referencia: " . htmlspecialchars($errorId, ENT_QUOTES, 'UTF-8') . "</h1>";
 }

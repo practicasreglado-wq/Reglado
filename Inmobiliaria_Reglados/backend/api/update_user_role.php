@@ -6,6 +6,9 @@ require_once dirname(__DIR__) . '/config/db.php';
 require_once dirname(__DIR__) . '/config/auth.php';
 require_once __DIR__ . '/../config/cors.php';
 require_once dirname(__DIR__) . '/lib/audit.php';
+require_once dirname(__DIR__) . '/lib/email_layout.php';
+require_once dirname(__DIR__) . '/lib/error_reporting.php';
+require_once dirname(__DIR__) . '/lib/notifications.php';
 require_once dirname(__DIR__) . '/send_mail.php';
 
 loadEnv(dirname(__DIR__) . '/.env');
@@ -27,10 +30,15 @@ if ($role !== 'admin') {
 $input = json_decode(file_get_contents('php://input') ?: '{}', true);
 $targetUserId = (int) ($input['user_id'] ?? 0);
 $newRole = strtolower(trim((string) ($input['role'] ?? '')));
+$adminPassword = (string) ($input['admin_password'] ?? '');
 
 $allowedRoles = ['user', 'real'];
 if ($targetUserId <= 0 || !in_array($newRole, $allowedRoles, true)) {
     respondJson(422, ['success' => false, 'message' => 'Datos inválidos. Solo se permite cambiar entre user y real.']);
+}
+
+if ($adminPassword === '') {
+    respondJson(422, ['success' => false, 'message' => 'Debes confirmar tu contraseña para cambiar el rol.']);
 }
 
 $host = (string) getenv('DB_HOST');
@@ -44,6 +52,58 @@ try {
         $dbUser, $dbPass,
         [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]
     );
+
+    $adminId = (int) ($auth['sub'] ?? 0);
+
+    $rateScope = 'admin_role_change_password';
+    $rateKeyHash = hash('sha256', $rateScope . '|' . $adminId);
+    $rateWindowSeconds = 900;
+    $rateMaxFailures = 5;
+
+    $rlStmt = $pdoAuth->prepare('SELECT id, attempts, updated_at FROM rate_limits WHERE key_hash = ? AND scope_name = ? LIMIT 1');
+    $rlStmt->execute([$rateKeyHash, $rateScope]);
+    $rlRow = $rlStmt->fetch();
+
+    if ($rlRow) {
+        $updatedAt = strtotime((string) $rlRow['updated_at']) ?: 0;
+        $withinWindow = $updatedAt >= time() - $rateWindowSeconds;
+        if ($withinWindow && (int) $rlRow['attempts'] >= $rateMaxFailures) {
+            auditLog($pdo, 'user.role_change_rate_limited', array_merge(
+                auditContextFromAuth($auth),
+                ['resource_type' => 'user', 'resource_id' => (string) $targetUserId]
+            ));
+            respondJson(429, ['success' => false, 'message' => 'Demasiados intentos fallidos. Espera unos minutos antes de volver a probar.']);
+        }
+    }
+
+    $adminStmt = $pdoAuth->prepare("SELECT password FROM users WHERE id = :id LIMIT 1");
+    $adminStmt->execute(['id' => $adminId]);
+    $adminRow = $adminStmt->fetch();
+
+    if (!$adminRow || !password_verify($adminPassword, (string) $adminRow['password'])) {
+        if (!$rlRow) {
+            $pdoAuth->prepare('INSERT INTO rate_limits(key_hash, scope_name, attempts, updated_at, created_at) VALUES(?, ?, 1, NOW(), NOW())')
+                    ->execute([$rateKeyHash, $rateScope]);
+        } else {
+            $updatedAt = strtotime((string) $rlRow['updated_at']) ?: 0;
+            if ($updatedAt < time() - $rateWindowSeconds) {
+                $pdoAuth->prepare('UPDATE rate_limits SET attempts = 1, updated_at = NOW() WHERE id = ?')
+                        ->execute([(int) $rlRow['id']]);
+            } else {
+                $pdoAuth->prepare('UPDATE rate_limits SET attempts = attempts + 1, updated_at = NOW() WHERE id = ?')
+                        ->execute([(int) $rlRow['id']]);
+            }
+        }
+
+        auditLog($pdo, 'user.role_change_auth_failed', array_merge(
+            auditContextFromAuth($auth),
+            ['resource_type' => 'user', 'resource_id' => (string) $targetUserId]
+        ));
+        respondJson(401, ['success' => false, 'message' => 'Contraseña incorrecta.']);
+    }
+
+    $pdoAuth->prepare('DELETE FROM rate_limits WHERE key_hash = ? AND scope_name = ?')
+            ->execute([$rateKeyHash, $rateScope]);
 
     $userStmt = $pdoAuth->prepare("SELECT id, email, role, first_name FROM users WHERE id = :id LIMIT 1");
     $userStmt->execute(['id' => $targetUserId]);
@@ -66,31 +126,42 @@ try {
     $updateStmt = $pdoAuth->prepare("UPDATE users SET role = :role WHERE id = :id");
     $updateStmt->execute(['role' => $newRole, 'id' => $targetUserId]);
 
-    $invalidateStmt = $pdo->prepare("
-        INSERT INTO user_inmo_status (user_id, last_token_invalidated_at, updated_by)
-        VALUES (:uid, NOW(), :updater)
-        ON DUPLICATE KEY UPDATE last_token_invalidated_at = NOW(), updated_by = :updater
-    ");
-    $invalidateStmt->execute([
-        'uid' => $targetUserId,
-        'updater' => (int) ($auth['sub'] ?? 0),
-    ]);
+    try {
+        createNotification($pdo, $targetUserId, [
+            'title'   => $newRole === 'real' ? 'Has sido promocionado a Usuario Premium' : 'Tu rol ha cambiado',
+            'message' => $newRole === 'real'
+                ? 'Tu rol en Reglado Real Estate ha sido actualizado a Usuario Premium. Deberás volver a iniciar sesión para que los cambios surtan efecto.'
+                : 'Tu rol en Reglado Real Estate ha sido actualizado a Usuario estándar. Deberás volver a iniciar sesión para que los cambios surtan efecto.',
+            'type'    => $newRole === 'real' ? 'role_promotion' : 'role_demotion',
+        ]);
+    } catch (Throwable $e) {
+        error_log('[update_user_role] notification falló: ' . $e->getMessage());
+    }
+
+    if ($newRole === 'user') {
+        try {
+            $pdo->prepare('DELETE FROM user_match_preferences WHERE user_id = :uid')
+                ->execute(['uid' => $targetUserId]);
+        } catch (Throwable $e) {
+            error_log('[update_user_role] delete user_match_preferences falló: ' . $e->getMessage());
+        }
+
+        try {
+            $pdo->prepare('DELETE FROM search_history WHERE user_id = :uid')
+                ->execute(['uid' => $targetUserId]);
+        } catch (Throwable $e) {
+            error_log('[update_user_role] delete search_history falló: ' . $e->getMessage());
+        }
+    }
 
     if (filter_var($targetUser['email'], FILTER_VALIDATE_EMAIL)) {
-        $newRoleLabel = $newRole === 'real' ? 'Usuario Real' : 'Usuario estándar';
-        $emailBody = '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"></head>
-<body style="margin:0;padding:0;background:#f4f6f8;font-family:Arial,sans-serif;color:#1f2937;">
-<table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6f8;padding:30px 0;"><tr><td align="center">
-<table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,0.08);">
-<tr><td style="background:linear-gradient(135deg,#0b3d91,#123f7a);padding:30px;text-align:center;color:#fff;">
-<h2 style="margin:0;font-size:22px;">Tu rol ha cambiado</h2>
-</td></tr>
-<tr><td style="padding:30px;">
-<p style="font-size:15px;line-height:1.7;">Tu rol en Reglado Real Estate ha sido actualizado a: <strong>' . htmlspecialchars($newRoleLabel) . '</strong>.</p>
-<p style="font-size:15px;line-height:1.7;">Por seguridad, deberás volver a iniciar sesión para que los cambios surtan efecto.</p>
-</td></tr>
-<tr><td style="padding:18px;text-align:center;font-size:12px;color:#9ca3af;border-top:1px solid #e5e7eb;">Reglado Real Estate</td></tr>
-</table></td></tr></table></body></html>';
+        $newRoleLabel = $newRole === 'real' ? 'Usuario Premium' : 'Usuario estándar';
+        $emailBody = renderEmailLayout(
+            'Tu rol ha cambiado',
+            'Tu perfil en Reglado Real Estate ha sido actualizado',
+            '<p style="margin:0 0 16px;">Tu rol en Reglado Real Estate ha sido actualizado a: <strong>' . htmlspecialchars($newRoleLabel) . '</strong>.</p>
+<p style="margin:0;">Por seguridad, deberás volver a iniciar sesión para que los cambios surtan efecto.</p>'
+        );
 
         try {
             sendNotificationEmail($targetUser['email'], 'Tu rol en Reglado Real Estate ha cambiado', $emailBody);
@@ -111,5 +182,9 @@ try {
     respondJson(200, ['success' => true, 'message' => 'Rol actualizado correctamente.', 'changed' => true]);
 
 } catch (Throwable $e) {
-    respondJson(500, ['success' => false, 'message' => 'Error al actualizar el rol: ' . $e->getMessage()]);
+    $errorId = logAndReferenceError('update_user_role', $e);
+    respondJson(500, [
+        'success' => false,
+        'message' => 'Error al actualizar el rol. Referencia: ' . $errorId,
+    ]);
 }

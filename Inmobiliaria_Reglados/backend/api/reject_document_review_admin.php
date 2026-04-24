@@ -9,6 +9,9 @@ require_once dirname(__DIR__) . '/lib/document_access.php';
 require_once dirname(__DIR__) . '/lib/document_review.php';
 require_once dirname(__DIR__) . '/lib/notifications.php';
 require_once dirname(__DIR__) . '/lib/audit.php';
+require_once dirname(__DIR__) . '/lib/email_layout.php';
+require_once dirname(__DIR__) . '/lib/error_reporting.php';
+require_once dirname(__DIR__) . '/lib/admin_password_check.php';
 require_once dirname(__DIR__) . '/send_mail.php';
 
 loadEnv(dirname(__DIR__) . '/.env');
@@ -30,10 +33,17 @@ if ($role !== 'admin') {
 
 $input = json_decode(file_get_contents('php://input') ?: '{}', true);
 $reviewId = (int) ($input['review_id'] ?? 0);
+$adminPassword = (string) ($input['admin_password'] ?? '');
 
 if ($reviewId <= 0) {
     respondJson(422, ['success' => false, 'message' => 'ID de revisión no válido.']);
 }
+
+requireAdminPasswordConfirmation(
+    (int) ($auth['sub'] ?? 0),
+    $adminPassword,
+    'admin_document_reject'
+);
 
 if ($pdo instanceof PDO) {
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -111,40 +121,18 @@ try {
     $pdo->commit();
 
     if ($buyerEmail && filter_var($buyerEmail, FILTER_VALIDATE_EMAIL)) {
-        $emailBody = <<<'HTML'
-<!DOCTYPE html>
-<html lang="es">
-<head><meta charset="UTF-8"><title>Documentación rechazada</title></head>
-<body style="margin:0;padding:0;background-color:#f3f4f6;font-family:Arial, sans-serif;">
-<table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f3f4f6;padding:30px 0;">
-<tr><td align="center">
-<table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.1);">
-<tr><td style="background:linear-gradient(135deg,#2563eb,#1e40af);padding:20px 24px;text-align:center;color:#ffffff;">
-<h2 style="margin:0;font-size:22px;line-height:1.3;font-weight:700;">Reglado Real Estate</h2>
-</td></tr>
-<tr><td style="padding:30px;color:#111827;">
-<h3 style="margin-top:0;color:#b91c1c;">Documentación rechazada</h3>
-<p style="font-size:15px;line-height:1.6;margin-bottom:16px;">
-Tu documentación ha sido <strong>rechazada</strong>.
-</p>
-<p style="font-size:15px;line-height:1.6;margin-bottom:20px;">
-Por favor, revisa los documentos enviados y vuelve a subirlos desde tu panel.
-</p>
+        $emailBody = renderEmailLayout(
+            'Documentación rechazada',
+            'La revisión administrativa no ha superado la validación',
+            <<<'HTML'
+<h3 style="margin:0 0 16px;color:#b91c1c;font-size:18px;">Documentación rechazada</h3>
+<p style="margin:0 0 16px;">Tu documentación ha sido <strong>rechazada</strong>.</p>
+<p style="margin:0 0 20px;">Por favor, revisa los documentos enviados y vuelve a subirlos desde tu panel.</p>
 <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:16px;margin-bottom:24px;">
-<p style="margin:0;color:#991b1b;font-size:14px;">
-✖ La documentación no ha superado la validación administrativa
-</p>
+<p style="margin:0;color:#991b1b;font-size:14px;">✖ La documentación no ha superado la validación administrativa</p>
 </div>
-</td></tr>
-<tr><td style="padding:20px;text-align:center;font-size:12px;color:#9ca3af;border-top:1px solid #e5e7eb;">
-Reglado Real Estate · Sistema automatizado de inversión inmobiliaria
-</td></tr>
-</table>
-</td></tr>
-</table>
-</body>
-</html>
-HTML;
+HTML
+        );
 
         try {
             sendNotificationEmail($buyerEmail, 'Documentación rechazada', $emailBody);
@@ -166,5 +154,9 @@ HTML;
 
 } catch (Throwable $e) {
     if ($pdo->inTransaction()) $pdo->rollBack();
-    respondJson(500, ['success' => false, 'message' => 'Error al rechazar: ' . $e->getMessage()]);
+    $errorId = logAndReferenceError('reject_document_review_admin', $e);
+    respondJson(500, [
+        'success' => false,
+        'message' => 'Error al rechazar. Referencia: ' . $errorId,
+    ]);
 }

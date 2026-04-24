@@ -5,6 +5,7 @@ require_once dirname(__DIR__) . '/config/db.php';
 require_once dirname(__DIR__) . '/config/auth.php';
 require_once __DIR__ . '/../config/cors.php';
 require_once dirname(__DIR__) . '/lib/audit.php';
+require_once dirname(__DIR__) . '/lib/error_reporting.php';
 
 applyCors();
 handlePreflight();
@@ -42,8 +43,9 @@ try {
         'requests' => $rows,
     ]);
 } catch (Throwable $e) {
+    $errorId = logAndReferenceError('get_pending_requests', $e);
     respondJson(500, [
         'success' => false,
-        'message' => 'Error al consultar las solicitudes: ' . $e->getMessage()
+        'message' => 'Error al consultar las solicitudes. Referencia: ' . $errorId,
     ]);
 }

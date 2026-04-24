@@ -4,6 +4,7 @@ declare(strict_types=1);
 require_once dirname(__DIR__) . '/config/db.php';
 require_once dirname(__DIR__) . '/lib/notifications.php';
 require_once dirname(__DIR__) . '/lib/env_loader.php';
+require_once dirname(__DIR__) . '/lib/email_layout.php';
 require_once dirname(__DIR__) . '/send_mail.php';
 
 loadEnv(dirname(__DIR__) . '/.env');
@@ -13,7 +14,9 @@ function logExpiredTokenJob(string $message, array $context = []): void
     $logsDir = dirname(__DIR__) . '/logs';
 
     if (!is_dir($logsDir)) {
-        @mkdir($logsDir, 0777, true);
+        if (@mkdir($logsDir, 0750, true)) {
+            @chmod($logsDir, 0750);
+        }
     }
 
     $line = '[' . date('Y-m-d H:i:s') . '] ' . $message;
@@ -108,32 +111,23 @@ try {
 
                 $subject = 'El enlace para enviar tu documentación ha expirado';
 
-                $body = '
-                <div style="margin:0;padding:24px;background:#f5f7fa;font-family:Arial,sans-serif;color:#1f2937;">
-                    <div style="max-width:640px;margin:0 auto;background:#ffffff;border:1px solid #d9e2ec;border-radius:8px;overflow:hidden;">
-                        <div style="background:linear-gradient(135deg,#2563eb,#1e40af);padding:20px;text-align:center;color:#ffffff;">
-                            <h2 style="margin:0;font-size:22px;">Reglado Real Estate</h2>
-                        </div>
+                $panelUrl = htmlspecialchars(
+                    rtrim((string) (getenv('FRONTEND_URL') ?: 'http://localhost:5175'), '/') . '/profile/properties-for-sale',
+                    ENT_QUOTES,
+                    'UTF-8'
+                );
 
-                        <div style="padding:32px 24px;">
-                            <p style="margin:0 0 16px;font-size:15px;line-height:1.6;">
-                                Hola ' . htmlspecialchars($displayName, ENT_QUOTES, 'UTF-8') . ',
-                            </p>
-
-                            <p style="margin:0 0 16px;font-size:15px;line-height:1.6;">
-                                El enlace habilitado para aprobar la documentación de ' . htmlspecialchars($propertyLabel, ENT_QUOTES, 'UTF-8') . ' ha expirado.
-                            </p>
-
-                            <p style="margin:0 0 16px;font-size:15px;line-height:1.6;">
-                                Para continuar con el proceso, debes volver a acceder a la plataforma y repetir el envío de los archivos firmados.
-                            </p>
-
-                            <p style="margin:0;font-size:15px;line-height:1.6;">
-                                Si necesitas ayuda, contacta con nuestro equipo.
-                            </p>
-                        </div>
-                    </div>
-                </div>';
+                $body = renderEmailLayout(
+                    'Enlace de firma expirado',
+                    'El plazo para subir los archivos firmados ha terminado',
+                    '<p style="margin:0 0 16px;">Hola ' . htmlspecialchars($displayName, ENT_QUOTES, 'UTF-8') . ',</p>' .
+                    '<p style="margin:0 0 16px;">El enlace habilitado para aprobar la documentación de ' . htmlspecialchars($propertyLabel, ENT_QUOTES, 'UTF-8') . ' ha expirado.</p>' .
+                    '<p style="margin:0 0 16px;">Para continuar con el proceso, debes volver a acceder a la plataforma y repetir el envío de los archivos firmados.</p>' .
+                    '<div style="text-align:center;margin:24px 0;">' .
+                    '<a href="' . $panelUrl . '" target="_blank" rel="noopener" style="background:#0b3d91;color:#ffffff;padding:12px 24px;text-decoration:none;border-radius:8px;font-size:14px;font-weight:bold;display:inline-block;">Volver a la plataforma</a>' .
+                    '</div>' .
+                    '<p style="margin:0;">Si necesitas ayuda, contacta con nuestro equipo.</p>'
+                );
 
                 sendNotificationEmail($email, $subject, $body);
 

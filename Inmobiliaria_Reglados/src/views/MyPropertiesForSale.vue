@@ -50,12 +50,29 @@
       @click.self="closeDeleteModal"
     >
       <div class="delete-modal">
-        <p class="delete-modal__eyebrow">Confirmación</p>
-        <h3>¿Eliminar propiedad?</h3>
+        <p class="delete-modal__eyebrow">Solicitud de eliminación</p>
+        <h3>¿Solicitar eliminación?</h3>
         <p class="delete-modal__text">
-          Vas a eliminar
+          Vas a solicitar la eliminación de
           <strong>{{ propertyToDelete.titulo || propertyToDelete.tipo_propiedad || "esta propiedad" }}</strong>.
-          Esta acción no se puede deshacer.
+          Un administrador la revisará y decidirá si aprobar o rechazar la
+          petición. Recibirás el resultado por correo y en tus notificaciones.
+        </p>
+
+        <label class="delete-modal__reason-label">
+          Motivo (opcional)
+          <textarea
+            v-model="deletionReason"
+            class="delete-modal__reason"
+            rows="3"
+            maxlength="1000"
+            placeholder="Indícale al admin por qué quieres eliminarla..."
+            :disabled="deletingPropertyId === propertyToDelete.id"
+          ></textarea>
+        </label>
+
+        <p v-if="deletionFeedback" class="delete-modal__feedback" :class="{ 'is-error': deletionFeedbackIsError }">
+          {{ deletionFeedback }}
         </p>
 
         <div class="delete-modal__actions">
@@ -72,7 +89,7 @@
             :disabled="deletingPropertyId === propertyToDelete.id"
             @click="confirmDelete"
           >
-            {{ deletingPropertyId === propertyToDelete.id ? "Eliminando..." : "Sí, eliminar" }}
+            {{ deletingPropertyId === propertyToDelete.id ? "Enviando..." : "Enviar solicitud" }}
           </button>
         </div>
       </div>
@@ -88,7 +105,7 @@ import {
   fetchUserPropertiesForSale,
   removeFavorite,
   saveFavorite,
-  deleteUserProperty,
+  requestUserPropertyDeletion,
 } from "../services/properties";
 
 export default {
@@ -106,6 +123,9 @@ export default {
       showDeleteModal: false,
       propertyToDelete: null,
       deletingPropertyId: null,
+      deletionReason: "",
+      deletionFeedback: "",
+      deletionFeedbackIsError: false,
     };
   },
 
@@ -169,6 +189,9 @@ export default {
 
       this.showDeleteModal = false;
       this.propertyToDelete = null;
+      this.deletionReason = "";
+      this.deletionFeedback = "";
+      this.deletionFeedbackIsError = false;
     },
 
     async confirmDelete() {
@@ -178,22 +201,25 @@ export default {
 
       const propertyId = this.propertyToDelete.id;
       this.deletingPropertyId = propertyId;
+      this.deletionFeedback = "";
+      this.deletionFeedbackIsError = false;
 
       try {
-        await deleteUserProperty(propertyId);
+        await requestUserPropertyDeletion(propertyId, this.deletionReason);
 
-        this.properties = this.properties.filter(
-          (property) => property.id !== propertyId
-        );
-
+        this.deletionFeedback =
+          "Solicitud enviada. Un administrador la revisará en breve y recibirás el resultado por email y notificación.";
+        this.deletionFeedbackIsError = false;
         this.deletingPropertyId = null;
-        this.closeDeleteModal(true);
+
+        setTimeout(() => {
+          this.closeDeleteModal(true);
+        }, 2200);
       } catch (error) {
-        console.error("Error eliminando propiedad:", error);
-        alert(
-          error?.message ||
-          "No se pudo eliminar la propiedad. Inténtalo de nuevo."
-        );
+        console.error("Error solicitando eliminación:", error);
+        this.deletionFeedback =
+          error?.message || "No se pudo enviar la solicitud. Inténtalo de nuevo.";
+        this.deletionFeedbackIsError = true;
         this.deletingPropertyId = null;
       }
     },
@@ -370,6 +396,50 @@ export default {
   margin: 0;
   line-height: 1.6;
   color: #475569;
+}
+
+.delete-modal__reason-label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.delete-modal__reason {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  font: inherit;
+  color: #0f172a;
+  resize: vertical;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.delete-modal__reason:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.delete-modal__feedback {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #ecfdf5;
+  border: 1px solid #86efac;
+  color: #15803d;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.delete-modal__feedback.is-error {
+  background: #fef2f2;
+  border-color: #fca5a5;
+  color: #b91c1c;
 }
 
 .delete-modal__actions {

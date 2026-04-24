@@ -4,6 +4,7 @@ declare(strict_types=1);
 require_once dirname(__DIR__) . '/config/db.php';
 require_once dirname(__DIR__) . '/config/auth.php';
 require_once __DIR__ . '/../config/cors.php';
+require_once dirname(__DIR__) . '/lib/error_reporting.php';
 
 applyCors();
 handlePreflight();
@@ -95,8 +96,9 @@ try {
         'entries'  => $rows,
     ]);
 } catch (Throwable $e) {
+    $errorId = logAndReferenceError('get_audit_log', $e);
     respondJson(500, [
         'success' => false,
-        'message' => 'Error al consultar el log de auditoría: ' . $e->getMessage()
+        'message' => 'Error al consultar el log de auditoría. Referencia: ' . $errorId,
     ]);
 }

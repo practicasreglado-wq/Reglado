@@ -7,6 +7,9 @@ require_once dirname(__DIR__) . '/config/auth.php';
 require_once __DIR__ . '/../config/cors.php';
 require_once dirname(__DIR__) . '/lib/notifications_helper.php';
 require_once dirname(__DIR__) . '/lib/audit.php';
+require_once dirname(__DIR__) . '/lib/email_layout.php';
+require_once dirname(__DIR__) . '/lib/error_reporting.php';
+require_once dirname(__DIR__) . '/lib/admin_password_check.php';
 require_once dirname(__DIR__) . '/send_mail.php';
 
 loadEnv(dirname(__DIR__) . '/.env');
@@ -28,10 +31,17 @@ if ($role !== 'admin') {
 
 $input = json_decode(file_get_contents('php://input') ?: '{}', true);
 $requestId = (int) ($input['request_id'] ?? 0);
+$adminPassword = (string) ($input['admin_password'] ?? '');
 
 if ($requestId <= 0) {
     respondJson(422, ['success' => false, 'message' => 'ID de solicitud no válido.']);
 }
+
+requireAdminPasswordConfirmation(
+    (int) ($auth['sub'] ?? 0),
+    $adminPassword,
+    'admin_role_reject'
+);
 
 $host = (string) getenv('DB_HOST');
 $port = (string) getenv('DB_PORT');
@@ -78,7 +88,7 @@ try {
         'user_id'    => $userRow ? (int) $userRow['id'] : null,
         'user_email' => $email,
         'title'      => 'Solicitud rechazada',
-        'message'    => 'Tu solicitud para acceder como usuario real ha sido revisada y no ha sido aprobada en este momento. Puedes volver a solicitarla más adelante.',
+        'message'    => 'Tu solicitud para acceder como usuario Premium ha sido revisada y no ha sido aprobada en este momento. Puedes volver a solicitarla más adelante.',
         'type'       => 'warning',
         'link'       => '/profile',
     ]);
@@ -86,46 +96,29 @@ try {
     $pdo->commit();
 
     if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $emailBody = <<<'HTML'
-<!DOCTYPE html>
-<html lang="es">
-<head><meta charset="UTF-8"><title>Solicitud rechazada</title></head>
-<body style="margin:0;padding:0;background-color:#f4f6f8;font-family:Arial,sans-serif;color:#1f2937;">
-<table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f8;padding:30px 0;">
-<tr><td align="center">
-<table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,0.08);">
-<tr><td style="background:linear-gradient(135deg,#0b3d91,#123f7a);padding:30px;text-align:center;color:#ffffff;">
-<h2 style="margin:0;font-size:24px;font-weight:700;">Solicitud revisada</h2>
-<p style="margin:10px 0 0;font-size:14px;color:rgba(255,255,255,0.85);">Resultado de su solicitud de acceso</p>
-</td></tr>
-<tr><td style="padding:32px;color:#374151;">
-<div style="display:inline-block;background:#fef2f2;color:#b91c1c;font-size:13px;font-weight:700;padding:8px 14px;border-radius:999px;margin-bottom:20px;">
-Solicitud no aprobada
-</div>
-<p style="font-size:15px;line-height:1.7;margin:0 0 16px;">
-Le informamos que su solicitud para acceder como <strong>usuario real</strong> ha sido revisada y <strong>no ha sido aprobada</strong> en este momento.
-</p>
-<p style="font-size:15px;line-height:1.7;margin:0 0 16px;">
-Puede volver a enviar la solicitud más adelante si lo considera necesario.
-</p>
+        $panelUrl = htmlspecialchars(
+            rtrim((string) (getenv('FRONTEND_URL') ?: 'http://localhost:5175'), '/') . '/profile',
+            ENT_QUOTES,
+            'UTF-8'
+        );
+        $emailBody = renderEmailLayout(
+            'Solicitud revisada',
+            'Resultado de su solicitud de acceso',
+            <<<HTML
+<div style="display:inline-block;background:#fef2f2;color:#b91c1c;font-size:13px;font-weight:700;padding:8px 14px;border-radius:999px;margin-bottom:20px;">Solicitud no aprobada</div>
+<p style="margin:0 0 16px;">Le informamos que su solicitud para acceder como <strong>usuario Premium</strong> ha sido revisada y <strong>no ha sido aprobada</strong> en este momento.</p>
+<p style="margin:0 0 16px;">Puede volver a enviar la solicitud más adelante si lo considera necesario.</p>
 <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:18px;margin:20px 0;">
-<p style="margin:0;font-size:14px;color:#4b5563;line-height:1.6;">
-Si necesita más información o desea realizar cualquier consulta, nuestro equipo estará encantado de atenderle.
-</p>
+<p style="margin:0;font-size:14px;color:#4b5563;line-height:1.6;">Si necesita más información o desea realizar cualquier consulta, nuestro equipo estará encantado de atenderle.</p>
 </div>
-</td></tr>
-<tr><td style="padding:18px;text-align:center;font-size:12px;color:#9ca3af;border-top:1px solid #e5e7eb;">
-Reglado Real Estate
-</td></tr>
-</table>
-</td></tr>
-</table>
-</body>
-</html>
-HTML;
+<div style="text-align:center;margin:24px 0;">
+<a href="{$panelUrl}" target="_blank" rel="noopener" style="background:#0b3d91;color:#ffffff;padding:12px 24px;text-decoration:none;border-radius:8px;font-size:14px;font-weight:bold;display:inline-block;">Acceder a mi cuenta</a>
+</div>
+HTML
+        );
 
         try {
-            sendNotificationEmail($email, 'Solicitud de acceso como usuario real - Revisada', $emailBody);
+            sendNotificationEmail($email, 'Solicitud de acceso Premium - Revisada', $emailBody);
         } catch (Throwable $emailEx) {
             error_log('[reject_pending_request] email falló: ' . $emailEx->getMessage());
         }
@@ -144,5 +137,9 @@ HTML;
 
 } catch (Throwable $e) {
     if ($pdo->inTransaction()) $pdo->rollBack();
-    respondJson(500, ['success' => false, 'message' => 'Error al rechazar la solicitud: ' . $e->getMessage()]);
+    $errorId = logAndReferenceError('reject_pending_request', $e);
+    respondJson(500, [
+        'success' => false,
+        'message' => 'Error al rechazar la solicitud. Referencia: ' . $errorId,
+    ]);
 }

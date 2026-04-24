@@ -30,15 +30,26 @@ function sanitizeMatchPreferenceAnswers($rawAnswers): array
         return [];
     }
 
+    // Topes anti-abuso: el formulario real tiene ~5-15 preguntas con respuestas
+    // cortas. Estos límites descartan payloads anómalos sin afectar al uso
+    // legítimo.
+    $MAX_KEYS = 50;
+    $MAX_VALUE_LENGTH = 500;
+    $MAX_KEY_LENGTH = 100;
+
     $cleaned = [];
 
     foreach ($rawAnswers as $key => $value) {
+        if (count($cleaned) >= $MAX_KEYS) {
+            break;
+        }
+
         if (!is_string($key)) {
             continue;
         }
 
         $normalizedKey = trim($key);
-        if ($normalizedKey === "") {
+        if ($normalizedKey === "" || mb_strlen($normalizedKey) > $MAX_KEY_LENGTH) {
             continue;
         }
 
@@ -54,6 +65,10 @@ function sanitizeMatchPreferenceAnswers($rawAnswers): array
 
         if ($cleanedValue === null || $cleanedValue === "") {
             continue;
+        }
+
+        if (mb_strlen($cleanedValue) > $MAX_VALUE_LENGTH) {
+            $cleanedValue = mb_substr($cleanedValue, 0, $MAX_VALUE_LENGTH);
         }
 
         $cleaned[$normalizedKey] = $cleanedValue;

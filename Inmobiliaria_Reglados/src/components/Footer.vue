@@ -35,7 +35,7 @@
         <div class="footer-pill">Contacto</div>
         <div class="footer-contact-info">
           <div><strong>Tel:</strong> +34 911 462 674 / 615 641 081</div>
-          <div><strong>Email:</strong> info@regladoconsultores.com</div>
+          <div><strong>Email:</strong> realstate@regladoconsultores.com</div>
         </div>
       </div>
     </div>

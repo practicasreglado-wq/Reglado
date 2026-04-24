@@ -1,0 +1,25 @@
+{
+  "files.exclude": {
+    "**/vendor": true,
+    "**/node_modules": true,
+    "**/.phpunit.cache": true
+  },
+  "search.exclude": {
+    "**/vendor": true,
+    "**/node_modules": true,
+    "**/.phpunit.cache": true,
+    "**/dist": true
+  },
+  "files.watcherExclude": {
+    "**/vendor/**": true,
+    "**/node_modules/**": true,
+    "**/.phpunit.cache/**": true
+  },
+  "php.validate.enable": true,
+  "php.suggest.basic": false,
+  "intelephense.files.exclude": [
+    "**/vendor/**",
+    "**/node_modules/**",
+    "**/.phpunit.cache/**"
+  ]
+}

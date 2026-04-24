@@ -13,6 +13,7 @@ require_once __DIR__ . '/../lib/pdf_signature.php';
 require_once __DIR__ . '/../lib/document_access.php';
 require_once __DIR__ . '/../lib/document_review.php';
 require_once __DIR__ . '/../lib/audit.php';
+require_once __DIR__ . '/../lib/error_reporting.php';
 require_once __DIR__ . '/../send_mail.php';
 
 loadEnv(__DIR__ . '/../.env');
@@ -93,6 +94,58 @@ if ($buyerUserId <= 0 || $propertyId <= 0) {
     ]);
 }
 
+// Rate limit por usuario: máximo 10 subidas por hora. Reutiliza la tabla
+// regladousers.rate_limits que ya usan el login y otros endpoints sensibles.
+try {
+    $rlPdo = new PDO(
+        sprintf(
+            'mysql:host=%s;port=%s;dbname=regladousers;charset=utf8mb4',
+            (string) getenv('DB_HOST'),
+            (string) getenv('DB_PORT')
+        ),
+        (string) getenv('DB_USER'),
+        (string) getenv('DB_PASS'),
+        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]
+    );
+
+    $rateScope = 'upload_signed_docs';
+    $rateKeyHash = hash('sha256', $rateScope . '|' . $buyerUserId);
+    $rateWindowSeconds = 3600;
+    $rateMaxAttempts = 10;
+
+    $rlRead = $rlPdo->prepare('SELECT id, attempts, updated_at FROM rate_limits WHERE key_hash = ? AND scope_name = ? LIMIT 1');
+    $rlRead->execute([$rateKeyHash, $rateScope]);
+    $rlRow = $rlRead->fetch();
+
+    $nowTs = time();
+    $withinWindow = $rlRow && (strtotime((string) $rlRow['updated_at']) ?: 0) >= $nowTs - $rateWindowSeconds;
+
+    if ($withinWindow && (int) $rlRow['attempts'] >= $rateMaxAttempts) {
+        respondJson(429, [
+            'success' => false,
+            'message' => 'Has alcanzado el límite de subidas. Intenta de nuevo en una hora.',
+        ]);
+    }
+
+    // Registra el intento antes del trabajo pesado: cada request cuenta, sea
+    // válido o no, para que un atacante que mande PDFs inválidos no pueda
+    // saltarse el tope.
+    if (!$rlRow) {
+        $rlPdo->prepare('INSERT INTO rate_limits(key_hash, scope_name, attempts, updated_at, created_at) VALUES(?, ?, 1, NOW(), NOW())')
+              ->execute([$rateKeyHash, $rateScope]);
+    } elseif (!$withinWindow) {
+        $rlPdo->prepare('UPDATE rate_limits SET attempts = 1, updated_at = NOW() WHERE id = ?')
+              ->execute([(int) $rlRow['id']]);
+    } else {
+        $rlPdo->prepare('UPDATE rate_limits SET attempts = attempts + 1, updated_at = NOW() WHERE id = ?')
+              ->execute([(int) $rlRow['id']]);
+    }
+} catch (Throwable $e) {
+    // Si la BD del rate limiter no responde, seguimos adelante (fail-open):
+    // el endpoint ya exige JWT válido, así que el riesgo es acotado.
+    uploadLog('Rate limit check falló', ['error' => $e->getMessage()]);
+}
+
 $requiredFiles = [
     'nda' => 'signed_nda',
     'loi' => 'signed_loi',
@@ -143,7 +196,14 @@ if (!$property) {
 $uploadDir = dirname(__DIR__) . '/uploads/signed_docs';
 
 if (!is_dir($uploadDir)) {
-    $created = mkdir($uploadDir, 0775, true);
+    // 0750: solo el usuario de PHP escribe; el grupo solo puede listar
+    // (útil para procesos de backup que corren como otro usuario del mismo
+    // grupo); el resto no tiene acceso. Se aplica chmod() explícito porque
+    // mkdir() respeta el umask del sistema y podría relajar los permisos.
+    $created = mkdir($uploadDir, 0750, true);
+    if ($created) {
+        @chmod($uploadDir, 0750);
+    }
     uploadLog('Creando directorio signed_docs', [
         'uploadDir' => $uploadDir,
         'created' => $created,
@@ -177,9 +237,43 @@ try {
             throw new RuntimeException(sprintf('Error subiendo el documento %s.', strtoupper($type)));
         }
 
+        // Tope de tamaño a nivel de app (además del upload_max_filesize del PHP).
+        // Un NDA/LOI firmado legítimo rara vez pasa de 2-3 MB; 20 MB es holgado
+        // y cierra el vector de DoS por disco lleno.
+        $MAX_UPLOAD_BYTES = 20 * 1024 * 1024;
+        if ((int) ($file['size'] ?? 0) > $MAX_UPLOAD_BYTES) {
+            throw new RuntimeException(sprintf(
+                'El %s supera el tamaño máximo permitido (20 MB).',
+                strtoupper($type)
+            ));
+        }
+
         $extension = strtolower(pathinfo((string) $file['name'], PATHINFO_EXTENSION));
         if ($extension !== 'pdf') {
             throw new RuntimeException('Solo se permiten archivos PDF.');
+        }
+
+        // Validación por contenido: la extensión la controla el cliente y es
+        // trivial de falsear, así que confirmamos que el archivo es realmente
+        // un PDF leyendo sus primeros bytes (todo PDF legítimo empieza con
+        // "%PDF-") y, si está disponible, contrastando el MIME con libmagic.
+        $tmpPath = (string) $file['tmp_name'];
+
+        $handle = @fopen($tmpPath, 'rb');
+        $magicBytes = $handle ? (string) fread($handle, 5) : '';
+        if ($handle) {
+            fclose($handle);
+        }
+        if ($magicBytes !== '%PDF-') {
+            throw new RuntimeException('El archivo no es un PDF válido.');
+        }
+
+        if (class_exists('finfo')) {
+            $finfo = new finfo(FILEINFO_MIME_TYPE);
+            $detectedMime = (string) $finfo->file($tmpPath);
+            if ($detectedMime !== 'application/pdf') {
+                throw new RuntimeException('El archivo no es un PDF válido.');
+            }
         }
 
         $cleanName = preg_replace('/[^a-zA-Z0-9._-]/', '_', (string) $file['name']);
@@ -196,6 +290,11 @@ try {
         if (!move_uploaded_file((string) $file['tmp_name'], $targetPath)) {
             throw new RuntimeException('No se pudo guardar el archivo subido.');
         }
+
+        // El NDA/LOI firmado contiene datos personales y es confidencial:
+        // se sirve siempre vía PHP (nunca directo por Apache), así que no
+        // necesita ser legible por "otros".
+        @chmod($targetPath, 0640);
 
         $uploadedAbsolutePaths[] = $targetPath;
 
@@ -228,7 +327,9 @@ try {
         ]);
 
         if (empty($detection['accepted'])) {
-            @unlink($targetPath);
+            if (is_file($targetPath) && !unlink($targetPath)) {
+                error_log('[upload_signed_documents] unlink falló tras rechazo de firma: ' . $targetPath);
+            }
 
             throw new RuntimeException(sprintf(
                 'El %s no parece firmado: %s',
@@ -383,22 +484,25 @@ if ($existingRow) {
     }
 
     foreach ($uploadedAbsolutePaths as $path) {
-        if (is_file($path)) {
-            @unlink($path);
+        if (!is_file($path)) {
+            continue;
+        }
+        if (unlink($path)) {
             uploadLog('Archivo limpiado tras error', ['path' => $path]);
+        } else {
+            error_log('[upload_signed_documents] unlink falló durante rollback: ' . $path);
         }
     }
 
+    $errorId = logAndReferenceError('upload_signed_documents', $exception);
     uploadLog('Error general', [
-        'message' => $exception->getMessage(),
-        'file' => $exception->getFile(),
-        'line' => $exception->getLine(),
+        'error_id' => $errorId,
+        'message'  => $exception->getMessage(),
     ]);
 
     respondJson(500, [
         'success' => false,
-        'message' => 'No se pudo procesar la documentación.',
-        'detail' => $exception->getMessage(),
+        'message' => 'No se pudo procesar la documentación. Referencia: ' . $errorId,
     ]);
 }
 
