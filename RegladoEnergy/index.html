@@ -87,7 +87,7 @@
         border: 1px solid rgba(255, 255, 255, 0.15) !important;
         background: radial-gradient(900px 420px at 12% 10%, rgba(242, 197, 61, 0.05), transparent 60%),
                     radial-gradient(900px 420px at 88% 0%, rgba(27, 92, 142, 0.05), transparent 62%),
-                    #0b0d10 !important; /* Fondo oscuro de Energy */
+                    #1c1f25 !important; /* Gris oscuro */
         backdrop-filter: blur(20px) !important;
         border-radius: 20px !important;
         box-shadow: 0 26px 80px rgba(0, 0, 0, 0.6) !important;
@@ -123,6 +123,27 @@
       }
       .cr-chat-input {
         color: #e9eef6 !important;
+        scrollbar-width: none !important; /* Firefox */
+      }
+      .cr-chat-input::-webkit-scrollbar {
+        display: none !important; /* Chrome/Safari/Edge */
+      }
+      .cr-chat-messages {
+        scrollbar-width: thin !important;
+        scrollbar-color: rgba(197, 160, 33, 0.35) transparent !important;
+      }
+      .cr-chat-messages::-webkit-scrollbar {
+        width: 6px !important;
+      }
+      .cr-chat-messages::-webkit-scrollbar-track {
+        background: transparent !important;
+      }
+      .cr-chat-messages::-webkit-scrollbar-thumb {
+        background: rgba(197, 160, 33, 0.35) !important;
+        border-radius: 999px !important;
+      }
+      .cr-chat-messages::-webkit-scrollbar-thumb:hover {
+        background: rgba(197, 160, 33, 0.55) !important;
       }
       .cr-chat-submit {
         background: linear-gradient(135deg, #c5a021, #8b6d11) !important;
