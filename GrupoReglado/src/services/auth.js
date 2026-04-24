@@ -159,6 +159,44 @@ function clearSession() {
   state.user = null;
 }
 
+/**
+ * Reconcilia el estado local con la cookie compartida `reglado_auth_token`.
+ * Pensado para llamarse cuando la pestaña vuelve a ser visible: si otro
+ * proyecto del ecosistema (Energy, etc.) inició o cerró sesión, aquí
+ * detectamos el cambio sin necesidad de recargar.
+ */
+async function syncWithCookie() {
+  const cookieToken = getCookie(COOKIE_TOKEN_KEY);
+
+  if (cookieToken === state.token && state.user) {
+    return;
+  }
+
+  if (!cookieToken) {
+    if (state.token) {
+      clearSession();
+    }
+    return;
+  }
+
+  if (cookieToken !== state.token) {
+    setToken(cookieToken);
+  }
+
+  state.loading = true;
+  try {
+    const payload = await request("/auth/me", {
+      method: "GET",
+      headers: authHeaders(),
+    });
+    state.user = payload.user || null;
+  } catch {
+    clearSession();
+  } finally {
+    state.loading = false;
+  }
+}
+
 function applySessionPayload(payload) {
   if (!payload || !payload.token) {
     return payload;
@@ -328,6 +366,7 @@ export const auth = {
   setSession,
   clearSession,
   initialize,
+  syncWithCookie,
   login,
   register,
   updateUsername,

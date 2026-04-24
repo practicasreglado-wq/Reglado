@@ -26,7 +26,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { onBeforeUnmount, onMounted, ref } from "vue";
 import SiteHeader from "./components/SiteHeader.vue";
 import SiteFooter from "./components/SiteFooter.vue";
 import CTASticky from "./components/CTASticky.vue";
@@ -36,8 +36,19 @@ import { auth } from "./services/auth";
 
 const isCTAClosed = ref(false);
 
+function handleVisibilityChange() {
+  if (document.visibilityState === "visible") {
+    auth.syncWithCookie();
+  }
+}
+
 onMounted(() => {
   auth.initialize();
+  document.addEventListener("visibilitychange", handleVisibilityChange);
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener("visibilitychange", handleVisibilityChange);
 });
 </script>
 
