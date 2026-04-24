@@ -22,7 +22,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { onBeforeUnmount, onMounted, ref } from "vue";
 import { RouterView, useRouter } from "vue-router";
 import LoginModal from "./components/LoginModal.vue";
 import SiteFooter from "./components/SiteFooter.vue";
@@ -32,6 +32,12 @@ import { auth } from "./services/auth";
 
 const showLogin = ref(false);
 const router = useRouter();
+
+function handleVisibilityChange() {
+  if (document.visibilityState === "visible") {
+    auth.syncWithCookie();
+  }
+}
 
 onMounted(() => {
   auth.initialize();
@@ -45,6 +51,12 @@ onMounted(() => {
   } else if (savedTheme === "light") {
     document.body.classList.remove("dark-mode");
   }
+
+  document.addEventListener("visibilitychange", handleVisibilityChange);
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener("visibilitychange", handleVisibilityChange);
 });
 
 async function handleLogout() {

@@ -31,12 +31,7 @@
       </nav>
 
       <div class="nav-actions">
-        <a
-          href="https://regladogroup.com/"
-          class="group-link"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+        <a href="https://regladogroup.com/" class="group-link">
           Reglado Group
         </a>
         <router-link to="/contacto" class="btn primary glow header-action" v-glow>
@@ -117,12 +112,7 @@
 
     <div v-if="open" class="mobile">
       <div class="container mobile-inner">
-        <a
-          href="https://regladogroup.com/"
-          class="m-link m-link-group-home"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+        <a href="https://regladogroup.com/" class="m-link m-link-group-home">
           <span class="m-link-group-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" focusable="false">
               <path
@@ -204,6 +194,8 @@ const props = defineProps({
   },
 });
 
+const emit = defineEmits(["open-login"]);
+
 const open = ref(false);
 const mobileClientsOpen = ref(false);
 const userMenuOpen = ref(false);
@@ -264,22 +256,8 @@ function handleMediaChange(event) {
   }
 }
 
-function getCallbackUrl() {
-  const base = `${window.location.origin}${window.location.pathname}`;
-  const sep = base.endsWith("/") ? "" : "/";
-  return `${base}${sep}auth/callback`;
-}
-
-function buildExternalAuthUrl(path) {
-  const base = import.meta.env.VITE_GRUPO_REGLADO_BASE_URL || "http://localhost:5173";
-  const url = new URL(path, base);
-  url.searchParams.set("returnTo", getCallbackUrl());
-  return url.toString();
-}
-
 function goToLogin() {
-  const loginPath = import.meta.env.VITE_GRUPO_REGLADO_LOGIN_PATH || "/login";
-  window.location.href = buildExternalAuthUrl(loginPath);
+  emit("open-login");
 }
 
 function goToSettings() {

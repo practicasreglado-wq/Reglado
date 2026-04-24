@@ -159,6 +159,48 @@ function clearSession() {
   state.user = null;
 }
 
+/**
+ * Reconcilia el estado local con la cookie compartida `reglado_auth_token`.
+ * Pensado para llamarse cuando la pestaña vuelve a ser visible: si otro
+ * proyecto del ecosistema (Energy, etc.) inició o cerró sesión, aquí
+ * detectamos el cambio sin necesidad de recargar.
+ */
+async function syncWithCookie() {
+  const cookieToken = getCookie(COOKIE_TOKEN_KEY);
+
+  // Cookie desapareció del propio dominio (logout en otra pestaña o
+  // limpieza vía /sso-logout desde otro dominio) → cerrar local.
+  if (!cookieToken && state.token) {
+    clearSession();
+    return;
+  }
+
+  // Cookie cambió (login en otra pestaña) → adoptar el nuevo token antes
+  // de revalidar.
+  if (cookieToken && cookieToken !== state.token) {
+    setToken(cookieToken);
+  }
+
+  if (!state.token) return;
+
+  // Siempre revalidar contra /auth/me aunque la cookie no haya cambiado:
+  // permite detectar invalidaciones server-side (ban, force-logout,
+  // password change, rotación de sid por login en otro dominio) en el
+  // próximo cambio de visibilidad de la pestaña.
+  state.loading = true;
+  try {
+    const payload = await request("/auth/me", {
+      method: "GET",
+      headers: authHeaders(),
+    });
+    state.user = payload.user || null;
+  } catch {
+    clearSession();
+  } finally {
+    state.loading = false;
+  }
+}
+
 function applySessionPayload(payload) {
   if (!payload || !payload.token) {
     return payload;
@@ -328,6 +370,7 @@ export const auth = {
   setSession,
   clearSession,
   initialize,
+  syncWithCookie,
   login,
   register,
   updateUsername,

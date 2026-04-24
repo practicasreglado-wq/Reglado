@@ -133,6 +133,38 @@
       body.dark-mode .cr-chat-input {
         color: #ffffff !important;
       }
+      .cr-chat-input {
+        scrollbar-width: none !important; /* Firefox */
+      }
+      .cr-chat-input::-webkit-scrollbar {
+        display: none !important; /* Chrome/Safari/Edge */
+      }
+      .cr-chat-messages {
+        scrollbar-width: thin !important;
+        scrollbar-color: rgba(39, 61, 92, 0.3) transparent !important;
+      }
+      .cr-chat-messages::-webkit-scrollbar {
+        width: 6px !important;
+      }
+      .cr-chat-messages::-webkit-scrollbar-track {
+        background: transparent !important;
+      }
+      .cr-chat-messages::-webkit-scrollbar-thumb {
+        background: rgba(39, 61, 92, 0.3) !important;
+        border-radius: 999px !important;
+      }
+      .cr-chat-messages::-webkit-scrollbar-thumb:hover {
+        background: rgba(39, 61, 92, 0.55) !important;
+      }
+      body.dark-mode .cr-chat-messages {
+        scrollbar-color: rgba(96, 165, 250, 0.4) transparent !important;
+      }
+      body.dark-mode .cr-chat-messages::-webkit-scrollbar-thumb {
+        background: rgba(96, 165, 250, 0.4) !important;
+      }
+      body.dark-mode .cr-chat-messages::-webkit-scrollbar-thumb:hover {
+        background: rgba(96, 165, 250, 0.65) !important;
+      }
       .cr-chat-submit {
         background: #273d5c !important;
         border-radius: 10px !important;

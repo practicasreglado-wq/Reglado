@@ -16,6 +16,11 @@ import Admin from "../pages/Admin.vue";
 import AvisoLegal from "../pages/AvisoLegal.vue";
 import PoliticaCookies from "../pages/PoliticaCookies.vue";
 import PoliticaPrivacidad from "../pages/PoliticaPrivacidad.vue";
+import RegisterView from "../pages/RegisterView.vue";
+import ForgotPasswordView from "../pages/ForgotPasswordView.vue";
+import EmailVerifiedView from "../pages/EmailVerifiedView.vue";
+import ResetPasswordView from "../pages/ResetPasswordView.vue";
+import ConfirmarAccesoView from "../pages/ConfirmarAccesoView.vue";
 
 const routes = [
   { path: "/", component: Home },
@@ -33,6 +38,11 @@ const routes = [
   { path: "/aviso-legal", component: AvisoLegal },
   { path: "/politica-cookies", component: PoliticaCookies },
   { path: "/politica-privacidad", component: PoliticaPrivacidad },
+  { path: "/registro", component: RegisterView },
+  { path: "/recuperar-contrasena", component: ForgotPasswordView },
+  { path: "/restablecer-contrasena", component: ResetPasswordView },
+  { path: "/verificacion-exitosa", component: EmailVerifiedView },
+  { path: "/confirmar-acceso", component: ConfirmarAccesoView },
   { path: "/auth/callback", component: AuthCallback },
   { path: "/:pathMatch(.*)*", component: NotFound },
 ];

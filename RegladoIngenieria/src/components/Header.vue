@@ -50,7 +50,7 @@
           </div>
         </template>
         <template v-else>
-          <router-link to="/area-clientes" class="btn primary btn-sm">Acceder</router-link>
+          <button type="button" class="btn primary btn-sm" @click="handleAccess">Acceder</button>
         </template>
       </div>
 
@@ -75,7 +75,7 @@
         <button @click="auth.logout()" class="danger-text">Salir</button>
       </template>
       <template v-else>
-        <router-link to="/area-clientes" @click="mobileOpen = false">Acceder</router-link>
+        <button type="button" @click="handleAccess">Acceder</button>
       </template>
     </nav>
   </header>
@@ -85,9 +85,16 @@
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import { auth } from "@/services/auth.js";
 
+const emit = defineEmits(["open-login"]);
+
 const mobileOpen = ref(false);
 const userMenuOpen = ref(false);
 const userMenuWrap = ref(null);
+
+const handleAccess = () => {
+  mobileOpen.value = false;
+  emit("open-login");
+};
 
 const isAdmin = computed(() => auth.state.user?.role === "admin");
 const userInitial = computed(() => {

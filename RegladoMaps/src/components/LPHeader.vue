@@ -133,6 +133,7 @@ import logoutIcon from '../assets/logout.svg';
 
 export default {
   name: 'LPHeader',
+  emits: ['scrollToTop', 'scrollTo', 'open-login'],
   data() {
     return {
       adminUserIcon,
@@ -209,10 +210,7 @@ export default {
     },
     handleLogin() {
       this.closeMenu();
-      const loginPath = import.meta.env.VITE_GRUPO_REGLADO_LOGIN_PATH || '/login';
-      const base = import.meta.env.VITE_GRUPO_REGLADO_BASE_URL || 'http://localhost:5173';
-      const returnUrl = `${window.location.origin}/auth/callback`;
-      window.location.href = `${base}${loginPath}?returnTo=${encodeURIComponent(returnUrl)}`;
+      this.$emit('open-login');
     },
     async handleLogout() {
       this.closeMenu();

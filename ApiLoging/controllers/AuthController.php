@@ -222,9 +222,18 @@ class AuthController
 
             $sid = User::rotateSession((int) $freshUser['id']);
             $jwt = JwtService::generate($freshUser, $sid);
-            $redirectBase = getenv('EMAIL_VERIFY_REDIRECT_URL') ?: '';
 
-            if ($redirectBase !== '' && Security::isAllowedAbsoluteUrl($redirectBase, 'REDIRECT_ALLOWED_ORIGINS')) {
+            // El clic en el email llega sin Origin, pero el link del email
+            // propaga `return_origin` desde buildVerificationUrl(). Si es
+            // válido, devolvemos al usuario al frontend que inició el alta.
+            $candidateOrigin = $_GET['return_origin'] ?? null;
+            $redirectBase = Security::resolveFrontendUrlFromCandidate(
+                is_string($candidateOrigin) ? $candidateOrigin : null,
+                '/verificacion-exitosa',
+                'EMAIL_VERIFY_REDIRECT_URL'
+            );
+
+            if ($redirectBase !== '') {
                 $separator = str_contains($redirectBase, '?') ? '&' : '?';
                 $location = $redirectBase . $separator . 'token=' . urlencode($jwt);
                 header('Location: ' . $location, true, 302);
@@ -847,11 +856,21 @@ class AuthController
 
     private static function buildVerificationUrl(string $plainToken): string
     {
-        return self::buildUrlFromEnv(
+        $url = self::buildUrlFromEnv(
             'EMAIL_VERIFY_URL_BASE',
             'http://localhost:8000/auth/verify-email',
             $plainToken
         );
+
+        // El link del email llegará al backend sin Origin. Propagamos el
+        // origen del proyecto que inició el alta como query param para que
+        // verify() pueda devolver al usuario al mismo frontend.
+        $origin = Security::validatedRequestOrigin();
+        if ($origin !== null) {
+            $url .= '&return_origin=' . urlencode($origin);
+        }
+
+        return $url;
     }
 
     private static function buildEmailChangeUrl(string $plainToken): string
@@ -865,11 +884,20 @@ class AuthController
 
     private static function buildPasswordResetUrl(string $plainToken): string
     {
-        return self::buildUrlFromEnv(
-            'PASSWORD_RESET_URL_BASE',
-            'http://localhost:5173/restablecer-contrasena',
-            $plainToken
-        );
+        // Prioriza el origen de la request (XHR desde el frontend que hizo
+        // el request-password-reset). Si no hay Origin válido, cae al env
+        // var — mantiene compatibilidad con Grupo que ya funcionaba así.
+        $base = Security::resolveFrontendUrl('/restablecer-contrasena', 'PASSWORD_RESET_URL_BASE');
+        if ($base === '') {
+            return self::buildUrlFromEnv(
+                'PASSWORD_RESET_URL_BASE',
+                'http://localhost:5173/restablecer-contrasena',
+                $plainToken
+            );
+        }
+
+        $separator = str_contains($base, '?') ? '&' : '?';
+        return $base . $separator . 'token=' . urlencode($plainToken);
     }
 
     /**
@@ -1089,10 +1117,12 @@ class AuthController
 
     private static function resolveLoginAlertBaseUrl(): ?string
     {
-        // La URL de confirmación apunta al FRONTEND (GrupoReglado), que
-        // recibe el clic del email y hace el POST al backend. Así la UI
-        // es consistente con el resto del portal.
-        $base = (string) (getenv('LOGIN_ALERT_FRONTEND_URL_BASE') ?: '');
+        // La alerta se dispara dentro de un POST /auth/login desde el
+        // frontend, así que el Origin está disponible. Si pertenece a la
+        // allowlist lo usamos como base — el email lleva al usuario de
+        // vuelta al mismo proyecto. Si no, fallback al env var y por
+        // último a localhost en APP_ENV=local.
+        $base = Security::resolveFrontendUrl('/confirmar-acceso', 'LOGIN_ALERT_FRONTEND_URL_BASE');
         if ($base !== '') return $base;
         $appEnv = strtolower((string) (getenv('APP_ENV') ?: 'local'));
         return $appEnv === 'local' ? 'http://localhost:5173/confirmar-acceso' : null;
