@@ -3,37 +3,32 @@
     <transition name="modal">
       <div v-if="modelValue" class="modal-overlay" @click.self="closeModal">
         <div class="modal-content">
-          <button class="close-btn" @click="closeModal" aria-label="Cerrar modal">
-            <span></span>
-            <span></span>
-          </button>
+          <button class="close-btn" @click="closeModal" aria-label="Cerrar modal">×</button>
 
           <div class="modal-header">
-            <h2>Inicio de sesión</h2>
-            <p>Accede a tu área de cliente</p>
+            <h2>Iniciar sesión</h2>
+            <p>Accede al área de Reglado Ingeniería</p>
           </div>
 
           <form @submit.prevent="handleLogin" class="login-form">
-            <div class="form-group">
+            <div class="field">
               <label for="email">Correo electrónico</label>
               <input
                 id="email"
                 v-model.trim="form.email"
                 type="email"
-                placeholder="tu@email.com"
                 autocomplete="email"
                 required
                 :disabled="loading"
               />
             </div>
 
-            <div class="form-group">
+            <div class="field">
               <label for="password">Contraseña</label>
               <input
                 id="password"
                 v-model="form.password"
                 type="password"
-                placeholder="••••••••"
                 autocomplete="current-password"
                 required
                 :disabled="loading"
@@ -42,7 +37,7 @@
 
             <div class="form-options">
               <span></span>
-              <router-link to="/recuperar-contrasena" class="forgot-password" @click="closeModal">
+              <router-link to="/recuperar-contrasena" class="link" @click="closeModal">
                 ¿Olvidaste tu contraseña?
               </router-link>
             </div>
@@ -50,7 +45,7 @@
             <p v-if="error" class="feedback error">{{ error }}</p>
             <p v-if="success" class="feedback success">{{ success }}</p>
 
-            <button type="submit" class="btn-login" :disabled="loading">
+            <button type="submit" class="btn primary" :disabled="loading">
               {{ loading ? "Entrando..." : "Iniciar sesión" }}
             </button>
 
@@ -79,22 +74,14 @@
 
 <script setup>
 import { ref, watch } from "vue";
-import { auth } from "../services/auth";
+import { auth } from "@/services/auth.js";
 
 const props = defineProps({
-  modelValue: {
-    type: Boolean,
-    required: true,
-  },
+  modelValue: { type: Boolean, required: true },
 });
-
 const emit = defineEmits(["update:modelValue", "success"]);
 
-const form = ref({
-  email: "",
-  password: "",
-});
-
+const form = ref({ email: "", password: "" });
 const loading = ref(false);
 const error = ref("");
 const success = ref("");
@@ -155,178 +142,131 @@ async function resendMail() {
 <style scoped>
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
+  inset: 0;
+  background: rgba(26, 31, 46, 0.55);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  backdrop-filter: blur(4px);
+  padding: 1rem;
 }
 
 .modal-content {
   position: relative;
-  background: rgba(11, 13, 16, 0.95);
-  border: 1px solid #f2c53d;
-  border-radius: 20px;
-  padding: 40px;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 36px;
   max-width: 420px;
-  width: 90%;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-  animation: slideIn 0.3s ease-out;
+  width: 100%;
+  box-shadow: var(--shadow-lg), 0 24px 60px rgba(26, 31, 46, 0.18);
+  animation: slideIn 0.25s ease-out;
 }
 
 .close-btn {
   position: absolute;
-  top: 20px;
-  right: 20px;
+  top: 12px;
+  right: 12px;
   background: transparent;
   border: none;
   cursor: pointer;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  transition: background 0.2s;
+  width: 36px;
+  height: 36px;
+  font-size: 24px;
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
+  transition: all var(--transition);
 }
 
 .close-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.close-btn span {
-  position: absolute;
-  width: 18px;
-  height: 2px;
-  background: rgba(233, 238, 246, 0.8);
-  border-radius: 1px;
-}
-
-.close-btn span:first-child {
-  transform: rotate(45deg);
-}
-
-.close-btn span:last-child {
-  transform: rotate(-45deg);
+  background: var(--bg-soft);
+  color: var(--text);
 }
 
 .modal-header {
-  margin-bottom: 30px;
-  text-align: center;
+  margin-bottom: 24px;
 }
 
 .modal-header h2 {
-  font-size: 24px;
+  font-size: 1.375rem;
   font-weight: 700;
-  margin-bottom: 8px;
-  color: #e9eef6;
+  margin: 0 0 6px;
+  color: var(--text);
 }
 
 .modal-header p {
-  font-size: 14px;
-  color: rgba(233, 238, 246, 0.6);
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin: 0;
 }
 
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 14px;
 }
 
-.form-group {
+.field {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
-.form-group label {
-  font-size: 13px;
+.field label {
+  font-size: 0.8125rem;
   font-weight: 600;
-  color: rgba(233, 238, 246, 0.85);
+  color: var(--text);
 }
 
-.form-group input {
-  padding: 12px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.04);
-  color: #e9eef6;
-  font-size: 14px;
-  transition: all 0.2s;
+.field input {
+  padding: 11px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.9375rem;
+  font-family: inherit;
+  transition: all var(--transition);
 }
 
-.form-group input::placeholder {
-  color: rgba(233, 238, 246, 0.4);
-}
-
-.form-group input:focus {
+.field input:focus {
   outline: none;
-  border-color: rgba(242, 197, 61, 0.5);
-  background: rgba(255, 255, 255, 0.06);
-  box-shadow: 0 0 0 3px rgba(242, 197, 61, 0.1);
+  border-color: var(--steel);
+  box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.12);
+}
+
+.field input:disabled {
+  background: var(--bg-soft);
+  cursor: not-allowed;
 }
 
 .form-options {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 
-.remember-me {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  color: rgba(233, 238, 246, 0.7);
-}
-
-.remember-me input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
-  accent-color: #f2c53d;
-}
-
-.forgot-password {
-  color: #f2c53d;
+.link {
+  color: var(--steel);
   text-decoration: none;
-  transition: color 0.2s;
+  transition: color var(--transition);
 }
 
-.forgot-password:hover {
-  color: #ffd966;
+.link:hover {
+  color: var(--steel-dark);
+  text-decoration: underline;
 }
 
-.btn-login {
-  padding: 12px 20px;
-  background: linear-gradient(135deg, #f2c53d 0%, #e6b320 100%);
-  color: #0b0d10;
-  border: none;
-  border-radius: 10px;
-  font-weight: 700;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.2s;
-  margin-top: 8px;
+.btn.primary {
+  width: 100%;
+  justify-content: center;
+  margin-top: 4px;
 }
 
-.btn-login:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(242, 197, 61, 0.3);
-}
-
-.btn-login:active {
-  transform: translateY(0);
-}
-
-.btn-login:disabled {
-  opacity: 0.6;
+.btn.primary:disabled {
+  opacity: 0.55;
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
@@ -335,37 +275,38 @@ async function resendMail() {
 .feedback {
   margin: 0;
   padding: 10px 12px;
-  border-radius: 10px;
-  font-size: 13px;
+  border-radius: var(--radius-sm);
+  font-size: 0.8125rem;
   border: 1px solid transparent;
 }
 
 .feedback.error {
-  color: #ffb7b7;
-  background: rgba(183, 28, 28, 0.15);
-  border-color: rgba(255, 183, 183, 0.25);
+  color: #b91c1c;
+  background: #fee2e2;
+  border-color: #fecaca;
 }
 
 .feedback.success {
-  color: #b7ffc7;
-  background: rgba(28, 183, 87, 0.12);
-  border-color: rgba(183, 255, 199, 0.25);
+  color: #15803d;
+  background: #dcfce7;
+  border-color: #bbf7d0;
 }
 
 .btn-link {
   background: transparent;
   border: none;
-  color: #f2c53d;
-  font-size: 13px;
+  color: var(--steel);
+  font-size: 0.8125rem;
   cursor: pointer;
   padding: 4px 0 0;
   text-decoration: underline;
   text-underline-offset: 3px;
   align-self: center;
+  font-family: inherit;
 }
 
 .btn-link:hover:not(:disabled) {
-  color: #ffd966;
+  color: var(--steel-dark);
 }
 
 .btn-link:disabled {
@@ -374,60 +315,36 @@ async function resendMail() {
 }
 
 .modal-footer {
-  margin-top: 24px;
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
   text-align: center;
-  font-size: 13px;
-  color: rgba(233, 238, 246, 0.7);
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  padding-top: 24px;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
 }
 
 .modal-footer a {
-  color: #f2c53d;
+  color: var(--steel);
   text-decoration: none;
-  transition: color 0.2s;
+  font-weight: 600;
 }
 
 .modal-footer a:hover {
-  color: #ffd966;
+  color: var(--steel-dark);
+  text-decoration: underline;
 }
 
-/* Animaciones */
 .modal-enter-active,
-.modal-leave-active {
-  transition: opacity 0.3s ease;
-}
-
+.modal-leave-active { transition: opacity 0.25s ease; }
 .modal-enter-from,
-.modal-leave-to {
-  opacity: 0;
-}
+.modal-leave-to { opacity: 0; }
 
 @keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95) translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
+  from { opacity: 0; transform: scale(0.96) translateY(-12px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
 }
 
-@media (max-width: 600px) {
-  .modal-content {
-    padding: 30px 24px;
-    border-radius: 16px;
-  }
-
-  .modal-header h2 {
-    font-size: 20px;
-  }
-
-  .form-options {
-    flex-direction: column;
-    gap: 12px;
-    align-items: flex-start;
-  }
+@media (max-width: 520px) {
+  .modal-content { padding: 28px 22px; }
 }
 </style>

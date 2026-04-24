@@ -116,6 +116,92 @@ async function initialize() {
 }
 
 /**
+ * Reconcilia el estado local con la cookie compartida `reglado_auth_token`.
+ * Se llama cuando la pestaña vuelve a ser visible para detectar logins o
+ * logouts hechos en otro proyecto del ecosistema sin recargar.
+ */
+async function syncWithCookie() {
+  const cookieToken = getCookie(COOKIE_TOKEN_KEY);
+
+  if (cookieToken === state.token && state.user) {
+    return;
+  }
+
+  if (!cookieToken) {
+    if (state.token) {
+      clearSession();
+    }
+    return;
+  }
+
+  if (cookieToken !== state.token) {
+    setToken(cookieToken);
+  }
+
+  state.loading = true;
+  try {
+    const payload = await request("/auth/me", {
+      method: "GET",
+      headers: authHeaders(),
+    });
+    state.user = payload.user || null;
+  } catch {
+    clearSession();
+  } finally {
+    state.loading = false;
+  }
+}
+
+async function login(email, password) {
+  const payload = await request("/auth/login", {
+    method: "POST",
+    body: JSON.stringify({ email, password }),
+  });
+
+  setSession(payload.token, payload.user || null);
+  return payload;
+}
+
+async function resendVerification(email) {
+  return request("/auth/resend-verification", {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  });
+}
+
+async function register(payload) {
+  return request("/auth/register", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+async function requestPasswordReset(email) {
+  return request("/auth/request-password-reset", {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  });
+}
+
+async function resetPassword(token, newPassword, newPasswordConfirmation) {
+  return request("/auth/reset-password", {
+    method: "POST",
+    body: JSON.stringify({
+      token,
+      new_password: newPassword,
+      new_password_confirmation: newPasswordConfirmation,
+    }),
+  });
+}
+
+async function confirmLoginLocation(token, decision) {
+  return request("/auth/confirm-login-location", {
+    method: "POST",
+    body: JSON.stringify({ token, decision }),
+  });
+}
+
+/**
  * Realiza el cierre de sesión destruyendo las credenciales almacenadas
  * localmente y redirigiendo al portal corporativo raíz (GrupoReglado).
  */
@@ -141,6 +227,13 @@ export const auth = {
   setSession,
   clearSession,
   initialize,
+  syncWithCookie,
+  login,
+  resendVerification,
+  register,
+  requestPasswordReset,
+  resetPassword,
+  confirmLoginLocation,
   logout,
 };
 

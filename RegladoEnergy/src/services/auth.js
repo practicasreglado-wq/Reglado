@@ -177,6 +177,38 @@ async function resendVerification(email) {
   });
 }
 
+async function register(payload) {
+  return request("/auth/register", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+async function requestPasswordReset(email) {
+  return request("/auth/request-password-reset", {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  });
+}
+
+async function resetPassword(token, newPassword, newPasswordConfirmation) {
+  return request("/auth/reset-password", {
+    method: "POST",
+    body: JSON.stringify({
+      token,
+      new_password: newPassword,
+      new_password_confirmation: newPasswordConfirmation,
+    }),
+  });
+}
+
+async function confirmLoginLocation(token, decision) {
+  return request("/auth/confirm-login-location", {
+    method: "POST",
+    body: JSON.stringify({ token, decision }),
+  });
+}
+
 /**
  * Cierra la sesión activa revocando el token en el backend y borrando
  * los datos locales. Tras ello, devuelve al usuario al portal principal.
@@ -203,6 +235,10 @@ export const auth = {
   syncWithCookie,
   login,
   resendVerification,
+  register,
+  requestPasswordReset,
+  resetPassword,
+  confirmLoginLocation,
   logout,
 };
 

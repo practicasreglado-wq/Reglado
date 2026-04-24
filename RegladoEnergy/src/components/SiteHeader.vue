@@ -31,12 +31,7 @@
       </nav>
 
       <div class="nav-actions">
-        <a
-          href="https://regladogroup.com/"
-          class="group-link"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+        <a href="https://regladogroup.com/" class="group-link">
           Reglado Group
         </a>
         <router-link to="/contacto" class="btn primary glow header-action" v-glow>
@@ -117,12 +112,7 @@
 
     <div v-if="open" class="mobile">
       <div class="container mobile-inner">
-        <a
-          href="https://regladogroup.com/"
-          class="m-link m-link-group-home"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+        <a href="https://regladogroup.com/" class="m-link m-link-group-home">
           <span class="m-link-group-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" focusable="false">
               <path

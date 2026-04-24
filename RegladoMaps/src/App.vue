@@ -9,7 +9,7 @@
 -->
 <template>
   <div id="app">
-    <LPHeader @scrollToTop="scrollToTop" @scrollTo="scrollToSection" />
+    <LPHeader @scrollToTop="scrollToTop" @scrollTo="scrollToSection" @open-login="showLogin = true" />
 
     <nav class="side-nav" :class="{ 'side-nav-visible': showBackToTop && !isFooterVisible }" v-show="$route.path === '/'">
       <button v-for="energia in energyTypes" :key="energia.id" 
@@ -185,6 +185,7 @@
       </svg>
     </button>
     <CookieBanner />
+    <LoginModal v-model="showLogin" />
   </div>
 </template>
 
@@ -200,16 +201,18 @@ import LPHeader from './components/LPHeader.vue'
 import LandingPage from './components/LandingPage.vue'
 import LPFooter from './components/LPFooter.vue'
 import CookieBanner from './components/CookieBanner.vue'
+import LoginModal from './components/LoginModal.vue'
 import { auth } from './services/auth'
 
 export default {
   name: 'App',
-  components: { LPHeader, LandingPage, LPFooter, CookieBanner },
+  components: { LPHeader, LandingPage, LPFooter, CookieBanner, LoginModal },
   data() {
     return {
-      showBackToTop: false, 
+      showBackToTop: false,
       isWhiteGlass: false,
       isFooterVisible: false,
+      showLogin: false,
       activeSection: null,
       energyTypes: [
         { id: 'eolica', emoji: '<svg viewBox="0 0 24 24" width="1.2em" height="1.2em" fill="none" class="svg-eolica" style="vertical-align: middle;"><defs><linearGradient id="towerGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#CBD5E1"/><stop offset="40%" stop-color="#FFFFFF"/><stop offset="100%" stop-color="#E2E8F0"/></linearGradient><linearGradient id="bladeGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FFFFFF"/><stop offset="100%" stop-color="#CBD5E1"/></linearGradient></defs><path d="M8 22h8" stroke="#E2E8F0" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/><path d="M11.3 22 L11.7 10 L12.3 10 L12.7 22 Z" fill="url(#towerGrad)" /><rect x="11" y="9.2" width="2" height="1.6" rx="0.4" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="0.3" /><g class="molino-aspas"><path d="M12 10 L12.4 4 A 0.4 0.4 0 0 0 11.6 4 L12 10 Z" fill="url(#bladeGrad)" /><path d="M12 10 L12.4 4 A 0.4 0.4 0 0 0 11.6 4 L12 10 Z" fill="url(#bladeGrad)" transform="rotate(120, 12, 10)" /><path d="M12 10 L12.4 4 A 0.4 0.4 0 0 0 11.6 4 L12 10 Z" fill="url(#bladeGrad)" transform="rotate(240, 12, 10)" /></g><circle cx="12" cy="10" r="1.2" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="0.5" /></svg>', label: 'Eólica' },
@@ -289,11 +292,16 @@ export default {
      * Navega a la vista de mapa filtrando opcionalmente por un tipo de energía.
      * @param {string} [energia] Tipo de energía (eolica, solar, etc.)
      */
-    goToMap(energia) { 
+    goToMap(energia) {
       if(energia) {
         this.$router.push({ path: '/mapa', query: { energia } });
       } else {
         this.$router.push('/mapa');
+      }
+    },
+    handleVisibilityChange() {
+      if (document.visibilityState === 'visible') {
+        auth.syncWithCookie();
       }
     }
   },
@@ -306,6 +314,10 @@ export default {
     // Inicialización del estado de autenticación centralizado.
     // Intenta recuperar el token de la cookie compartida 'reglado_auth_token'.
     auth.initialize().catch(err => console.warn('Auth INIT Error:', err));
+
+    // Detecta logins/logouts hechos en otra pestaña del ecosistema al
+    // volver a Maps (ver auth.syncWithCookie).
+    document.addEventListener('visibilitychange', this.handleVisibilityChange);
 
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
@@ -331,7 +343,10 @@ export default {
 
     window.addEventListener('scroll', this.handleScroll);
   },
-  beforeUnmount() { window.removeEventListener('scroll', this.handleScroll) }
+  beforeUnmount() {
+    window.removeEventListener('scroll', this.handleScroll);
+    document.removeEventListener('visibilitychange', this.handleVisibilityChange);
+  }
 }
 </script>
 
