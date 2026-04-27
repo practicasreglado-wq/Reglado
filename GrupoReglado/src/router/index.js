@@ -1,19 +1,22 @@
 import { createRouter, createWebHistory } from "vue-router";
 import PortalView from "../pages/PortalView.vue";
-import RegisterView from "../pages/RegisterView.vue";
-import EmailVerifiedView from "../pages/EmailVerifiedView.vue";
-import LoginView from "../pages/LoginView.vue";
-import SettingsView from "../pages/SettingsView.vue";
-import ForgotPasswordView from "../pages/ForgotPasswordView.vue";
-import ResetPasswordView from "../pages/ResetPasswordView.vue";
-import AdminView from "../pages/AdminView.vue";
-import AvisoLegalView from "../pages/AvisoLegalView.vue";
-import PoliticaCookiesView from "../pages/PoliticaCookiesView.vue";
-import PoliticaPrivacidadView from "../pages/PoliticaPrivacidadView.vue";
-import ConfirmarAccesoView from "../pages/ConfirmarAccesoView.vue";
-import SsoHandshakeView from "../pages/SsoHandshakeView.vue";
-import SsoStoreView from "../pages/SsoStoreView.vue";
-import SsoLogoutView from "../pages/SsoLogoutView.vue";
+
+// Resto de páginas en lazy import: cada una se carga bajo demanda en su
+// propio chunk, manteniendo el bundle inicial pequeño (solo home).
+const RegisterView = () => import("../pages/RegisterView.vue");
+const EmailVerifiedView = () => import("../pages/EmailVerifiedView.vue");
+const LoginView = () => import("../pages/LoginView.vue");
+const SettingsView = () => import("../pages/SettingsView.vue");
+const ForgotPasswordView = () => import("../pages/ForgotPasswordView.vue");
+const ResetPasswordView = () => import("../pages/ResetPasswordView.vue");
+const AdminView = () => import("../pages/AdminView.vue");
+const AvisoLegalView = () => import("../pages/AvisoLegalView.vue");
+const PoliticaCookiesView = () => import("../pages/PoliticaCookiesView.vue");
+const PoliticaPrivacidadView = () => import("../pages/PoliticaPrivacidadView.vue");
+const ConfirmarAccesoView = () => import("../pages/ConfirmarAccesoView.vue");
+const SsoHandshakeView = () => import("../pages/SsoHandshakeView.vue");
+const SsoStoreView = () => import("../pages/SsoStoreView.vue");
+const SsoLogoutView = () => import("../pages/SsoLogoutView.vue");
 
 const routes = [
   { path: "/", name: "portal", component: PortalView, meta: { title: "Reglado Group | Portal Empresarial" } },

@@ -17,6 +17,7 @@
 import { onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { auth } from "../services/auth";
+import { redirectToStore } from "../services/ssoClient";
 import { useUserStore } from "../stores/user";
 
 const route = useRoute();
@@ -41,11 +42,13 @@ onMounted(async () => {
       throw new Error("No se pudo iniciar la sesión.");
     }
 
-    if (userStore.userRole === "user") {
-      router.replace("/profile");
-    } else {
-      router.replace("/dashboard");
-    }
+    // Antes de mostrar al usuario su dashboard, propagamos la sesión al
+    // hub (Grupo). Así el resto de dominios del ecosistema heredan el
+    // login sin necesidad de que el usuario vuelva a entrar en cada uno.
+    // El hub redirige de vuelta a la URL que le pasamos (perfil/dashboard).
+    const targetPath = userStore.userRole === "user" ? "/profile" : "/dashboard";
+    const returnUrl = window.location.origin + targetPath;
+    redirectToStore(token, returnUrl);
   } catch (err) {
     auth.clearSession();
     userStore.logoutLocal();

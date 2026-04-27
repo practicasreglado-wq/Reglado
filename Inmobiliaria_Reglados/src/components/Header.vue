@@ -204,7 +204,9 @@ export default {
     NotificationBell,
   },
 
-  setup() {
+  emits: ["open-login"],
+
+  setup(props, { emit }) {
     const userStore = useUserStore();
     const profileMenuStore = useProfileMenuStore();
     const router = useRouter();
@@ -250,9 +252,10 @@ export default {
     };
 
 const goToLogin = () => {
-  const loginPath =
-    import.meta.env.VITE_GRUPO_REGLADO_LOGIN_PATH || "/login";
-  window.location.href = buildExternalAuthUrl(loginPath);
+  // El login ahora es local — emitimos el evento al App.vue para que
+  // abra el modal en su lugar (sin redirect a Grupo). Mantenemos el
+  // mismo nombre de la función para no romper referencias en el template.
+  emit("open-login");
 };
 
     const toggleProfileMenu = () => {

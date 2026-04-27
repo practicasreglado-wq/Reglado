@@ -3,6 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!--
+    Content Security Policy — hardening F1 (2026-04-27).
+    Restringe los orígenes permitidos para reducir el impacto de un XSS.
+    Si tras un cambio de dependencias o endpoints aparece "Refused to load..."
+    en consola, añadir aquí el origen legítimo afectado.
+  -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' 'unsafe-inline';
+    style-src 'self' 'unsafe-inline';
+    font-src 'self' data:;
+    img-src 'self' data: blob: https:;
+    connect-src 'self' http://localhost http://localhost:8000 http://localhost:8002 https://regladogroup.com https://realstate.com;
+    media-src 'self' blob:;
+    base-uri 'self';
+    form-action 'self';
+    object-src 'none';
+  ">
+
   <title>Reglado Real State | Inmobiliaria</title>
   <link rel="icon" type="image/svg+xml" href="/src/assets/reglado-RS-logo.svg">
   <link rel="stylesheet" href="/src/styles/style.CSS">  <!-- Vincula tu archivo CSS compilado -->

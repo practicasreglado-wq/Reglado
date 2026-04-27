@@ -4,6 +4,25 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+    <!--
+      Content Security Policy — hardening F1 (2026-04-27).
+      Restringe orígenes para reducir el impacto de un XSS. Si tras un
+      cambio de dependencias o endpoints aparece "Refused to load..." en
+      consola, añadir aquí el origen legítimo afectado.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' https://chatbot.regladogroup.com;
+      style-src 'self' 'unsafe-inline';
+      font-src 'self' data:;
+      img-src 'self' data: blob: https:;
+      connect-src 'self' http://localhost http://localhost:8000 http://localhost:8001 https://regladogroup.com https://regladoenergy.com https://chatbot.regladogroup.com;
+      media-src 'self' blob:;
+      base-uri 'self';
+      form-action 'self';
+      object-src 'none';
+    " />
+
     <title>Reglado Energy | Consultoría energética independiente</title>
     <meta
       name="description"

@@ -2,6 +2,27 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
+
+    <!--
+      Content Security Policy — hardening F1 (2026-04-27).
+      Maps carga librerías externas (jQuery, Leaflet, Bootstrap, Select2,
+      SweetAlert2, FontAwesome) desde CDN públicos en `apimapa/`. La
+      política los lista explícitamente. Si tras un cambio de dependencias
+      aparece "Refused to load..." en consola, añadir el origen legítimo.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://code.jquery.com https://unpkg.com;
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com;
+      font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com;
+      img-src 'self' data: blob: https:;
+      connect-src 'self' http://localhost http://localhost:8000 https://regladogroup.com https://teal-bat-675895.hostingersite.com;
+      media-src 'self' blob:;
+      base-uri 'self';
+      form-action 'self';
+      object-src 'none';
+    " />
+
     <link rel="icon" type="image/svg+xml" href="/reglado-logo.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Reglado Maps - Plataforma interactiva para la gestión y visualización de recursos energéticos, propiedades y ubicaciones de Grupo Reglado." />
