@@ -59,7 +59,7 @@ Los env vars siguen siendo el **fallback**. El comportamiento preferente es el `
 
 **Actual en [`.env.production.example`](../ApiLoging/.env.production.example):**
 ```
-CORS_ALLOWED_ORIGINS=https://regladogroup.com,https://regladoenergy.com,https://realstate.com
+CORS_ALLOWED_ORIGINS=https://regladogroup.com,https://regladoenergy.com,https://regladorealestate.com
 ```
 
 **Pendiente añadir** cuando se conozcan los dominios:

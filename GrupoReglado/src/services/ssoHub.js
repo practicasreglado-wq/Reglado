@@ -26,7 +26,7 @@ const SSO_ALLOWED_RETURNS = [
   "https://www.regladogroup.com",
   "https://regladoenergy.com",
   "https://teal-bat-675895.hostingersite.com", // Reglado Maps (dominio Hostinger provisional)
-  "https://realstate.com", // Inmobiliaria_Reglados
+  "https://regladorealestate.com", // Inmobiliaria_Reglados
   // TODO: añadir dominio final de Maps y el de Ingeniería cuando estén listos.
 ];
 
@@ -98,7 +98,7 @@ const SSO_THEMES = {
   // Inmobiliaria — light + navy
   "http://localhost:5175": INMOBILIARIA_THEME(),
   "http://127.0.0.1:5175": INMOBILIARIA_THEME(),
-  "https://realstate.com": INMOBILIARIA_THEME(),
+  "https://regladorealestate.com": INMOBILIARIA_THEME(),
 };
 
 function ENERGY_THEME() {
