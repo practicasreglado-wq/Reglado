@@ -1,13 +1,15 @@
 /**
  * Servicio central de Autenticación para el frontend (GrupoReglado).
- * 
- * Gestiona el estado reactivo del usuario, almacena el JWT (en LocalStorage y Cookies),
- * y provee los métodos principales para interactuar de forma unificada con ApiLoging.
+ *
+ * Gestiona el estado reactivo del usuario, almacena el JWT en la cookie
+ * compartida `reglado_auth_token` (única fuente de verdad cross-tab del
+ * mismo dominio; sincronización entre dominios distintos se hace via SSO
+ * Hub — ver docs/ECOSYSTEM_AUTH_SSO_HUB.md). Provee los métodos
+ * principales para interactuar de forma unificada con ApiLoging.
  */
 import { reactive } from "vue";
 
 const API_BASE = import.meta.env.VITE_AUTH_API_URL || "http://localhost:8000";
-const TOKEN_KEY = "auth_token";
 const COOKIE_TOKEN_KEY = "reglado_auth_token";
 const COOKIE_CONSENT_KEY = "reglado_consent_settings";
 const COOKIE_LANG_KEY = "reglado_lang";
@@ -15,7 +17,7 @@ const COOKIE_MAX_AGE_SESSION = 60 * 60 * 24 * 7; // 7 days
 const COOKIE_MAX_AGE_YEAR = 60 * 60 * 24 * 365; // 1 year
 
 const state = reactive({
-  token: localStorage.getItem(TOKEN_KEY) || getCookie(COOKIE_TOKEN_KEY) || "",
+  token: getCookie(COOKIE_TOKEN_KEY) || "",
   user: null,
   loading: false,
 });
@@ -116,12 +118,13 @@ async function request(path, options = {}) {
 function setToken(token) {
   state.token = token || "";
   if (state.token) {
-    // Se persiste en ambos sitios para compartir sesion entre proyectos en el mismo navegador.
-    localStorage.setItem(TOKEN_KEY, state.token);
+    // Cookie como única fuente de persistencia (SameSite=Lax + Secure en
+    // HTTPS). El localStorage se eliminó por hardening F3 — reduce la
+    // superficie ante XSS sin pérdida funcional, ya que la cookie cubre
+    // tanto la persistencia entre recargas como la compartición entre
+    // pestañas del mismo dominio.
     setCookie(COOKIE_TOKEN_KEY, state.token, COOKIE_MAX_AGE_SESSION, "Lax");
   } else {
-    // Si no hay token, se limpian ambos almacenamientos.
-    localStorage.removeItem(TOKEN_KEY);
     clearCookie(COOKIE_TOKEN_KEY);
   }
 }

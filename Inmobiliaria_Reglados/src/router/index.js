@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { useUserStore } from "../stores/user";
 import Home from "../views/Home.vue";
-import Login from "../views/Login.vue";
 import Register from "../views/Register.vue";
 import Dashboard from "../views/Dashboard.vue";
 import UserProfile from "../views/Profile.vue";
@@ -21,11 +20,22 @@ import AuthCallback from "../views/AuthCallback.vue";
 import RestrictedAccessView from "../views/RestrictedAccessView.vue";
 import PropertyDetail from "../views/PropertyDetail.vue";
 import Legal from "../views/Legal.vue";
+import ForgotPasswordView from "../views/ForgotPasswordView.vue";
+import ResetPasswordView from "../views/ResetPasswordView.vue";
+import EmailVerifiedView from "../views/EmailVerifiedView.vue";
+import ConfirmarAccesoView from "../views/ConfirmarAccesoView.vue";
 
 const routes = [
   { path: "/", component: Home },
-  { path: "/login", component: Login },
-  { path: "/register", component: Register },
+  // /login ahora dispara el modal local desde App.vue via query flag.
+  { path: "/login", redirect: { path: "/", query: { login: "required" } } },
+  // /register se mantiene por compat con bookmarks antiguos; /registro es la canónica.
+  { path: "/register", redirect: "/registro" },
+  { path: "/registro", component: Register },
+  { path: "/recuperar-contrasena", component: ForgotPasswordView },
+  { path: "/restablecer-contrasena", component: ResetPasswordView },
+  { path: "/verificacion-exitosa", component: EmailVerifiedView },
+  { path: "/confirmar-acceso", component: ConfirmarAccesoView },
   { path: "/auth/callback", component: AuthCallback },
   { path: "/dashboard", component: Dashboard, meta: { requiresAuth: true, requiresReal: true } },
   {
@@ -101,10 +111,17 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const userStore = useUserStore();
 
-  const isAuthRoute = to.path === "/login" || to.path === "/register";
+  const isAuthRoute =
+    to.path === "/login" ||
+    to.path === "/register" ||
+    to.path === "/registro";
 
   if (to.meta.requiresAuth && !userStore.isLoggedIn) {
-    return next("/login");
+    // En vez de redirigir a /login (que era una vista de "vete a Grupo"),
+    // mandamos al home con un query flag que App.vue intercepta para
+    // abrir el modal de login local; tras autenticar, App.vue navega a
+    // returnTo automáticamente.
+    return next({ path: "/", query: { login: "required", returnTo: to.fullPath } });
   }
 
   if (isAuthRoute && userStore.isLoggedIn) {

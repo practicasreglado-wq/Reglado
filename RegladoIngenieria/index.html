@@ -3,6 +3,26 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!--
+      Content Security Policy — hardening F1 (2026-04-27).
+      Restringe orígenes para reducir el impacto de un XSS. Si tras un
+      cambio de dependencias o endpoints aparece "Refused to load..." en
+      consola, añadir aquí el origen legítimo afectado.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      script-src 'self' 'unsafe-inline';
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+      font-src 'self' data: https://fonts.gstatic.com;
+      img-src 'self' data: blob: https:;
+      connect-src 'self' http://localhost http://localhost:8000 http://localhost:8003 https://regladogroup.com https://gruporeglado.com;
+      media-src 'self' blob:;
+      base-uri 'self';
+      form-action 'self';
+      object-src 'none';
+    " />
+
     <title>Reglado Ingeniería | Consultoría de Ingeniería Industrial</title>
     <meta name="description" content="Consultoría especializada en ingeniería industrial. Análisis técnicos, proyectos y soluciones para empresas del sector." />
     <meta name="robots" content="index, follow" />
