@@ -1,6 +1,19 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Descarga de NDA o LOI por parte del comprador (paso PREVIO a firmarlos).
+ *
+ * No requiere haber firmado nada — es la primera descarga del flujo. Tras
+ * descargarlo, el comprador firma fuera de la plataforma y vuelve para
+ * subir el PDF firmado en upload_signed_documents.php.
+ *
+ * Marca el progreso en buyer_property_document_download_progress (NDA o LOI
+ * descargado), que el resto del flujo usa para gating.
+ *
+ * Audit log: 'document.legal.download'.
+ */
+
 require_once __DIR__ . '/../config/cors.php';
 applyCors();
 handlePreflight();

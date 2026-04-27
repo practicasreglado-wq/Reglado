@@ -2,6 +2,18 @@
 
 declare(strict_types=1);
 
+/**
+ * Endpoint para que un admin cambie el estado de una propiedad
+ * ('activa', 'inactiva', 'vendida', 'pendiente'…).
+ *
+ * Cambiar el estado afecta a la visibilidad pública (solo 'activa' aparece
+ * en get_properties.php) y al flujo de compra (no se puede solicitar compra
+ * si no está activa).
+ *
+ * Requiere confirmación de contraseña del admin. Audit log:
+ * 'property.status_change' con metadata del estado anterior y nuevo.
+ */
+
 require_once dirname(__DIR__) . '/config/db.php';
 require_once dirname(__DIR__) . '/config/auth.php';
 require_once __DIR__ . '/../config/cors.php';

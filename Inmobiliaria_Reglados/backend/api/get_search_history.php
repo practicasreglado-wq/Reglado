@@ -1,4 +1,11 @@
 <?php
+
+/**
+ * Devuelve el historial reciente de búsquedas del usuario autenticado
+ * (search_history). Lo consume el frontend para mostrar "Búsquedas
+ * recientes" y permitir relanzarlas con un click.
+ */
+
 require_once __DIR__ . '/../config/cors.php';
 applyCors();
 handlePreflight();

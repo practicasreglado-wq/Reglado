@@ -2,6 +2,26 @@
 
 declare(strict_types=1);
 
+/**
+ * Endpoint de borrado directo de propiedad (admin o dueño).
+ *
+ * Path "rápido" sin pasar por el flujo de solicitud de eliminación. Lo usa:
+ *  - Admin desde el panel para borrar propiedades problemáticas.
+ *  - Dueño de una propiedad para borrar la suya (requiere ser owner).
+ *
+ * Para el flujo "usuario solicita → admin aprueba" ver:
+ *  - api/request_property_deletion.php (solicita)
+ *  - api/approve_property_deletion.php (aprueba)
+ *  - api/reject_property_deletion.php (rechaza)
+ *
+ * Requiere confirmación de contraseña del admin (lib/admin_password_check.php)
+ * para evitar borrados accidentales o por sesión secuestrada.
+ *
+ * El borrado real lo hace lib/property_delete_ops.php → executePropertyDeletion(),
+ * que purga TODAS las tablas relacionadas (documentos_firmados, citas, etc.)
+ * y los archivos en disco.
+ */
+
 require_once dirname(__DIR__) . '/config/db.php';
 require_once dirname(__DIR__) . '/config/auth.php';
 require_once __DIR__ . '/../config/cors.php';

@@ -1,3 +1,14 @@
+/**
+ * Service: llamadas relacionadas con propiedades + helpers de imagen.
+ *
+ * Incluye un mapping `categoryToImage` (Hoteles → hotel.png, Fincas →
+ * finca.png, etc.) que las vistas usan como placeholder/fallback cuando
+ * una propiedad no tiene foto subida.
+ *
+ * También expone funciones para acciones del USUARIO sobre sus propias
+ * propiedades (delete, update). Para acciones admin usa services/admin.js.
+ */
+
 import hotelImage from "../assets/hotel.png";
 import fincaImage from "../assets/finca.png";
 import parkingImage from "../assets/parking.png";

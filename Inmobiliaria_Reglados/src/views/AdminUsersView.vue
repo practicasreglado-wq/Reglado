@@ -1,3 +1,13 @@
+<!--
+  Vista de admin: gestión de usuarios de la plataforma.
+
+  Operaciones disponibles (todas requieren confirmar contraseña del admin):
+   - Cambiar rol (admin / real / basic) → update_user_role.php
+   - Bloquear/desbloquear acceso a Inmobiliaria
+   - Forzar re-login (revoca el JWT actual)
+
+  Datos vienen de get_inmo_users.php. Solo accesible para role=admin.
+-->
 <template>
   <div class="admin-users">
     <header class="admin-header">

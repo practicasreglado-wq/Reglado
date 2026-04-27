@@ -1,6 +1,19 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Endpoint de alta de propiedad desde el formulario web manual.
+ *
+ * Es la vía "directa" (vs create_property_from_text.php que extrae datos con
+ * IA, y vs el pipeline de receive_email.php que procesa correos entrantes).
+ *
+ * Recibe los campos ya estructurados (tipo, ciudad, dirección, precio…),
+ * los valida, geocodifica con Nominatim (lib/geocoding.php), calcula
+ * address_hash para deduplicación (lib/address_hash.php), inserta la
+ * propiedad y notifica matches con buyer_intents pendientes
+ * (lib/buyer_intents.php).
+ */
+
 require_once __DIR__ . '/../config/cors.php';
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../config/auth.php';

@@ -1,3 +1,19 @@
+/**
+ * Estado global de autenticación (Vue reactive) compartido por toda la SPA.
+ *
+ * El JWT se obtiene de ApiLoging (servicio Laravel separado, ver VITE_AUTH_API_URL)
+ * y se guarda en DOS sitios:
+ *  - localStorage[TOKEN_KEY]: persistencia local solo de esta SPA.
+ *  - cookie COOKIE_TOKEN_KEY: COMPARTIDA con el resto de proyectos del
+ *    ecosistema (GrupoReglado, RegladoEnergy, RegladoIngenieria) para que
+ *    el login en uno propague a los demás. Por eso `clearAllAuthArtifacts`
+ *    es agresiva borrando combinaciones de path/domain.
+ *
+ * `auth.state` se importa en muchas vistas para mostrar/ocultar UI según
+ * sesión y rol; al cambiar `state.token` reactivamente, las vistas se
+ * actualizan solas.
+ */
+
 import { reactive } from "vue";
 
 const API_BASE = import.meta.env.VITE_AUTH_API_URL || "http://localhost:8000";

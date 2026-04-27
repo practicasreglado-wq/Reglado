@@ -1,6 +1,16 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Crea un nuevo buyer_intent (criterios de búsqueda del comprador).
+ *
+ * Una vez creado, lib/buyer_intents.php notifica a otros usuarios para que
+ * suban propiedades que encajen. Cuando alguien sube una que matchea con
+ * estos criterios, el comprador recibe notificación + email.
+ *
+ * Audit log: 'buyer_intent.create'.
+ */
+
 require_once __DIR__ . '/../config/cors.php';
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../config/auth.php';

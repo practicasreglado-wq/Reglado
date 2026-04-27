@@ -4,6 +4,22 @@ declare(strict_types=1);
 require_once dirname(__DIR__) . '/lib/geocoding.php';
 require_once dirname(__DIR__) . '/lib/address_hash.php';
 
+/**
+ * Capa de acceso a BD para el pipeline de procesado de propiedades entrantes
+ * (vía email/CloudMailin → receive_email.php → PropertyProcessor).
+ *
+ * Centraliza todas las queries que necesita el pipeline:
+ *  - insertReceivedAsset(): registra el correo entrante crudo en
+ *    `activos_recibidos` con un hash de contenido para deduplicar.
+ *  - createOrUpdateProperty / updateProperty / etc.: persisten la ficha
+ *    estructurada que produce ClaudeClient.
+ *  - findRegladoUserIdByEmail(): resuelve el dueño del activo si el email
+ *    asignado por la IA pertenece a un usuario ya registrado.
+ *
+ * Hace cache en memoria de columnas existentes (`columnExistsCache`) para no
+ * machacar INFORMATION_SCHEMA en runs largos. El cache vive solo durante una
+ * petición/proceso, no entre invocaciones.
+ */
 class Repository
 {
     private PDO $pdo;

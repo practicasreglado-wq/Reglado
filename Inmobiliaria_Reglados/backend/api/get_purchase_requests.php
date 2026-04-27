@@ -1,6 +1,14 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Lista de solicitudes de compra (purchase_appointments con metadatos del
+ * comprador y la propiedad) para el panel admin. Permite filtrar por estado
+ * y revisar todo el flujo notarial.
+ *
+ * Audit log: 'admin.list_purchase_requests'. Solo role=admin.
+ */
+
 require_once dirname(__DIR__) . '/config/db.php';
 require_once dirname(__DIR__) . '/config/auth.php';
 require_once __DIR__ . '/../config/cors.php';

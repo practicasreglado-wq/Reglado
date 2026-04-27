@@ -1,6 +1,23 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Endpoint del enlace "Aprobar usuario Premium" del correo al admin.
+ *
+ * El admin llega aquí desde el email enviado por send_real_user_request.php
+ * con un token en query string. Si es válido y la solicitud sigue pendiente:
+ *  1) Sube el rol del usuario a 'real' en regladousers.users.
+ *  2) Marca la fila de role_promotion_requests como resolved (approved).
+ *  3) Notifica al usuario (in-app + email) de la aprobación.
+ *
+ * Trabaja con DOS bases de datos en transacciones separadas (inmobiliaria y
+ * regladousers) — si la segunda falla, la primera se rollbackea para evitar
+ * estados inconsistentes.
+ *
+ * Devuelve HTML directo (no JSON) porque se accede desde el navegador del
+ * admin, no desde la SPA.
+ */
+
 require_once dirname(__DIR__) . '/lib/env_loader.php';
 require_once dirname(__DIR__) . '/lib/notifications_helper.php';
 require_once dirname(__DIR__) . '/lib/audit.php';

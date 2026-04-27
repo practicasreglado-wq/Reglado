@@ -2,6 +2,17 @@
 
 declare(strict_types=1);
 
+/**
+ * Listado público de propiedades para la vista del comprador.
+ *
+ * Solo devuelve propiedades con status='activa' y NO expone coordenadas
+ * reales — el mapa va con coordenadas desplazadas vía lib/privacy_map.php.
+ *
+ * Soporta filtros por tipo, ciudad, precio, m². La paginación la hace el
+ * frontend al recibir el array completo (en futuro evaluar paginación
+ * server-side si crece el volumen).
+ */
+
 require_once __DIR__ . '/../config/cors.php';
 applyCors();
 handlePreflight();

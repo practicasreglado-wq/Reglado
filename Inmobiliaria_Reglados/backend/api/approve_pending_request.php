@@ -1,6 +1,18 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Endpoint para que un admin AUTENTICADO apruebe una solicitud de
+ * promoción a Premium desde el panel admin (NO desde el correo).
+ *
+ * Diferencias con approve_real_role.php:
+ *  - Aquel: enlace de email con token, sin login.
+ *  - Este: SPA del admin con JWT + confirmación de pwd.
+ *
+ * Mismo efecto de fondo: sube el rol a 'real' en regladousers.users +
+ * notificación al usuario + audit 'role.promotion.approve'.
+ */
+
 require_once dirname(__DIR__) . '/lib/env_loader.php';
 require_once dirname(__DIR__) . '/config/db.php';
 require_once dirname(__DIR__) . '/config/auth.php';

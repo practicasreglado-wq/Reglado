@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * Guarda una búsqueda hecha por el usuario en `search_history` para que
+ * pueda volver a ella desde "Mis búsquedas recientes".
+ *
+ * Distinto de buyer_intents: las searches son consultas puntuales, los
+ * intents son criterios persistentes que disparan notificaciones cuando
+ * aparece una propiedad que matchea.
+ */
+
 require_once dirname(__DIR__) . "/config/db.php";
 require_once dirname(__DIR__) . "/config/auth.php";
 require_once __DIR__ . '/../config/cors.php';

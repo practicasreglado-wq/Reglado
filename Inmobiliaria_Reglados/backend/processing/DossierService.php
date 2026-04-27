@@ -3,6 +3,27 @@ declare(strict_types=1);
 
 use Dompdf\Dompdf;
 
+/**
+ * Genera el dossier comercial PDF completo de una propiedad.
+ *
+ * El dossier es el documento "premium" que solo se desbloquea para el
+ * comprador tras firmar NDA + LOI. Contiene la información detallada del
+ * activo (datos financieros, fotos, planos, situación urbanística...) que
+ * NO se muestra públicamente en la web.
+ *
+ * Estructura de archivos:
+ *   $uploadDir/
+ *     dossiers/
+ *       dossier_<tipo>_<ciudad>_<zona>.pdf    ← uno por propiedad
+ *
+ * El nombre del archivo se "slugifica" (sin acentos, sin espacios) para que
+ * funcione en cualquier sistema de archivos (Linux/Windows) y se pueda
+ * referenciar limpiamente desde la URL de descarga.
+ *
+ * Diferencia con PdfGenerator: ese genera múltiples docs auxiliares (NDA,
+ * LOI, ficha) en formatos sencillos. DossierService solo hace el dossier
+ * comercial pero con plantilla más elaborada y multi-página.
+ */
 class DossierService
 {
     private string $workingDir;

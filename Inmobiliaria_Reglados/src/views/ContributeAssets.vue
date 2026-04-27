@@ -1,3 +1,9 @@
+<!--
+  Vista pública para "aportar un activo" (un usuario externo describe una
+  propiedad para que un agente la valide). Va al mismo pipeline que
+  CreateProperty.vue pero más simple — sin autenticación obligatoria, lo
+  procesa la IA y queda como activo recibido pendiente de revisión por admin.
+-->
 <template>
   <div class="aportar-container">
     <div class="form-header">

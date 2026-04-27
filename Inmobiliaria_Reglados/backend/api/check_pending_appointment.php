@@ -1,6 +1,12 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Comprueba si el usuario autenticado tiene una cita pendiente para una
+ * propiedad concreta. Lo usa el frontend para decidir si mostrar
+ * "Solicitar cita" o "Ver mi cita pendiente" en PropertyDetail.vue.
+ */
+
 require_once dirname(__DIR__) . '/config/db.php';
 require_once dirname(__DIR__) . '/config/auth.php';
 require_once __DIR__ . '/../config/cors.php';

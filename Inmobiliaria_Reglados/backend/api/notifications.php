@@ -1,6 +1,15 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * CRUD de notificaciones in-app del usuario autenticado.
+ *
+ *   GET  → lista notificaciones (paginada, no-leídas primero).
+ *   POST → marca una notificación como leída (action=mark_read).
+ *
+ * Lo consume el componente NotificationBell.vue del header.
+ */
+
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../config/auth.php';
 require_once __DIR__ . '/../config/cors.php';

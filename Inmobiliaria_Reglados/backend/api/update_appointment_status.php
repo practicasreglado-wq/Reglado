@@ -1,6 +1,16 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Endpoint para que un admin marque una cita como completada o cancelada.
+ *
+ * Estados que acepta en el body: 'completed', 'cancelled'.
+ * Sella la columna correspondiente (completed_at o cancelled_at) con NOW().
+ *
+ * Requiere confirmación de contraseña del admin para evitar cambios
+ * accidentales que afecten a la disponibilidad de slots futuros.
+ */
+
 require_once dirname(__DIR__) . '/config/db.php';
 require_once dirname(__DIR__) . '/config/auth.php';
 require_once __DIR__ . '/../config/cors.php';

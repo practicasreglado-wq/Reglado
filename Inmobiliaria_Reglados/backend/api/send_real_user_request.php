@@ -2,6 +2,22 @@
 
 declare(strict_types=1);
 
+/**
+ * Endpoint para que un usuario solicite promoción a Premium ('real').
+ *
+ * Crea una fila en `role_promotion_requests` con un token único + hash y
+ * envía email al admin (ADMIN_NOTIFICATIONS_EMAIL del .env) con dos botones:
+ *  - Aprobar → enlace a api/approve_real_role.php?token=…
+ *  - Rechazar → enlace a api/reject_user.php?token=…
+ *
+ * Defensa anti-spam:
+ *  - Rate limit: máximo 3 solicitudes por usuario en 24h.
+ *  - El usuario debe estar autenticado (JWT válido).
+ *  - El motivo (mensaje) es obligatorio.
+ *
+ * Audit log: 'role.promotion_requested'.
+ */
+
 require_once dirname(__DIR__) . '/config/db.php';
 require_once dirname(__DIR__) . '/config/auth.php';
 require_once __DIR__ . '/../config/cors.php';

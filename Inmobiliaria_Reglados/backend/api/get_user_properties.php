@@ -1,6 +1,15 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Devuelve las propiedades de las que el usuario autenticado es DUEÑO
+ * (filtrado por owner_user_id == auth.sub). Lo usa la vista "Mis propiedades"
+ * del perfil del usuario.
+ *
+ * Incluye coordenadas desplazadas (lib/privacy_map.php) por consistencia
+ * con get_properties.php, aunque el dueño podría ver las reales.
+ */
+
 require_once __DIR__ . '/../config/cors.php';
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../config/auth.php';

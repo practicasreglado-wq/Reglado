@@ -1,6 +1,17 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Devuelve el estado actual del flujo de firma del comprador para una
+ * propiedad. Lo consume el frontend (PropertyDetail.vue) para mostrar el
+ * botón correcto (descargar NDA, subir firmado, descargar dossier...).
+ *
+ * Respuesta incluye flags como:
+ *  - dossier_unlocked / contact_unlocked
+ *  - nda_downloaded / loi_downloaded
+ *  - status: 'pendiente' | 'firmado' | 'validado'
+ */
+
 require_once __DIR__ . '/../config/cors.php';
 applyCors();
 handlePreflight();

@@ -2,6 +2,19 @@
 declare(strict_types=1);
 
 /**
+ * Resumen del estado de firma de documentos para un (user, propiedad).
+ *
+ * Lo consume el frontend (dashboard del comprador) para saber en qué punto
+ * del flujo está: pendiente de subir, subido pero sin validar, o validado y
+ * dossier desbloqueado.
+ *
+ * Estados devueltos en `status`:
+ *  - 'pendiente' → Falta NDA o LOI por subir.
+ *  - 'firmado'   → NDA + LOI subidos, esperando validación admin.
+ *  - 'validado'  → Admin validó las firmas, puede descargar el dossier.
+ */
+
+/**
  * Fetches a summary of signed documents for a user/property pair.
  *
  * @return array{

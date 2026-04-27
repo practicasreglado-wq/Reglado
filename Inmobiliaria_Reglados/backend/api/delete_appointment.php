@@ -1,6 +1,17 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Endpoint para que un admin elimine una cita programada por completo (no
+ * solo cambiar estado — borra la fila de purchase_appointments).
+ *
+ * Útil cuando hay que liberar el slot porque hubo un error al crearla o
+ * porque el comprador desistió. Requiere confirmación de contraseña.
+ *
+ * Para cambiar el estado de una cita (sin borrarla) usar
+ * update_appointment_status.php.
+ */
+
 require_once dirname(__DIR__) . '/config/db.php';
 require_once dirname(__DIR__) . '/config/auth.php';
 require_once __DIR__ . '/../config/cors.php';

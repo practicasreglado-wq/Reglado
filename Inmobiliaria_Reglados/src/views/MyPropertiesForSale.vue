@@ -1,3 +1,12 @@
+<!--
+  "Mis propiedades" — propiedades de las que el USUARIO autenticado es
+  dueño (filtradas server-side por owner_user_id == auth.sub vía
+  get_user_properties.php).
+
+  Desde aquí el dueño puede:
+   - Ver el detalle / editar campos
+   - Solicitar eliminación (request_property_deletion.php → admin decide)
+-->
 <template>
   <section class="properties-sale">
     <div class="properties-sale__hero">

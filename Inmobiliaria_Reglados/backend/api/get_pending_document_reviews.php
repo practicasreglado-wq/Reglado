@@ -1,6 +1,14 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Lista de documentos firmados pendientes de revisión por el admin.
+ * Lo consume el panel admin → "Documentos por aprobar".
+ *
+ * Solo accesible para role=admin. Audit:
+ * 'admin.list_pending_document_reviews'.
+ */
+
 require_once dirname(__DIR__) . '/config/db.php';
 require_once dirname(__DIR__) . '/config/auth.php';
 require_once __DIR__ . '/../config/cors.php';

@@ -1,6 +1,17 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Endpoint para que un admin rechace una solicitud pendiente de eliminación
+ * de propiedad. Espejo de approve_property_deletion.php pero negativo:
+ *  1) Confirma contraseña del admin.
+ *  2) Marca la fila de property_deletion_requests como 'rejected'.
+ *  3) NO borra nada — la propiedad sigue activa.
+ *  4) Notifica al solicitante del rechazo con motivo opcional.
+ *
+ * Devuelve JSON al frontend del admin.
+ */
+
 require_once dirname(__DIR__) . '/config/db.php';
 require_once dirname(__DIR__) . '/config/auth.php';
 require_once __DIR__ . '/../config/cors.php';

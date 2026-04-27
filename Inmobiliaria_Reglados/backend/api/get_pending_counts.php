@@ -1,6 +1,15 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Devuelve los contadores de "elementos pendientes" para el panel admin
+ * (badges del menú lateral): solicitudes Premium, eliminaciones de
+ * propiedad, documentos por revisar, citas por gestionar, etc.
+ *
+ * Endpoint ligero pensado para polling frecuente — solo COUNT(*) por tabla.
+ * Solo accesible para role=admin.
+ */
+
 require_once dirname(__DIR__) . '/config/db.php';
 require_once dirname(__DIR__) . '/config/auth.php';
 require_once __DIR__ . '/../config/cors.php';

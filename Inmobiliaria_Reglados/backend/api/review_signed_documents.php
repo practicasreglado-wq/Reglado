@@ -1,6 +1,18 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Endpoint para que el revisor (admin) marque un documento como
+ * approve/reject por separado (granularidad por documento, no por par
+ * NDA+LOI completo).
+ *
+ * Acepta `?action=approve` o `?action=reject` en query string. Lo usa el
+ * panel admin cuando la revisión la quieren hacer documento a documento
+ * antes de tomar la decisión final del par completo.
+ *
+ * Audit log: 'document.review.approve' / 'document.review.reject'.
+ */
+
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../config/auth.php';

@@ -369,6 +369,26 @@
 </template>
 
 <script setup>
+/**
+ * Vista de ficha de propiedad — el componente más grande y crítico de la SPA.
+ *
+ * Cubre TODO el flujo del comprador para una propiedad:
+ *  1) Vista pública: datos básicos, mapa con coordenadas desplazadas, fotos.
+ *  2) Descarga de NDA y LOI (download_legal_document).
+ *  3) Subida de NDA y LOI firmados (upload_signed_documents).
+ *  4) Tras validación admin: descarga del dossier completo (download_document).
+ *  5) Solicitud de cita notarial (request_purchase) con selector de fecha/hora
+ *     que filtra slots ocupados ± 3h (lógica blockedSlots / BLOCK_WINDOW_MINUTES).
+ *
+ * Estado clave:
+ *  - signedAccess: estado actual del comprador para esta propiedad
+ *    ('pendiente' / 'firmado' / 'validado').
+ *  - bookedTimesForDate: horarios ocupados ese día (de get_booked_time_ranges).
+ *  - blockedSlots: derivado, slots a ±3h de cualquier cita ocupada.
+ *  - hasPendingAppointment: si el usuario ya tiene cita pendiente (no permite
+ *    crear otra).
+ */
+
 import { computed, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useUserStore } from "../stores/user";

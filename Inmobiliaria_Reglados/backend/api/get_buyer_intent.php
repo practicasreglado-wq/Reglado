@@ -1,6 +1,15 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Devuelve los buyer_intents activos del usuario autenticado (matchmaking
+ * comprador → propiedad). Los muestra el frontend en su sección "Mis
+ * búsquedas activas".
+ *
+ * Para crear uno: create_buyer_intent.php. Lógica de matching y
+ * notificaciones: lib/buyer_intents.php.
+ */
+
 require_once __DIR__ . '/../config/cors.php';
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../config/auth.php';

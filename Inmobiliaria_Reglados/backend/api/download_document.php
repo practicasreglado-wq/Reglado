@@ -1,6 +1,20 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Endpoint de descarga "post-firma" de documentos asociados a una propiedad
+ * (dossier comercial completo, ficha extendida, etc.).
+ *
+ * Requiere acceso del comprador (buyer_property_access.dossier_unlocked = 1)
+ * — gating en lib/document_access.php. Sin ese flag, devuelve 403 aunque el
+ * usuario esté autenticado.
+ *
+ * Para los docs legales (NDA/LOI) que se descargan ANTES de firmar, ver
+ * download_legal_document.php.
+ *
+ * Audit log: 'document.<documentKind>.download'.
+ */
+
 require_once __DIR__ . '/../config/cors.php';
 applyCors();
 handlePreflight();

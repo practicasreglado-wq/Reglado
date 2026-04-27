@@ -1,3 +1,11 @@
+<!--
+  Pantalla de "redirección al login externo".
+
+  El login real ocurre en GrupoReglado (servicio Vue separado en
+  VITE_GRUPO_REGLADO_BASE_URL). Esta vista solo construye la URL con
+  buildExternalAuthUrl() y redirige; cuando el usuario se autentica allí,
+  vuelve a /auth/callback con el JWT (ver AuthCallback.vue).
+-->
 <template>
   <div class="auth-redirect">
     <div class="overlay"></div>

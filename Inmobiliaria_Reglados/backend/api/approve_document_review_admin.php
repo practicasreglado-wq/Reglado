@@ -1,6 +1,18 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Endpoint para que un admin AUTENTICADO apruebe la revisión de documentos
+ * firmados desde el panel admin (NO desde el correo).
+ *
+ * Diferencias con approve_signed_documents.php:
+ *  - Aquel se accede desde el navegador del revisor con token (sin login).
+ *  - Este se llama desde la SPA del admin con JWT + confirmación de pwd.
+ *
+ * Comparten misma lógica de fondo: marca docs como validados, desbloquea
+ * dossier en buyer_property_access y notifica al comprador.
+ */
+
 require_once dirname(__DIR__) . '/config/db.php';
 require_once dirname(__DIR__) . '/config/auth.php';
 require_once __DIR__ . '/../config/cors.php';

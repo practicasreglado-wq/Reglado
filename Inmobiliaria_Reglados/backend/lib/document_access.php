@@ -1,6 +1,29 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Acceso del comprador (buyer) a la documentación de una propiedad.
+ *
+ * Modela el flujo de gating: para que un comprador pueda ver el dossier
+ * completo / contactar al vendedor / agendar firma, primero tiene que:
+ *  1) Descargar NDA y LOI (registrado en `buyer_property_document_download_progress`).
+ *  2) Subir esos documentos firmados (gestionado en api/upload_signed_documents.php).
+ *  3) Que el admin valide la firma (gestionado en api/approve_signed_documents.php).
+ *
+ * Este archivo trabaja con dos tablas:
+ *  - `buyer_property_access`: una fila por (propiedad, comprador) cuando ya
+ *    tiene acceso. Sus columnas (dossier_unlocked, contact_unlocked, etc.)
+ *    son flags que el admin va activando según el progreso.
+ *  - `buyer_property_document_download_progress`: tracking de qué legal
+ *    docs (NDA/LOI) ha descargado para no dejarle subir firmados sin haber
+ *    descargado primero las plantillas.
+ */
+
+/**
+ * Lee la fila de buyer_property_access (o null si no existe). Esta fila se
+ * crea automáticamente con `ensureBuyerPropertyAccess()` cuando el comprador
+ * ya ha descargado ambos documentos legales.
+ */
 function fetchBuyerPropertyAccess(PDO $pdo, int $propertyId, int $buyerUserId): ?array
 {
     $stmt = $pdo->prepare(
@@ -17,6 +40,10 @@ function fetchBuyerPropertyAccess(PDO $pdo, int $propertyId, int $buyerUserId): 
     return $row ?: null;
 }
 
+/**
+ * Lee el progreso de descarga de docs legales del comprador para una
+ * propiedad. Devuelve null si todavía no ha descargado nada.
+ */
 function fetchBuyerPropertyDocumentDownloadProgress(PDO $pdo, int $propertyId, int $buyerUserId): ?array
 {
     $stmt = $pdo->prepare(
@@ -33,6 +60,10 @@ function fetchBuyerPropertyDocumentDownloadProgress(PDO $pdo, int $propertyId, i
     return $row ?: null;
 }
 
+/**
+ * Comprueba si el comprador ya descargó NDA y LOI. Devuelve false si
+ * $progress es null (nunca descargó nada) o si falta alguno.
+ */
 function buyerHasDownloadedBothLegalDocuments(?array $progress): bool
 {
     if ($progress === null) {
@@ -123,6 +154,12 @@ function markBuyerPropertyAllLegalDocumentsDownloaded(PDO $pdo, int $propertyId,
     return fetchBuyerPropertyDocumentDownloadProgress($pdo, $propertyId, $buyerUserId) ?? [];
 }
 
+/**
+ * Crea la fila de buyer_property_access si no existía Y el comprador ya
+ * descargó NDA + LOI. Si no cumple ese gate, devuelve [] (sin acceso). Es
+ * idempotente: llamarlo varias veces no duplica filas (UPSERT por clave
+ * compuesta).
+ */
 function ensureBuyerPropertyAccess(PDO $pdo, int $propertyId, int $buyerUserId): array
 {
     $existing = fetchBuyerPropertyAccess($pdo, $propertyId, $buyerUserId);
@@ -149,6 +186,12 @@ function ensureBuyerPropertyAccess(PDO $pdo, int $propertyId, int $buyerUserId):
 }
 
 /**
+ * Actualiza columnas concretas de buyer_property_access (típicamente flags
+ * como dossier_unlocked, contact_unlocked) y devuelve la fila refrescada.
+ *
+ * ⚠️ $updates va directo a SQL — solo pasar nombres de columna validados a
+ * mano, NO valores que vengan del request.
+ *
  * @param array<string,int> $updates
  */
 function updateBuyerPropertyAccess(PDO $pdo, int $propertyId, int $buyerUserId, array $updates): array

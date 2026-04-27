@@ -3,6 +3,21 @@ declare(strict_types=1);
 
 use Dompdf\Dompdf;
 
+/**
+ * Genera los PDFs auxiliares que acompañan a una propiedad recién procesada
+ * (NDA y LOI con datos pre-rellenados, ficha resumen, etc.).
+ *
+ * Usa Dompdf para renderizar HTML → PDF — pasable visualmente pero pesado
+ * (50ms-1s por documento). Si el rendimiento se vuelve un problema, evaluar
+ * mPDF o wkhtmltopdf como alternativa.
+ *
+ * Storage: los PDFs se guardan en $storageDir (típicamente
+ * backend/uploads/textos/) con permisos 0750 para limitar acceso a otros
+ * usuarios del servidor.
+ *
+ * El dossier comercial completo lo genera DossierService aparte porque tiene
+ * estructura distinta (multi-página con plantilla más rica).
+ */
 class PdfGenerator
 {
     private string $storageDir;

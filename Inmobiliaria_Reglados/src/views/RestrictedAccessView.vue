@@ -1,3 +1,8 @@
+<!--
+  Página que muestra el router cuando el usuario intenta acceder a una ruta
+  protegida sin tener el rol/permisos necesarios. Renderiza el componente
+  RestrictedAccess (mensaje + CTA "Solicitar promoción a Premium").
+-->
 <template>
   <div class="restricted-page">
     <RestrictedAccess />

@@ -1,6 +1,20 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Detección heurística de firma digital en PDFs subidos.
+ *
+ * No verifica criptográficamente la firma — eso requeriría validar la cadena
+ * de certificación contra una CA reconocida (no trivial y dependiente de
+ * librerías pesadas). Lo que hace es buscar marcadores que SOLO aparecen
+ * cuando un PDF ha pasado por DocuSign / Adobe Sign / Acrobat con firma
+ * digital, y rechazar PDFs que claramente NO los tienen.
+ *
+ * Es una primera línea de defensa; el admin sigue siendo el responsable
+ * final de validar visualmente las firmas vía
+ * api/approve_signed_documents.php.
+ */
+
 /*function pdfSeemsSigned($uploadedPath, $originalPath = null): array
 {
     return [
@@ -9,6 +23,17 @@ declare(strict_types=1);
     ];
 }*/
 
+/**
+ * Devuelve ['accepted' => bool, 'reason' => string].
+ *
+ * Rechaza si:
+ *  - El archivo no se puede leer.
+ *  - El SHA-256 del subido coincide con el original (no se ha tocado nada).
+ *  - No aparece ningún patrón de firma digital reconocido.
+ *
+ * Acepta si encuentra al menos uno de los patrones (campo /Sig, AcroForm
+ * SigFlags, SubFilter PKCS7/CAdES, marca DocuSign/Adobe Sign).
+ */
 function pdfSeemsSigned(string $uploadedPath, ?string $originalPath = null): array
 {
     if (!is_file($uploadedPath) || !is_readable($uploadedPath)) {

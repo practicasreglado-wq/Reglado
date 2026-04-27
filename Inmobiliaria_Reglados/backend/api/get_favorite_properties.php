@@ -1,6 +1,14 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Lista las propiedades marcadas como favoritas por el usuario autenticado.
+ * Devuelve los mismos datos que get_properties.php (con coordenadas
+ * desplazadas vía privacy_map) pero filtrado por la tabla `favorites`.
+ *
+ * Para añadir/quitar favoritos: save_favorite.php / remove_favorite.php.
+ */
+
 require_once __DIR__ . '/../config/cors.php';
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../config/auth.php';

@@ -1,6 +1,17 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Lista de usuarios de la plataforma inmobiliaria (de regladousers.users)
+ * para el panel admin → "Gestión de usuarios".
+ *
+ * Devuelve email, rol, fechas, flags de bloqueo, etc. Lo usa el admin para
+ * subir/bajar de rol (update_user_role.php), bloquear acceso, forzar
+ * re-login, etc.
+ *
+ * Audit log: 'admin.list_users'. Solo role=admin.
+ */
+
 require_once dirname(__DIR__) . '/lib/env_loader.php';
 require_once dirname(__DIR__) . '/config/db.php';
 require_once dirname(__DIR__) . '/config/auth.php';

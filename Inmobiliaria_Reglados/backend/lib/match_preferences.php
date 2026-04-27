@@ -1,8 +1,27 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Sanitización de las "preferencias de match" (cuestionario que rellena el
+ * comprador para perfilar qué le interesa).
+ *
+ * Las respuestas vienen del frontend como un objeto libre y se guardan en
+ * la tabla `match_preferences` como JSON. Aquí validamos que la categoría
+ * esté en una lista cerrada (whitelist) y que las respuestas tengan tipos
+ * razonables — el resto de filtrado lo hace el endpoint que consume estos
+ * datos para emparejar con propiedades.
+ *
+ * Tabla relacionada: api/save_preferences.php / api/match_preferences.php.
+ */
+
+/** Whitelist de categorías válidas. Cualquier valor fuera se ignora. */
 const MATCH_PREFERENCE_CATEGORIES = ["Hoteles", "Fincas", "Parking", "Edificios", "Activos"];
 
+/**
+ * Normaliza la categoría: trim, comparación case-insensitive contra la
+ * whitelist, devuelve la versión "canónica" (con mayúsculas correctas) o
+ * null si no encaja con ninguna de las permitidas.
+ */
 function normalizeMatchPreferenceCategory(?string $value): ?string
 {
     if (!is_string($value)) {
@@ -24,6 +43,11 @@ function normalizeMatchPreferenceCategory(?string $value): ?string
     return null;
 }
 
+/**
+ * Limpia el array de respuestas del cuestionario antes de serializarlo a JSON.
+ * Aplica topes anti-abuso (50 keys, 100 chars en key, 500 chars en valor) y
+ * convierte tipos no-string (números, bools) a representación textual.
+ */
 function sanitizeMatchPreferenceAnswers($rawAnswers): array
 {
     if (!is_array($rawAnswers)) {
@@ -77,11 +101,16 @@ function sanitizeMatchPreferenceAnswers($rawAnswers): array
     return $cleaned;
 }
 
+/** Serializa las respuestas a JSON. Si falla la codificación devuelve "{}". */
 function encodeMatchPreferenceAnswers(array $answers): string
 {
     return json_encode($answers, JSON_UNESCAPED_UNICODE) ?: "{}";
 }
 
+/**
+ * Inverso de encode. Si el JSON está vacío, mal formado, o trae valores no
+ * escalares, devuelve [] o filtra los valores inválidos sin lanzar.
+ */
 function decodeMatchPreferenceAnswers(?string $json): array
 {
     if (!is_string($json) || trim($json) === "") {
@@ -110,6 +139,10 @@ function decodeMatchPreferenceAnswers(?string $json): array
     return $cleaned;
 }
 
+/**
+ * Devuelve las preferencias activas del usuario (categoría + respuestas
+ * deserializadas + metadatos). Si no existen, devuelve [].
+ */
 function fetchUserMatchPreferences(PDO $pdo, int $userId): array
 {
     if ($userId <= 0) {
@@ -140,6 +173,13 @@ function fetchUserMatchPreferences(PDO $pdo, int $userId): array
     ];
 }
 
+/**
+ * Crea o actualiza las preferencias del usuario en una sola query (UPSERT
+ * por user_id). Marca is_active = 1 y refresca last_used_at.
+ *
+ * Lanza InvalidArgumentException si la categoría no está en la whitelist.
+ * Devuelve el registro recién insertado/actualizado.
+ */
 function upsertUserMatchPreferences(PDO $pdo, int $userId, string $category, array $answers): array
 {
     $normalizedCategory = normalizeMatchPreferenceCategory($category);
@@ -170,6 +210,11 @@ function upsertUserMatchPreferences(PDO $pdo, int $userId, string $category, arr
     return fetchUserMatchPreferences($pdo, $userId);
 }
 
+/**
+ * Borra "blandamente" las preferencias del usuario: pone is_active = 0,
+ * limpia las respuestas y resetea last_used_at. Mantiene el registro para no
+ * perder histórico.
+ */
 function deactivateUserMatchPreferences(PDO $pdo, int $userId): void
 {
     if ($userId <= 0) {

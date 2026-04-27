@@ -1,3 +1,13 @@
+<!--
+  Vista de admin: solicitudes pendientes de aprobación.
+
+  Tres tipos de solicitudes que llegan aquí:
+   1) Promoción a Premium (role.promotion) → approve/reject_pending_request.php
+   2) Validación de docs firmados → approve/reject_document_review_admin.php
+   3) Eliminación de propiedad → approve/reject_property_deletion.php
+
+  Todas las acciones críticas piden confirmación de contraseña del admin.
+-->
 <template>
   <div class="admin-pending">
     <header class="admin-header">

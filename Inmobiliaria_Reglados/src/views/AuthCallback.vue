@@ -1,3 +1,11 @@
+<!--
+  Endpoint de "vuelta" tras el login externo en GrupoReglado.
+
+  Recibe el JWT en query string, lo guarda en auth.state (auth.js setSession)
+  y redirige al usuario a la página de origen (returnTo) o /profile por defecto.
+
+  Si llega sin token o con uno inválido, muestra mensaje de error.
+-->
 <template>
   <div class="auth-callback">
     <p v-if="error">{{ error }}</p>

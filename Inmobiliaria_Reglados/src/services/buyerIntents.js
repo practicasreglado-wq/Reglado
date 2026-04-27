@@ -1,3 +1,15 @@
+/**
+ * Service: gestión de buyer_intents (matchmaking comprador → propiedad).
+ *
+ * Un buyer_intent guarda los criterios del usuario (categoría, ciudad, precio
+ * máximo, m² mínimos). Cuando alguien sube una propiedad que matchea, el
+ * comprador recibe notificación + email automáticamente (lógica server-side
+ * en backend/lib/buyer_intents.php).
+ *
+ * Distinto de search_history (búsquedas puntuales): los intents son
+ * persistentes y disparan notificaciones futuras.
+ */
+
 import { auth } from "./auth";
 
 const API_BASE =

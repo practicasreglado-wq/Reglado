@@ -1,3 +1,15 @@
+<!--
+  Vista de admin: listado y gestión de TODAS las propiedades de la plataforma
+  (incluye inactivas, vendidas, pendientes — vs PropertiesForSale.vue que solo
+  muestra las activas al público).
+
+  Permite al admin:
+   - Cambiar estado de propiedad (update_property_status.php)
+   - Eliminar propiedad (delete_property.php) con confirmación de pwd
+   - Ver detalles y editar campos clave
+
+  Solo accesible si auth.state.user.role === 'admin' (router guard).
+-->
 <template>
   <div class="admin-properties">
     <header class="admin-header">

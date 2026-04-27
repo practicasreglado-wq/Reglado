@@ -5,6 +5,26 @@ declare(strict_types=1);
  * Operaciones compartidas de borrado de propiedades. Usadas por:
  *  - api/delete_property.php          (borrado directo desde admin o dueño)
  *  - api/approve_property_deletion.php (admin aprueba una solicitud)
+ *
+ * Particularidades importantes:
+ *
+ *  - **Esquema dinámico**: las funciones helper (getTableColumns, columnExists,
+ *    tableExists, getExistingColumn) inspeccionan INFORMATION_SCHEMA antes de
+ *    cada operación. Esto sirve para tolerar despliegues con versiones
+ *    distintas del esquema (la columna puede llamarse `propiedad_id` o
+ *    `property_id`, etc.) y no romper si una tabla auxiliar todavía no existe.
+ *
+ *  - **Borrado en cascada manual**: deleteAllRelatedRows() borra de TODAS las
+ *    tablas del esquema que tengan una FK al propertyId, excluyendo unas
+ *    cuantas que se manejan aparte (notifications, signed_document_review_tokens,
+ *    activos_recibidos). No depende de FOREIGN KEYs reales en MySQL.
+ *
+ *  - **Path traversal hardening**: absoluteUploadPath() valida que el path
+ *    resuelto siga dentro de backend/uploads/, así un valor envenenado en BD
+ *    no puede borrar archivos del sistema fuera de uploads.
+ *
+ *  - **Idempotencia**: todos los `if (!function_exists(...))` permiten cargar
+ *    este archivo varias veces en la misma request sin errores de redeclare.
  */
 
 if (!function_exists('getTableColumns')) {

@@ -1,3 +1,8 @@
+<!--
+  "Mis favoritos" — propiedades que el usuario ha marcado con el corazón.
+  Datos de get_favorite_properties.php (filtrado por user_id en la tabla
+  `favorites`). Acción "quitar" usa remove_favorite.php.
+-->
 <template>
   <section class="favorite-properties">
     <div class="favorite-properties__hero">

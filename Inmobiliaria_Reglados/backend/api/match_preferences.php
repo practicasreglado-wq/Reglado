@@ -1,6 +1,16 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * CRUD de las preferencias de matching del usuario autenticado:
+ *
+ *   GET    → devuelve las preferencias activas (categoría + respuestas).
+ *   POST   → upsert (crea o actualiza) las preferencias.
+ *   DELETE → desactiva las preferencias actuales (soft delete).
+ *
+ * Lógica de validación y persistencia: lib/match_preferences.php.
+ */
+
 require_once __DIR__ . '/../config/cors.php';
 applyCors();
 handlePreflight();

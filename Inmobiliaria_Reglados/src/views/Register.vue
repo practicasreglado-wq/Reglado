@@ -1,3 +1,8 @@
+<!--
+  Espejo de Login.vue para registro nuevo. Redirige a la página de registro
+  de GrupoReglado (VITE_GRUPO_REGLADO_REGISTER_PATH del .env). Al completar,
+  el usuario vuelve a /auth/callback con un JWT recién emitido.
+-->
 <template>
   <div class="auth-redirect">
     <div class="overlay"></div>

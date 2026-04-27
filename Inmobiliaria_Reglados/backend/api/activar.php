@@ -1,5 +1,18 @@
 <?php
 declare(strict_types=1);
+
+/**
+ * Endpoint de "activación" de docs firmados vía token corto (legacy).
+ *
+ * Variante anterior del flujo de aprobación: el comprador (no el revisor)
+ * recibe un token y al pulsar el enlace marca sus propios documentos como
+ * validados. Mantenido por compatibilidad con tokens emitidos antes de
+ * migrar al flujo del revisor (approve_signed_documents.php).
+ *
+ * Para flujos nuevos, usar approve_document_review_admin.php /
+ * reject_document_review_admin.php — tienen mejores garantías de seguridad.
+ */
+
 require_once __DIR__ . '/../config/cors.php';
 applyCors();
 

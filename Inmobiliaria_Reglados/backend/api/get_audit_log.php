@@ -1,6 +1,21 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Endpoint que devuelve entradas de la tabla `audit_log` para el panel de
+ * Registro de Auditoría del admin (src/views/AdminAuditView.vue).
+ *
+ * Solo accesible para role=admin. Soporta filtros por:
+ *  - action (búsqueda por código, ej. 'document.signed.approve')
+ *  - user_email
+ *  - date_from / date_to
+ * Y paginación (page, per_page).
+ *
+ * Los códigos de `action` que devuelve los traduce a español el frontend
+ * con el mapping ACTION_LABELS de AdminAuditView.vue. Si añades una acción
+ * nueva en lib/audit.php, recuerda mapearla allí.
+ */
+
 require_once dirname(__DIR__) . '/config/db.php';
 require_once dirname(__DIR__) . '/config/auth.php';
 require_once __DIR__ . '/../config/cors.php';

@@ -1,6 +1,24 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Endpoint para que el comprador suba sus NDA y LOI firmados.
+ *
+ * Requisitos previos: el comprador debe haber descargado ambos documentos
+ * legales (gating en lib/document_access.php) y estar autenticado.
+ *
+ * Flujo:
+ *  1) Recibe los PDFs por multipart/form-data.
+ *  2) Valida que tienen marcadores de firma digital (lib/pdf_signature.php).
+ *  3) Mueve los archivos a backend/uploads/firmados/ con nombre único.
+ *  4) Inserta en `documentos_firmados` con firmado_valido = 1.
+ *  5) Genera un token de revisión (lib/document_review.php) y manda email
+ *     al revisor (DOCUMENT_REVIEW_EMAIL) con enlaces aprobar/rechazar.
+ *
+ * El comprador queda en estado "pendiente de validación admin" hasta que
+ * alguien haga click en uno de los enlaces del correo.
+ */
+
 require_once __DIR__ . '/../config/cors.php';
 applyCors();
 handlePreflight();

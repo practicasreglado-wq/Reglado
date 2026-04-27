@@ -1,6 +1,26 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Cron: notifica al comprador cuando su token de subida de docs firmados ha
+ * expirado.
+ *
+ * Cuando el comprador sube NDA/LOI firmados, upload_signed_documents.php
+ * genera un token de revisión con TTL de 7 días (ver lib/document_review.php).
+ * Si ese token caduca sin que el revisor lo apruebe ni lo rechace, este cron
+ * detecta la caducidad y avisa al comprador (in-app + email) para que vuelva
+ * a iniciar el proceso.
+ *
+ * Idempotencia: cada token tiene dos columnas (`expiration_notified_at` y
+ * `expiration_email_sent_at`) que se sellan al avisar — si el cron corre
+ * varias veces, no manda nada duplicado.
+ *
+ * Programar en Hostinger (cron):
+ *   *\/15 * * * * /usr/bin/php .../backend/cron/notify_expired_review_tokens.php
+ *
+ * Logs: backend/logs/expired_tokens_job.log.
+ */
+
 require_once dirname(__DIR__) . '/config/db.php';
 require_once dirname(__DIR__) . '/lib/notifications.php';
 require_once dirname(__DIR__) . '/lib/env_loader.php';
@@ -9,6 +29,10 @@ require_once dirname(__DIR__) . '/send_mail.php';
 
 loadEnv(dirname(__DIR__) . '/.env');
 
+/**
+ * Helper de log específico del job. Escribe en backend/logs/, asegurándose de
+ * crear el directorio si no existe (con permisos restrictivos 0750).
+ */
 function logExpiredTokenJob(string $message, array $context = []): void
 {
     $logsDir = dirname(__DIR__) . '/logs';

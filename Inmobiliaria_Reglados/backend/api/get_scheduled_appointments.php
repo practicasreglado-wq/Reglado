@@ -1,6 +1,13 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Lista de citas notariales programadas (purchase_appointments con
+ * status='scheduled') para el panel admin. Vista calendario/agenda.
+ *
+ * Audit log: 'admin.list_appointments'. Solo role=admin.
+ */
+
 require_once dirname(__DIR__) . '/config/db.php';
 require_once dirname(__DIR__) . '/config/auth.php';
 require_once __DIR__ . '/../config/cors.php';

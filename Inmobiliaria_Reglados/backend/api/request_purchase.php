@@ -1,6 +1,23 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Endpoint para que un comprador agende cita de firma con notario.
+ *
+ * Pre-requisito: el comprador debe tener docs firmados validados por admin
+ * (buyer_property_access.dossier_unlocked = 1).
+ *
+ * Validaciones clave:
+ *  - Datos de la notaría (nombre, dirección, contacto) obligatorios.
+ *  - Fecha y hora futuras.
+ *  - **Ventana de bloqueo de 3h**: no puede haber otra cita programada en
+ *    [reqdate - 180min, reqdate + 180min] (ver bloque más abajo). Se valida
+ *    server-side aunque el frontend ya filtre huecos en el dropdown.
+ *
+ * Tras crear la cita en `purchase_appointments` (status=scheduled), envía
+ * email de confirmación al comprador y al admin con el detalle.
+ */
+
 require_once __DIR__ . '/../config/cors.php';
 applyCors();
 handlePreflight();

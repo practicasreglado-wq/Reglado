@@ -1,6 +1,21 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Endpoint de alta de propiedad a partir de texto libre (modo "pega aquí
+ * el correo del agente y la IA lo estructura").
+ *
+ * Es el mismo pipeline que receive_email.php (CloudMailin) pero disparado
+ * manualmente desde la SPA en vez de por un webhook. Pasa por:
+ *
+ *  Repository.insertReceivedAsset → ClaudeClient extrae ficha →
+ *  PropertyProcessor crea la propiedad → PdfGenerator/DossierService
+ *  generan los PDFs.
+ *
+ * Útil cuando un usuario tiene la info en texto pero no quiere/no puede
+ * usar email para mandarla.
+ */
+
 require_once __DIR__ . '/../config/cors.php';
 applyCors();
 handlePreflight();

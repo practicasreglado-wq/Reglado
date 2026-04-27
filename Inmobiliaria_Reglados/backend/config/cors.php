@@ -1,6 +1,33 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Política CORS y cabeceras de seguridad para todos los endpoints de api/.
+ *
+ * Uso típico al inicio de un endpoint:
+ *
+ *   require_once __DIR__ . '/../config/cors.php';
+ *   applyCors();
+ *   handlePreflight();
+ *
+ * `applyCors()` debe llamarse SIEMPRE — añade cabeceras de seguridad genéricas
+ * (X-Content-Type-Options, X-Frame-Options, Referrer-Policy) aunque el origen
+ * no esté permitido, para que las respuestas de error también estén
+ * protegidas. `handlePreflight()` corta los OPTIONS con 204 antes de tocar
+ * lógica de negocio.
+ */
+
+/**
+ * Devuelve la lista de orígenes que pueden hacer peticiones CORS.
+ *
+ * Combina dos fuentes:
+ *  1) Defaults de localhost (solo en entorno de desarrollo).
+ *  2) Lo que haya en la variable de entorno CORS_ALLOWED_ORIGINS (lista
+ *     separada por comas, sin barra final por origen).
+ *
+ * En producción real, si te olvidas de configurar CORS_ALLOWED_ORIGINS, la
+ * lista queda vacía y el navegador rechaza cualquier origen (fail-closed).
+ */
 function getCorsAllowedOrigins(): array
 {
     // Los defaults de localhost SOLO se aplican en desarrollo. Detectamos local
@@ -38,6 +65,12 @@ function getCorsAllowedOrigins(): array
     return array_values(array_unique(array_merge($defaults, $extras)));
 }
 
+/**
+ * Aplica las cabeceras CORS al response actual + cabeceras de seguridad
+ * genéricas. Solo añade Access-Control-Allow-Origin si el origen del cliente
+ * está en la lista blanca; si no, las cabeceras CORS no se mandan y el
+ * navegador bloquea la respuesta (comportamiento esperado).
+ */
 function applyCors(): void
 {
     $allowedOrigins = getCorsAllowedOrigins();
@@ -58,6 +91,11 @@ function applyCors(): void
     header('Referrer-Policy: strict-origin-when-cross-origin');
 }
 
+/**
+ * Corta peticiones OPTIONS (preflight CORS) devolviendo 204 sin cuerpo. Debe
+ * llamarse JUSTO después de applyCors() para que el navegador reciba las
+ * cabeceras de la política antes de hacer la petición real.
+ */
 function handlePreflight(): void
 {
     if (($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') {

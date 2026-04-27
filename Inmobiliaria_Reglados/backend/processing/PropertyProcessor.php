@@ -3,6 +3,29 @@ declare(strict_types=1);
 
 require_once dirname(__DIR__) . '/lib/buyer_intents.php';
 
+/**
+ * Orquestador del pipeline de procesado de propiedades entrantes.
+ *
+ * Cuando llega un correo a CloudMailin → receive_email.php, se crea un
+ * "activo recibido" en BD y se invoca a este processor con su id. El flujo:
+ *
+ *  1) Lee el texto crudo del activo desde Repository.
+ *  2) Llama a ClaudeClient para extraer la ficha estructurada (tipo, ciudad,
+ *     dirección, precio, dossier_inversion...).
+ *  3) Resuelve el dueño:
+ *      - Si la IA asignó un email_usuario que existe → owner_user_id real.
+ *      - Si el email no está registrado → owner_user_id NULL +
+ *        owner_email_pending para que se enlace cuando ese email se registre
+ *        (ver lib/property_owner_linking.php).
+ *      - Si no hay email asignado → fallback al usuario que disparó la
+ *        petición (createdByUserId).
+ *  4) Crea/actualiza la propiedad en BD vía Repository.
+ *  5) Genera el dossier PDF (PdfGenerator + DossierService).
+ *  6) Notifica matches con buyer_intents pendientes (lib/buyer_intents.php).
+ *
+ * Si cualquier paso falla, el activo queda marcado con error en BD y un
+ * admin debe revisarlo a mano — no se crean propiedades parciales.
+ */
 class PropertyProcessor
 {
     private Repository $repository;

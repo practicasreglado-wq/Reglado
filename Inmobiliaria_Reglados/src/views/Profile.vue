@@ -1,3 +1,15 @@
+<!--
+  Perfil del usuario — vista hub con sidebar y subrutas anidadas.
+
+  Las subrutas (children del router) renderizan en el <RouterView/> interno:
+   - /profile/my-properties-for-sale → MyPropertiesForSale.vue
+   - /profile/favorites              → FavoriteProperties.vue
+   - /profile/preferences            → preferencias de matching
+   - /profile/buyer-intents          → buyer_intents activos
+   - /profile/search-history         → historial de búsquedas
+
+  El sidebar puede pinearse (isSidebarPinned) para usuarios desktop.
+-->
 <template>
 <section
   ref="profileRoot"

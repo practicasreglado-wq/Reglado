@@ -7,6 +7,12 @@ declare(strict_types=1);
  * (Funciones extraídas tras la eliminación del sistema de matching)
  */
 
+/**
+ * Decodifica una cadena JSON garantizando que el resultado es siempre un
+ * array. Si la entrada es null/vacía/JSON inválido devuelve [] en vez de
+ * propagar un error — útil para deserializar columnas TEXT que pueden venir
+ * sucias desde versiones antiguas del esquema.
+ */
 function decodeJsonArray(?string $json): array
 {
     if (!is_string($json) || trim($json) === '') {

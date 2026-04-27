@@ -1,6 +1,21 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Endpoint para que un admin cambie el rol de un usuario manualmente
+ * (sin pasar por la solicitud Premium del usuario).
+ *
+ * Roles válidos: admin, real, basic (los 3 niveles de la plataforma).
+ *
+ * Defensas:
+ *  - Confirmación de contraseña del admin (lib/admin_password_check.php).
+ *  - Rate limit por admin para evitar cambios masivos accidentales (audit
+ *    queda con 'user.role_change_rate_limited' si se supera).
+ *  - Auth fallida queda registrada con 'user.role_change_auth_failed'.
+ *  - Cambio exitoso → 'user.role_change' + notificación al usuario afectado
+ *    + opción de forzar re-login si baja de nivel.
+ */
+
 require_once dirname(__DIR__) . '/lib/env_loader.php';
 require_once dirname(__DIR__) . '/config/db.php';
 require_once dirname(__DIR__) . '/config/auth.php';

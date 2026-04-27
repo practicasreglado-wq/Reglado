@@ -1,3 +1,11 @@
+<!--
+  Historial de búsquedas del usuario (get_search_history.php). Permite
+  relanzar una búsqueda con un click o eliminar entradas (delete_search_history.php).
+
+  Distinto de buyer_intents (criterios persistentes con notificaciones):
+  esto es solo el log de qué ha buscado el usuario para que pueda repetir
+  fácilmente.
+-->
 <template>
   <section class="history-view">
     <div class="history-header">

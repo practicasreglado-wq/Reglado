@@ -1,15 +1,34 @@
 <?php
 declare(strict_types=1);
 
-// Borra filas antiguas de audit_log para que la tabla no crezca sin tope.
-// Retención configurable con AUDIT_LOG_RETENTION_DAYS en .env (default 365).
-// Programar este script con cron / Task Scheduler (recomendado: diario 03:00).
+/**
+ * Cron: purga entradas viejas de la tabla `audit_log`.
+ *
+ * Sin esta limpieza la tabla crecería indefinidamente (cada acción crítica
+ * escribe una fila vía lib/audit.php). En sistemas con tráfico, eso lleva
+ * tarde o temprano a problemas de tamaño de disco y de rendimiento.
+ *
+ * Configuración: variable AUDIT_LOG_RETENTION_DAYS del .env (default 365).
+ *
+ * Algoritmo:
+ *  - Borra en chunks de 5.000 filas para no bloquear la tabla con un DELETE
+ *    masivo (importante en MySQL/InnoDB con mucho tráfico concurrente).
+ *  - Hasta 1.000 iteraciones por ejecución → tope de 5M filas/run.
+ *
+ * Programar en Hostinger (cron):
+ *   0 3 * * * /usr/bin/php .../backend/cron/purge_audit_log.php
+ *
+ * Logs: backend/logs/purge_audit_log.log.
+ */
 
 require_once dirname(__DIR__) . '/config/db.php';
 require_once dirname(__DIR__) . '/lib/env_loader.php';
 
 loadEnv(dirname(__DIR__) . '/.env');
 
+/**
+ * Helper de log específico del job. Escribe en backend/logs/purge_audit_log.log.
+ */
 function logPurgeAuditJob(string $message, array $context = []): void
 {
     $logsDir = dirname(__DIR__) . '/logs';

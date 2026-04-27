@@ -1,6 +1,19 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Endpoint para que un usuario (no admin) pida la eliminación de su propiedad.
+ *
+ * Crea una fila en `property_deletion_requests` con status='pending' y
+ * notifica a TODOS los admins (in-app + email) para que la revisen y la
+ * aprueben o rechacen vía:
+ *   - api/approve_property_deletion.php
+ *   - api/reject_property_deletion.php
+ *
+ * El usuario debe ser dueño de la propiedad (owner_user_id == auth.sub) para
+ * poder pedir su eliminación. Admins usan delete_property.php directamente.
+ */
+
 require_once dirname(__DIR__) . '/config/db.php';
 require_once dirname(__DIR__) . '/config/auth.php';
 require_once __DIR__ . '/../config/cors.php';

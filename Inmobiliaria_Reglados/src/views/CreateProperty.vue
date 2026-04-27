@@ -1,3 +1,14 @@
+<!--
+  Formulario de alta manual de propiedad.
+
+  Dos modos posibles:
+   1) Estructurado: rellenar campos uno a uno → POST a createProperty.php.
+   2) "Pega aquí el correo del agente" → create_property_from_text.php
+      lanza el pipeline IA (ClaudeClient extrae los campos automáticamente).
+
+  Tras crear la propiedad, lib/buyer_intents.php server-side notifica a
+  compradores con preferencias que matcheen.
+-->
 <template>
   <section class="create-property">
     <div class="content">

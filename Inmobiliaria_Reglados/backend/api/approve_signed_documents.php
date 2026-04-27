@@ -1,6 +1,22 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Endpoint del enlace "Aprobar firma" del correo al revisor.
+ *
+ * El revisor llega aquí desde el email enviado por upload_signed_documents.php,
+ * con un token en query string (?token=…). Si el token es válido y no está
+ * caducado:
+ *  1) Marca el token como aprobado (lib/document_review.php).
+ *  2) Pone documentos_firmados.validado_admin = 1 para esa propiedad y comprador.
+ *  3) Activa buyer_property_access.dossier_unlocked = 1 → el comprador ya
+ *    puede descargar el dossier completo y agendar firma con notario.
+ *  4) Notifica al comprador (in-app + email) que sus docs han sido validados.
+ *
+ * Devuelve HTML directo (no JSON) porque se accede desde el navegador del
+ * revisor, no desde el frontend SPA.
+ */
+
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../lib/env_loader.php';
 require_once __DIR__ . '/../lib/document_access.php';

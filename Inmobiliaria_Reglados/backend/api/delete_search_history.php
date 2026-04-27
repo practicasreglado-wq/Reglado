@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Borra una entrada (o todas) del historial de búsquedas del usuario
+ * autenticado. Solo afecta a search_history del propio user — no a
+ * buyer_intents.
+ */
+
 require_once dirname(__DIR__) . "/config/db.php";
 require_once dirname(__DIR__) . "/config/auth.php";
 require_once __DIR__ . '/../config/cors.php';

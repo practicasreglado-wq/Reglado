@@ -1,6 +1,23 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Notificaciones in-app (campanita del header).
+ *
+ * Persiste avisos en la tabla `notifications` y los expone al frontend vía
+ * api/notifications.php. NO envía emails — para eso hay un helper aparte
+ * (ver lib/notifications_helper.php → sendNotificationEmail()).
+ *
+ * Tipos comunes que aparecen en `type`: 'info', 'warning', 'success',
+ * 'document_token_expired', 'property_deletion_request',
+ * 'property_deletion_approved', 'property_deletion_rejected'... El frontend
+ * usa el tipo para elegir icono/color del badge.
+ */
+
+/**
+ * Devuelve las notificaciones del usuario, primero las no leídas y dentro de
+ * cada grupo las más recientes arriba. Acepta paginación con limit/offset.
+ */
 function fetchUserNotifications(PDO $pdo, int $userId, int $limit = 30, int $offset = 0): array
 {
     $stmt = $pdo->prepare(
@@ -20,6 +37,11 @@ function fetchUserNotifications(PDO $pdo, int $userId, int $limit = 30, int $off
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
+/**
+ * Cuenta cuántas notificaciones tiene el usuario sin leer. Lo usa el badge
+ * numérico de la campanita y el endpoint api/notifications_unread_count.php
+ * (que el frontend hace polling para refrescar el contador).
+ */
 function countUserUnreadNotifications(PDO $pdo, int $userId): int
 {
     $stmt = $pdo->prepare(
@@ -34,6 +56,14 @@ function countUserUnreadNotifications(PDO $pdo, int $userId): int
     return (int) $stmt->fetchColumn();
 }
 
+/**
+ * Comprueba si ya existe una notificación del mismo (user_id, type,
+ * related_request_id). Sirve para evitar duplicados cuando un job se ejecuta
+ * varias veces (ej. el cron de tokens expirados).
+ *
+ * Usa el operador NULL-safe `<=>` en SQL para que `related_request_id IS NULL`
+ * también case correctamente con `:related_request_id = NULL`.
+ */
 function hasUserNotificationForRequest(PDO $pdo, int $userId, string $type, ?int $relatedRequestId): bool
 {
     $stmt = $pdo->prepare(
@@ -58,6 +88,15 @@ function hasUserNotificationForRequest(PDO $pdo, int $userId, string $type, ?int
     return (int) $stmt->fetchColumn() > 0;
 }
 
+/**
+ * Crea una notificación en BD. Validaciones:
+ *  - user_id, title y message son obligatorios → si faltan, lanza
+ *    InvalidArgumentException (NO responde HTTP — el caller decide qué hacer).
+ *  - Si ya existe una notificación con el mismo (user_id, type,
+ *    related_request_id) NO crea otra y devuelve 0 (idempotencia).
+ *
+ * Devuelve el ID nuevo o 0 si era duplicado.
+ */
 function createUserNotificationRecord(PDO $pdo, array $payload): int
 {
     $userId = (int) ($payload['user_id'] ?? 0);
@@ -105,6 +144,11 @@ function createUserNotificationRecord(PDO $pdo, array $payload): int
     return (int) $pdo->lastInsertId();
 }
 
+/**
+ * Marca como leída una notificación. Filtra por user_id además del id para
+ * que un usuario no pueda marcar como leídas las notificaciones de otro.
+ * Devuelve true si efectivamente cambió el estado (antes estaba sin leer).
+ */
 function markUserNotificationAsRead(PDO $pdo, int $userId, int $notificationId): bool
 {
     $stmt = $pdo->prepare(
@@ -124,6 +168,10 @@ function markUserNotificationAsRead(PDO $pdo, int $userId, int $notificationId):
     return $stmt->rowCount() > 0;
 }
 
+/**
+ * Wrapper más cómodo de createUserNotificationRecord para cuando ya tienes el
+ * user_id por separado. La mayoría del código usa esta versión.
+ */
 function createNotification(PDO $pdo, int $userId, array $data): int
 {
     return createUserNotificationRecord($pdo, [

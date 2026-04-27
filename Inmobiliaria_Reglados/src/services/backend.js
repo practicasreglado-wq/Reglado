@@ -1,3 +1,19 @@
+/**
+ * Cliente HTTP genérico contra el backend de Inmobiliaria.
+ *
+ * Helpers principales:
+ *  - BACKEND_BASE / GROUP_BASE: bases de URL configurables vía .env
+ *    (VITE_INMOBILIARIA_BACKEND_BASE / VITE_GRUPO_REGLADO_BASE_URL).
+ *  - buildBackendUrl(path):  monta URL absoluta contra el backend.
+ *  - buildExternalAuthUrl(): monta URL al login externo (GrupoReglado) con
+ *    callback de vuelta.
+ *  - backendJson(path, opts): fetch JSON con Bearer token automático y
+ *    redirección a /login en 401 (centraliza el "logout forzado").
+ *
+ * El resto de services (admin.js, properties.js, buyerIntents.js) construyen
+ * sobre este — no llaman a fetch() crudo.
+ */
+
 import { auth, clearAllAuthArtifacts } from "./auth";
 
 export const BACKEND_BASE =

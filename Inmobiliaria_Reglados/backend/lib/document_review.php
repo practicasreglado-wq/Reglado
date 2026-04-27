@@ -1,6 +1,30 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Tokens "magic link" para que el revisor (admin/legal) apruebe o rechace
+ * los documentos firmados desde su correo, sin tener que loguearse.
+ *
+ * Flujo:
+ *  1) Comprador sube docs firmados → upload_signed_documents.php genera un
+ *     token con createDocumentReviewToken() y lo manda por email al revisor.
+ *  2) Revisor hace click en "Aprobar" o "Rechazar" → llega a
+ *     approve_signed_documents.php / reject_signed_documents.php?token=…
+ *  3) El endpoint llama a fetchDocumentReviewByToken() para validar y luego
+ *     a markDocumentReview{Approved,Rejected}().
+ *
+ * Seguridad: el token plano va por correo pero en BD solo se guarda su
+ * SHA-256 — si la BD se filtra, los enlaces ya enviados no son utilizables.
+ *
+ * Cron cron/notify_expired_review_tokens.php se encarga de avisar al usuario
+ * cuando un token caduca sin haber sido usado (default: 7 días).
+ */
+
+/**
+ * Crea un nuevo token de revisión y devuelve el valor en claro (que se mete
+ * en el enlace del correo). En BD solo queda el hash. Caduca en 7 días por
+ * defecto, configurable con $expiresAt.
+ */
 function createDocumentReviewToken(PDO $pdo, int $propertyId, int $buyerUserId, string $reviewerEmail = '', ?DateTimeImmutable $expiresAt = null): string
 {
     $token = bin2hex(random_bytes(24));
@@ -33,6 +57,14 @@ function createDocumentReviewToken(PDO $pdo, int $propertyId, int $buyerUserId, 
     return $token;
 }
 
+/**
+ * Busca un token (vía hash, no en claro) y lo devuelve enriquecido con dos
+ * flags útiles para el endpoint que lo recibe:
+ *   - is_expired         → expires_at < ahora.
+ *   - is_already_approved → approved_at no es nulo (para evitar doble click).
+ *
+ * Devuelve null si no se encuentra el token (no existe o nunca existió).
+ */
 function fetchDocumentReviewByToken(PDO $pdo, string $token): ?array
 {
     $hash = hash('sha256', $token);
@@ -62,6 +94,11 @@ function fetchDocumentReviewByToken(PDO $pdo, string $token): ?array
     return $record;
 }
 
+/**
+ * Marca el token como aprobado (sella approved_at + approved_by). Tras esto
+ * el endpoint de aprobación procede a cambiar el estado de la propiedad y a
+ * notificar al comprador.
+ */
 function markDocumentReviewApproved(PDO $pdo, int $tokenId, ?int $approverId = null): void
 {
     $stmt = $pdo->prepare('
@@ -76,6 +113,11 @@ function markDocumentReviewApproved(PDO $pdo, int $tokenId, ?int $approverId = n
     ]);
 }
 
+/**
+ * Marca el token como rechazado. Reusa la columna `approved_at` para sellar
+ * la fecha de decisión — el flag de "rechazo vs aprobación" se distingue en
+ * otra parte del flujo (tabla documentos_firmados o estado de propiedad).
+ */
 function markDocumentReviewRejected(PDO $pdo, int $tokenId, ?int $reviewerId = null): void
 {
     $stmt = $pdo->prepare('
@@ -90,6 +132,12 @@ function markDocumentReviewRejected(PDO $pdo, int $tokenId, ?int $reviewerId = n
     ]);
 }
 
+/**
+ * Construye la URL absoluta del enlace "Aprobar" del correo. Usa
+ * BACKEND_APPROVAL_URL del .env si está, si no la deriva del Host de la
+ * petición actual (útil en local; en producción es importante setearla en el
+ * .env porque la generación del correo puede ocurrir desde un cron sin Host).
+ */
 function buildReviewApprovalLink(string $token, string $reviewerEmail = ''): string
 {
     $base = getenv('BACKEND_APPROVAL_URL');
@@ -102,6 +150,9 @@ function buildReviewApprovalLink(string $token, string $reviewerEmail = ''): str
     return rtrim($base, '/') . '/api/approve_signed_documents.php?token=' . rawurlencode($token);
 }
 
+/**
+ * Igual que buildReviewApprovalLink pero apunta al endpoint de rechazo.
+ */
 function buildReviewRejectLink(string $token, string $reviewerEmail = ''): string
 {
     $base = getenv('BACKEND_APPROVAL_URL');

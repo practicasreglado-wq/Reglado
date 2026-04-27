@@ -1,6 +1,11 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Quita una propiedad de los favoritos del usuario autenticado (delete en
+ * `favorites`). Idempotente: no falla si no estaba marcada.
+ */
+
 require_once __DIR__ . '/../config/cors.php';
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../config/auth.php';

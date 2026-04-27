@@ -1,6 +1,20 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Endpoint del enlace "Rechazar firma" del correo al revisor.
+ *
+ * Mismo flujo que approve_signed_documents.php pero negativo:
+ *  1) Marca el token como rechazado.
+ *  2) Pone documentos_firmados.firmado_valido = 0 (los docs quedan inválidos).
+ *  3) NO desbloquea el dossier — buyer_property_access queda como estaba.
+ *  4) Notifica al comprador (in-app + email) que debe volver a subir docs
+ *    correctos.
+ *
+ * Devuelve HTML directo (no JSON) porque se accede desde el navegador del
+ * revisor.
+ */
+
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../lib/env_loader.php';
 require_once __DIR__ . '/../lib/document_access.php';

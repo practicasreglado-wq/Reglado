@@ -1,6 +1,18 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Endpoint del enlace "Rechazar usuario Premium" del correo al admin.
+ *
+ * Espejo de approve_real_role.php pero negativo:
+ *  1) NO cambia el rol del usuario.
+ *  2) Marca role_promotion_requests como resolved (rejected).
+ *  3) Notifica al usuario (in-app + email) que su solicitud no fue aprobada
+ *    y que puede volver a solicitarla más adelante.
+ *
+ * Devuelve HTML directo (no JSON) — se accede desde el navegador del admin.
+ */
+
 require_once dirname(__DIR__) . '/lib/env_loader.php';
 require_once dirname(__DIR__) . '/lib/notifications_helper.php';
 require_once dirname(__DIR__) . '/lib/audit.php';

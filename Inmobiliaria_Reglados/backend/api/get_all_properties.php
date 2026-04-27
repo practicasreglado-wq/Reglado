@@ -2,6 +2,16 @@
 
 declare(strict_types=1);
 
+/**
+ * Listado completo de propiedades para el panel del admin (incluye
+ * inactivas, vendidas, pendientes de revisión, etc.).
+ *
+ * Solo accesible para role=admin. Audit log: 'admin.list_all_properties'.
+ *
+ * Para el listado público (compradores) ver get_properties.php — ese filtra
+ * por status='activa' y oculta coordenadas reales.
+ */
+
 require_once dirname(__DIR__) . '/config/db.php';
 require_once dirname(__DIR__) . '/config/auth.php';
 require_once __DIR__ . '/../config/cors.php';

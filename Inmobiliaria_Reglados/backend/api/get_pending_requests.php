@@ -1,6 +1,14 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Lista de solicitudes pendientes de promoción a Premium ('real') desde el
+ * panel admin. Cada fila viene con datos del solicitante (nombre, email,
+ * username) y el motivo de la solicitud.
+ *
+ * Audit log: 'admin.list_pending_requests'. Solo role=admin.
+ */
+
 require_once dirname(__DIR__) . '/config/db.php';
 require_once dirname(__DIR__) . '/config/auth.php';
 require_once __DIR__ . '/../config/cors.php';

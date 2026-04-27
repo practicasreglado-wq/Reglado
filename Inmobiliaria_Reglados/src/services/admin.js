@@ -1,3 +1,18 @@
+/**
+ * Service: llamadas a endpoints administrativos del backend.
+ *
+ * Engloba acciones que solo están disponibles para role=admin: cambio de
+ * estado de propiedad, borrado, gestión de usuarios, audit log, gestión
+ * de citas y solicitudes de compra, etc.
+ *
+ * Patrón de uso desde las vistas:
+ *   import { fetchAuditLog, deletePropertyAsAdmin } from "@/services/admin";
+ *
+ * Las funciones que cambian estado (POST) suelen pedir adminPassword como
+ * argumento — es la confirmación que valida server-side
+ * lib/admin_password_check.php.
+ */
+
 import { backendJson } from "./backend";
 import { auth } from "./auth";
 

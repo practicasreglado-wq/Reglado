@@ -1,6 +1,36 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Registro de auditoría: persiste cada acción crítica en `audit_log`.
+ *
+ * Cualquier operación que cambie estado importante (crear/eliminar propiedad,
+ * aprobar rol, cambiar estado de cita, etc.) debe llamar a `auditLog()` con
+ * un código de acción consistente. Esos códigos los traduce a español el
+ * frontend en `src/views/AdminAuditView.vue` (mapping ACTION_LABELS).
+ *
+ * El cron `cron/purge_audit_log.php` borra entradas más antiguas que
+ * AUDIT_LOG_RETENTION_DAYS para que la tabla no crezca sin tope.
+ */
+
+/**
+ * Inserta una entrada en `audit_log`.
+ *
+ * Parámetros:
+ *  - $action: código corto y estable, ej. 'property.delete', 'role.promotion.approve'.
+ *    Si añades uno nuevo, recuerda mapearlo en ACTION_LABELS de AdminAuditView.vue.
+ *  - $context: array con metadatos opcionales:
+ *      user_id, user_email, user_role  → quien hizo la acción
+ *      resource_type, resource_id      → sobre qué la hizo
+ *      success                         → bool, default true
+ *      metadata                        → array libre, se serializa a JSON
+ *
+ * Truncamos el User-Agent a 500 chars porque hay clientes (bots, frameworks)
+ * que mandan UAs absurdamente largos y la columna no es ilimitada.
+ *
+ * Diseñado para no romper nunca el flujo principal: si falla la inserción
+ * solo se loguea con error_log(), no se propaga la excepción.
+ */
 function auditLog(PDO $pdo, string $action, array $context = []): void
 {
     try {
@@ -39,6 +69,14 @@ function auditLog(PDO $pdo, string $action, array $context = []): void
     }
 }
 
+/**
+ * Atajo para construir las claves user_id/user_email/user_role de $context a
+ * partir del payload del JWT que devuelve `requireAuthenticatedUser()`.
+ *
+ * Si pasas $userId explícito, lo prioriza sobre $auth['sub'] (útil cuando el
+ * "actor" del audit no coincide con el usuario autenticado, ej. un admin
+ * actuando sobre la cuenta de otro).
+ */
 function auditContextFromAuth(array $auth, ?int $userId = null): array
 {
     return [

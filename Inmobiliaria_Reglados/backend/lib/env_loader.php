@@ -1,6 +1,33 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Cargador de variables de entorno desde un archivo `.env` plano.
+ *
+ * Implementación mínima propia (sin dependencias) — equivalente a vlucas/phpdotenv
+ * pero sin el peso del paquete. Se llama al inicio de cualquier punto de
+ * entrada (config/db.php, config/auth.php, crons, webhooks) antes de leer
+ * variables con getenv().
+ *
+ * Soporta:
+ *  - Comentarios con #
+ *  - Líneas en blanco
+ *  - Valores entre comillas simples o dobles (las quita)
+ *
+ * NO soporta:
+ *  - Interpolación tipo ${OTRA_VAR}
+ *  - Multi-línea
+ *  - Escapes con backslash
+ *
+ * Si necesitas algo de eso, considera migrar a vlucas/phpdotenv vía composer.
+ */
+
+/**
+ * Lee el archivo .env de la ruta indicada y publica cada par KEY=VALUE en
+ * putenv() / $_ENV / $_SERVER. Si el archivo no existe o no es legible, no
+ * hace nada (no lanza excepción) — útil en tests o scripts que pueden vivir
+ * sin .env.
+ */
 function loadEnv(string $path): void
 {
     if (!is_file($path) || !is_readable($path)) {

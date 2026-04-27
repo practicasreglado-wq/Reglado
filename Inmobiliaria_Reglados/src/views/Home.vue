@@ -1,3 +1,9 @@
+<!--
+  Landing pública (ruta /). Hero con vídeo de fondo, secciones de
+  presentación (qué hace Reglado), y CTAs hacia el catálogo
+  (PropertiesForSale.vue) o el formulario de contacto (Contacto.vue).
+  Accesible sin login.
+-->
 <template>
   <section class="hero grain-overlay">
     <!-- Background video with enhanced overlay -->

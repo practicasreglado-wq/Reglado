@@ -1,3 +1,11 @@
+<!--
+  Catálogo público de propiedades en venta. Pública: cualquier visitante
+  puede ver el listado, aunque para entrar al detalle (PropertyDetail.vue)
+  y descargar docs hace falta login.
+
+  Filtros: tipo, ciudad, precio, m². Datos de get_properties.php (solo
+  status='activa', con coordenadas desplazadas para el mapa).
+-->
 <template>
   <section class="properties-sale">
     <div class="properties-sale__hero">

@@ -1,6 +1,14 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Endpoint para que un admin cambie el estado de una solicitud de compra
+ * (ej. de 'pending' a 'in_progress' o 'completed').
+ *
+ * El cambio queda registrado en audit con
+ * 'purchase_request.status_change' y se notifica al comprador.
+ */
+
 require_once dirname(__DIR__) . '/config/db.php';
 require_once dirname(__DIR__) . '/config/auth.php';
 require_once __DIR__ . '/../config/cors.php';

@@ -1,6 +1,14 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Lista de solicitudes de eliminación de propiedad con status='pending'.
+ * Lo consume el panel admin para mostrar las que necesitan resolución vía
+ * approve_property_deletion.php / reject_property_deletion.php.
+ *
+ * Solo accesible para role=admin.
+ */
+
 require_once dirname(__DIR__) . '/config/db.php';
 require_once dirname(__DIR__) . '/config/auth.php';
 require_once __DIR__ . '/../config/cors.php';

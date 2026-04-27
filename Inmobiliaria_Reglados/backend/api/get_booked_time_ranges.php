@@ -1,6 +1,18 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Devuelve los horarios YA reservados (status='scheduled') para una fecha.
+ *
+ * El frontend (PropertyDetail.vue) lo consume al elegir hora para una cita
+ * y, con la lógica de bloqueo de 3h, deshabilita los slots dentro de
+ * [hora ± 180min] de cualquier cita ya reservada.
+ *
+ * La validación final está duplicada server-side en request_purchase.php
+ * (defense-in-depth: que un usuario no se salte el filtro del frontend
+ * con una petición manual).
+ */
+
 require_once dirname(__DIR__) . '/config/db.php';
 require_once dirname(__DIR__) . '/config/auth.php';
 require_once __DIR__ . '/../config/cors.php';

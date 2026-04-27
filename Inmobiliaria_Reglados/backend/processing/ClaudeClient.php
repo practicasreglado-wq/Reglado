@@ -1,6 +1,28 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Cliente HTTP para la API de Anthropic (Claude).
+ *
+ * Lo usa PropertyProcessor para extraer una ficha estructurada (JSON) a
+ * partir del cuerpo libre de un email entrante: tipo de propiedad, ciudad,
+ * zona, dirección, m², precio, descripción larga, etc.
+ *
+ * Responsabilidades:
+ *  - Construir el prompt (buildStructuredPrompt) con instrucciones precisas
+ *    sobre qué campos extraer y en qué formato.
+ *  - Llamar a /v1/messages con HTTP POST (sin SDK — petición cruda con cURL).
+ *  - Parsear la respuesta del modelo (que viene como texto + JSON embebido)
+ *    y validar que están todos los campos obligatorios (`requiredFichaFields`).
+ *
+ * Configuración:
+ *  - ANTHROPIC_API_KEY (obligatoria, viene del .env).
+ *  - ANTHROPIC_MODEL (default 'claude-sonnet-4-6' en el .env).
+ *
+ * Si la API responde mal o falta algún campo crítico, lanza RuntimeException
+ * y el caller (PropertyProcessor) marca el activo como `error` para que un
+ * humano lo revise — no creamos propiedades a medias.
+ */
 class ClaudeClient
 {
     private string $apiKey;

@@ -1,6 +1,12 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Espejo negativo de approve_document_review_admin.php — admin autenticado
+ * rechaza la revisión desde el panel. Marca docs como inválidos y notifica
+ * al comprador para que vuelva a subir versiones correctas.
+ */
+
 require_once dirname(__DIR__) . '/config/db.php';
 require_once dirname(__DIR__) . '/config/auth.php';
 require_once __DIR__ . '/../config/cors.php';

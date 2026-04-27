@@ -1,6 +1,30 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Geocoding (dirección de texto → lat/lon) usando Nominatim (OpenStreetMap).
+ *
+ * Se llama al crear/actualizar una propiedad para guardar coordenadas reales
+ * en BD. Esas coordenadas NO se exponen al cliente directamente — el frontend
+ * recibe una versión desplazada vía lib/privacy_map.php para no filtrar la
+ * ubicación exacta del activo antes de la firma del NDA.
+ *
+ * Política de uso de Nominatim:
+ *  - User-Agent identificativo obligatorio (ya configurado).
+ *  - Sin clave de API, pero con rate limit suave (1 req/seg recomendado).
+ *  - countrycodes=es para acotar resultados a España.
+ *
+ * Estrategia de fallback: probamos varias queries con detalle decreciente
+ * (dirección completa → calle+CP → calle+ciudad → CP+ciudad → solo ciudad) y
+ * nos quedamos con el primer hit. Esto maximiza la tasa de geocoding cuando
+ * los datos vienen incompletos (típico cuando llegan vía email).
+ */
+
+/**
+ * Limpia un campo de texto antes de usarlo en queries: trim + filtra valores
+ * basura ('null', 'undefined', 'n/a', '-', 'sin definir') que aparecen
+ * cuando el usuario o el LLM rellenan campos vacíos con strings literales.
+ */
 function normalizeGeoText(mixed $value): string
 {
     $text = trim((string) ($value ?? ''));
@@ -18,6 +42,11 @@ function normalizeGeoText(mixed $value): string
     return $text;
 }
 
+/**
+ * Añade $value a $parts solo si no está ya (case-insensitive). Sirve para
+ * evitar queries con repeticiones tipo "Madrid, Madrid, España" cuando ciudad
+ * y provincia coinciden.
+ */
 function addUniquePart(array &$parts, string $value): void
 {
     $value = trim($value);
@@ -37,6 +66,11 @@ function addUniquePart(array &$parts, string $value): void
     $parts[] = $value;
 }
 
+/**
+ * Construye una lista ordenada de queries para Nominatim, de la más
+ * específica a la más genérica. La función geocodeApproximateLocation las
+ * recorre en orden y se queda con la primera que devuelva resultado.
+ */
 function buildGeocodingQueries(array $property): array
 {
     $direccionCompleta = normalizeGeoText($property['direccion_completa'] ?? '');
@@ -85,6 +119,15 @@ function buildGeocodingQueries(array $property): array
     return $queries;
 }
 
+/**
+ * Llamada HTTP cruda a la API de Nominatim. Devuelve null si:
+ *  - La red falla, timeout (12 s).
+ *  - El JSON está vacío o no tiene formato esperado.
+ *  - lat/lon no son números finitos.
+ *
+ * Los logs intermedios ayudan a diagnosticar por qué un activo no se
+ * geolocaliza — son ruido en producción y se podrían bajar a debug.
+ */
 function callNominatim(string $query): ?array
 {
     $params = [
@@ -154,6 +197,14 @@ function callNominatim(string $query): ?array
     ];
 }
 
+/**
+ * Punto de entrada principal. Recibe un array con campos de dirección
+ * (direccion, ciudad, provincia, codigo_postal, pais...) y devuelve:
+ *
+ *   ['latitud' => float, 'longitud' => float, 'query' => str, 'display_name' => str]
+ *
+ * O null si ningún intento devolvió resultado.
+ */
 function geocodeApproximateLocation(array $property): ?array
 {
     $queries = buildGeocodingQueries($property);

@@ -1,6 +1,14 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Endpoint para que un admin autenticado rechace una solicitud de promoción
+ * Premium desde el panel admin. Espejo de approve_pending_request.php.
+ *
+ * NO cambia el rol del usuario. Marca la solicitud como rejected, notifica
+ * al usuario y queda en audit como 'role.promotion.reject'.
+ */
+
 require_once dirname(__DIR__) . '/lib/env_loader.php';
 require_once dirname(__DIR__) . '/config/db.php';
 require_once dirname(__DIR__) . '/config/auth.php';

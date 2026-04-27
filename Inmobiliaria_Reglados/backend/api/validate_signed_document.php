@@ -1,6 +1,17 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Pre-validación cliente-side de un PDF subido (heurística de firma digital).
+ *
+ * El frontend lo llama antes de enviar el PDF al endpoint definitivo
+ * (upload_signed_documents.php) para dar feedback inmediato si el archivo
+ * claramente no tiene firma digital. La validación real se vuelve a hacer
+ * server-side durante el upload — esto es solo UX.
+ *
+ * Devuelve {accepted: bool, reason: string} de lib/pdf_signature.php.
+ */
+
 require_once __DIR__ . '/../config/cors.php';
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../lib/pdf_signature.php';

@@ -1,3 +1,11 @@
+<!--
+  Dashboard de admin: hub central con accesos rápidos a las secciones de
+  gestión (propiedades, usuarios, solicitudes pendientes, citas, audit).
+
+  Muestra contadores en tiempo real (badges) consumiendo
+  api/get_pending_counts.php cada pocos segundos. Solo accesible para
+  role=admin (router guard).
+-->
 <template>
   <section class="dashboard">
     <div class="particles">

@@ -1,6 +1,22 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Endpoint para que un admin apruebe una solicitud pendiente de eliminación
+ * de propiedad (creada por el usuario en request_property_deletion.php).
+ *
+ * Pasos:
+ *  1) Validación de admin + confirmación de su contraseña
+ *     (lib/admin_password_check.php) para evitar borrados accidentales.
+ *  2) Marca la fila de property_deletion_requests como 'approved'.
+ *  3) Ejecuta el borrado completo de la propiedad y todas sus dependencias
+ *     (lib/property_delete_ops.php → executePropertyDeletion).
+ *  4) Notifica al solicitante del resultado (lib/property_deletion_notify.php
+ *     → notifyRequesterOfDeletionResolution).
+ *
+ * Devuelve JSON al frontend del admin.
+ */
+
 require_once dirname(__DIR__) . '/config/db.php';
 require_once dirname(__DIR__) . '/config/auth.php';
 require_once __DIR__ . '/../config/cors.php';
