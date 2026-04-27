@@ -1,3 +1,8 @@
+<!--
+  Modal/popper que muestra el detalle de POR QUÉ una propiedad matchea las
+  preferencias del usuario (qué criterios coinciden, score, etc.). Se abre
+  desde PropertyCard cuando hay match parcial.
+-->
 <template>
   <div
     v-if="visible"

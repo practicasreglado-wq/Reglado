@@ -1,3 +1,6 @@
+<!--
+  Cuestionario de preferencias para "Parking". Mismo patrón que HotelesForm.
+-->
 <template>
   <PreferenceQuestionsForm
     :form="form"

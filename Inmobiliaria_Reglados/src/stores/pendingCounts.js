@@ -1,3 +1,15 @@
+/**
+ * Store de contadores "pendientes" del panel admin (Pinia).
+ *
+ * Consume api/get_pending_counts.php cada 15s vía polling y mantiene los
+ * contadores por categoría (roles, documents, purchases, appointments,
+ * property_deletions). Lo usa Dashboard.vue y el header del admin para
+ * mostrar badges numéricos en el menú lateral.
+ *
+ * Si el usuario no es admin no se debería iniciar el polling — el endpoint
+ * devuelve 403 en ese caso y el contador queda en 0.
+ */
+
 import { defineStore } from "pinia";
 import { backendJson } from "../services/backend";
 

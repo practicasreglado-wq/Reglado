@@ -1,3 +1,21 @@
+/**
+ * Configuración del router de la SPA + guards de acceso por rol.
+ *
+ * Convención de meta-fields:
+ *  - requiresAuth:  necesita estar logueado (cualquier rol).
+ *  - requiresReal:  necesita rol 'real' o 'admin' (Premium o superior).
+ *  - requiresAdmin: necesita rol 'admin' exclusivamente.
+ *
+ * El guard global (beforeEach al final del archivo) lee meta y redirige a:
+ *  - /login → si requiresAuth y no hay sesión.
+ *  - RestrictedAccessView → si requiresReal y el usuario es 'basic'.
+ *  - RestrictedAdminView → si requiresAdmin y el usuario no es admin.
+ *
+ * Las subrutas anidadas bajo /profile heredan el meta de la padre + añaden
+ * los suyos propios (ej. /profile/favorite-properties exige Real porque
+ * lo hereda PERO también tiene su propio meta).
+ */
+
 import { createRouter, createWebHistory } from "vue-router";
 import { useUserStore } from "../stores/user";
 import Home from "../views/Home.vue";

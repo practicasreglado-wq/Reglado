@@ -1,3 +1,7 @@
+<!--
+  Cuestionario de preferencias para "Activos" (categoría genérica). Mismo
+  patrón que HotelesForm.
+-->
 <template>
   <PreferenceQuestionsForm
     :form="form"

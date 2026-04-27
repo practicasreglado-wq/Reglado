@@ -1,3 +1,7 @@
+<!--
+  Footer global. Estático: enlaces legales, info de contacto y copyright.
+  Sin lógica reactiva.
+-->
 <template>
   <footer class="footer">
     <div class="container footer-inner">

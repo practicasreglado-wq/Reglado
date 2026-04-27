@@ -1,3 +1,11 @@
+<!--
+  Componente "tonto" que renderiza un cuestionario dinámico (lista de
+  preguntas con su tipo: text, select, range, etc.). Recibe questions y
+  modelValue como props, emite update:modelValue al cambiar.
+
+  Lo embebe PreferencePanel.vue. Las preguntas reales viven hardcodeadas en
+  el padre por categoría.
+-->
 <template>
   <div class="section">
     <div

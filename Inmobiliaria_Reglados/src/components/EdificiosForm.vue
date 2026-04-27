@@ -1,3 +1,6 @@
+<!--
+  Cuestionario de preferencias para "Edificios". Mismo patrón que HotelesForm.
+-->
 <template>
   <PreferenceQuestionsForm
     :form="form"

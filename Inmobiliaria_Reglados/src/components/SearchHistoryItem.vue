@@ -1,3 +1,8 @@
+<!--
+  Tarjeta individual de una entrada del historial de búsquedas. Lo renderiza
+  SearchHistory.vue en bucle. Permite relanzar la búsqueda o eliminarla
+  (delete_search_history.php).
+-->
 <template>
   <article class="history-card">
     <div class="history-card__top">
