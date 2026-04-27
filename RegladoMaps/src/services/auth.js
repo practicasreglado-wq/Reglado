@@ -9,12 +9,11 @@ import { reactive } from "vue";
 import { redirectToLogout } from "./ssoClient";
 
 const API_BASE = import.meta.env.VITE_AUTH_API_URL || "http://localhost:8000";
-const TOKEN_KEY = "maps_auth_token";
 const COOKIE_TOKEN_KEY = "reglado_auth_token";
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 
 const state = reactive({
-  token: localStorage.getItem(TOKEN_KEY) || getCookie(COOKIE_TOKEN_KEY) || "",
+  token: getCookie(COOKIE_TOKEN_KEY) || "",
   user: null,
   loading: false,
 });
@@ -67,10 +66,10 @@ async function request(path, options = {}) {
 function setToken(token) {
   state.token = token || "";
   if (state.token) {
-    localStorage.setItem(TOKEN_KEY, state.token);
+    // Cookie como única fuente de persistencia. Hardening F3: se eliminó
+    // localStorage para reducir superficie ante XSS.
     setCookie(COOKIE_TOKEN_KEY, state.token, COOKIE_MAX_AGE);
   } else {
-    localStorage.removeItem(TOKEN_KEY);
     clearCookie(COOKIE_TOKEN_KEY);
   }
 }

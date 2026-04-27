@@ -15,6 +15,8 @@ const SSO_ALLOWED_RETURNS = [
   "http://127.0.0.1:5173",
   "http://localhost:5174",
   "http://127.0.0.1:5174",
+  "http://localhost:5175",
+  "http://127.0.0.1:5175",
   "http://localhost:5176",
   "http://127.0.0.1:5176",
   "http://localhost:5177",
@@ -24,6 +26,7 @@ const SSO_ALLOWED_RETURNS = [
   "https://www.regladogroup.com",
   "https://regladoenergy.com",
   "https://teal-bat-675895.hostingersite.com", // Reglado Maps (dominio Hostinger provisional)
+  "https://realstate.com", // Inmobiliaria_Reglados
   // TODO: añadir dominio final de Maps y el de Ingeniería cuando estén listos.
 ];
 
@@ -92,6 +95,10 @@ const SSO_THEMES = {
   // Ingeniería — light + steel blue
   "http://localhost:5177": INGENIERIA_THEME(),
   "http://127.0.0.1:5177": INGENIERIA_THEME(),
+  // Inmobiliaria — light + navy
+  "http://localhost:5175": INMOBILIARIA_THEME(),
+  "http://127.0.0.1:5175": INMOBILIARIA_THEME(),
+  "https://realstate.com": INMOBILIARIA_THEME(),
 };
 
 function ENERGY_THEME() {
@@ -130,6 +137,19 @@ function INGENIERIA_THEME() {
     accent: "#4a9eff",
     accentSoft: "rgba(74, 158, 255, 0.12)",
     border: "#e0e4ea",
+  };
+}
+
+function INMOBILIARIA_THEME() {
+  return {
+    name: "inmobiliaria",
+    bg: "#f5f7fa",
+    surface: "#ffffff",
+    text: "#1a1f2e",
+    textMuted: "#64748b",
+    accent: "#24386b",
+    accentSoft: "rgba(36, 56, 107, 0.12)",
+    border: "rgba(36, 56, 107, 0.18)",
   };
 }
 
