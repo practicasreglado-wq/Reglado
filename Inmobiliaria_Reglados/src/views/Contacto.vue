@@ -79,7 +79,7 @@
           <span class="dot"></span><strong>Telefono:</strong> +34 911 462 674
         </div>
         <div class="item">
-          <span class="dot"></span><strong>Email:</strong> realstate@regladoconsultores.com
+          <span class="dot"></span><strong>Email:</strong> info@regladoconsultores.com
         </div>
       </div>
     </div>

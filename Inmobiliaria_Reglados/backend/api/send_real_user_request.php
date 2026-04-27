@@ -140,7 +140,11 @@ use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\PHPMailer;
 
 $subject = 'Solicitud de Usuario promocionar a Premium';
-$recipient = 'practicasreglado@gmail.com';
+$recipient = trim((string) getenv('ADMIN_NOTIFICATIONS_EMAIL'));
+
+if ($recipient === '' || !filter_var($recipient, FILTER_VALIDATE_EMAIL)) {
+    respondJson(500, ['success' => false, 'message' => 'No hay un destinatario administrativo configurado para esta notificación.']);
+}
 
 $safeFirstName = htmlspecialchars($firstName, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 $safeLastName = htmlspecialchars($lastName, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');

@@ -174,7 +174,7 @@ $body = renderEmailLayout(
 <p style="margin:0 0 24px 0;">Quedamos a su disposición para cualquier consulta adicional.</p>
 <div style="height:1px;background-color:#e5e7eb;margin:8px 0 22px;"></div>
 <p style="margin:0 0 6px 0;font-weight:700;color:#111827;">Atentamente,</p>
-<p style="margin:0;color:#4b5563;"><strong>Reglado Real Estate</strong><br>realstate@regladoconsultores.com</p>
+<p style="margin:0;color:#4b5563;"><strong>Reglado Real Estate</strong><br>info@regladoconsultores.com</p>
 HTML
 );
 
