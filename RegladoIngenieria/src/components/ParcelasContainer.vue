@@ -1,7 +1,7 @@
 <template>
   <div class="parcelas-wrap">
     <div class="card placeholder-card">
-      <div class="placeholder-icon">⚙</div>
+      <div class="placeholder-icon"><Icon name="gear" /></div>
       <h2 class="h3">Consulta de Parcelas Industriales</h2>
       <p class="text-muted" style="margin-top:8px">Esta funcionalidad está siendo integrada y estará disponible próximamente.</p>
       <p class="hint">Cuando esté lista, se montará aquí automáticamente usando el token de sesión.</p>
@@ -10,6 +10,8 @@
 </template>
 
 <script setup>
+import Icon from "@/components/Icon.vue";
+
 defineProps({ token: { type: String, required: true } });
 </script>
 

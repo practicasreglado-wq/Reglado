@@ -18,7 +18,7 @@
         <h2 class="h2 section-title">Nuestros servicios</h2>
         <div class="grid-3">
           <div class="card" v-for="s in services" :key="s.title">
-            <div class="service-icon">{{ s.icon }}</div>
+            <div class="service-icon"><Icon :name="s.icon" /></div>
             <h3 class="h3">{{ s.title }}</h3>
             <p class="text-muted" style="margin-top:8px">{{ s.desc }}</p>
           </div>
@@ -55,10 +55,12 @@
 </template>
 
 <script setup>
+import Icon from "@/components/Icon.vue";
+
 const services = [
-  { icon: "⚙", title: "Consultoría técnica", desc: "Asesoramiento especializado en procesos industriales y optimización de instalaciones." },
-  { icon: "📋", title: "Análisis de parcelas", desc: "Estudios técnicos de parcelas industriales para instalaciones, usos y normativa vigente." },
-  { icon: "📐", title: "Proyectos de ingeniería", desc: "Desarrollo de proyectos técnicos adaptados a los requisitos y normativa del cliente." },
+  { icon: "gear", title: "Consultoría técnica", desc: "Asesoramiento especializado en procesos industriales y optimización de instalaciones." },
+  { icon: "clipboard", title: "Análisis de parcelas", desc: "Estudios técnicos de parcelas industriales para instalaciones, usos y normativa vigente." },
+  { icon: "ruler", title: "Proyectos de ingeniería", desc: "Desarrollo de proyectos técnicos adaptados a los requisitos y normativa del cliente." },
 ];
 
 const points = [
