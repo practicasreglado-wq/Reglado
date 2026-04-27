@@ -50,7 +50,7 @@
           </div>
         </template>
         <template v-else>
-          <router-link to="/area-clientes" class="btn primary btn-sm">Acceder</router-link>
+          <button type="button" class="btn primary btn-sm" @click="handleAccess">Acceder</button>
         </template>
       </div>
 
@@ -75,7 +75,7 @@
         <button @click="auth.logout()" class="danger-text">Salir</button>
       </template>
       <template v-else>
-        <router-link to="/area-clientes" @click="mobileOpen = false">Acceder</router-link>
+        <button type="button" @click="handleAccess">Acceder</button>
       </template>
     </nav>
   </header>
@@ -85,9 +85,16 @@
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import { auth } from "@/services/auth.js";
 
+const emit = defineEmits(["open-login"]);
+
 const mobileOpen = ref(false);
 const userMenuOpen = ref(false);
 const userMenuWrap = ref(null);
+
+const handleAccess = () => {
+  mobileOpen.value = false;
+  emit("open-login");
+};
 
 const isAdmin = computed(() => auth.state.user?.role === "admin");
 const userInitial = computed(() => {
@@ -137,7 +144,15 @@ onUnmounted(() => {
   height: 64px;
 }
 .logo { display: flex; align-items: center; gap: 4px; }
-.logo-img { height: 40px; width: auto; }
+.logo-img { 
+  height: 40px; 
+  width: auto; 
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), filter 0.4s ease;
+}
+.logo:hover .logo-img {
+  transform: rotate(180deg) scale(1.05);
+  filter: drop-shadow(0 0.35rem 0.8rem rgba(0, 0, 0, 0.15));
+}
 .logo-text { font-size: 1.25rem; color: var(--text); }
 .logo-text strong { color: var(--steel); }
 .nav-desktop { display: flex; gap: 28px; margin-right: auto; }

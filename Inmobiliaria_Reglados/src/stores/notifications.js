@@ -60,7 +60,7 @@ export const useNotificationsStore = defineStore("notifications", {
       }
     },
 
-    async loadNotifications(limit = 20, silent = false) {
+    async loadNotifications(limit = 30, silent = false) {
       if (this.loading && !silent) {
         return;
       }

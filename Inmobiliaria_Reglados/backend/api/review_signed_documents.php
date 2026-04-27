@@ -16,7 +16,7 @@ $reviewerId = (int) (
     $context['local']['iduser']
     ?? $context['local']['id']
     ?? $context['auth']['id']
-    ?? $_SESSION['user']['id']
+    ?? $context['auth']['sub']
     ?? 0
 );
 $propertyId = (int) ($_POST['property_id'] ?? 0);

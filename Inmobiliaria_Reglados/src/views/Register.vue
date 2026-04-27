@@ -3,8 +3,9 @@
     <div class="overlay"></div>
     <div class="card">
       <h2>Registro</h2>
-      <p>Te estamos redirigiendo a Grupo Reglado para crear tu cuenta.</p>
-      <button class="auth-btn" type="button" @click="goNow">
+      <p v-if="!autoRedirectBlocked">Te estamos redirigiendo a Grupo Reglado para crear tu cuenta.</p>
+      <p v-else>Acción protegida. Pulsa el botón para ir al registro del grupo.</p>
+      <button class="auth-btn" type="button" @click="forceRegister">
         Ir al registro
       </button>
     </div>
@@ -12,15 +13,31 @@
 </template>
 
 <script setup>
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
 import { buildExternalAuthUrl } from "../services/backend";
+
+const autoRedirectBlocked = ref(false);
 
 function goNow() {
   const registerPath = import.meta.env.VITE_GRUPO_REGLADO_REGISTER_PATH || "/registro";
-  window.location.href = buildExternalAuthUrl(registerPath);
+  window.location.replace(buildExternalAuthUrl(registerPath));
+}
+
+function forceRegister() {
+  sessionStorage.removeItem("last_login_attempt");
+  goNow();
 }
 
 onMounted(() => {
+  const lastAttempt = sessionStorage.getItem("last_login_attempt");
+  const now = Date.now();
+  
+  if (lastAttempt && now - parseInt(lastAttempt, 10) < 5000) {
+    autoRedirectBlocked.value = true;
+    return;
+  }
+  
+  sessionStorage.setItem("last_login_attempt", now.toString());
   goNow();
 });
 </script>

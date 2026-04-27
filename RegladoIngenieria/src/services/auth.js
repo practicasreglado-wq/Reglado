@@ -1,4 +1,5 @@
 import { reactive } from "vue";
+import { redirectToLogout } from "./ssoClient.js";
  
 const API_BASE = import.meta.env.VITE_AUTH_API_URL || "http://localhost:8000";
 const TOKEN_KEY = import.meta.env.VITE_TOKEN_KEY || "ingenieria_auth_token";
@@ -22,6 +23,14 @@ async function request(path, options = {}) {
   });
   let payload = {};
   try { payload = await response.json(); } catch { payload = {}; }
+
+  if (response.status === 401 && state.token) {
+    // Sesión invalidada server-side (login en otro dispositivo, password
+    // change, ban, admin force-logout). Limpiamos el token local; el estado
+    // reactivo y los guards del router se encargan del resto.
+    clearSession();
+  }
+
   if (!response.ok) throw new Error(payload.error || payload.message || "La solicitud no se pudo completar.");
   return payload;
 }
@@ -65,6 +74,78 @@ async function initialize() {
   }
 }
  
+async function syncWithCookie() {
+  const cookieToken = getCookie(COOKIE_TOKEN_KEY);
+
+  if (!cookieToken && state.token) {
+    clearSession();
+    return;
+  }
+
+  if (cookieToken && cookieToken !== state.token) setToken(cookieToken);
+
+  if (!state.token) return;
+
+  // Revalidación contra /auth/me para detectar invalidaciones server-side.
+  state.loading = true;
+  try {
+    const payload = await request("/auth/me", { method: "GET", headers: authHeaders() });
+    state.user = payload.user || null;
+  } catch {
+    clearSession();
+  } finally {
+    state.loading = false;
+  }
+}
+
+async function login(email, password) {
+  const payload = await request("/auth/login", {
+    method: "POST",
+    body: JSON.stringify({ email, password }),
+  });
+  setSession(payload.token, payload.user || null);
+  return payload;
+}
+
+async function resendVerification(email) {
+  return request("/auth/resend-verification", {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  });
+}
+
+async function register(payload) {
+  return request("/auth/register", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+async function requestPasswordReset(email) {
+  return request("/auth/request-password-reset", {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  });
+}
+
+async function resetPassword(token, newPassword, newPasswordConfirmation) {
+  return request("/auth/reset-password", {
+    method: "POST",
+    body: JSON.stringify({
+      token,
+      new_password: newPassword,
+      new_password_confirmation: newPasswordConfirmation,
+    }),
+  });
+}
+
+async function confirmLoginLocation(token, decision) {
+  return request("/auth/confirm-login-location", {
+    method: "POST",
+    body: JSON.stringify({ token, decision }),
+  });
+}
+
 async function logout() {
   try {
     if (state.token) {
@@ -72,11 +153,27 @@ async function logout() {
     }
   } finally {
     clearSession();
-    window.location.href = window.location.origin;
+    // Propaga el cierre al hub para que también limpie su almacenamiento.
+    redirectToLogout();
   }
 }
  
-export const auth = { state, setSession, clearSession, initialize, logout, getCookie, setCookie };
+export const auth = {
+  state,
+  setSession,
+  clearSession,
+  initialize,
+  syncWithCookie,
+  login,
+  resendVerification,
+  register,
+  requestPasswordReset,
+  resetPassword,
+  confirmLoginLocation,
+  logout,
+  getCookie,
+  setCookie,
+};
  
 function setCookie(name, value, maxAge) {
   const secure = window.location.protocol === "https:" ? "; Secure" : "";

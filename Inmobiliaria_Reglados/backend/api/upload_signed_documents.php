@@ -12,6 +12,7 @@ require_once __DIR__ . '/../lib/env_loader.php';
 require_once __DIR__ . '/../lib/pdf_signature.php';
 require_once __DIR__ . '/../lib/document_access.php';
 require_once __DIR__ . '/../lib/document_review.php';
+require_once __DIR__ . '/../lib/audit.php';
 require_once __DIR__ . '/../send_mail.php';
 
 loadEnv(__DIR__ . '/../.env');
@@ -32,12 +33,6 @@ function uploadLog(string $message, array $context = []): void
             $line .= ' | ' . $json;
         }
     }
-
-    file_put_contents(
-        dirname(__DIR__) . '/upload_signed_flow_debug.txt',
-        $line . PHP_EOL,
-        FILE_APPEND
-    );
 
     error_log('[upload_signed_documents] ' . $line);
 }
@@ -363,7 +358,7 @@ if ($existingRow) {
         'access' => $access,
     ]);
 
-    $token = createDocumentReviewToken($pdo, $propertyId, $buyerUserId);
+    $token = createDocumentReviewToken($pdo, $propertyId, $buyerUserId, (string) getenv('DOCUMENT_REVIEW_EMAIL'));
 
     uploadLog('Token de revisión creado', [
         'token' => $token,
@@ -371,6 +366,15 @@ if ($existingRow) {
 
     $pdo->commit();
     uploadLog('COMMIT OK');
+
+    auditLog($pdo, 'document.signed.upload', [
+        'user_id'       => $buyerUserId,
+        'user_email'    => $authUser['email'] ?? null,
+        'user_role'     => $authUser['role'] ?? null,
+        'resource_type' => 'property',
+        'resource_id'   => (string) $propertyId,
+        'metadata'      => ['documents' => array_keys($savedFiles ?? [])]
+    ]);
 
 } catch (Throwable $exception) {
     if ($pdo->inTransaction()) {
@@ -409,8 +413,9 @@ $buyerEmail = $authUser['email'] ?? 'No disponible';
 $buyerPhone = $authUser['phone'] ?? 'No disponible';
 $buyerUsername = $authUser['username'] ?? $authUser['sub'] ?? '—';
 $buyerId = (string) ($authUser['sub'] ?? $authUser['id'] ?? '—');
-$approvalLink = buildReviewApprovalLink($token);
-$rejectLink = buildReviewRejectLink($token);
+$reviewerEmail = (string) getenv('DOCUMENT_REVIEW_EMAIL');
+$approvalLink = buildReviewApprovalLink($token, $reviewerEmail);
+$rejectLink = buildReviewRejectLink($token, $reviewerEmail);
 
 $documentItems = [];
 

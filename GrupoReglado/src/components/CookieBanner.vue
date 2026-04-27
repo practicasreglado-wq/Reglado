@@ -75,7 +75,7 @@ onMounted(() => {
       Object.assign(consent, parsed.categories);
       return; // Ya tiene consentimiento, no mostrar banner
     } catch (e) {
-      console.error("Error parsing consent:", e);
+      console.error("Error al leer el consentimiento:", e);
     }
   }
 

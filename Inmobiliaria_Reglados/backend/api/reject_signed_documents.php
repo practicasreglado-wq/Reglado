@@ -6,6 +6,7 @@ require_once __DIR__ . '/../lib/env_loader.php';
 require_once __DIR__ . '/../lib/document_access.php';
 require_once __DIR__ . '/../lib/document_review.php';
 require_once __DIR__ . '/../lib/notifications.php';
+require_once __DIR__ . '/../lib/audit.php';
 require_once __DIR__ . '/../config/cors.php';
 
 applyCors();
@@ -145,6 +146,14 @@ try {
     ]);
 
     markDocumentReviewRejected($pdo, $reviewId, 0);
+
+    auditLog($pdo, 'document.signed.reject', [
+        'user_email'    => (string) ($review['reviewer_email'] ?? '') ?: null,
+        'user_role'     => 'admin',
+        'resource_type' => 'signed_document_review',
+        'resource_id'   => (string) $reviewId,
+        'metadata'      => ['property_id' => $propertyId, 'buyer_user_id' => $buyerUserId]
+    ]);
 
     try {
         createUserNotificationRecord($pdo, [

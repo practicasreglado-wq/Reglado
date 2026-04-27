@@ -6,6 +6,7 @@ require_once __DIR__ . '/../lib/env_loader.php';
 require_once __DIR__ . '/../lib/document_access.php';
 require_once __DIR__ . '/../lib/document_review.php';
 require_once __DIR__ . '/../lib/notifications.php';
+require_once __DIR__ . '/../lib/audit.php';
 require_once __DIR__ . '/../config/cors.php';
 
 applyCors();
@@ -182,9 +183,27 @@ try {
     ]);
     approveDebug('updateBuyerPropertyAccess OK', $access);
 
-    markDocumentReviewApproved($pdo, $reviewId, 0);
+    $approverId = null;
+    $reviewerEmailStored = (string) ($review['reviewer_email'] ?? '');
+    if ($reviewerEmailStored !== '') {
+        $approverStmt = $pdo->prepare('SELECT id FROM regladousers.users WHERE email = :email LIMIT 1');
+        $approverStmt->execute(['email' => $reviewerEmailStored]);
+        $approverRow = $approverStmt->fetch(PDO::FETCH_ASSOC);
+        $approverId = $approverRow ? (int) $approverRow['id'] : null;
+    }
+
+    markDocumentReviewApproved($pdo, $reviewId, $approverId);
     approveDebug('markDocumentReviewApproved OK', [
         'review_id' => $reviewId,
+    ]);
+
+    auditLog($pdo, 'document.signed.approve', [
+        'user_id'       => $approverId,
+        'user_email'    => $reviewerEmailStored !== '' ? $reviewerEmailStored : null,
+        'user_role'     => 'admin',
+        'resource_type' => 'signed_document_review',
+        'resource_id'   => (string) $reviewId,
+        'metadata'      => ['property_id' => $propertyId, 'buyer_user_id' => $buyerUserId]
     ]);
 
     try {

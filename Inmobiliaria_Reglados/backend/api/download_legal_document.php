@@ -9,6 +9,7 @@ require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../config/auth.php';
 require_once __DIR__ . '/../lib/env_loader.php';
 require_once __DIR__ . '/../lib/document_access.php';
+require_once __DIR__ . '/../lib/audit.php';
 
 loadEnv(__DIR__ . '/../.env');
 
@@ -21,7 +22,6 @@ function resolveUploadPdfPath(string $relative): string
 
     $clean = str_replace('\\', '/', $clean);
     $clean = ltrim($clean, '/');
-    $clean = str_replace('../', '', $clean);
 
     $baseDir = realpath(__DIR__ . '/../uploads');
     if ($baseDir === false) {
@@ -39,7 +39,7 @@ function resolveUploadPdfPath(string $relative): string
         throw new RuntimeException('Archivo no encontrado.');
     }
 
-    if (!str_starts_with($filePath, $baseDir)) {
+    if (!str_starts_with($filePath, $baseDir . DIRECTORY_SEPARATOR)) {
         throw new RuntimeException('Acceso denegado.');
     }
 
@@ -121,6 +121,15 @@ header('Cache-Control: no-store, no-cache, must-revalidate');
 header('Pragma: public');
 header('Expires: 0');
 header('Content-Length: ' . (string) filesize($filePath));
+
+auditLog($pdo, 'document.legal.download', array_merge(
+    auditContextFromAuth($context['auth'] ?? [], $buyerUserId),
+    [
+        'resource_type' => 'document',
+        'resource_id'   => $type . ':' . $propertyId,
+        'metadata'      => ['file' => $filename, 'type' => $type, 'property_id' => $propertyId]
+    ]
+));
 
 readfile($filePath);
 exit;

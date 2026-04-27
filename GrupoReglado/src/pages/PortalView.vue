@@ -270,11 +270,33 @@ const heroVideoRef = ref(null);
 
 function handleVideoEnded() {
   setTimeout(() => {
-    if (heroVideoRef.value) {
-      heroVideoRef.value.currentTime = 0;
-      heroVideoRef.value.play().catch(console.error);
-    }
+    // Saltamos el replay si la pestaña está oculta: el navegador pausa
+    // vídeos con autoplay muted para ahorrar batería y play() rechazaría
+    // con AbortError. Cuando vuelva a ser visible, el evento 'visibilitychange'
+    // (abajo) dispara el replay.
+    if (!heroVideoRef.value || document.hidden) return;
+    heroVideoRef.value.currentTime = 0;
+    heroVideoRef.value.play().catch((err) => {
+      // AbortError es esperado (interrupciones del navegador al volver del
+      // segundo plano, power-saving, etc.); lo ignoramos para no ensuciar
+      // la consola. Cualquier otro error sí se reporta.
+      if (err?.name !== 'AbortError') {
+        console.error(err);
+      }
+    });
   }, 4000);
+}
+
+// Si la pestaña vuelve a estar visible y el video está pausado, intentamos
+// retomarlo. Así no se queda parado tras un rato en segundo plano.
+if (typeof document !== 'undefined') {
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && heroVideoRef.value && heroVideoRef.value.paused) {
+      heroVideoRef.value.play().catch((err) => {
+        if (err?.name !== 'AbortError') console.error(err);
+      });
+    }
+  });
 }
 
 </script>
@@ -724,12 +746,15 @@ function handleVideoEnded() {
   overflow: hidden;
   min-height: 460px;
   box-shadow: var(--card-shadow);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
   transition: transform 0.23s ease, box-shadow 0.23s ease, background-color 0.4s ease;
 }
 
 .company-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 16px 30px rgba(15, 32, 57, 0.16);
+  transform: translateY(-5px) translateZ(0);
+  box-shadow: var(--card-shadow-hover);
 }
 
 .company-image-wrap {

@@ -6,14 +6,18 @@ const routes = [
   
   // Rutas provisionales hasta crear los componentes finales en la carpeta views
   { path: '/reglado-group', component: { template: '<div style="padding-top:100px; text-align:center;"><h1>Reglado Group</h1><p>Sección en desarrollo.</p></div>' } },
-  { path: '/login', component: { template: '<div style="padding-top:100px; text-align:center;"><h1>Iniciar Sesión</h1><p>Área de clientes en desarrollo.</p></div>' } },
   { path: '/aviso-legal', component: () => import('./components/AvisoLegal.vue') },
   { path: '/politica-cookies', component: () => import('./components/PoliticaCookies.vue') },
   { path: '/politica-privacidad', component: () => import('./components/PoliticaPrivacidad.vue') },
   { path: '/admin', component: () => import('./components/AdminPanel.vue') },
   { path: '/mapa', component: () => import('./components/MapView.vue') },
-  { 
-    path: '/auth/callback', 
+  { path: '/registro', component: () => import('./components/RegisterView.vue') },
+  { path: '/recuperar-contrasena', component: () => import('./components/ForgotPasswordView.vue') },
+  { path: '/restablecer-contrasena', component: () => import('./components/ResetPasswordView.vue') },
+  { path: '/verificacion-exitosa', component: () => import('./components/EmailVerifiedView.vue') },
+  { path: '/confirmar-acceso', component: () => import('./components/ConfirmarAccesoView.vue') },
+  {
+    path: '/auth/callback',
     component: () => import('./components/AuthCallback.vue')
   },
 ];

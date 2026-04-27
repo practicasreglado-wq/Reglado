@@ -2,19 +2,14 @@
   <article class="property-card">
     <div class="property-card__media property-card__media--map">
       <div v-if="hasMapCoordinates" class="property-card__map-full">
-        <div ref="mapContainer" class="property-card__leaflet-map"></div>
+  <div ref="mapContainer" class="property-card__leaflet-map"></div>
 
-        <div class="property-card__map-overlay"></div>
+  <div class="property-card__map-overlay"></div>
 
-        <div class="property-card__zone-radius-badge">
-          Zona aprox. · {{ areaRadiusLabel }}
-        </div>
-
-        <div class="property-card__location-badge">
-          <span class="property-card__location-icon">📍</span>
-          <span class="property-card__location-text">{{ approximateLocationLabel }}</span>
-        </div>
-      </div>
+  <div class="property-card__zone-radius-badge">
+    Zona aprox. · {{ areaRadiusLabel }}
+  </div>
+</div>
 
       <div v-else class="property-card__map-fallback">
         <div class="property-card__map-fallback-content">
@@ -80,8 +75,18 @@
     </div>
 
     <div class="property-card__body">
-      <div class="property-card__category">{{ property.categoria }}</div>
-      <h3>{{ property.titulo }}</h3>
+      <div class="property-card__heading">
+  <div class="property-card__category">{{ property.categoria }}</div>
+
+  <span
+    class="status-badge"
+    :class="property.estado === 'vendido' ? 'status-badge--sold' : 'status-badge--available'"
+  >
+    {{ property.estado === 'vendido' ? 'Vendida' : 'Disponible' }}
+  </span>
+</div>
+
+<h3>{{ property.titulo }}</h3>
 
       <div class="property-card__meta">
         <span>{{ property.ciudad || "Sin ciudad" }}</span>
@@ -148,18 +153,20 @@ export default {
   },
 
   data() {
-    return {
-      favoritePopTimeout: null,
-      isFavoritePopping: false,
-      animationFrame: null,
-      animatedMatch: 0,
-      matchScale: 1,
-      map: null,
-      mapCircle: null,
-      tileLayer: null,
-      mapHasBeenFitted: false,
-    };
-  },
+  return {
+    favoritePopTimeout: null,
+    isFavoritePopping: false,
+    animationFrame: null,
+    animatedMatch: 0,
+    matchScale: 1,
+    map: null,
+    mapCircle: null,
+    tileLayer: null,
+    mapHasBeenFitted: false,
+    resizeObserver: null,
+    resizeTimeout: null,
+  };
+},
 
   computed: {
     localFavorite() {
@@ -373,16 +380,17 @@ detailButtonClass() {
   },
 
   mounted() {
-    if (this.hasMatch) {
-      this.animateMatch();
-    }
+  if (this.hasMatch) {
+    this.animateMatch();
+  }
 
-    if (this.hasMapCoordinates) {
-      this.$nextTick(() => {
-        this.initMap();
-      });
-    }
-  },
+  if (this.hasMapCoordinates) {
+    this.$nextTick(() => {
+      this.initMap();
+      this.setupResizeObserver();
+    });
+  }
+},
 
   watch: {
     matchValue(newValue) {
@@ -398,6 +406,7 @@ detailButtonClass() {
       if (newValue) {
         this.$nextTick(() => {
           this.initMap();
+          this.setupResizeObserver();
         });
       } else {
         this.destroyMap();
@@ -420,6 +429,8 @@ detailButtonClass() {
   beforeUnmount() {
     if (this.animationFrame) cancelAnimationFrame(this.animationFrame);
     if (this.favoritePopTimeout) clearTimeout(this.favoritePopTimeout);
+    if (this.resizeTimeout) clearTimeout(this.resizeTimeout);
+    this.teardownResizeObserver();
     this.destroyMap();
   },
 
@@ -513,6 +524,7 @@ detailButtonClass() {
       setTimeout(() => {
         if (this.map) {
           this.map.invalidateSize();
+          this.map.setView(this.displayCenter, 14);
         }
       }, 300);
     },
@@ -553,6 +565,8 @@ detailButtonClass() {
     },
 
     destroyMap() {
+      this.teardownResizeObserver();
+
       if (this.map) {
         this.map.remove();
         this.map = null;
@@ -635,12 +649,90 @@ detailButtonClass() {
 
       this.$emit("remove-favorite", this.property);
     },
+
+    setupResizeObserver() {
+  if (!this.$refs.mapContainer || this.resizeObserver) {
+    return;
+  }
+
+  this.resizeObserver = new ResizeObserver(() => {
+    if (this.resizeTimeout) {
+      clearTimeout(this.resizeTimeout);
+    }
+
+    this.resizeTimeout = setTimeout(() => {
+      this.handleMapResize();
+    }, 80);
+  });
+    this.resizeObserver.observe(this.$refs.mapContainer);
+  },
+
+    teardownResizeObserver() {
+      if (this.resizeObserver) {
+        this.resizeObserver.disconnect();
+        this.resizeObserver = null;
+      }
+    },
+
+    handleMapResize() {
+      if (!this.map || !this.hasMapCoordinates || !this.displayCenter) {
+        return;
+      }
+
+      this.$nextTick(() => {
+        setTimeout(() => {
+          if (!this.map) return;
+
+          this.map.invalidateSize();
+
+          const center = this.displayCenter;
+          this.map.setView(center, this.map.getZoom() || 14);
+        }, 60);
+      });
+    },
   },
 };
 
 </script>
 
 <style scoped>
+.property-card__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.status-badge--available {
+  background: linear-gradient(180deg, #ecfdf3 0%, #dcfce7 100%);
+  color: #15803d;
+  border-color: rgba(34, 197, 94, 0.22);
+  box-shadow: 0 6px 14px rgba(34, 197, 94, 0.08);
+}
+
+.status-badge--sold {
+  background: linear-gradient(180deg, #fff1f2 0%, #ffe4e6 100%);
+  color: #be123c;
+  border-color: rgba(244, 63, 94, 0.22);
+  box-shadow: 0 6px 14px rgba(244, 63, 94, 0.08);
+}
 .detail-link {
   padding: 6px 16px;
   border-radius: 20px;
@@ -772,41 +864,6 @@ detailButtonClass() {
   font-size: 0.76rem;
   font-weight: 800;
   box-shadow: 0 8px 18px rgba(15, 23, 42, 0.14);
-}
-
-.property-card__location-badge {
-  position: absolute;
-  left: 14px;
-  bottom: 14px;
-  z-index: 402;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  max-width: calc(100% - 28px);
-  min-height: 40px;
-  padding: 8px 12px;
-  border-radius: 999px;
-  background: rgba(15, 23, 42, 0.82);
-  color: #fff;
-  backdrop-filter: blur(8px);
-  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.18);
-}
-
-.property-card__location-icon {
-  flex: 0 0 auto;
-  font-size: 0.9rem;
-  line-height: 1;
-}
-
-.property-card__location-text {
-  display: block;
-  min-width: 0;
-  font-size: 0.78rem;
-  font-weight: 700;
-  line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .property-card__map-fallback {
@@ -1009,6 +1066,38 @@ detailButtonClass() {
   gap: 12px;
 }
 
+.property-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border-radius: 24px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.property-card__media {
+  height: 240px; /* fija */
+  flex-shrink: 0;
+}
+
+.property-card__body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 20px;
+}
+
+.property-card__content {
+  flex: 1;
+}
+
+.property-card__footer {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .property-card__footer {
   display: flex;
   justify-content: space-between;
@@ -1098,12 +1187,6 @@ detailButtonClass() {
     padding: 7px 9px;
   }
 
-  .property-card__location-badge {
-    left: 10px;
-    bottom: 10px;
-    max-width: calc(100% - 140px);
-  }
-
   .property-card__zone-radius-badge {
     right: 10px;
     bottom: 10px;
@@ -1148,6 +1231,16 @@ detailButtonClass() {
 }
 
 @media (max-width: 480px) {
+  .property-card__heading {
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.status-badge {
+  font-size: 0.68rem;
+  padding: 5px 10px;
+  min-height: 28px;
+}
   .property-card__media {
     height: 400px;
   }
@@ -1178,14 +1271,6 @@ detailButtonClass() {
 
   .property-card__actions {
     max-width: calc(100% - 16px);
-  }
-
-  .property-card__location-badge {
-    left: 10px;
-    bottom: 10px;
-    max-width: calc(100% - 132px);
-    min-height: 36px;
-    padding: 7px 10px;
   }
 
   .property-card__zone-radius-badge {

@@ -44,8 +44,11 @@ class Repository
                 $contentHash,
             ]);
 
+            $insertedAssetId = (int) $this->pdo->lastInsertId();
+            error_log('[ACTIVO RECIBIDO INSERT] id=' . $insertedAssetId . ' origin=' . $origin);
+
             return [
-                'id' => (int) $this->pdo->lastInsertId(),
+                'id' => $insertedAssetId,
                 'is_duplicate' => false,
             ];
         } catch (PDOException $e) {
@@ -153,7 +156,8 @@ class Repository
         ?int $captadorId,
         ?int $ownerUserId,
         ?int $createdByUserId = null,
-        ?string $ownerEmailPending = null
+        ?string $ownerEmailPending = null,
+        ?int $activoRecibidoId = null
     ): int {
         $ficha = $claudeData['ficha_web'] ?? [];
         $dossier = $claudeData['dossier_inversion'] ?? [];
@@ -274,6 +278,20 @@ class Repository
             'owner_user_id' => $ownerUserId,
         ];
 
+        if ($activoRecibidoId !== null) {
+            if ($activoRecibidoId <= 0) {
+                throw new InvalidArgumentException('activo_recibido_id invalido para insertPropertyRecord');
+            }
+
+            if (!$this->columnExists('propiedades', 'activo_recibido_id')) {
+                throw new RuntimeException('La columna propiedades.activo_recibido_id es obligatoria en este flujo.');
+            }
+
+            $columns[] = 'activo_recibido_id';
+            $placeholders[] = ':activo_recibido_id';
+            $params['activo_recibido_id'] = $activoRecibidoId;
+        }
+
         // Campos nuevos (opcionales) para no romper instalaciones que aun no han migrado la tabla.
         if ($effectiveCreatedByUserId !== null && $this->columnExists('propiedades', 'created_by_user_id')) {
             $columns[] = 'created_by_user_id';
@@ -291,6 +309,7 @@ class Repository
             'INSERT INTO propiedades (' . implode(', ', $columns) . ') VALUES (' . implode(', ', $placeholders) . ')'
         );
 
+        error_log('[PROP INSERT LINK] activo_recibido_id=' . json_encode($params['activo_recibido_id'] ?? null));
         error_log('[INSERT PARAMS] ' . json_encode($params, JSON_UNESCAPED_UNICODE));
 
         try {

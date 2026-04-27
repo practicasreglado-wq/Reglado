@@ -1,10 +1,14 @@
 <template>
   <div class="auth-redirect">
     <div class="overlay"></div>
+
     <div class="card">
-      <h2>Iniciar sesión</h2>
-      <p>Te estamos redirigiendo a Grupo Reglado para acceder con tu cuenta.</p>
-      <button class="auth-btn" type="button" @click="goNow">
+      <h2>Debes iniciar sesión</h2>
+      <p>
+        Para continuar, accede con tu cuenta a través de Grupo Reglado.
+      </p>
+
+      <button class="auth-btn" type="button" @click="goToGroupLogin">
         Iniciar sesión
       </button>
     </div>
@@ -12,17 +16,16 @@
 </template>
 
 <script setup>
-import { onMounted } from "vue";
 import { buildExternalAuthUrl } from "../services/backend";
+import { clearAllAuthArtifacts } from "../services/auth";
 
-function goNow() {
+function goToGroupLogin() {
+  // Limpieza agresiva antes de salir hacia el login externo, para garantizar
+  // que el usuario no vuelva con la sesión antigua aún activa.
+  clearAllAuthArtifacts();
   const loginPath = import.meta.env.VITE_GRUPO_REGLADO_LOGIN_PATH || "/login";
   window.location.href = buildExternalAuthUrl(loginPath);
 }
-
-onMounted(() => {
-  goNow();
-});
 </script>
 
 <style scoped>
@@ -50,6 +53,18 @@ onMounted(() => {
   border-radius: 16px;
   padding: 32px;
   text-align: center;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.18);
+}
+
+.card h2 {
+  margin: 0 0 12px;
+  color: #24386b;
+}
+
+.card p {
+  margin: 0;
+  color: #334155;
+  line-height: 1.5;
 }
 
 .auth-btn {

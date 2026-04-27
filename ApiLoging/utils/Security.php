@@ -93,6 +93,64 @@ class Security
         return 'unknown';
     }
 
+    /**
+     * Devuelve la URL base del frontend para un flujo de auth (reset de
+     * contraseña, alerta de login, etc.). Prioriza el header Origin de la
+     * request — si está en REDIRECT_ALLOWED_ORIGINS, se usa ese dominio
+     * con la ruta fija correspondiente. Si no, se cae al env var de
+     * fallback (mantiene el comportamiento previo a B2 y cubre peticiones
+     * sin Origin como cronjobs o same-origin).
+     *
+     * Pensado para endpoints XHR iniciados desde el frontend (register,
+     * request-password-reset, login) donde el navegador manda Origin.
+     */
+    public static function resolveFrontendUrl(string $fixedPath, string $envFallbackKey): string
+    {
+        $origin = $_SERVER['HTTP_ORIGIN'] ?? null;
+        if (is_string($origin) && $origin !== ''
+            && self::isAllowedAbsoluteUrl($origin, 'REDIRECT_ALLOWED_ORIGINS')) {
+            return self::joinOriginAndPath($origin, $fixedPath);
+        }
+        return (string) (getenv($envFallbackKey) ?: '');
+    }
+
+    /**
+     * Variante para cuando el origen viaja en el query string (caso del
+     * verify email: el usuario llega desde su cliente de correo, la
+     * request no lleva Origin, pero el link del email ya lo incluye como
+     * `return_origin`). Siempre se valida contra la allowlist antes de
+     * usarlo para evitar redirects abiertos.
+     */
+    public static function resolveFrontendUrlFromCandidate(?string $candidate, string $fixedPath, string $envFallbackKey): string
+    {
+        if (is_string($candidate) && $candidate !== ''
+            && self::isAllowedAbsoluteUrl($candidate, 'REDIRECT_ALLOWED_ORIGINS')) {
+            return self::joinOriginAndPath($candidate, $fixedPath);
+        }
+        return (string) (getenv($envFallbackKey) ?: '');
+    }
+
+    /**
+     * Devuelve el Origin de la request si es un valor válido de la
+     * allowlist; en caso contrario null. Útil para propagar el origen
+     * entre flujos que no son 100% XHR (p.ej. incrustarlo en la URL de
+     * un email cuyo clic luego llegará sin Origin).
+     */
+    public static function validatedRequestOrigin(): ?string
+    {
+        $origin = $_SERVER['HTTP_ORIGIN'] ?? null;
+        if (is_string($origin) && $origin !== ''
+            && self::isAllowedAbsoluteUrl($origin, 'REDIRECT_ALLOWED_ORIGINS')) {
+            return $origin;
+        }
+        return null;
+    }
+
+    private static function joinOriginAndPath(string $origin, string $path): string
+    {
+        return rtrim($origin, '/') . '/' . ltrim($path, '/');
+    }
+
     public static function isAllowedAbsoluteUrl(string $url, string $envKey): bool
     {
         if ($url === '') {

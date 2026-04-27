@@ -11,6 +11,11 @@ import LegalNotice from "@/pages/LegalNotice.vue";
 import PrivacyPolicy from "@/pages/PrivacyPolicy.vue";
 import CookiePolicy from "@/pages/CookiePolicy.vue";
 import NotFound from "@/pages/NotFound.vue";
+import RegisterView from "@/pages/RegisterView.vue";
+import ForgotPasswordView from "@/pages/ForgotPasswordView.vue";
+import ResetPasswordView from "@/pages/ResetPasswordView.vue";
+import EmailVerifiedView from "@/pages/EmailVerifiedView.vue";
+import ConfirmarAccesoView from "@/pages/ConfirmarAccesoView.vue";
 
 const routes = [
   { path: "/", component: Home },
@@ -23,6 +28,11 @@ const routes = [
   { path: "/aviso-legal", component: LegalNotice },
   { path: "/politica-privacidad", component: PrivacyPolicy },
   { path: "/politica-cookies", component: CookiePolicy },
+  { path: "/registro", component: RegisterView },
+  { path: "/recuperar-contrasena", component: ForgotPasswordView },
+  { path: "/restablecer-contrasena", component: ResetPasswordView },
+  { path: "/verificacion-exitosa", component: EmailVerifiedView },
+  { path: "/confirmar-acceso", component: ConfirmarAccesoView },
   { path: "/:pathMatch(.*)*", component: NotFound },
 ];
 
@@ -40,9 +50,10 @@ router.beforeEach(async (to) => {
   }
 
   if (!auth.state.token) {
-    const callbackUrl = encodeURIComponent(window.location.origin + "/auth/callback");
-    window.location.href = `${import.meta.env.VITE_AUTH_FRONTEND_URL || import.meta.env.VITE_AUTH_API_URL || "https://gruporeglado.com"}/login?returnTo=${callbackUrl}`;
-    return false;
+    // En vez de redirigir a Grupo para loguear, mandamos a home con un
+    // query flag que App.vue intercepta para abrir el modal de login y
+    // recuperar la ruta original tras autenticar.
+    return { path: "/", query: { login: "required", returnTo: to.fullPath } };
   }
 
   if (to.meta.requiresAdmin && auth.state.user?.role !== "admin") {

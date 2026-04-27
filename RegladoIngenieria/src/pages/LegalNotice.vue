@@ -10,9 +10,9 @@
 
           <p><strong>2. DATOS IDENTIFICATIVOS.</strong></p>
           <ul>
-            <li>Denominación social: REGLADO GROUP S.L</li>
+            <li>Denominación social: Reglado Ingeniería</li>
             <li>Nombre Comercial: REGLADO INGENIERÍA</li>
-            <li>CIF: B23982762</li>
+            <li>CIF: pendiente</li>
             <li>Domicilio: AVDA. ISLA GRACIOSA, 7 PISO 1º DESPACHOS 5-6 28703 SAN SEBASTIÁN DE LOS REYES.</li>
             <li>Teléfono: +34 911462674 / 615-641-081</li>
             <li>Dirección electrónica: info@regladoingenieria.com</li>

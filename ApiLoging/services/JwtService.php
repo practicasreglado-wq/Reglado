@@ -11,13 +11,20 @@ class JwtService
 {
     /**
      * Genera un token JWT para un usuario.
-     * Incluye datos de perfil básicos en el payload para evitar consultas constantes a la BD.
-     * 
+     * Incluye datos de perfil básicos en el payload para evitar consultas
+     * constantes a la BD, y un session id (`sid`) que el middleware compara
+     * contra users.current_session_id para garantizar una única sesión activa.
+     *
      * @param array $user Datos del usuario (id, email, role, etc.)
+     * @param string $sid Session id (64 hex chars). Obligatorio.
      * @return string Token JWT codificado
      */
-    public static function generate(array $user): string
+    public static function generate(array $user, string $sid): string
     {
+        if ($sid === '') {
+            throw new RuntimeException('sid required');
+        }
+
         $now = time();
         $ttl = (int) (getenv('JWT_TTL_SECONDS') ?: 86400);
         $secret = getenv('JWT_SECRET') ?: 'change-this-secret';
@@ -28,6 +35,7 @@ class JwtService
             'iat' => $now,
             'exp' => $now + $ttl,
             'sub' => (int) $user['id'],
+            'sid' => $sid,
             'email' => $user['email'],
             'username' => $user['username'] ?? null,
             'first_name' => $user['first_name'] ?? null,

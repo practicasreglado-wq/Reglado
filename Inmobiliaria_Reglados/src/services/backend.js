@@ -1,11 +1,22 @@
-﻿import { auth } from "./auth";
+import { auth, clearAllAuthArtifacts } from "./auth";
 
 export const BACKEND_BASE =
   import.meta.env.VITE_INMOBILIARIA_BACKEND_BASE ||
   "http://localhost/Reglado/Inmobiliaria_Reglados/backend";
 
 export const GROUP_BASE =
-  import.meta.env.VITE_GRUPO_REGLADO_BASE_URL || "http://localhost:5175";
+  import.meta.env.VITE_GRUPO_REGLADO_BASE_URL ||
+  (import.meta.env.DEV ? "http://localhost:5173" : "");
+
+export function buildExternalAuthUrl(path) {
+  if (!GROUP_BASE) {
+    throw new Error("Falta VITE_GRUPO_REGLADO_BASE_URL en producción");
+  }
+
+  const url = new URL(path, GROUP_BASE);
+  url.searchParams.set("returnTo", getCallbackUrl());
+  return url.toString();
+}
 
 export function buildBackendUrl(path) {
   return new URL(path, `${BACKEND_BASE}/`).toString();
@@ -15,12 +26,6 @@ export function getCallbackUrl() {
   return new URL("auth/callback", `${window.location.origin}/`).toString();
 }
 
-export function buildExternalAuthUrl(path) {
-  const url = new URL(path, GROUP_BASE);
-  url.searchParams.set("returnTo", getCallbackUrl());
-  return url.toString();
-}
-
 export function buildUploadsUrl(fileName) {
   if (!fileName) {
     return null;
@@ -28,6 +33,8 @@ export function buildUploadsUrl(fileName) {
 
   return new URL(`uploads/${fileName}`, `${BACKEND_BASE}/`).toString();
 }
+
+let isRedirecting = false;
 
 export async function backendJson(path, options = {}) {
   const finalHeaders = {
@@ -51,6 +58,20 @@ export async function backendJson(path, options = {}) {
   }
 
   if (!response.ok) {
+    if (response.status === 401 && !isRedirecting) {
+      if (typeof window !== "undefined") {
+        isRedirecting = true;
+        auth.clearSession();
+        clearAllAuthArtifacts();
+
+        setTimeout(() => {
+          if (window.location.pathname !== "/login") {
+            window.location.replace("/login");
+          }
+        }, 150);
+      }
+    }
+
     throw new Error(
       payload.message ||
       payload.error ||

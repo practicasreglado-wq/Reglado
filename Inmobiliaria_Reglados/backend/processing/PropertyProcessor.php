@@ -25,6 +25,10 @@ class PropertyProcessor
 
     public function process(int $assetId): int
     {
+        if ($assetId <= 0) {
+            throw new InvalidArgumentException('assetId invalido para procesar propiedad');
+        }
+
         $asset = $this->repository->getReceivedAsset($assetId);
         $text = trim((string) ($asset['texto_recibido'] ?? ''));
 
@@ -47,13 +51,8 @@ class PropertyProcessor
         $resolvedOwnerUserId = null;
         $ownerEmailPending = null;
 
-        $defaultOwnerUserId = (int) (getenv('DEFAULT_OWNER_USER_ID') ?: 1);
-        if ($defaultOwnerUserId <= 0) {
-            $defaultOwnerUserId = 1;
-        }
-
         if ($normalizedOwnerEmail === null) {
-            $resolvedOwnerUserId = $defaultOwnerUserId;
+            $resolvedOwnerUserId = $this->createdByUserId;
         } else {
             $resolvedOwnerUserId = $this->repository->findRegladoUserIdByEmail($normalizedOwnerEmail);
 
@@ -73,7 +72,8 @@ class PropertyProcessor
             $captadorId,
             $resolvedOwnerUserId,
             $this->createdByUserId,
-            $ownerEmailPending
+            $ownerEmailPending,
+            $assetId
         );
 
         $documents = $this->pdfGenerator->generateDocuments(

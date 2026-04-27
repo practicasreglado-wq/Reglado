@@ -5,6 +5,7 @@ declare(strict_types=1);
 require_once dirname(__DIR__) . '/config/db.php';
 require_once dirname(__DIR__) . '/config/auth.php';
 require_once __DIR__ . '/../config/cors.php';
+require_once dirname(__DIR__) . '/lib/audit.php';
 
 applyCors();
 handlePreflight();
@@ -14,7 +15,7 @@ $auth = $context['auth'];
 
 $role = strtolower((string) ($auth['role'] ?? ''));
 
-if (!in_array($role, ['admin', 'real'], true)) {
+if ($role !== 'admin') {
     respondJson(403, [
         'success' => false,
         'message' => 'Acceso restringido. Esta sección es solo para administradores.'
@@ -98,7 +99,7 @@ try {
         $prop['id'] = isset($row['id']) ? (int) $row['id'] : 0;
         $prop['precio'] = isset($row['precio']) ? (float) $row['precio'] : 0;
         $prop['metros_cuadrados'] = isset($row['metros_cuadrados']) ? (int) $row['metros_cuadrados'] : 0;
-
+        $prop['estado'] = !empty($row['estado']) ? (string) $row['estado'] : 'disponible';
         $prop['titulo'] = (string) (
             $row['titulo']
             ?? $row['tipo_propiedad']
@@ -139,6 +140,11 @@ try {
 
         $properties[] = $prop;
     }
+
+    auditLog($pdo, 'admin.list_all_properties', array_merge(
+        auditContextFromAuth($auth),
+        ['metadata' => ['total' => count($properties)]]
+    ));
 
     respondJson(200, [
         'success' => true,

@@ -18,10 +18,12 @@
               <label for="email">Correo electrónico</label>
               <input
                 id="email"
-                v-model="form.email"
+                v-model.trim="form.email"
                 type="email"
                 placeholder="tu@email.com"
+                autocomplete="email"
                 required
+                :disabled="loading"
               />
             </div>
 
@@ -32,25 +34,41 @@
                 v-model="form.password"
                 type="password"
                 placeholder="••••••••"
+                autocomplete="current-password"
                 required
+                :disabled="loading"
               />
             </div>
 
             <div class="form-options">
-              <label class="remember-me">
-                <input v-model="form.rememberMe" type="checkbox" />
-                <span>Recuérdame</span>
-              </label>
-              <a href="#" class="forgot-password">¿Olvidaste tu contraseña?</a>
+              <span></span>
+              <router-link to="/recuperar-contrasena" class="forgot-password" @click="closeModal">
+                ¿Olvidaste tu contraseña?
+              </router-link>
             </div>
 
-            <button type="submit" class="btn-login">Iniciar sesión</button>
+            <p v-if="error" class="feedback error">{{ error }}</p>
+            <p v-if="success" class="feedback success">{{ success }}</p>
+
+            <button type="submit" class="btn-login" :disabled="loading">
+              {{ loading ? "Entrando..." : "Iniciar sesión" }}
+            </button>
+
+            <button
+              v-if="error"
+              type="button"
+              class="btn-link"
+              :disabled="loading"
+              @click="resendMail"
+            >
+              Reenviar correo de verificación
+            </button>
           </form>
 
           <div class="modal-footer">
             <p>
               ¿No tienes cuenta?
-              <a href="#" @click.prevent="toggleSignup">Regístrate aquí</a>
+              <router-link to="/registro" @click="closeModal">Regístrate aquí</router-link>
             </p>
           </div>
         </div>
@@ -60,38 +78,84 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, watch } from "vue";
+import { auth } from "../services/auth";
+import { redirectToStore } from "../services/ssoClient";
 
-defineProps({
+const props = defineProps({
   modelValue: {
     type: Boolean,
     required: true,
   },
 });
 
-const emit = defineEmits(["update:modelValue"]);
+const emit = defineEmits(["update:modelValue", "success"]);
 
 const form = ref({
   email: "",
   password: "",
-  rememberMe: false,
 });
 
-const closeModal = () => {
+const loading = ref(false);
+const error = ref("");
+const success = ref("");
+
+watch(
+  () => props.modelValue,
+  (isOpen) => {
+    if (!isOpen) {
+      error.value = "";
+      success.value = "";
+      form.value.password = "";
+    }
+  }
+);
+
+function closeModal() {
   emit("update:modelValue", false);
-};
+}
 
-const handleLogin = () => {
-  console.log("Login attempt:", form.value);
-  // Aquí irá la lógica de autenticación
-  // Por ahora solo cerramos el modal
-  closeModal();
-};
+async function handleLogin() {
+  error.value = "";
+  success.value = "";
+  loading.value = true;
 
-const toggleSignup = () => {
-  console.log("Toggle signup mode");
-  // Aquí puedes agregar lógica para cambiar a modo registro
-};
+  try {
+    await auth.login(form.value.email, form.value.password);
+    success.value = "Sesión iniciada";
+    emit("success");
+    closeModal();
+    // Propaga el token al hub (Grupo) para que el ecosistema comparta la
+    // sesión. Usamos origin+pathname (sin query/hash) para que al volver
+    // no arrastremos flags sobrantes tipo ?sso_failed=1.
+    const returnUrl = window.location.origin + window.location.pathname;
+    redirectToStore(auth.state.token, returnUrl);
+  } catch (err) {
+    error.value = err instanceof Error ? err.message : "No fue posible iniciar sesión";
+  } finally {
+    loading.value = false;
+  }
+}
+
+async function resendMail() {
+  if (!form.value.email) {
+    error.value = "Indica un correo para reenviar la verificación";
+    return;
+  }
+
+  loading.value = true;
+  error.value = "";
+  success.value = "";
+
+  try {
+    const response = await auth.resendVerification(form.value.email);
+    success.value = response.message || "Correo de verificación reenviado.";
+  } catch (err) {
+    error.value = err instanceof Error ? err.message : "No fue posible reenviar el correo";
+  } finally {
+    loading.value = false;
+  }
+}
 </script>
 
 <style scoped>
@@ -265,6 +329,54 @@ const toggleSignup = () => {
 
 .btn-login:active {
   transform: translateY(0);
+}
+
+.btn-login:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.feedback {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 13px;
+  border: 1px solid transparent;
+}
+
+.feedback.error {
+  color: #ffb7b7;
+  background: rgba(183, 28, 28, 0.15);
+  border-color: rgba(255, 183, 183, 0.25);
+}
+
+.feedback.success {
+  color: #b7ffc7;
+  background: rgba(28, 183, 87, 0.12);
+  border-color: rgba(183, 255, 199, 0.25);
+}
+
+.btn-link {
+  background: transparent;
+  border: none;
+  color: #f2c53d;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 4px 0 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  align-self: center;
+}
+
+.btn-link:hover:not(:disabled) {
+  color: #ffd966;
+}
+
+.btn-link:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .modal-footer {
