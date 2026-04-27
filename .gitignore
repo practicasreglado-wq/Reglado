@@ -1,19 +1,80 @@
+# Reglado ecosystem — .gitignore consolidado
+#
+# Este es el único .gitignore del repo. Cada proyecto NO lleva el suyo
+# propio (excepción: Inmobiliaria_Reglados, que mantiene su propio
+# .gitignore porque lo gestiona otro equipo).
+
+# === SO / IDEs / editores ===
+.DS_Store
+.vscode/
+.idea/
+.claude/
+
+# === Logs comunes ===
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# === ApiLoging (PHP backend principal) ===
 ApiLoging/.env
 ApiLoging/.env.local.bak
-Inmobiliaria_Reglados/backend/uploads/
 ApiLoging/vendor/
+ApiLoging/data/*.mmdb
+
+# === GrupoReglado (Vue + Vite) ===
+GrupoReglado/node_modules/
+GrupoReglado/dist/
+GrupoReglado/.env
+GrupoReglado/.env.*
+!GrupoReglado/.env.example
+
+# === RegladoEnergy (Vue + Vite + BACKEND PHP) ===
+RegladoEnergy/node_modules/
+RegladoEnergy/dist/
+RegladoEnergy/.env
+RegladoEnergy/.env.*
+!RegladoEnergy/.env.example
+RegladoEnergy/BACKEND/.env
+RegladoEnergy/release-hostinger/
+
+# === RegladoMaps (Vue + Vite) ===
+RegladoMaps/node_modules/
+RegladoMaps/dist/
+RegladoMaps/.env
+RegladoMaps/.env.*
+!RegladoMaps/.env.example
+
+# === RegladoIngenieria (Vue + Vite + BACKEND PHP) ===
+RegladoIngenieria/node_modules/
+RegladoIngenieria/dist/
+RegladoIngenieria/.env
+RegladoIngenieria/.env.*
+!RegladoIngenieria/.env.example
+RegladoIngenieria/BACKEND/.env
+
+# === Inmobiliaria_Reglados (gestionado por su equipo) ===
+# Reglas adicionales locales en Inmobiliaria_Reglados/.gitignore — no
+# duplicar ni modificar desde aquí. Estas son las únicas que ya estaban
+# en el .gitignore raíz y se mantienen por seguridad.
+Inmobiliaria_Reglados/backend/uploads/
 Inmobiliaria_Reglados/backend/vendor/
 Inmobiliaria_Reglados/vendor/
 Inmobiliaria_Reglados/.phpunit.cache/
-.env
+
+# === ApiMapa (PHP backend de mapas) ===
+ApiMapa/.env
+ApiMapa/vendor/
+
+# === Carpetas de trabajo locales / artefactos ===
 Pruebas/
 RegladoBienesRaices/
 n8nJson/
 SkillsClaude/
-.claude/
-scripts/RegladoIngenieria/
-SkillsClaude/
 ReleasesEstables/
 scripts/
-ApiLoging/data/*.mmdb
 Chatbot/
+
+# === Variables de entorno en raíz ===
+.env
+.env.local
