@@ -6,6 +6,8 @@ require_once dirname(__DIR__) . '/config/db.php';
 require_once dirname(__DIR__) . '/config/auth.php';
 require_once __DIR__ . '/../config/cors.php';
 require_once dirname(__DIR__) . '/lib/audit.php';
+require_once dirname(__DIR__) . '/lib/error_reporting.php';
+require_once dirname(__DIR__) . '/lib/admin_password_check.php';
 
 applyCors();
 handlePreflight();
@@ -155,8 +157,8 @@ function deleteCollectedFiles(array $fileMap): void
             continue;
         }
 
-        if (is_file($absolutePath)) {
-            @unlink($absolutePath);
+        if (is_file($absolutePath) && !unlink($absolutePath)) {
+            error_log('[delete_property] unlink falló: ' . $absolutePath);
         }
     }
 }
@@ -259,12 +261,21 @@ if (!is_array($input)) {
 }
 
 $propertyId = (int) ($input['property_id'] ?? 0);
+$adminPassword = (string) ($input['admin_password'] ?? '');
 
 if ($userId <= 0) {
     respondJson(401, [
         'success' => false,
         'message' => 'Usuario no autenticado.'
     ]);
+}
+
+if ($isAdmin) {
+    requireAdminPasswordConfirmation(
+        (int) ($auth['sub'] ?? 0),
+        $adminPassword,
+        'admin_property_delete'
+    );
 }
 
 if ($propertyId <= 0) {
@@ -378,8 +389,9 @@ try {
         $pdo->rollBack();
     }
 
+    $errorId = logAndReferenceError('delete_property', $e);
     respondJson(500, [
         'success' => false,
-        'message' => 'Error al eliminar la propiedad: ' . $e->getMessage()
+        'message' => 'Error al eliminar la propiedad. Referencia: ' . $errorId,
     ]);
 }

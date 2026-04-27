@@ -20,9 +20,6 @@
       <button class="tab-btn" :class="{ active: activeTab === 'all' }" type="button" @click="changeTab('all')">
         Todos los del grupo
       </button>
-      <button class="tab-btn" :class="{ active: activeTab === 'blocked' }" type="button" @click="changeTab('blocked')">
-        Bloqueados
-      </button>
     </div>
 
     <div v-if="loading" class="admin-state">
@@ -62,7 +59,6 @@
         <span class="col-label">Email</span>
         <span class="col-label">Rol</span>
         <span class="col-label">Actividad</span>
-        <span class="col-label">Estado</span>
         <span class="col-label">Detalles</span>
       </div>
 
@@ -70,7 +66,7 @@
         v-for="u in filteredUsers"
         :key="u.id"
         class="user-item"
-        :class="{ 'is-expanded': expandedId === u.id, 'is-blocked': u.is_blocked }"
+        :class="{ 'is-expanded': expandedId === u.id }"
       >
         <div class="user-item__header" @click="toggleExpand(u.id)">
           <span class="user-id">#{{ u.id }}</span>
@@ -80,8 +76,6 @@
           <span class="activity-badge" :class="u.is_active_in_inmo ? 'activity-badge--active' : 'activity-badge--inactive'">
             {{ u.is_active_in_inmo ? 'Activo' : 'Sin actividad' }}
           </span>
-          <span v-if="u.is_blocked" class="status-badge status-badge--blocked">Bloqueado</span>
-          <span v-else class="status-badge status-badge--ok">Activo</span>
           <button class="expand-btn" type="button">
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M6 9l6 6 6-6" />
@@ -115,19 +109,6 @@
                 </ul>
               </div>
 
-              <div class="details-block">
-                <h4>Estado en Inmobiliaria</h4>
-                <ul>
-                  <li><strong>Bloqueado:</strong>
-                    <span v-if="u.is_blocked" class="status-badge status-badge--blocked">Sí</span>
-                    <span v-else class="status-badge status-badge--ok">No</span>
-                  </li>
-                  <li v-if="u.inmo_status?.last_token_invalidated_at">
-                    <strong>Última invalidación:</strong> {{ formatDate(u.inmo_status.last_token_invalidated_at) }}
-                  </li>
-                  <li v-if="u.inmo_status?.notes"><strong>Notas:</strong> {{ u.inmo_status.notes }}</li>
-                </ul>
-              </div>
             </div>
 
             <div v-if="u.role !== 'admin'" class="details-actions">
@@ -138,7 +119,7 @@
                 :disabled="actionLoadingId === u.id"
                 @click.stop="changeRole(u, 'real')"
               >
-                {{ actionLoadingId === u.id ? 'Procesando...' : 'Promover a Real' }}
+                {{ actionLoadingId === u.id ? 'Procesando...' : 'Promover a Premium' }}
               </button>
 
               <button
@@ -149,35 +130,6 @@
                 @click.stop="changeRole(u, 'user')"
               >
                 {{ actionLoadingId === u.id ? 'Procesando...' : 'Cambiar a User' }}
-              </button>
-
-              <button
-                class="action-btn action-btn--relogin"
-                type="button"
-                :disabled="actionLoadingId === u.id"
-                @click.stop="forceRelogin(u)"
-              >
-                {{ actionLoadingId === u.id ? 'Procesando...' : 'Forzar re-login' }}
-              </button>
-
-              <button
-                v-if="!u.is_blocked"
-                class="action-btn action-btn--block"
-                type="button"
-                :disabled="actionLoadingId === u.id"
-                @click.stop="blockUser(u)"
-              >
-                {{ actionLoadingId === u.id ? 'Procesando...' : 'Bloquear acceso' }}
-              </button>
-
-              <button
-                v-else
-                class="action-btn action-btn--unblock"
-                type="button"
-                :disabled="actionLoadingId === u.id"
-                @click.stop="unblockUser(u)"
-              >
-                {{ actionLoadingId === u.id ? 'Procesando...' : 'Desbloquear' }}
               </button>
             </div>
 
@@ -198,8 +150,10 @@
           <input
             v-if="confirmModal.withInput"
             v-model="confirmModal.inputValue"
+            :type="confirmModal.inputType || 'text'"
             :placeholder="confirmModal.inputPlaceholder"
             class="modal-input"
+            autocomplete="current-password"
           />
           <div class="custom-modal-actions">
             <button class="btn-cancel" type="button" @click="confirmModal.cancel">Cancelar</button>
@@ -219,13 +173,7 @@
 
 <script>
 import { ref, computed, onMounted } from "vue";
-import {
-  fetchInmoUsers,
-  updateUserRole,
-  blockInmoUser,
-  unblockInmoUser,
-  forceUserRelogin,
-} from "../services/admin";
+import { fetchInmoUsers, updateUserRole } from "../services/admin";
 
 export default {
   name: "AdminUsersView",
@@ -241,13 +189,12 @@ export default {
     const toasts = ref([]);
     const confirmModal = ref({
       show: false, title: "", message: "", withInput: false,
-      inputValue: "", inputPlaceholder: "",
+      inputValue: "", inputPlaceholder: "", inputType: "text",
       confirm: () => {}, cancel: () => {},
     });
 
     const tabLabel = computed(() => {
       if (activeTab.value === "active") return "Activos";
-      if (activeTab.value === "blocked") return "Bloqueados";
       return "Total";
     });
 
@@ -272,10 +219,10 @@ export default {
       setTimeout(() => { toasts.value = toasts.value.filter((t) => t.id !== id); }, 3200);
     }
 
-    function showConfirm({ title, message, withInput = false, inputPlaceholder = "" }) {
+    function showConfirm({ title, message, withInput = false, inputPlaceholder = "", inputType = "text" }) {
       return new Promise((resolve) => {
         confirmModal.value = {
-          show: true, title, message, withInput, inputValue: "", inputPlaceholder,
+          show: true, title, message, withInput, inputValue: "", inputPlaceholder, inputType,
           confirm: () => {
             const value = confirmModal.value.inputValue;
             confirmModal.value.show = false;
@@ -318,15 +265,18 @@ export default {
     }
 
     async function changeRole(user, newRole) {
-      const confirmed = await showConfirm({
-        title: "Cambiar rol",
-        message: `¿Cambiar el rol de ${user.email} a "${newRole}"? Se le obligará a re-login y se enviará un email.`,
+      const password = await showConfirm({
+        title: "Confirma tu contraseña",
+        message: `Introduce tu contraseña para cambiar el rol de ${user.email} a "${newRole}". Se le obligará a re-login y se enviará un email.`,
+        withInput: true,
+        inputType: "password",
+        inputPlaceholder: "Tu contraseña",
       });
-      if (!confirmed) return;
+      if (!password) return;
 
       actionLoadingId.value = user.id;
       try {
-        const result = await updateUserRole(user.id, newRole);
+        const result = await updateUserRole(user.id, newRole, password);
         if (!result?.success) throw new Error(result?.message || "Error al cambiar rol");
         user.role = newRole;
         showToast("Rol cambiado correctamente", "success");
@@ -337,79 +287,12 @@ export default {
       }
     }
 
-    async function blockUser(user) {
-      const notes = await showConfirm({
-        title: "Bloquear acceso a Inmobiliaria",
-        message: `¿Bloquear el acceso de ${user.email}? Podrá seguir usando otros servicios del grupo, pero no Inmobiliaria. Se le enviará un email.`,
-        withInput: true,
-        inputPlaceholder: "Notas (opcional, motivo del bloqueo)",
-      });
-      if (notes === false) return;
-
-      actionLoadingId.value = user.id;
-      try {
-        const result = await blockInmoUser(user.id, notes || "");
-        if (!result?.success) throw new Error(result?.message || "Error al bloquear");
-        user.is_blocked = true;
-        if (activeTab.value === "active") {
-          users.value = users.value.filter((x) => x.id !== user.id);
-        }
-        showToast("Usuario bloqueado correctamente", "success");
-      } catch (e) {
-        showToast(e.message || "Error al bloquear", "error");
-      } finally {
-        actionLoadingId.value = null;
-      }
-    }
-
-    async function unblockUser(user) {
-      const confirmed = await showConfirm({
-        title: "Desbloquear usuario",
-        message: `¿Restaurar el acceso de ${user.email} a Inmobiliaria? Se le enviará un email.`,
-      });
-      if (!confirmed) return;
-
-      actionLoadingId.value = user.id;
-      try {
-        const result = await unblockInmoUser(user.id);
-        if (!result?.success) throw new Error(result?.message || "Error al desbloquear");
-        user.is_blocked = false;
-        if (activeTab.value === "blocked") {
-          users.value = users.value.filter((x) => x.id !== user.id);
-        }
-        showToast("Usuario desbloqueado correctamente", "success");
-      } catch (e) {
-        showToast(e.message || "Error al desbloquear", "error");
-      } finally {
-        actionLoadingId.value = null;
-      }
-    }
-
-    async function forceRelogin(user) {
-      const confirmed = await showConfirm({
-        title: "Forzar re-login",
-        message: `¿Invalidar la sesión actual de ${user.email}? Tendrá que volver a iniciar sesión la próxima vez.`,
-      });
-      if (!confirmed) return;
-
-      actionLoadingId.value = user.id;
-      try {
-        const result = await forceUserRelogin(user.id);
-        if (!result?.success) throw new Error(result?.message || "Error al forzar re-login");
-        showToast("Sesión invalidada correctamente", "success");
-      } catch (e) {
-        showToast(e.message || "Error", "error");
-      } finally {
-        actionLoadingId.value = null;
-      }
-    }
-
     onMounted(load);
 
     return {
       users, loading, error, expandedId, actionLoadingId, activeTab, search, roleFilter,
       toasts, confirmModal, tabLabel, filteredUsers,
-      changeTab, toggleExpand, formatDate, changeRole, blockUser, unblockUser, forceRelogin,
+      changeTab, toggleExpand, formatDate, changeRole,
     };
   },
 };
@@ -499,7 +382,7 @@ export default {
 
 .users-header-row {
   display: grid;
-  grid-template-columns: 60px 130px 1fr 80px 130px 120px 50px;
+  grid-template-columns: 60px 130px 1fr 80px 130px 50px;
   align-items: center; padding: 0 30px 6px 30px; gap: 16px;
 }
 .col-label {
@@ -521,11 +404,10 @@ export default {
   border-color: #c4aa1c; background: rgba(255, 255, 255, 0.7);
   box-shadow: 0 20px 40px rgba(196, 170, 28, 0.15);
 }
-.user-item.is-blocked { opacity: 0.7; border-color: rgba(185, 28, 28, 0.3); }
 
 .user-item__header {
   padding: 22px 30px; display: grid;
-  grid-template-columns: 60px 130px 1fr 80px 130px 120px 50px;
+  grid-template-columns: 60px 130px 1fr 80px 130px 50px;
   align-items: center; cursor: pointer; user-select: none; gap: 16px;
 }
 
@@ -553,13 +435,6 @@ export default {
 .activity-badge--active { background: rgba(34, 197, 94, 0.12); color: #15803d; border: 1px solid rgba(34, 197, 94, 0.3); }
 .activity-badge--inactive { background: rgba(148, 163, 184, 0.12); color: #64748b; border: 1px solid rgba(148, 163, 184, 0.3); }
 
-.status-badge {
-  font-size: 0.7rem; font-weight: 800; text-transform: uppercase;
-  padding: 4px 10px; border-radius: 999px; justify-self: center;
-}
-.status-badge--ok { background: rgba(34, 197, 94, 0.12); color: #15803d; }
-.status-badge--blocked { background: rgba(239, 68, 68, 0.12); color: #b91c1c; border: 1px solid rgba(239, 68, 68, 0.3); }
-
 .expand-btn {
   background: #f8fafc; border: 1px solid #e2e8f0; color: #94a3b8;
   width: 40px; height: 40px; border-radius: 12px;
@@ -568,21 +443,30 @@ export default {
 }
 .is-expanded .expand-btn { transform: rotate(180deg); background: #c4aa1c; border-color: #c4aa1c; color: white; }
 
-.user-item__details { padding: 0 30px 30px 30px; border-top: 1px solid #f1f5f9; background: #fcfcfc; }
+.user-item__details { padding: 0 30px 30px 30px; border-top: 1px solid #e2e8f0; background: #f1f5f9; }
 
 .details-grid {
   display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 30px; padding: 30px 0;
+  gap: 20px; padding: 24px 0;
+}
+.details-block {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 14px;
+  padding: 22px;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
 }
 .details-block h4 {
   font-size: 0.85rem; text-transform: uppercase; color: #c4aa1c;
-  margin: 0 0 18px 0; letter-spacing: 0.1em; font-weight: 800;
-  border-bottom: 2px solid rgba(196, 170, 28, 0.1); padding-bottom: 8px;
+  margin: 0 0 16px 0; letter-spacing: 0.1em; font-weight: 800;
+  border-bottom: 2px solid rgba(196, 170, 28, 0.2); padding-bottom: 10px;
 }
 .details-block ul { list-style: none; padding: 0; margin: 0; }
 .details-block li {
   margin-bottom: 10px; font-size: 0.95rem; color: #1e293b;
-  display: grid; grid-template-columns: 160px 1fr; gap: 12px; align-items: start;
+  display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 8px; align-items: start;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 .details-block li strong { color: #64748b; font-weight: 500; }
 .details-block li span { overflow-wrap: anywhere; }
@@ -604,15 +488,6 @@ export default {
 
 .action-btn--demote { background: rgba(100, 116, 139, 0.12); color: #475569; border-color: rgba(100, 116, 139, 0.3); }
 .action-btn--demote:hover:not(:disabled) { background: #475569; color: white; transform: translateY(-2px); }
-
-.action-btn--relogin { background: rgba(245, 158, 11, 0.12); color: #b45309; border-color: rgba(245, 158, 11, 0.3); }
-.action-btn--relogin:hover:not(:disabled) { background: #d97706; color: white; transform: translateY(-2px); }
-
-.action-btn--block { background: rgba(239, 68, 68, 0.12); color: #b91c1c; border-color: rgba(239, 68, 68, 0.3); }
-.action-btn--block:hover:not(:disabled) { background: #dc2626; color: white; transform: translateY(-2px); }
-
-.action-btn--unblock { background: rgba(34, 197, 94, 0.12); color: #15803d; border-color: rgba(34, 197, 94, 0.3); }
-.action-btn--unblock:hover:not(:disabled) { background: #16a34a; color: white; transform: translateY(-2px); }
 
 .admin-protected-note {
   text-align: center; padding: 18px;
@@ -692,7 +567,7 @@ export default {
     gap: 10px; padding: 20px; grid-template-columns: none;
   }
   .user-id, .user-username, .user-email, .role-badge,
-  .activity-badge, .status-badge, .expand-btn { justify-self: auto; }
+  .activity-badge, .expand-btn { justify-self: auto; }
   .details-actions { flex-direction: column; }
   .action-btn { width: 100%; }
 }

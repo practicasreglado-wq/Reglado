@@ -59,6 +59,21 @@ function authHeaders() {
   return state.token ? { Authorization: `Bearer ${state.token}` } : {};
 }
 
+function isJwtExpired(token) {
+  try {
+    const [, payloadB64] = token.split(".");
+    if (!payloadB64) return true;
+    const json = atob(payloadB64.replace(/-/g, "+").replace(/_/g, "/"));
+    const { exp } = JSON.parse(json);
+    if (typeof exp !== "number") return false;
+    return Date.now() >= exp * 1000;
+  } catch {
+    return true;
+  }
+}
+
+let initializePromise = null;
+
 async function request(path, options = {}) {
   const response = await fetch(`${API_BASE}${path}`, {
     ...options,
@@ -121,36 +136,53 @@ function setSession(token, user = null) {
  * actual a la API (endpoint /auth/me) para hidratar el estado reactivo.
  */
 async function initialize() {
-  if (!state.token) {
-    const cookieToken = getCookie(COOKIE_TOKEN_KEY);
-    if (cookieToken) {
-      setToken(cookieToken);
+  if (initializePromise) {
+    return initializePromise;
+  }
+
+  initializePromise = (async () => {
+    if (!state.token) {
+      const cookieToken = getCookie(COOKIE_TOKEN_KEY);
+      if (cookieToken) {
+        setToken(cookieToken);
+      }
     }
-  }
 
-  // Set default language only if user consented to preferences
-  if (hasConsentCategory('preferences')) {
-    if (!getCookie(COOKIE_LANG_KEY)) {
-      setCookie(COOKIE_LANG_KEY, "ESP", COOKIE_MAX_AGE_YEAR, "Lax");
+    // Set default language only if user consented to preferences
+    if (hasConsentCategory('preferences')) {
+      if (!getCookie(COOKIE_LANG_KEY)) {
+        setCookie(COOKIE_LANG_KEY, "ESP", COOKIE_MAX_AGE_YEAR, "Lax");
+      }
     }
-  }
 
-  if (!state.token) {
-    state.user = null;
-    return;
-  }
+    if (!state.token) {
+      state.user = null;
+      return;
+    }
 
-  state.loading = true;
+    if (isJwtExpired(state.token)) {
+      clearSession();
+      return;
+    }
+
+    state.loading = true;
+    try {
+      const payload = await request("/auth/me", {
+        method: "GET",
+        headers: authHeaders(),
+      });
+      state.user = payload.user || null;
+    } catch {
+      clearSession();
+    } finally {
+      state.loading = false;
+    }
+  })();
+
   try {
-    const payload = await request("/auth/me", {
-      method: "GET",
-      headers: authHeaders(),
-    });
-    state.user = payload.user || null;
-  } catch {
-    clearSession();
+    return await initializePromise;
   } finally {
-    state.loading = false;
+    initializePromise = null;
   }
 }
 

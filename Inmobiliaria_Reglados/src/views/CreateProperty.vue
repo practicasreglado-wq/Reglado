@@ -16,6 +16,12 @@
         Describe la propiedad en texto libre. Debes incluir datos obligatorios como, tipo de propiedad, ciudad, zona, metros cuadrados, precio y direccion.
       </p>
 
+      <div v-if="prefillCategory" class="intent-hint">
+        Un comprador busca propiedades de la categoría
+        <strong>{{ prefillCategory }}</strong>. Si tienes una, súbela describiéndola
+        abajo y el sistema la emparejará automáticamente.
+      </div>
+
       <div class="panel panel-text">
         <textarea
           v-model="description"
@@ -38,7 +44,11 @@
 
 <script setup>
 import { ref } from "vue";
+import { useRoute } from "vue-router";
 import { processPropertyFromText } from "../services/properties";
+
+const route = useRoute();
+const prefillCategory = ref(String(route.query.category || "").trim());
 
 const description = ref("");
 const textProcessing = ref(false);
@@ -133,6 +143,21 @@ async function handleProcessText() {
   margin: 0 0 24px;
   color: #4c566a;
   line-height: 1.5;
+}
+
+.intent-hint {
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1e3a8a;
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.intent-hint strong {
+  color: #1e40af;
 }
 
 .panel {

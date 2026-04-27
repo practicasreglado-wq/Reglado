@@ -39,26 +39,6 @@ function requireAuthenticatedUser(PDO $pdo): array
     $payload = verifyJwt($token);
 
     $userId = (int) ($payload['sub'] ?? 0);
-    if ($userId > 0) {
-        try {
-            $statusStmt = $pdo->prepare('SELECT is_blocked, last_token_invalidated_at FROM user_inmo_status WHERE user_id = :uid LIMIT 1');
-            $statusStmt->execute(['uid' => $userId]);
-            $status = $statusStmt->fetch(PDO::FETCH_ASSOC);
-            if ($status) {
-                if ((int) $status['is_blocked'] === 1) {
-                    respondJson(403, ["success" => false, "message" => "Tu acceso a Inmobiliaria ha sido revocado por un administrador."]);
-                }
-                if (!empty($status['last_token_invalidated_at']) && isset($payload['iat'])) {
-                    $invalidatedAt = strtotime((string) $status['last_token_invalidated_at']);
-                    if ($invalidatedAt !== false && (int) $payload['iat'] < $invalidatedAt) {
-                        respondJson(401, ["success" => false, "message" => "Tu sesión ha caducado. Vuelve a iniciar sesión."]);
-                    }
-                }
-            }
-        } catch (Throwable $e) {
-            error_log('[auth] user_inmo_status check failed: ' . $e->getMessage());
-        }
-    }
 
     try {
         $email = (string) ($payload['email'] ?? '');

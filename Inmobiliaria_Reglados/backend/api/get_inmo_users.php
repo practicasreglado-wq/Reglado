@@ -6,6 +6,7 @@ require_once dirname(__DIR__) . '/config/db.php';
 require_once dirname(__DIR__) . '/config/auth.php';
 require_once __DIR__ . '/../config/cors.php';
 require_once dirname(__DIR__) . '/lib/audit.php';
+require_once dirname(__DIR__) . '/lib/error_reporting.php';
 
 loadEnv(dirname(__DIR__) . '/.env');
 applyCors();
@@ -20,7 +21,7 @@ if ($role !== 'admin') {
 }
 
 $mode = $_GET['mode'] ?? 'active';
-$allowed = ['active', 'all', 'blocked'];
+$allowed = ['active', 'all'];
 if (!in_array($mode, $allowed, true)) {
     $mode = 'active';
 }
@@ -43,15 +44,6 @@ try {
         ORDER BY created_at DESC, id DESC
     ");
     $allUsers = $usersStmt->fetchAll(PDO::FETCH_ASSOC);
-
-    $statusStmt = $pdo->query("
-        SELECT user_id, is_blocked, last_token_invalidated_at, notes, updated_at
-        FROM user_inmo_status
-    ");
-    $statusByUser = [];
-    foreach ($statusStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
-        $statusByUser[(int) $row['user_id']] = $row;
-    }
 
     $propStmt = $pdo->query("
         SELECT user_id, COUNT(*) AS total FROM (
@@ -112,11 +104,7 @@ try {
         $accesses = $accessByUser[$uid] ?? 0;
         $isActive = ($properties > 0 || $audits > 0 || $purchases > 0 || $accesses > 0);
 
-        $status = $statusByUser[$uid] ?? null;
-        $isBlocked = $status ? (int) $status['is_blocked'] === 1 : false;
-
         if ($mode === 'active' && !$isActive) continue;
-        if ($mode === 'blocked' && !$isBlocked) continue;
 
         $result[] = [
             'id' => $uid,
@@ -128,12 +116,6 @@ try {
             'role' => $u['role'],
             'created_at' => $u['created_at'],
             'is_active_in_inmo' => $isActive,
-            'is_blocked' => $isBlocked,
-            'inmo_status' => $status ? [
-                'last_token_invalidated_at' => $status['last_token_invalidated_at'],
-                'notes' => $status['notes'],
-                'updated_at' => $status['updated_at'],
-            ] : null,
             'activity' => [
                 'properties' => $properties,
                 'audit_events' => $audits,
@@ -157,5 +139,9 @@ try {
     ]);
 
 } catch (Throwable $e) {
-    respondJson(500, ['success' => false, 'message' => 'Error al consultar usuarios: ' . $e->getMessage()]);
+    $errorId = logAndReferenceError('get_inmo_users', $e);
+    respondJson(500, [
+        'success' => false,
+        'message' => 'Error al consultar usuarios. Referencia: ' . $errorId,
+    ]);
 }

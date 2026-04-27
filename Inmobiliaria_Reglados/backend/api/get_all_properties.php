@@ -6,6 +6,7 @@ require_once dirname(__DIR__) . '/config/db.php';
 require_once dirname(__DIR__) . '/config/auth.php';
 require_once __DIR__ . '/../config/cors.php';
 require_once dirname(__DIR__) . '/lib/audit.php';
+require_once dirname(__DIR__) . '/lib/error_reporting.php';
 
 applyCors();
 handlePreflight();
@@ -151,8 +152,9 @@ try {
         'properties' => $properties
     ]);
 } catch (Throwable $e) {
+    $errorId = logAndReferenceError('get_all_properties', $e);
     respondJson(500, [
         'success' => false,
-        'message' => 'Error al obtener las propiedades: ' . $e->getMessage()
+        'message' => 'Error al obtener las propiedades. Referencia: ' . $errorId,
     ]);
 }

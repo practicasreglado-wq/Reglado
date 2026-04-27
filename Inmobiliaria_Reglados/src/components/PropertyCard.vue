@@ -275,14 +275,7 @@ detailButtonClass() {
     },
 
     lat() {
-      const raw =
-        this.property.map_latitud ??
-        this.property.latitud ??
-        this.property.latitude ??
-        this.property.geo_lat ??
-        null;
-
-      const value = Number(raw);
+      const value = Number(this.property.map_latitud ?? null);
 
       if (!Number.isFinite(value)) {
         return null;
@@ -296,15 +289,7 @@ detailButtonClass() {
     },
 
     lon() {
-      const raw =
-        this.property.map_longitud ??
-        this.property.longitud ??
-        this.property.longitude ??
-        this.property.geo_lng ??
-        this.property.lng ??
-        null;
-
-      const value = Number(raw);
+      const value = Number(this.property.map_longitud ?? null);
 
       if (!Number.isFinite(value)) {
         return null;
@@ -375,7 +360,7 @@ detailButtonClass() {
         return null;
       }
 
-      return this.getOffsetCoordinates(this.lat, this.lon);
+      return [this.lat, this.lon];
     },
   },
 
@@ -450,43 +435,6 @@ detailButtonClass() {
       }
 
       return normalized;
-    },
-
-    getStableOffsetSeed() {
-      const base = String(
-        this.property?.id ??
-        `${this.lat ?? ""}-${this.lon ?? ""}`
-      );
-
-      let hash = 0;
-      for (let i = 0; i < base.length; i += 1) {
-        hash = (hash * 31 + base.charCodeAt(i)) >>> 0;
-      }
-
-      return hash;
-    },
-
-    getOffsetCoordinates(lat, lon) {
-      const seed = this.getStableOffsetSeed();
-
-      const offsetMeters = 400 + (seed % 90);
-      const angleDeg = seed % 360;
-      const angle = angleDeg * (Math.PI / 180);
-
-      const earthRadius = 6378137;
-
-      const dLat =
-        (offsetMeters * Math.cos(angle)) / earthRadius * (180 / Math.PI);
-
-      const dLon =
-        (offsetMeters * Math.sin(angle)) /
-        (earthRadius * Math.cos((lat * Math.PI) / 180)) *
-        (180 / Math.PI);
-
-      return [
-        lat + dLat,
-        lon + dLon,
-      ];
     },
 
     initMap() {

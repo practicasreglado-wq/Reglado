@@ -228,8 +228,8 @@ const ACTION_LABELS = {
   "document.signed.upload": "Subió documentos firmados",
   "document.signed.approve": "Aprobó documentos firmados",
   "document.signed.reject": "Rechazó documentos firmados",
-  "role.promotion.approve": "Aprobó solicitud de rol Real",
-  "role.promotion.reject": "Rechazó solicitud de rol Real",
+  "role.promotion.approve": "Aprobó solicitud de rol Premium",
+  "role.promotion.reject": "Rechazó solicitud de rol Premium",
   "purchase_request.status_change": "Cambió el estado de una solicitud de compra",
   "admin.list_users": "Consultó listado de usuarios",
   "user.role_change": "Cambió el rol de un usuario",
@@ -699,15 +699,23 @@ export default {
 
 .audit-item__details {
   padding: 0 30px 30px 30px;
-  border-top: 1px solid #f1f5f9;
-  background: #fcfcfc;
+  border-top: 1px solid #e2e8f0;
+  background: #f1f5f9;
 }
 
 .details-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 30px;
-  padding: 30px 0;
+  gap: 20px;
+  padding: 24px 0;
+}
+
+.details-block {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 14px;
+  padding: 22px;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
 }
 
 .details-block--full {
@@ -721,11 +729,11 @@ export default {
   font-size: 0.85rem;
   text-transform: uppercase;
   color: #c4aa1c;
-  margin: 0 0 18px 0;
+  margin: 0 0 16px 0;
   letter-spacing: 0.1em;
   font-weight: 800;
-  border-bottom: 2px solid rgba(196, 170, 28, 0.1);
-  padding-bottom: 8px;
+  border-bottom: 2px solid rgba(196, 170, 28, 0.2);
+  padding-bottom: 10px;
 }
 
 .details-block ul {
@@ -739,9 +747,11 @@ export default {
   font-size: 0.95rem;
   color: #1e293b;
   display: grid;
-  grid-template-columns: 110px 1fr;
-  gap: 12px;
+  grid-template-columns: 85px minmax(0, 1fr);
+  gap: 8px;
   align-items: start;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .details-block li strong {

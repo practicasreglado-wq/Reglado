@@ -79,7 +79,7 @@
         </div>
 
         <div class="dossier-actions">
-          <button class="primary-btn" type="button" @click="openSignatureModal">
+          <button class="primary-btn" type="button" @click="openDownloadNotice">
             Descargar documentos
           </button>
           <button class="secondary-btn" type="button" @click="openSignatureModal">
@@ -114,7 +114,7 @@
 
     <div class="purchase-block">
       <button
-        v-if="accessGranted"
+        v-if="accessGranted && !hasPendingAppointment"
         class="primary-btn"
         type="button"
         :disabled="purchaseLoading"
@@ -122,6 +122,10 @@
       >
         {{ purchaseLoading ? "Enviando..." : "Me interesa comprar" }}
       </button>
+
+      <p class="status appointment-pending" v-else-if="accessGranted && hasPendingAppointment">
+        ✓ Ya tienes una cita agendada para esta propiedad. El equipo se pondrá en contacto contigo.
+      </p>
 
       <p class="status" v-else>
         Debes validar la firma y esperar la aprobación administrativa para solicitar la compra.
@@ -135,6 +139,23 @@
     <p class="status">{{ errorMessage || "Propiedad no encontrada." }}</p>
   </section>
 
+  <div v-if="showDownloadNotice" class="download-notice" @click.self="cancelDownloadNotice">
+    <div class="download-notice__card" role="dialog" aria-labelledby="download-notice-title">
+      <h4 id="download-notice-title">Descarga de documentos</h4>
+      <p>
+        Se van a descargar el <strong>NDA</strong> y la <strong>LOI</strong> de esta propiedad.
+      </p>
+      <div class="download-notice__actions">
+        <button type="button" class="download-notice__cancel" @click="cancelDownloadNotice">
+          Cancelar
+        </button>
+        <button type="button" class="download-notice__confirm" @click="confirmDownloadNotice">
+          Continuar
+        </button>
+      </div>
+    </div>
+  </div>
+
   <div v-if="showSignatureModal" class="signature-modal">
     <div class="signature-modal__card">
       <header class="signature-modal__header">
@@ -143,28 +164,8 @@
       </header>
 
       <p>
-        Descarga, firma digitalmente y sube el NDA y la LOI para desbloquear el dossier completo.
+        Sube el NDA y la LOI firmados con <strong>certificado digital</strong> para desbloquear el dossier completo.
       </p>
-
-      <div class="download-links">
-        <button
-          v-if="property.confidentiality_file"
-          type="button"
-          class="download-link"
-          @click="downloadLegalDocument('nda', property.confidentiality_file)"
-        >
-          Descargar NDA
-        </button>
-
-        <button
-          v-if="property.intention_file"
-          type="button"
-          class="download-link"
-          @click="downloadLegalDocument('loi', property.intention_file)"
-        >
-          Descargar LOI
-        </button>
-      </div>
 
       <div class="upload-section">
       <label>
@@ -193,10 +194,6 @@
             ❌ No válido
           </span>
         </div>
-
-        <small v-if="ndaValidation.message" class="file-validation-message">
-          {{ ndaValidation.message }}
-        </small>
       </label>
 
   <label>
@@ -225,10 +222,6 @@
         ❌ No válido
       </span>
     </div>
-
-    <small v-if="loiValidation.message" class="file-validation-message">
-      {{ loiValidation.message }}
-    </small>
   </label>
     </div>
 
@@ -245,12 +238,112 @@
     </div>
   </div>
 
-  <div v-if="showPurchaseModal" class="confirm-modal">
-    <div class="confirm-modal__card">
-      <h4>Confirmar interés de compra</h4>
-      <p>
-        ¿Estás seguro de que quieres enviar tu solicitud de interés para esta propiedad?
+  <div v-if="showPurchaseModal" class="appointment-modal">
+    <div class="appointment-modal__card">
+      <h4>Agendar cita de firma</h4>
+      <p class="appointment-modal__sub">
+        Indica cuándo y en qué notaría se realizará la firma. El equipo revisará tu propuesta y confirmará la cita.
       </p>
+
+      <div class="appointment-row">
+        <div class="appointment-col">
+          <label class="appointment-label">Fecha de firma <span class="appointment-required">*</span></label>
+          <input
+            v-model="appointmentDateOnly"
+            type="date"
+            class="appointment-input"
+            :min="minDate"
+            :disabled="purchaseLoading"
+          />
+        </div>
+        <div class="appointment-col">
+          <label class="appointment-label">Hora <span class="appointment-required">*</span></label>
+          <select
+            v-model="appointmentTimeOnly"
+            class="appointment-input"
+            :disabled="purchaseLoading || !appointmentDateOnly || loadingBookedTimes"
+          >
+            <option value="" disabled>
+              {{
+                !appointmentDateOnly
+                  ? 'Elige primero una fecha'
+                  : loadingBookedTimes
+                    ? 'Cargando horarios...'
+                    : availableTimeSlots.length === 0
+                      ? 'No hay horarios libres ese día'
+                      : 'Selecciona una hora'
+              }}
+            </option>
+            <option
+              v-for="slot in timeSlots"
+              :key="slot"
+              :value="slot"
+              :disabled="blockedSlots.has(slot)"
+            >
+              {{ slot }}{{ blockedSlots.has(slot) ? ' — no disponible' : '' }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <h5 class="appointment-section-title">Datos de la notaría</h5>
+
+      <label class="appointment-label">Nombre de la notaría <span class="appointment-required">*</span></label>
+      <input
+        v-model="notaryName"
+        type="text"
+        class="appointment-input"
+        maxlength="255"
+        placeholder="Ej: Notaría de Juan Pérez"
+        :disabled="purchaseLoading"
+      />
+
+      <label class="appointment-label appointment-label--spaced">Dirección <span class="appointment-required">*</span></label>
+      <input
+        v-model="notaryAddress"
+        type="text"
+        class="appointment-input"
+        maxlength="500"
+        placeholder="Calle, número, piso..."
+        :disabled="purchaseLoading"
+      />
+
+      <div class="appointment-row">
+        <div class="appointment-col">
+          <label class="appointment-label appointment-label--spaced">Ciudad <span class="appointment-required">*</span></label>
+          <input
+            v-model="notaryCity"
+            type="text"
+            class="appointment-input"
+            maxlength="150"
+            placeholder="Madrid"
+            :disabled="purchaseLoading"
+          />
+        </div>
+        <div class="appointment-col">
+          <label class="appointment-label appointment-label--spaced">Teléfono notaría (opcional)</label>
+          <input
+            v-model="notaryPhone"
+            type="tel"
+            class="appointment-input"
+            maxlength="50"
+            placeholder="+34 912 345 678"
+            :disabled="purchaseLoading"
+          />
+        </div>
+      </div>
+
+      <label class="appointment-label appointment-label--spaced">Notas adicionales (opcional)</label>
+      <textarea
+        v-model="appointmentNotes"
+        class="appointment-textarea"
+        rows="3"
+        maxlength="1000"
+        placeholder="¿Algo que quieras comentar al equipo? (máx. 1000 caracteres)"
+        :disabled="purchaseLoading"
+      ></textarea>
+
+      <p v-if="purchaseMessage" class="appointment-feedback">{{ purchaseMessage }}</p>
 
       <div class="confirm-modal__actions">
         <button
@@ -266,9 +359,9 @@
           type="button"
           class="primary-btn"
           @click="submitPurchaseRequest"
-          :disabled="purchaseLoading"
+          :disabled="purchaseLoading || !canSubmitAppointment"
         >
-          {{ purchaseLoading ? "Enviando..." : "Sí, enviar solicitud" }}
+          {{ purchaseLoading ? "Enviando..." : "Agendar cita" }}
         </button>
       </div>
     </div>
@@ -288,7 +381,7 @@ import {
   saveFavorite,
   removeFavorite,
 } from "../services/properties";
-import { buildUploadsUrl } from "../services/backend";
+import { buildUploadsUrl, backendJson } from "../services/backend";
 
 const route = useRoute();
 const router = useRouter();
@@ -305,6 +398,7 @@ const loading = ref(true);
 const errorMessage = ref("");
 
 const showSignatureModal = ref(false);
+const showDownloadNotice = ref(false);
 const ndaFile = ref(null);
 const loiFile = ref(null);
 const uploadingDocuments = ref(false);
@@ -331,6 +425,114 @@ const downloadError = ref("");
 const purchaseLoading = ref(false);
 const purchaseMessage = ref("");
 const showPurchaseModal = ref(false);
+
+const appointmentDateOnly = ref(""); // YYYY-MM-DD
+const appointmentTimeOnly = ref(""); // HH:MM
+const appointmentNotes = ref("");
+const notaryName = ref("");
+const notaryAddress = ref("");
+const notaryCity = ref("");
+const notaryPhone = ref("");
+const hasPendingAppointment = ref(false);
+const pendingAppointmentInfo = ref(null);
+
+// Slots de hora cada 30 minutos entre 09:00 y 19:00
+const timeSlots = (() => {
+  const slots = [];
+  for (let h = 9; h <= 19; h++) {
+    for (const m of [0, 30]) {
+      if (h === 19 && m > 0) break;
+      slots.push(`${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`);
+    }
+  }
+  return slots;
+})();
+
+// Huecos ya reservados para la fecha seleccionada (se consultan al backend).
+// Bloqueamos cada hueco reservado más las 3 horas siguientes: si alguien
+// agenda a las 15:00, nadie puede coger 15:00–17:59. Próximo libre: 18:00.
+const BLOCK_WINDOW_MINUTES = 180;
+const bookedTimesForDate = ref([]);
+const loadingBookedTimes = ref(false);
+
+function slotToMinutes(slot) {
+  const [h, m] = String(slot).split(":").map(Number);
+  return h * 60 + m;
+}
+
+const blockedSlots = computed(() => {
+  const set = new Set();
+  for (const booked of bookedTimesForDate.value) {
+    const start = slotToMinutes(booked);
+    if (!Number.isFinite(start)) continue;
+    for (const slot of timeSlots) {
+      const slotMin = slotToMinutes(slot);
+      if (slotMin >= start && slotMin < start + BLOCK_WINDOW_MINUTES) {
+        set.add(slot);
+      }
+    }
+  }
+  return set;
+});
+
+const availableTimeSlots = computed(() =>
+  timeSlots.filter((slot) => !blockedSlots.value.has(slot))
+);
+
+async function refreshBookedTimes(date) {
+  if (!date) {
+    bookedTimesForDate.value = [];
+    return;
+  }
+
+  loadingBookedTimes.value = true;
+  try {
+    const payload = await backendJson(
+      `api/get_booked_time_ranges.php?date=${encodeURIComponent(date)}`
+    );
+    bookedTimesForDate.value = Array.isArray(payload.booked_times)
+      ? payload.booked_times
+      : [];
+    console.info(
+      `[appointments] Horas reservadas para ${date}:`,
+      bookedTimesForDate.value
+    );
+  } catch (err) {
+    console.error(
+      `[appointments] Error consultando horas reservadas para ${date}:`,
+      err
+    );
+    bookedTimesForDate.value = [];
+  } finally {
+    loadingBookedTimes.value = false;
+  }
+}
+
+watch(appointmentDateOnly, async (newDate) => {
+  await refreshBookedTimes(newDate);
+  // Si el hueco que tenía seleccionado queda bloqueado por las reservas de
+  // la nueva fecha, lo limpiamos para forzar una elección válida.
+  if (appointmentTimeOnly.value && blockedSlots.value.has(appointmentTimeOnly.value)) {
+    appointmentTimeOnly.value = "";
+  }
+});
+
+// Fecha mínima (hoy) en formato YYYY-MM-DD
+const minDate = computed(() => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+});
+
+const canSubmitAppointment = computed(() =>
+  Boolean(
+    appointmentDateOnly.value &&
+      appointmentTimeOnly.value &&
+      notaryName.value.trim() &&
+      notaryAddress.value.trim() &&
+      notaryCity.value.trim()
+  )
+);
+
 
 const documentsAccess = ref({
   nda_uploaded: false,
@@ -523,6 +725,7 @@ async function loadProperty() {
     property.value = payload;
     dossierLink.value = "";
     await refreshAccessState();
+    refreshPendingAppointment();
   } catch (err) {
     errorMessage.value = err?.message || "No se pudo cargar la propiedad.";
   } finally {
@@ -651,12 +854,20 @@ async function triggerDownload(url, fileName) {
       throw new Error(text || "Error descargando archivo");
     }
 
-    const blob = await response.blob();
-    const blobUrl = window.URL.createObjectURL(blob);
+    // Forzamos el MIME a application/octet-stream para evitar que el
+    // navegador intente abrir el PDF en su visor integrado en lugar de
+    // descargarlo. Los bytes del blob son los mismos que recibió del
+    // servidor, solo cambia la etiqueta de tipo.
+    const rawBlob = await response.blob();
+    const downloadBlob = new Blob([rawBlob], {
+      type: "application/octet-stream",
+    });
+    const blobUrl = window.URL.createObjectURL(downloadBlob);
 
     const link = document.createElement("a");
     link.href = blobUrl;
     link.download = fileName || "archivo.pdf";
+    link.rel = "noopener";
     document.body.appendChild(link);
     link.click();
     link.remove();
@@ -736,6 +947,46 @@ async function downloadLegalDocument(type, fileName) {
     (String(type || "").trim().toLowerCase() === "loi" ? "loi.pdf" : "nda.pdf");
 
   await triggerDownload(url, finalName);
+}
+
+async function downloadLegalPackage() {
+  const nda = property.value?.confidentiality_file;
+  const loi = property.value?.intention_file;
+
+  if (nda) {
+    await downloadLegalDocument("nda", nda);
+  }
+
+  if (loi) {
+    // Pequeña pausa para que el navegador no agrupe las descargas.
+    if (nda) {
+      await new Promise((resolve) => setTimeout(resolve, 300));
+    }
+    await downloadLegalDocument("loi", loi);
+  }
+}
+
+function openDownloadNotice() {
+  downloadError.value = "";
+
+  const nda = property.value?.confidentiality_file;
+  const loi = property.value?.intention_file;
+
+  if (!nda && !loi) {
+    downloadError.value = "No hay documentos legales para descargar.";
+    return;
+  }
+
+  showDownloadNotice.value = true;
+}
+
+function cancelDownloadNotice() {
+  showDownloadNotice.value = false;
+}
+
+async function confirmDownloadNotice() {
+  showDownloadNotice.value = false;
+  await downloadLegalPackage();
 }
 
 async function refreshAccessState() {
@@ -831,6 +1082,20 @@ async function submitDocuments() {
   }
 }
 
+async function refreshPendingAppointment() {
+  if (!property.value?.id) return;
+  try {
+    const payload = await backendJson(
+      `api/check_pending_appointment.php?property_id=${encodeURIComponent(property.value.id)}`
+    );
+    hasPendingAppointment.value = Boolean(payload.has_pending);
+    pendingAppointmentInfo.value = payload.appointment || null;
+  } catch (err) {
+    hasPendingAppointment.value = false;
+    pendingAppointmentInfo.value = null;
+  }
+}
+
 function confirmPurchase() {
   if (!property.value) {
     return;
@@ -841,6 +1106,20 @@ function confirmPurchase() {
     return;
   }
 
+  if (hasPendingAppointment.value) {
+    purchaseMessage.value =
+      "Ya tienes una cita pendiente para esta propiedad. Espera a que el equipo la gestione antes de agendar otra.";
+    return;
+  }
+
+  appointmentDateOnly.value = "";
+  appointmentTimeOnly.value = "";
+  appointmentNotes.value = "";
+  notaryName.value = "";
+  notaryAddress.value = "";
+  notaryCity.value = "";
+  notaryPhone.value = "";
+  purchaseMessage.value = "";
   showPurchaseModal.value = true;
 }
 
@@ -857,13 +1136,40 @@ async function submitPurchaseRequest() {
     return;
   }
 
+  if (!canSubmitAppointment.value) {
+    purchaseMessage.value = "Rellena la fecha, la hora y los datos obligatorios de la notaría.";
+    return;
+  }
+
+  // Combinar fecha + hora en un objeto Date
+  const [yyyy, mm, dd] = appointmentDateOnly.value.split("-").map(Number);
+  const [hh, mi] = appointmentTimeOnly.value.split(":").map(Number);
+  const selected = new Date(yyyy, mm - 1, dd, hh, mi, 0, 0);
+
+  if (Number.isNaN(selected.getTime()) || selected.getTime() <= Date.now()) {
+    purchaseMessage.value = "La fecha y hora seleccionadas deben ser futuras.";
+    return;
+  }
+
   purchaseLoading.value = true;
   purchaseMessage.value = "";
 
   try {
-    const response = await requestPropertyPurchase(property.value.id);
-    purchaseMessage.value = response.message || "Solicitud enviada correctamente.";
+    const response = await requestPropertyPurchase(property.value.id, {
+      appointmentDate: selected.toISOString(),
+      notes: appointmentNotes.value.trim(),
+      notaryName: notaryName.value.trim(),
+      notaryAddress: notaryAddress.value.trim(),
+      notaryCity: notaryCity.value.trim(),
+      notaryPhone: notaryPhone.value.trim(),
+    });
+    purchaseMessage.value = response.message || "Cita agendada correctamente.";
     showPurchaseModal.value = false;
+    hasPendingAppointment.value = true;
+    pendingAppointmentInfo.value = {
+      appointment_date: selected.toISOString(),
+      status: "scheduled",
+    };
   } catch (err) {
     purchaseMessage.value = err?.message || "No se pudo enviar la solicitud.";
   } finally {
@@ -1471,6 +1777,81 @@ watch(
 
 .signature-modal {
   animation: fadeSlideUp 0.22s ease;
+}
+
+.download-notice {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(6px);
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeSlideUp 0.22s ease;
+}
+
+.download-notice__card {
+  width: 100%;
+  max-width: 440px;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: 0 30px 60px rgba(15, 23, 42, 0.22);
+  text-align: center;
+  animation: fadeSlideUp 0.28s ease;
+}
+
+.download-notice__card h4 {
+  margin: 0 0 12px;
+  font-size: 1.3rem;
+  color: #0f172a;
+}
+
+.download-notice__card p {
+  margin: 0 0 22px;
+  color: #475569;
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+.download-notice__actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.download-notice__cancel,
+.download-notice__confirm {
+  min-width: 130px;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 12px;
+  border: none;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.download-notice__cancel {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.download-notice__cancel:hover {
+  background: #cbd5e1;
+}
+
+.download-notice__confirm {
+  background: #0b3d91;
+  color: #ffffff;
+}
+
+.download-notice__confirm:hover {
+  background: #082f72;
 }
 
 .signature-modal__card,
@@ -2294,5 +2675,141 @@ watch(
     padding: 8px 12px;
     font-size: 0.85rem;
   }
+}
+
+.appointment-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(6px);
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.appointment-modal__card {
+  width: 100%;
+  max-width: 520px;
+  background: #ffffff;
+  border-radius: 22px;
+  padding: 32px;
+  box-shadow: 0 30px 60px rgba(15, 23, 42, 0.22);
+  text-align: left;
+}
+
+.appointment-modal__card h4 {
+  margin: 0 0 10px;
+  font-size: 1.35rem;
+  color: #0f172a;
+  font-weight: 800;
+}
+
+.appointment-modal__sub {
+  margin: 0 0 20px;
+  color: #475569;
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+.appointment-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.appointment-label--spaced {
+  margin-top: 14px;
+}
+
+.appointment-required {
+  color: #dc2626;
+  margin-left: 2px;
+}
+
+.appointment-section-title {
+  margin: 22px 0 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 8px;
+}
+
+.appointment-input {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  box-sizing: border-box;
+  color: #0f172a;
+}
+
+.appointment-input:focus {
+  outline: none;
+  border-color: #0b3d91;
+  box-shadow: 0 0 0 3px rgba(11, 61, 145, 0.15);
+}
+
+.appointment-input:disabled {
+  background: #f1f5f9;
+  color: #94a3b8;
+}
+
+.appointment-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.appointment-col {
+  flex: 1 1 180px;
+  min-width: 0;
+}
+
+.appointment-textarea {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 80px;
+  box-sizing: border-box;
+  color: #0f172a;
+}
+
+.appointment-textarea:focus {
+  outline: none;
+  border-color: #0b3d91;
+  box-shadow: 0 0 0 3px rgba(11, 61, 145, 0.15);
+}
+
+.appointment-feedback {
+  margin: 14px 0 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.appointment-pending {
+  background: #ecfdf5;
+  color: #15803d;
+  padding: 14px 18px;
+  border-radius: 12px;
+  border: 1px solid #bbf7d0;
+  font-weight: 600;
 }
 </style>

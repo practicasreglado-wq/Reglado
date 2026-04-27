@@ -7,6 +7,7 @@ require_once __DIR__ . '/config/db.php';
 require_once __DIR__ . '/lib/env_loader.php';
 require_once __DIR__ . '/config/auth.php';
 require_once __DIR__ . '/send_mail.php';
+require_once __DIR__ . '/../lib/error_reporting.php';
 
 applyAuthCors();
 handlePreflight();
@@ -99,8 +100,9 @@ try {
     if ($pdo->inTransaction()) {
         $pdo->rollBack();
     }
+    $errorId = logAndReferenceError('activar', $exception);
     respondJson(500, [
         'success' => false,
-        'message' => 'No se pudo validar el token: ' . $exception->getMessage(),
+        'message' => 'No se pudo validar el token. Referencia: ' . $errorId,
     ]);
 }

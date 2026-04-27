@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+require_once dirname(__DIR__) . '/lib/buyer_intents.php';
+
 class PropertyProcessor
 {
     private Repository $repository;
@@ -64,7 +66,7 @@ class PropertyProcessor
         $email = trim((string) ($asset['email_remitente'] ?? ''));
         $captadorId = $this->resolveCaptador($email);
 
-        $propertyId = $this->repository->insertPropertyRecord(
+        $insertResult = $this->repository->insertPropertyRecord(
             $claudeData,
             'text',
             null,
@@ -75,6 +77,18 @@ class PropertyProcessor
             $ownerEmailPending,
             $assetId
         );
+
+        $propertyId = (int) $insertResult['id'];
+        $isDuplicate = (bool) ($insertResult['duplicate'] ?? false);
+
+        // Si la propiedad ya existía (dedup por address_hash), no regeneramos
+        // documentos — los que hay son válidos. Solo marcamos el activo como
+        // procesado y devolvemos el id existente.
+        if ($isDuplicate) {
+            error_log('[PROP PROCESSOR] Propiedad duplicada detectada, se salta generación de PDFs. property_id=' . $propertyId);
+            $this->repository->updateReceivedAssetStatus($assetId, 'procesado', $captadorId);
+            return $propertyId;
+        }
 
         $documents = $this->pdfGenerator->generateDocuments(
             $claudeData,
@@ -101,6 +115,14 @@ class PropertyProcessor
         ]);
 
         $this->repository->updateReceivedAssetStatus($assetId, 'procesado', $captadorId);
+
+        $ficha = $claudeData['ficha_web'] ?? [];
+        processNewPropertyMatching($this->repository->getPdo(), $propertyId, [
+            'categoria'        => $ficha['categoria'] ?? '',
+            'ciudad'           => $ficha['ciudad'] ?? '',
+            'precio'           => $ficha['precio'] ?? null,
+            'metros_cuadrados' => $ficha['metros_cuadrados'] ?? null,
+        ]);
 
         return $propertyId;
     }

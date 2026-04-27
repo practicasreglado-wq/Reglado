@@ -27,7 +27,7 @@
 
     <div class="contacto-card">
       <h2>Contactanos</h2>
-      <p class="subject-pill">Asunto: Solicitud de Usuario promocionar a Real</p>
+      <p class="subject-pill">Asunto: Solicitud de Usuario promocionar a Premium</p>
 
       <form class="formulario" @submit.prevent="submitRequest">
         <div class="row">
@@ -60,7 +60,7 @@
             id="contact-message"
             v-model.trim="message"
             rows="5"
-            placeholder="Cuentanos por que quieres solicitar acceso como usuario real"
+            placeholder="Cuentanos por que quieres solicitar acceso como usuario Premium"
             :disabled="isSubmitting || !isLoggedIn"
           ></textarea>
         </div>
@@ -79,7 +79,7 @@
           <span class="dot"></span><strong>Telefono:</strong> +34 911 462 674
         </div>
         <div class="item">
-          <span class="dot"></span><strong>Email:</strong> realstate@regladoconsultores.com
+          <span class="dot"></span><strong>Email:</strong> info@regladoconsultores.com
         </div>
       </div>
     </div>

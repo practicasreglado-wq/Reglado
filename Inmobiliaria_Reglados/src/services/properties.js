@@ -27,6 +27,29 @@ export async function deleteUserProperty(propertyId) {
   return response;
 }
 
+export async function requestUserPropertyDeletion(propertyId, reason = "") {
+  if (!propertyId) {
+    throw new Error("ID de propiedad no válido.");
+  }
+
+  const response = await backendJson("api/request_property_deletion.php", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      property_id: propertyId,
+      reason,
+    }),
+  });
+
+  if (!response?.success) {
+    throw new Error(response?.message || "No se pudo enviar la solicitud de eliminación.");
+  }
+
+  return response;
+}
+
 const categoryImageMap = {
   hoteles: hotelImage,
   fincas: fincaImage,
@@ -165,11 +188,28 @@ export async function reviewSignedDocuments(data) {
   });
 }
 
-export async function requestPropertyPurchase(propertyId) {
+export async function requestPropertyPurchase(propertyId, options = {}) {
+  const {
+    appointmentDate = null,
+    notes = "",
+    notaryName = "",
+    notaryAddress = "",
+    notaryCity = "",
+    notaryPhone = "",
+  } = options;
+
   return backendJson("api/request_purchase.php", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ property_id: propertyId }),
+    body: JSON.stringify({
+      property_id: propertyId,
+      appointment_date: appointmentDate,
+      notary_name: notaryName,
+      notary_address: notaryAddress,
+      notary_city: notaryCity,
+      notary_phone: notaryPhone,
+      notes,
+    }),
   });
 }
 
@@ -184,7 +224,7 @@ export async function saveFavorite(propertyId) {
     throw new Error("Identificador de propiedad requerido");
   }
 
-  return backendJson("api/save-favorite.php", {
+  return backendJson("api/save_favorite.php", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ property_id: propertyId }),
@@ -196,7 +236,7 @@ export async function removeFavorite(propertyId) {
     throw new Error("Identificador de propiedad requerido");
   }
 
-  return backendJson("api/remove-favorite.php", {
+  return backendJson("api/remove_favorite.php", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ property_id: propertyId }),

@@ -8,8 +8,15 @@ handlePreflight();
 
 require_once dirname(__DIR__) . '/config/db.php';
 require_once dirname(__DIR__) . '/config/auth.php';
+require_once dirname(__DIR__) . '/lib/privacy_map.php';
+require_once dirname(__DIR__) . '/lib/rate_limit.php';
+
+// Anti-scraping: 120 req/min por IP. Un usuario normal navegando y filtrando
+// está muy por debajo; un scraper bajando todo el catálogo se para en seco.
+enforceIpRateLimit('property_listing', clientIp(), 120, 60, true);
 
 $favoriteLookup = [];
+$intentMatchLookup = [];
 $userId = 0;
 
 try {
@@ -30,9 +37,30 @@ try {
         $favoriteStmt->execute(['user_id' => $userId]);
         $favoriteIds = array_column($favoriteStmt->fetchAll(PDO::FETCH_ASSOC), 'propiedad_id');
         $favoriteLookup = array_fill_keys(array_map('intval', $favoriteIds), true);
+
+        // Propiedades que hicieron match con un intent activo del comprador.
+        // Se usa en el frontend para forzar match_percentage=100 y que no
+        // queden filtradas por el umbral mínimo del catálogo.
+        try {
+            $intentStmt = $pdo->prepare('
+                SELECT matched_property_id
+                FROM buyer_intents
+                WHERE buyer_user_id = :user_id
+                  AND status = "matched"
+                  AND matched_property_id IS NOT NULL
+            ');
+            $intentStmt->execute(['user_id' => $userId]);
+            $matchedIds = array_column($intentStmt->fetchAll(PDO::FETCH_ASSOC), 'matched_property_id');
+            $intentMatchLookup = array_fill_keys(array_map('intval', $matchedIds), true);
+        } catch (Throwable $e) {
+            // Si la tabla no existe aún (migración no aplicada), dejamos el
+            // lookup vacío en lugar de romper el listado.
+            $intentMatchLookup = [];
+        }
     }
 } catch (Throwable $e) {
     $favoriteLookup = [];
+    $intentMatchLookup = [];
 }
 
 $propertyId = (int) ($_GET['id'] ?? 0);
@@ -67,7 +95,7 @@ if ($propertyId > 0) {
 
     respondJson(200, [
         'success' => true,
-        'property' => hydratePropertyDetail($row, $favoriteLookup),
+        'property' => hydratePropertyDetail($row, $favoriteLookup, $intentMatchLookup),
     ]);
 }
 
@@ -82,7 +110,7 @@ $stmt->execute($params);
 
 $properties = [];
 foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
-    $properties[] = hydratePropertyCard($row, $favoriteLookup);
+    $properties[] = hydratePropertyCard($row, $favoriteLookup, $intentMatchLookup);
 }
 
 respondJson(200, [
@@ -90,50 +118,7 @@ respondJson(200, [
     'properties' => $properties,
 ]);
 
-function buildPrivacyMapCoordinates(array $row): array
-{
-    $lat = isset($row['latitud']) ? (float) $row['latitud'] : null;
-    $lon = isset($row['longitud']) ? (float) $row['longitud'] : null;
-
-    if (!is_float($lat) || !is_float($lon)) {
-        return [
-            'map_latitud' => null,
-            'map_longitud' => null,
-        ];
-    }
-
-    if (!is_finite($lat) || !is_finite($lon)) {
-        return [
-            'map_latitud' => null,
-            'map_longitud' => null,
-        ];
-    }
-
-    if (abs($lat) < 0.000001 || abs($lon) < 0.000001) {
-        return [
-            'map_latitud' => null,
-            'map_longitud' => null,
-        ];
-    }
-
-    $seedBase = (string) ($row['id'] ?? '');
-    $hash = crc32($seedBase);
-    $offsetMeters = 120 + ($hash % 60);
-    $angleDeg = $hash % 360;
-    $angleRad = deg2rad((float) $angleDeg);
-
-    $earthRadius = 6378137.0;
-
-    $dLat = ($offsetMeters * cos($angleRad)) / $earthRadius * (180 / M_PI);
-    $dLon = ($offsetMeters * sin($angleRad)) / ($earthRadius * cos(deg2rad($lat))) * (180 / M_PI);
-
-    return [
-        'map_latitud' => round($lat + $dLat, 7),
-        'map_longitud' => round($lon + $dLon, 7),
-    ];
-}
-
-function hydratePropertyCard(array $row, array $favorites): array
+function hydratePropertyCard(array $row, array $favorites, array $intentMatches = []): array
 {
     $privacyMap = buildPrivacyMapCoordinates($row);
 
@@ -170,10 +155,11 @@ function hydratePropertyCard(array $row, array $favorites): array
         'caracteristicas' => $caracteristicas,
         'imagen_principal' => $row['imagen_principal'] ?? '',
         'is_favorite' => isset($favorites[(int) $row['id']]),
+        'matches_my_intent' => isset($intentMatches[(int) $row['id']]),
     ];
 }
 
-function hydratePropertyDetail(array $row, array $favorites): array
+function hydratePropertyDetail(array $row, array $favorites, array $intentMatches = []): array
 {
     $privacyMap = buildPrivacyMapCoordinates($row);
 
@@ -216,5 +202,6 @@ function hydratePropertyDetail(array $row, array $favorites): array
         'confidentiality_file' => $row['confidentiality_file'] ?? '',
         'intention_file' => $row['intention_file'] ?? '',
         'is_favorite' => isset($favorites[(int) $row['id']]),
+        'matches_my_intent' => isset($intentMatches[(int) $row['id']]),
     ];
 }

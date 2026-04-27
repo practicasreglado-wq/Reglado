@@ -4,6 +4,8 @@ declare(strict_types=1);
 require_once dirname(__DIR__) . '/lib/env_loader.php';
 require_once dirname(__DIR__) . '/lib/notifications_helper.php';
 require_once dirname(__DIR__) . '/lib/audit.php';
+require_once dirname(__DIR__) . '/lib/email_layout.php';
+require_once dirname(__DIR__) . '/lib/error_reporting.php';
 
 loadEnv(dirname(__DIR__) . '/.env');
 
@@ -108,7 +110,7 @@ try {
         'user_id'    => (int) $userRow['id'],
         'user_email' => $email,
         'title'      => 'Solicitud aprobada',
-        'message'    => 'Tu solicitud para acceder como usuario real ha sido aprobada. Ya puedes acceder a las funciones habilitadas para este perfil.',
+        'message'    => 'Tu solicitud para acceder como usuario Premium ha sido aprobada. Ya puedes acceder a las funciones habilitadas para este perfil.',
         'type'       => 'success',
         'link'       => '/profile',
     ]);
@@ -132,8 +134,9 @@ try {
         $pdoInmo->rollBack();
     }
 
+    $errorId = logAndReferenceError('approve_real_role.db', $e);
     http_response_code(500);
-    echo "<h1 style='color:red;font-family:sans-serif;'>Error: " . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8') . "</h1>";
+    echo "<h1 style='color:red;font-family:sans-serif;'>Error interno. Referencia: " . htmlspecialchars($errorId, ENT_QUOTES, 'UTF-8') . "</h1>";
     exit;
 }
 
@@ -158,110 +161,43 @@ if ($autoloadPath === null) {
 
 require_once $autoloadPath;
 
-$subject = 'Solicitud de acceso como usuario real - Aprobada';
+$subject = 'Solicitud de acceso Premium - Aprobada';
 
-$body = <<<HTML
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Solicitud aprobada</title>
-</head>
-<body style="margin:0;padding:0;background-color:#f4f6f8;font-family:Arial,Helvetica,sans-serif;color:#1f2937;">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f4f6f8;margin:0;padding:0;">
-    <tr>
-      <td align="center" style="padding:32px 16px;">
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:640px;background-color:#ffffff;border-radius:18px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,0.08);">
-          
-          <tr>
-            <td style="background:linear-gradient(135deg,#0b3d91 0%,#123f7a 100%);padding:32px 36px;text-align:center;">
-              <div style="display:inline-block;background-color:rgba(255,255,255,0.12);color:#ffffff;font-size:12px;font-weight:bold;letter-spacing:0.08em;text-transform:uppercase;padding:8px 14px;border-radius:999px;">
-                Reglado Real Estate
-              </div>
-              <h1 style="margin:18px 0 8px 0;font-size:30px;line-height:1.2;color:#ffffff;font-weight:700;">
-                Solicitud aprobada
-              </h1>
-              <p style="margin:0;font-size:15px;line-height:1.6;color:black;">
-                Su acceso como usuario real ha sido activado correctamente
-              </p>
-            </td>
-          </tr>
+$panelUrl = htmlspecialchars(
+    rtrim((string) (getenv('FRONTEND_URL') ?: 'http://localhost:5175'), '/') . '/dashboard',
+    ENT_QUOTES,
+    'UTF-8'
+);
 
-          <tr>
-            <td style="padding:36px 36px 20px 36px;">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-                <tr>
-                  <td>
-                    <div style="display:inline-block;background-color:#e9f9ef;color:#1f7a3d;font-size:13px;font-weight:700;padding:8px 14px;border-radius:999px;margin-bottom:20px;">
-                      Acceso aprobado
-                    </div>
-
-                    <p style="margin:0 0 16px 0;font-size:16px;line-height:1.7;color:#374151;">
-                      <strong>Estimado/a,</strong>
-                    </p>
-
-                    <p style="margin:0 0 16px 0;font-size:16px;line-height:1.7;color:#374151;">
-                      Nos complace informarle de que su solicitud para acceder como <strong>usuario real</strong> ha sido <strong>aprobada correctamente</strong>.
-                    </p>
-
-                    <p style="margin:0 0 16px 0;font-size:16px;line-height:1.7;color:#374151;">
-                      A partir de este momento ya puede acceder a las funcionalidades habilitadas para este perfil dentro de la plataforma.
-                    </p>
-
-                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:24px 0;background-color:#f9fafb;border:1px solid #e5e7eb;border-radius:14px;">
-                      <tr>
-                        <td style="padding:20px 22px;">
-                          <p style="margin:0 0 10px 0;font-size:15px;line-height:1.6;color:#111827;font-weight:700;">
-                            ¿Qué puede hacer ahora?
-                          </p>
-                          <p style="margin:0;font-size:15px;line-height:1.7;color:#4b5563;">
-                            Ya puede iniciar sesión y utilizar las opciones y accesos reservados para usuarios reales dentro de su cuenta.
-                          </p>
-                        </td>
-                      </tr>
-                    </table>
-
-                    <p style="margin:0 0 24px 0;font-size:16px;line-height:1.7;color:#374151;">
-                      Si necesita ayuda o desea realizar cualquier consulta, nuestro equipo estará encantado de atenderle.
-                    </p>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-
-          <tr>
-            <td style="padding:8px 36px 32px 36px;">
-              <div style="height:1px;background-color:#e5e7eb;margin-bottom:22px;"></div>
-              <p style="margin:0 0 6px 0;font-size:15px;line-height:1.6;color:#111827;font-weight:700;">
-                Atentamente,
-              </p>
-              <p style="margin:0;font-size:15px;line-height:1.6;color:#4b5563;">
-                <strong>Reglado Real Estate</strong><br>
-                info@regladoconsultores.com
-              </p>
-            </td>
-          </tr>
-
-          <tr>
-            <td style="background-color:#f9fafb;padding:18px 24px;text-align:center;border-top:1px solid #e5e7eb;">
-              <p style="margin:0;font-size:12px;line-height:1.6;color:#6b7280;">
-                Este correo ha sido enviado automáticamente desde la plataforma de Reglado Real Estate.
-              </p>
-            </td>
-          </tr>
-
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>
-HTML;
+$body = renderEmailLayout(
+    'Solicitud aprobada',
+    'Su acceso como usuario Premium ha sido activado correctamente',
+    <<<HTML
+<div style="display:inline-block;background-color:#e9f9ef;color:#1f7a3d;font-size:13px;font-weight:700;padding:8px 14px;border-radius:999px;margin-bottom:20px;">Acceso aprobado</div>
+<p style="margin:0 0 16px 0;"><strong>Estimado/a,</strong></p>
+<p style="margin:0 0 16px 0;">Nos complace informarle de que su solicitud para acceder como <strong>usuario Premium</strong> ha sido <strong>aprobada correctamente</strong>.</p>
+<p style="margin:0 0 16px 0;">A partir de este momento ya puede acceder a las funcionalidades habilitadas para este perfil dentro de la plataforma.</p>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:24px 0;background-color:#f9fafb;border:1px solid #e5e7eb;border-radius:14px;">
+  <tr>
+    <td style="padding:20px 22px;">
+      <p style="margin:0 0 10px 0;font-size:15px;line-height:1.6;color:#111827;font-weight:700;">¿Qué puede hacer ahora?</p>
+      <p style="margin:0;font-size:15px;line-height:1.7;color:#4b5563;">Ya puede iniciar sesión y utilizar las opciones y accesos reservados para usuarios reales dentro de su cuenta.</p>
+    </td>
+  </tr>
+</table>
+<div style="text-align:center;margin:24px 0;">
+<a href="{$panelUrl}" target="_blank" rel="noopener" style="background:#0b3d91;color:#ffffff;padding:12px 24px;text-decoration:none;border-radius:8px;font-size:14px;font-weight:bold;display:inline-block;">Acceder al panel</a>
+</div>
+<p style="margin:0 0 24px 0;">Si necesita ayuda o desea realizar cualquier consulta, nuestro equipo estará encantado de atenderle.</p>
+<div style="height:1px;background-color:#e5e7eb;margin:8px 0 22px;"></div>
+<p style="margin:0 0 6px 0;font-weight:700;color:#111827;">Atentamente,</p>
+<p style="margin:0;color:#4b5563;"><strong>Reglado Real Estate</strong><br>info@regladoconsultores.com</p>
+HTML
+);
 
 $altBody = trim(
     "Estimado/a,\n\n" .
-    "Nos complace informarle de que su solicitud para acceder como usuario real ha sido aprobada correctamente.\n\n" .
+    "Nos complace informarle de que su solicitud para acceder como usuario Premium ha sido aprobada correctamente.\n\n" .
     "A partir de este momento ya puede acceder a las funcionalidades habilitadas para este perfil dentro de la plataforma.\n\n" .
     "Si necesita ayuda o desea realizar cualquier consulta, puede ponerse en contacto con nosotros en info@regladoconsultores.com.\n\n" .
     "Atentamente,\n" .
@@ -295,15 +231,16 @@ try {
     echo "<div style='font-family:sans-serif;text-align:center;margin-top:50px;'>";
     if ($stmtUpdateUserRowCount > 0) {
         echo "<h1 style='color:#4CAF50;'>Solicitud aprobada correctamente</h1>";
-        echo "<p>El usuario con correo <strong>{$safeEmail}</strong> ha sido actualizado al rol Real.</p>";
+        echo "<p>El usuario con correo <strong>{$safeEmail}</strong> ha sido actualizado al rol Premium.</p>";
     } else {
         echo "<h1 style='color:#2563eb;'>Solicitud procesada correctamente</h1>";
-        echo "<p>El usuario <strong>{$safeEmail}</strong> ya tenía el rol Real, pero la solicitud ha quedado resuelta.</p>";
+        echo "<p>El usuario <strong>{$safeEmail}</strong> ya tenía el rol Premium, pero la solicitud ha quedado resuelta.</p>";
     }
     echo "<p>Además, se ha creado una notificación interna y se ha enviado el correo de aprobación al usuario.</p>";
     echo "</div>";
 
 } catch (Throwable $e) {
+    $errorId = logAndReferenceError('approve_real_role.mail', $e);
     http_response_code(500);
-    echo "<h1 style='color:red;font-family:sans-serif;'>La solicitud se aprobó correctamente, pero falló el envío del correo: " . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8') . "</h1>";
+    echo "<h1 style='color:red;font-family:sans-serif;'>La solicitud se aprobó correctamente, pero falló el envío del correo. Referencia: " . htmlspecialchars($errorId, ENT_QUOTES, 'UTF-8') . "</h1>";
 }

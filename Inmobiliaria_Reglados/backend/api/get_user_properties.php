@@ -4,6 +4,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../config/cors.php';
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../config/auth.php';
+require_once __DIR__ . '/../lib/privacy_map.php';
 
 applyCors();
 handlePreflight();
@@ -49,49 +50,6 @@ respondJson(200, [
     'success' => true,
     'properties' => $properties,
 ]);
-
-function buildPrivacyMapCoordinates(array $row): array
-{
-    $lat = isset($row['latitud']) ? (float) $row['latitud'] : null;
-    $lon = isset($row['longitud']) ? (float) $row['longitud'] : null;
-
-    if (!is_float($lat) || !is_float($lon)) {
-        return [
-            'map_latitud' => null,
-            'map_longitud' => null,
-        ];
-    }
-
-    if (!is_finite($lat) || !is_finite($lon)) {
-        return [
-            'map_latitud' => null,
-            'map_longitud' => null,
-        ];
-    }
-
-    if (abs($lat) < 0.000001 || abs($lon) < 0.000001) {
-        return [
-            'map_latitud' => null,
-            'map_longitud' => null,
-        ];
-    }
-
-    $seedBase = (string) ($row['id'] ?? '');
-    $hash = crc32($seedBase);
-    $offsetMeters = 120 + ($hash % 60);
-    $angleDeg = $hash % 360;
-    $angleRad = deg2rad((float) $angleDeg);
-
-    $earthRadius = 6378137.0;
-
-    $dLat = ($offsetMeters * cos($angleRad)) / $earthRadius * (180 / M_PI);
-    $dLon = ($offsetMeters * sin($angleRad)) / ($earthRadius * cos(deg2rad($lat))) * (180 / M_PI);
-
-    return [
-        'map_latitud' => round($lat + $dLat, 7),
-        'map_longitud' => round($lon + $dLon, 7),
-    ];
-}
 
 function hydrateMyPropertyCard(array $row): array
 {

@@ -84,6 +84,7 @@ bootLog('BOOT 23 despues loadEnv');
 
 bootLog('BOOT 24 antes send_mail.php');
 require_once __DIR__ . '/send_mail.php';
+require_once __DIR__ . '/lib/email_layout.php';
 bootLog('BOOT 25 despues send_mail.php');
 
 function webhookLog(string $message, array $context = []): void
@@ -300,57 +301,20 @@ function notifySenderProcessingResult(?string $sender, bool $success): void
         ? '#16a34a'
         : '#dc2626';
 
-    $html = "
-    <!DOCTYPE html>
-    <html lang='es'>
-    <head>
-        <meta charset='UTF-8'>
-        <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-        <title>{$subject}</title>
-    </head>
-    <body style='margin:0; padding:0; background-color:#f4f6f8; font-family:Arial, sans-serif;'>
-        <table width='100%' cellpadding='0' cellspacing='0' border='0' style='background-color:#f4f6f8; padding:24px 0;'>
-            <tr>
-                <td align='center'>
-                    <table width='520' cellpadding='0' cellspacing='0' border='0' style='max-width:520px; width:100%; background:#ffffff; border-radius:10px; overflow:hidden; box-shadow:0 2px 10px rgba(0,0,0,0.06);'>
-                        <tr>
-                            <td style='background:#111827; color:#ffffff; text-align:center; padding:18px 24px; font-size:20px; font-weight:bold;'>
-                                Reglado Real State
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style='padding:30px 28px; color:#333333;'>
-                                <p style='margin:0 0 14px 0; font-size:15px;'>
-                                    Hola,
-                                </p>
-
-                                <p style='margin:0 0 18px 0; font-size:15px; line-height:1.6; color:#374151;'>
-                                    {$message}
-                                </p>
-
-                                <div style='margin:0 0 20px 0; padding:12px 16px; border-radius:8px; background:#f9fafb; border-left:4px solid {$color};'>
-                                    <span style='font-size:14px; font-weight:bold; color:{$color};'>
-                                        {$status}
-                                    </span>
-                                </div>
-
-                                <p style='margin:0; font-size:13px; line-height:1.5; color:#6b7280;'>
-                                    Este es un mensaje automático generado por la plataforma.
-                                </p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style='background:#f9fafb; text-align:center; padding:14px 20px; font-size:12px; color:#9ca3af;'>
-                                © " . date('Y') . " Reglado Real State
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-        </table>
-    </body>
-    </html>
+    $innerBody = "
+        <p style='margin:0 0 14px 0;'>Hola,</p>
+        <p style='margin:0 0 18px 0;line-height:1.6;color:#374151;'>{$message}</p>
+        <div style='margin:0 0 20px 0;padding:12px 16px;border-radius:8px;background:#f9fafb;border-left:4px solid {$color};'>
+            <span style='font-size:14px;font-weight:bold;color:{$color};'>{$status}</span>
+        </div>
+        <p style='margin:0;font-size:13px;line-height:1.5;color:#6b7280;'>Este es un mensaje automático generado por la plataforma.</p>
     ";
+
+    $html = renderEmailLayout(
+        $subject,
+        $status,
+        $innerBody
+    );
 
     try {
         sendNotificationEmail($sender, $subject, $html);

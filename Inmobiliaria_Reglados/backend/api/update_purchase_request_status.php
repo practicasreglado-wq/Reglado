@@ -5,6 +5,8 @@ require_once dirname(__DIR__) . '/config/db.php';
 require_once dirname(__DIR__) . '/config/auth.php';
 require_once __DIR__ . '/../config/cors.php';
 require_once dirname(__DIR__) . '/lib/audit.php';
+require_once dirname(__DIR__) . '/lib/error_reporting.php';
+require_once dirname(__DIR__) . '/lib/admin_password_check.php';
 
 applyCors();
 handlePreflight();
@@ -25,6 +27,7 @@ $input = json_decode(file_get_contents('php://input') ?: '{}', true);
 $requestId = (int) ($input['request_id'] ?? 0);
 $newStatus = strtolower(trim((string) ($input['status'] ?? '')));
 $notes = trim((string) ($input['notes'] ?? ''));
+$adminPassword = (string) ($input['admin_password'] ?? '');
 
 $allowed = ['pending', 'contacted', 'closed'];
 
@@ -35,6 +38,12 @@ if ($requestId <= 0) {
 if (!in_array($newStatus, $allowed, true)) {
     respondJson(422, ['success' => false, 'message' => 'Estado no válido.']);
 }
+
+requireAdminPasswordConfirmation(
+    (int) ($auth['sub'] ?? 0),
+    $adminPassword,
+    'admin_purchase_status'
+);
 
 try {
     $stmt = $pdo->prepare("
@@ -70,8 +79,9 @@ try {
         'message' => 'Estado actualizado correctamente.',
     ]);
 } catch (Throwable $e) {
+    $errorId = logAndReferenceError('update_purchase_request_status', $e);
     respondJson(500, [
         'success' => false,
-        'message' => 'Error al actualizar la solicitud: ' . $e->getMessage()
+        'message' => 'Error al actualizar la solicitud. Referencia: ' . $errorId,
     ]);
 }

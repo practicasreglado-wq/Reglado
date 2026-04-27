@@ -6,6 +6,7 @@ require_once dirname(__DIR__) . '/config/db.php';
 require_once dirname(__DIR__) . '/config/auth.php';
 require_once __DIR__ . '/../config/cors.php';
 require_once dirname(__DIR__) . '/lib/audit.php';
+require_once dirname(__DIR__) . '/lib/admin_password_check.php';
 
 applyCors();
 handlePreflight();
@@ -41,6 +42,7 @@ if (!is_array($input)) {
 
 $propertyId = (int) ($input['property_id'] ?? 0);
 $estado = strtolower(trim((string) ($input['estado'] ?? '')));
+$adminPassword = (string) ($input['admin_password'] ?? '');
 
 $allowedStatuses = ['disponible', 'vendido'];
 
@@ -57,6 +59,12 @@ if (!in_array($estado, $allowedStatuses, true)) {
         'message' => 'Estado no válido.'
     ]);
 }
+
+requireAdminPasswordConfirmation(
+    (int) ($auth['sub'] ?? 0),
+    $adminPassword,
+    'admin_property_status'
+);
 
 $stmt = $pdo->prepare("
     SELECT id

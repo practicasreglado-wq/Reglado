@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 require_once dirname(__DIR__) . '/lib/geocoding.php';
+require_once dirname(__DIR__) . '/lib/address_hash.php';
 
 class Repository
 {
@@ -11,6 +12,11 @@ class Repository
     public function __construct(PDO $pdo)
     {
         $this->pdo = $pdo;
+    }
+
+    public function getPdo(): PDO
+    {
+        return $this->pdo;
     }
 
     public function insertReceivedAsset(
@@ -158,7 +164,7 @@ class Repository
         ?int $createdByUserId = null,
         ?string $ownerEmailPending = null,
         ?int $activoRecibidoId = null
-    ): int {
+    ): array {
         $ficha = $claudeData['ficha_web'] ?? [];
         $dossier = $claudeData['dossier_inversion'] ?? [];
 
@@ -208,6 +214,27 @@ class Repository
         $direccionCompleta = $this->trimValue($dossier['ubicacion_completa'] ?? '');
         $codigoPostal = $this->trimValue($dossier['codigo_postal'] ?? '');
         $direccionCorta = $this->trimValue($ficha['direccion'] ?? '');
+
+        // Dedup semántica por dirección: si ya existe una propiedad con el
+        // mismo address_hash, no creamos una nueva; devolvemos la existente.
+        $addressHash = buildPropertyAddressHash([
+            'direccion'     => $direccionCorta,
+            'ubicacion'     => $direccionCompleta,
+            'ciudad'        => $ciudad,
+            'provincia'     => $provincia,
+            'pais'          => $pais,
+            'codigo_postal' => $codigoPostal,
+        ]);
+
+        if ($addressHash !== null && $this->columnExists('propiedades', 'address_hash')) {
+            $dupStmt = $this->pdo->prepare('SELECT id FROM propiedades WHERE address_hash = :h LIMIT 1');
+            $dupStmt->execute(['h' => $addressHash]);
+            $existingId = $dupStmt->fetchColumn();
+            if ($existingId !== false) {
+                error_log('[PROP DUP SKIP] address_hash coincide con propiedad existente id=' . (int) $existingId);
+                return ['id' => (int) $existingId, 'duplicate' => true];
+            }
+        }
 
         $geo = geocodeApproximateLocation([
             'direccion_completa' => $direccionCompleta,
@@ -305,6 +332,12 @@ class Repository
             $params['owner_email_pending'] = $normalizedOwnerEmailPending;
         }
 
+        if ($addressHash !== null && $this->columnExists('propiedades', 'address_hash')) {
+            $columns[] = 'address_hash';
+            $placeholders[] = ':address_hash';
+            $params['address_hash'] = $addressHash;
+        }
+
         $stmt = $this->pdo->prepare(
             'INSERT INTO propiedades (' . implode(', ', $columns) . ') VALUES (' . implode(', ', $placeholders) . ')'
         );
@@ -319,6 +352,21 @@ class Repository
                 $errorInfo = $stmt->errorInfo();
                 throw new RuntimeException('SQL ERROR: ' . implode(' | ', $errorInfo));
             }
+        } catch (PDOException $e) {
+            // Race condition: otro proceso insertó la misma propiedad entre
+            // nuestro SELECT de dedup y este INSERT. Recuperamos el id
+            // existente y devolvemos ese.
+            if ((string) $e->getCode() === '23000' && $addressHash !== null) {
+                $recoverStmt = $this->pdo->prepare('SELECT id FROM propiedades WHERE address_hash = :h LIMIT 1');
+                $recoverStmt->execute(['h' => $addressHash]);
+                $existingId = $recoverStmt->fetchColumn();
+                if ($existingId !== false) {
+                    error_log('[PROP DUP RACE] address_hash colisionó en INSERT, devolviendo id=' . (int) $existingId);
+                    return ['id' => (int) $existingId, 'duplicate' => true];
+                }
+            }
+            error_log('[INSERT ERROR] ' . $e->getMessage());
+            throw $e;
         } catch (Throwable $e) {
             error_log('[INSERT ERROR] ' . $e->getMessage());
             throw $e;
@@ -332,7 +380,7 @@ class Repository
 
         error_log('[INSERT OK] ID: ' . $propertyId);
 
-        return $propertyId;
+        return ['id' => $propertyId, 'duplicate' => false];
     }
 
     public function findRegladoUserIdByEmail(string $email): ?int

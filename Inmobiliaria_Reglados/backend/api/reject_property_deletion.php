@@ -1,0 +1,121 @@
+<?php
+declare(strict_types=1);
+
+require_once dirname(__DIR__) . '/config/db.php';
+require_once dirname(__DIR__) . '/config/auth.php';
+require_once __DIR__ . '/../config/cors.php';
+require_once dirname(__DIR__) . '/lib/audit.php';
+require_once dirname(__DIR__) . '/lib/error_reporting.php';
+require_once dirname(__DIR__) . '/lib/admin_password_check.php';
+require_once dirname(__DIR__) . '/lib/property_deletion_notify.php';
+
+applyCors();
+handlePreflight();
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    respondJson(405, ['success' => false, 'message' => 'Método no permitido.']);
+}
+
+$context = requireAuthenticatedUser($pdo);
+$auth = $context['auth'] ?? [];
+$role = strtolower((string) ($auth['role'] ?? ''));
+
+if ($role !== 'admin') {
+    respondJson(403, ['success' => false, 'message' => 'Acceso restringido. Solo administradores.']);
+}
+
+$input = json_decode(file_get_contents('php://input') ?: '{}', true);
+$requestId = (int) ($input['request_id'] ?? 0);
+$adminPassword = (string) ($input['admin_password'] ?? '');
+$adminNotes = trim((string) ($input['admin_notes'] ?? ''));
+
+if ($requestId <= 0) {
+    respondJson(422, ['success' => false, 'message' => 'Identificador de solicitud inválido.']);
+}
+
+if (mb_strlen($adminNotes) > 1000) {
+    $adminNotes = mb_substr($adminNotes, 0, 1000);
+}
+
+requireAdminPasswordConfirmation(
+    (int) ($auth['sub'] ?? 0),
+    $adminPassword,
+    'admin_property_deletion_reject'
+);
+
+try {
+    $hasTitulo = (bool) $pdo
+        ->query("SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+                 WHERE TABLE_SCHEMA='inmobiliaria' AND TABLE_NAME='propiedades' AND COLUMN_NAME='titulo' LIMIT 1")
+        ->fetchColumn();
+    $titleExpr = $hasTitulo ? 'COALESCE(NULLIF(p.titulo, ""), p.tipo_propiedad)' : 'p.tipo_propiedad';
+
+    $stmt = $pdo->prepare("
+        SELECT pdr.id, pdr.property_id, pdr.requester_user_id, pdr.status,
+               {$titleExpr} AS property_title, p.tipo_propiedad AS property_type
+        FROM property_deletion_requests pdr
+        LEFT JOIN inmobiliaria.propiedades p ON p.id = pdr.property_id
+        WHERE pdr.id = :id LIMIT 1
+    ");
+    $stmt->execute(['id' => $requestId]);
+    $request = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$request) {
+        respondJson(404, ['success' => false, 'message' => 'Solicitud no encontrada.']);
+    }
+
+    if ($request['status'] !== 'pending') {
+        respondJson(409, [
+            'success' => false,
+            'message' => 'Esta solicitud ya está ' . $request['status'] . ' y no puede volver a procesarse.',
+        ]);
+    }
+
+    $updateStmt = $pdo->prepare('
+        UPDATE property_deletion_requests
+        SET status = "rejected",
+            admin_notes = :notes,
+            resolved_by_user_id = :by,
+            resolved_at = NOW()
+        WHERE id = :id
+    ');
+    $updateStmt->execute([
+        'id' => $requestId,
+        'by' => (int) ($auth['sub'] ?? 0),
+        'notes' => $adminNotes !== '' ? $adminNotes : null,
+    ]);
+
+    $propertyTitle = trim((string) ($request['property_title'] ?? $request['property_type'] ?? ''));
+    notifyRequesterOfDeletionResolution(
+        $pdo,
+        (int) $request['requester_user_id'],
+        (int) $request['property_id'],
+        $propertyTitle,
+        'rejected',
+        $adminNotes !== '' ? $adminNotes : null
+    );
+
+    auditLog($pdo, 'property.deletion_rejected', array_merge(
+        auditContextFromAuth($auth),
+        [
+            'resource_type' => 'property_deletion_request',
+            'resource_id'   => (string) $requestId,
+            'metadata'      => [
+                'property_id' => (int) $request['property_id'],
+                'requester_user_id' => (int) $request['requester_user_id'],
+                'admin_notes' => $adminNotes !== '' ? $adminNotes : null,
+            ],
+        ]
+    ));
+
+    respondJson(200, [
+        'success' => true,
+        'message' => 'Solicitud rechazada. Propiedad mantenida y usuario notificado.',
+    ]);
+} catch (Throwable $e) {
+    $errorId = logAndReferenceError('reject_property_deletion', $e);
+    respondJson(500, [
+        'success' => false,
+        'message' => 'Error al rechazar la solicitud. Referencia: ' . $errorId,
+    ]);
+}

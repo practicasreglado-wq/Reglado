@@ -3,11 +3,11 @@
     <header class="admin-header">
       <div class="admin-header__content">
         <h1>Solicitudes Pendientes</h1>
-        <p>Solicitudes de promoción a rol Real esperando revisión.</p>
+        <p>Solicitudes de promoción a rol Premium esperando revisión.</p>
       </div>
       <div class="admin-stats">
         <div class="stat-card">
-          <span class="stat-value">{{ requests.length + documentReviews.length }}</span>
+          <span class="stat-value">{{ totalPending }}</span>
           <span class="stat-label">Pendientes</span>
         </div>
       </div>
@@ -40,6 +40,24 @@
       >
         Solicitudes de compra
         <span class="tab-counter">{{ pendingPurchaseCount }}</span>
+      </button>
+      <button
+        class="tab-btn"
+        :class="{ active: activeTab === 'appointments' }"
+        type="button"
+        @click="activeTab = 'appointments'"
+      >
+        Citas agendadas
+        <span class="tab-counter">{{ pendingAppointmentCount }}</span>
+      </button>
+      <button
+        class="tab-btn"
+        :class="{ active: activeTab === 'deletions' }"
+        type="button"
+        @click="activeTab = 'deletions'"
+      >
+        Eliminar propiedades
+        <span class="tab-counter">{{ propertyDeletions.length }}</span>
       </button>
     </div>
 
@@ -164,7 +182,7 @@
                 :disabled="actionLoadingId === req.id"
                 @click.stop="approveRequest(req)"
               >
-                {{ actionLoadingId === req.id ? 'Procesando...' : 'Aprobar y asignar rol Real' }}
+                {{ actionLoadingId === req.id ? 'Procesando...' : 'Aprobar y asignar rol Premium' }}
               </button>
 
               <button
@@ -294,6 +312,24 @@
             </div>
 
             <div class="details-actions">
+              <button
+                class="action-btn action-btn--view"
+                type="button"
+                :disabled="!doc.nda_file_path"
+                @click.stop="openSignedPdf(doc.nda_file_path, 'NDA firmado · ' + (doc.property_title || ('Propiedad #' + doc.property_id)))"
+              >
+                Ver NDA firmado
+              </button>
+
+              <button
+                class="action-btn action-btn--view"
+                type="button"
+                :disabled="!doc.loi_file_path"
+                @click.stop="openSignedPdf(doc.loi_file_path, 'LOI firmada · ' + (doc.property_title || ('Propiedad #' + doc.property_id)))"
+              >
+                Ver LOI firmada
+              </button>
+
               <button
                 class="action-btn action-btn--approve"
                 type="button"
@@ -481,11 +517,230 @@
     </template>
     </template>
 
+    <template v-else-if="activeTab === 'appointments'">
+      <div v-if="appointments.length === 0" class="admin-state">
+        <p>No hay citas agendadas.</p>
+      </div>
+
+      <div v-else class="pending-list">
+        <div
+          v-for="appt in appointments"
+          :key="appt.id"
+          class="pending-item"
+          :class="{ 'is-expanded': expandedAppointmentId === appt.id }"
+        >
+          <div class="pending-item__header" @click="toggleExpandAppointment(appt.id)">
+            <span class="pending-id">#{{ appt.id }}</span>
+            <span class="pending-username">{{ formatAppointmentDate(appt.appointment_date) }}</span>
+            <span class="pending-email">{{ appt.buyer_email || '-' }}</span>
+            <span class="pending-name">{{ formatBuyerName(appt) }}</span>
+            <span class="pending-date">{{ appt.property_title || '-' }}</span>
+            <span class="status-badge" :class="`status-badge--${appt.status}`">
+              {{ appt.status === 'scheduled' ? 'Agendada' : appt.status === 'completed' ? 'Completada' : 'Cancelada' }}
+            </span>
+            <button class="expand-btn" type="button">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </button>
+          </div>
+
+          <transition name="expand">
+            <div v-if="expandedAppointmentId === appt.id" class="pending-item__details">
+              <div class="details-grid">
+                <div class="details-block">
+                  <h4>Datos de la cita</h4>
+                  <ul>
+                    <li><strong>Fecha:</strong> {{ formatAppointmentDate(appt.appointment_date) }}</li>
+                    <li><strong>Estado:</strong> {{ appt.status === 'scheduled' ? 'Agendada' : appt.status === 'completed' ? 'Completada' : 'Cancelada' }}</li>
+                    <li v-if="appt.notes"><strong>Notas del comprador:</strong> {{ appt.notes }}</li>
+                    <li v-if="appt.admin_notes"><strong>Notas admin:</strong> {{ appt.admin_notes }}</li>
+                    <li><strong>Solicitada:</strong> {{ formatDate(appt.created_at) }}</li>
+                  </ul>
+                </div>
+
+                <div class="details-block">
+                  <h4>Comprador</h4>
+                  <ul>
+                    <li><strong>Email:</strong> {{ appt.buyer_email || '-' }}</li>
+                    <li><strong>Nombre:</strong> {{ formatBuyerName(appt) }}</li>
+                    <li><strong>Username:</strong> {{ appt.buyer_username || '-' }}</li>
+                    <li><strong>Teléfono:</strong> {{ appt.buyer_phone || '-' }}</li>
+                  </ul>
+                </div>
+
+                <div class="details-block">
+                  <h4>Propiedad</h4>
+                  <ul>
+                    <li><strong>ID:</strong> #{{ appt.property_id }}</li>
+                    <li><strong>Título:</strong> {{ appt.property_title || '-' }}</li>
+                    <li><strong>Ciudad:</strong> {{ appt.property_city || '-' }}</li>
+                    <li><strong>Zona:</strong> {{ appt.property_zone || '-' }}</li>
+                    <li v-if="appt.property_price"><strong>Precio:</strong> {{ appt.property_price }} €</li>
+                  </ul>
+                </div>
+
+                <div class="details-block">
+                  <h4>Notaría</h4>
+                  <ul>
+                    <li><strong>Nombre:</strong> {{ appt.notary_name || '-' }}</li>
+                    <li><strong>Dirección:</strong> {{ appt.notary_address || '-' }}</li>
+                    <li><strong>Ciudad:</strong> {{ appt.notary_city || '-' }}</li>
+                    <li v-if="appt.notary_phone"><strong>Teléfono:</strong> {{ appt.notary_phone }}</li>
+                  </ul>
+                </div>
+
+                <div class="details-block">
+                  <h4>Propietario</h4>
+                  <ul>
+                    <li v-if="appt.owner_id"><strong>ID:</strong> #{{ appt.owner_id }}</li>
+                    <li><strong>Nombre:</strong> {{ formatOwnerName(appt) }}</li>
+                    <li><strong>Email:</strong> {{ appt.owner_email || '-' }}</li>
+                    <li v-if="appt.owner_username"><strong>Username:</strong> {{ appt.owner_username }}</li>
+                    <li v-if="appt.owner_phone"><strong>Teléfono:</strong> {{ appt.owner_phone }}</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="details-actions">
+                <button
+                  class="action-btn action-btn--approve"
+                  type="button"
+                  :disabled="actionLoadingAppointmentId === appt.id || appt.status !== 'scheduled'"
+                  @click.stop="completeAppointment(appt)"
+                >
+                  {{ actionLoadingAppointmentId === appt.id ? 'Procesando...' : 'Marcar completada' }}
+                </button>
+                <button
+                  class="action-btn action-btn--reject"
+                  type="button"
+                  :disabled="actionLoadingAppointmentId === appt.id || appt.status !== 'scheduled'"
+                  @click.stop="cancelAppointment(appt)"
+                >
+                  {{ actionLoadingAppointmentId === appt.id ? 'Procesando...' : 'Cancelar cita' }}
+                </button>
+                <button
+                  class="action-btn action-btn--delete"
+                  type="button"
+                  :disabled="actionLoadingAppointmentId === appt.id"
+                  @click.stop="deleteAppointmentAction(appt)"
+                >
+                  {{ actionLoadingAppointmentId === appt.id ? 'Procesando...' : 'Eliminar cita' }}
+                </button>
+              </div>
+            </div>
+          </transition>
+        </div>
+      </div>
+    </template>
+
+    <!-- TAB: Eliminar propiedades -->
+    <template v-else-if="activeTab === 'deletions'">
+      <div v-if="propertyDeletions.length === 0" class="admin-state">
+        <p>No hay solicitudes de eliminación pendientes.</p>
+      </div>
+
+      <div v-else class="pending-list">
+        <div class="pending-header-row pending-header-row--docs">
+          <span class="col-label">ID</span>
+          <span class="col-label">Solicitante</span>
+          <span class="col-label">Email</span>
+          <span class="col-label">Propiedad</span>
+          <span class="col-label">Solicitada</span>
+          <span class="col-label">Estado</span>
+          <span class="col-label">Acciones</span>
+        </div>
+
+        <div
+          v-for="req in propertyDeletions"
+          :key="'pdel-' + req.id"
+          class="pending-item"
+          :class="{ 'is-expanded': expandedDeletionId === req.id }"
+        >
+          <div class="pending-item__header pending-item__header--docs" @click="toggleExpandDeletion(req.id)">
+            <span class="pending-id">#{{ req.id }}</span>
+            <span class="pending-username">{{ formatRequesterName(req) }}</span>
+            <span class="pending-email">{{ req.requester_email || '-' }}</span>
+            <span class="pending-name">{{ req.property_title || ('Propiedad #' + req.property_id) }}</span>
+            <span class="pending-date">{{ formatDate(req.created_at) }}</span>
+            <span class="status-badge status-badge--pending">Pendiente</span>
+            <button class="expand-btn" type="button">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </button>
+          </div>
+
+          <transition name="expand">
+            <div v-if="expandedDeletionId === req.id" class="pending-item__details">
+              <div class="details-grid">
+                <div class="details-block">
+                  <h4>Solicitante</h4>
+                  <ul>
+                    <li><strong>ID:</strong> {{ req.requester_user_id }}</li>
+                    <li><strong>Nombre:</strong> {{ formatRequesterName(req) }}</li>
+                    <li><strong>Username:</strong> {{ req.requester_username || '-' }}</li>
+                    <li><strong>Email:</strong> {{ req.requester_email || '-' }}</li>
+                    <li><strong>Teléfono:</strong> {{ req.requester_phone || '-' }}</li>
+                  </ul>
+                </div>
+
+                <div class="details-block">
+                  <h4>Propiedad a eliminar</h4>
+                  <ul>
+                    <li><strong>ID:</strong> {{ req.property_id }}</li>
+                    <li><strong>Título:</strong> {{ req.property_title || '-' }}</li>
+                    <li><strong>Tipo:</strong> {{ req.property_type || '-' }}</li>
+                    <li><strong>Categoría:</strong> {{ req.property_category || '-' }}</li>
+                    <li><strong>Ciudad:</strong> {{ req.property_city || '-' }}</li>
+                    <li><strong>Zona:</strong> {{ req.property_zone || '-' }}</li>
+                    <li><strong>Precio:</strong> {{ formatPrice(req.property_price) }}</li>
+                  </ul>
+                </div>
+
+                <div class="details-block">
+                  <h4>Motivo de la solicitud</h4>
+                  <p style="margin:0;">{{ req.reason || 'Sin motivo especificado.' }}</p>
+                </div>
+              </div>
+
+              <div class="details-actions">
+                <button
+                  class="action-btn action-btn--approve"
+                  type="button"
+                  :disabled="actionLoadingDeletionId === req.id"
+                  @click.stop="approveDeletion(req)"
+                >
+                  {{ actionLoadingDeletionId === req.id ? 'Procesando...' : 'Aprobar y eliminar' }}
+                </button>
+                <button
+                  class="action-btn action-btn--reject"
+                  type="button"
+                  :disabled="actionLoadingDeletionId === req.id"
+                  @click.stop="rejectDeletion(req)"
+                >
+                  {{ actionLoadingDeletionId === req.id ? 'Procesando...' : 'Rechazar' }}
+                </button>
+              </div>
+            </div>
+          </transition>
+        </div>
+      </div>
+    </template>
+
     <transition name="fade">
       <div v-if="confirmModal.show" class="custom-modal-overlay">
         <div class="custom-modal">
           <h3>{{ confirmModal.title }}</h3>
           <p>{{ confirmModal.message }}</p>
+          <input
+            v-if="confirmModal.withInput"
+            v-model="confirmModal.inputValue"
+            :type="confirmModal.inputType || 'text'"
+            :placeholder="confirmModal.inputPlaceholder"
+            class="modal-input"
+            autocomplete="current-password"
+          />
           <div class="custom-modal-actions">
             <button class="btn-cancel" type="button" @click="confirmModal.cancel">Cancelar</button>
             <button class="btn-confirm" type="button" @click="confirmModal.confirm">Confirmar</button>
@@ -504,11 +759,52 @@
         {{ toast.message }}
       </div>
     </div>
+
+    <Teleport to="body">
+      <transition name="pdf-fade">
+        <div
+          v-if="pdfViewer.open"
+          class="pdf-viewer-backdrop"
+          @click.self="closePdfViewer"
+        >
+          <div class="pdf-viewer-window" role="dialog" aria-modal="true">
+            <div class="pdf-viewer-header">
+              <h3 class="pdf-viewer-title">{{ pdfViewer.title }}</h3>
+              <button
+                class="pdf-viewer-close"
+                type="button"
+                aria-label="Cerrar"
+                @click="closePdfViewer"
+              >
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div class="pdf-viewer-body">
+              <div v-if="pdfViewer.loading" class="pdf-viewer-state">
+                Cargando documento...
+              </div>
+              <div v-else-if="pdfViewer.error" class="pdf-viewer-state pdf-viewer-state--error">
+                {{ pdfViewer.error }}
+              </div>
+              <iframe
+                v-else-if="pdfViewer.url"
+                :src="pdfViewer.url"
+                class="pdf-viewer-frame"
+                title="Documento firmado"
+              />
+            </div>
+          </div>
+        </div>
+      </transition>
+    </Teleport>
   </div>
 </template>
 
 <script>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import {
   fetchPendingRequests,
   approvePendingRequest,
@@ -518,26 +814,56 @@ import {
   rejectDocumentReviewAsAdmin,
   fetchPurchaseRequests,
   updatePurchaseRequestStatus,
+  fetchScheduledAppointments,
+  updateAppointmentStatus,
+  deleteAppointment,
+  fetchPendingPropertyDeletions,
+  approvePropertyDeletion,
+  rejectPropertyDeletion,
 } from "../services/admin";
+import { auth } from "../services/auth";
+import { usePendingCountsStore } from "../stores/pendingCounts";
+
+const API_BASE =
+  import.meta.env.VITE_API_BASE_URL ||
+  "http://localhost/Reglado/Inmobiliaria_Reglados/backend/api";
 
 export default {
   name: "AdminPendingRequestsView",
   setup() {
+    const pendingCountsStore = usePendingCountsStore();
     const requests = ref([]);
     const documentReviews = ref([]);
     const purchaseRequests = ref([]);
+    const appointments = ref([]);
+    const propertyDeletions = ref([]);
     const loading = ref(true);
     const error = ref(null);
     const expandedId = ref(null);
     const expandedDocId = ref(null);
     const expandedPurchaseId = ref(null);
+    const expandedAppointmentId = ref(null);
+    const expandedDeletionId = ref(null);
     const actionLoadingId = ref(null);
     const actionLoadingDocId = ref(null);
     const actionLoadingPurchaseId = ref(null);
+    const actionLoadingAppointmentId = ref(null);
+    const actionLoadingDeletionId = ref(null);
     const activeTab = ref("roles");
 
     const pendingPurchaseCount = computed(() =>
       purchaseRequests.value.filter((p) => p.status === "pending").length
+    );
+
+    const pendingAppointmentCount = computed(() =>
+      appointments.value.filter((a) => a.status === "scheduled").length
+    );
+
+    const totalPending = computed(() =>
+      requests.value.length +
+      documentReviews.value.length +
+      pendingPurchaseCount.value +
+      pendingAppointmentCount.value
     );
 
     const rolesSearch = ref("");
@@ -595,6 +921,10 @@ export default {
       show: false,
       title: "",
       message: "",
+      withInput: false,
+      inputType: "text",
+      inputPlaceholder: "",
+      inputValue: "",
       confirm: () => {},
       cancel: () => {},
     });
@@ -607,15 +937,20 @@ export default {
       }, 3200);
     }
 
-    function showConfirm({ title, message }) {
+    function showConfirm({ title, message, withInput = false, inputType = "text", inputPlaceholder = "" }) {
       return new Promise((resolve) => {
         confirmModal.value = {
           show: true,
           title,
           message,
+          withInput,
+          inputType,
+          inputPlaceholder,
+          inputValue: "",
           confirm: () => {
+            const value = confirmModal.value.inputValue;
             confirmModal.value.show = false;
-            resolve(true);
+            resolve(withInput ? value : true);
           },
           cancel: () => {
             confirmModal.value.show = false;
@@ -629,19 +964,26 @@ export default {
       loading.value = true;
       error.value = null;
       try {
-        const [rolesPayload, docsPayload, purchasesPayload] = await Promise.all([
+        const [rolesPayload, docsPayload, purchasesPayload, appointmentsPayload, deletionsPayload] = await Promise.all([
           fetchPendingRequests(),
           fetchPendingDocumentReviews(),
           fetchPurchaseRequests(false),
+          fetchScheduledAppointments("all").catch(() => ({ appointments: [] })),
+          fetchPendingPropertyDeletions().catch(() => ({ requests: [] })),
         ]);
         requests.value = rolesPayload.requests || [];
         documentReviews.value = docsPayload.reviews || [];
         purchaseRequests.value = purchasesPayload.requests || [];
+        appointments.value = appointmentsPayload.appointments || [];
+        propertyDeletions.value = deletionsPayload.requests || [];
+        pendingCountsStore.loadCount(true);
       } catch (e) {
         error.value = e.message || "Error al cargar las solicitudes";
         requests.value = [];
         documentReviews.value = [];
         purchaseRequests.value = [];
+        appointments.value = [];
+        propertyDeletions.value = [];
       } finally {
         loading.value = false;
       }
@@ -653,6 +995,164 @@ export default {
 
     function toggleExpandDoc(id) {
       expandedDocId.value = expandedDocId.value === id ? null : id;
+    }
+
+    function toggleExpandAppointment(id) {
+      expandedAppointmentId.value = expandedAppointmentId.value === id ? null : id;
+    }
+
+    function formatAppointmentDate(iso) {
+      if (!iso) return "-";
+      const d = new Date(iso.replace(" ", "T"));
+      if (Number.isNaN(d.getTime())) return iso;
+      return d.toLocaleString("es-ES", {
+        weekday: "short",
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    }
+
+    function formatOwnerName(appt) {
+      const full = [appt.owner_first_name, appt.owner_last_name].filter(Boolean).join(" ").trim();
+      return full || appt.owner_username || "-";
+    }
+
+    async function completeAppointment(appt) {
+      const password = await showConfirm({
+        title: "Marcar cita como completada",
+        message: `Introduce tu contraseña para confirmar la cita del ${formatAppointmentDate(appt.appointment_date)} con ${appt.buyer_email || "comprador"}.`,
+        withInput: true,
+        inputType: "password",
+        inputPlaceholder: "Tu contraseña",
+      });
+      if (!password) return;
+
+      actionLoadingAppointmentId.value = appt.id;
+      try {
+        const result = await updateAppointmentStatus(appt.id, "completed", password);
+        if (!result?.success) throw new Error(result?.message || "Error");
+        showToast("Cita marcada como completada", "success");
+        await load();
+      } catch (e) {
+        showToast(e.message || "Error al actualizar la cita", "error");
+      } finally {
+        actionLoadingAppointmentId.value = null;
+      }
+    }
+
+    async function cancelAppointment(appt) {
+      const password = await showConfirm({
+        title: "Cancelar cita",
+        message: `Introduce tu contraseña para cancelar la cita del ${formatAppointmentDate(appt.appointment_date)} con ${appt.buyer_email || "comprador"}.`,
+        withInput: true,
+        inputType: "password",
+        inputPlaceholder: "Tu contraseña",
+      });
+      if (!password) return;
+
+      actionLoadingAppointmentId.value = appt.id;
+      try {
+        const result = await updateAppointmentStatus(appt.id, "cancelled", password);
+        if (!result?.success) throw new Error(result?.message || "Error");
+        showToast("Cita cancelada", "success");
+        await load();
+      } catch (e) {
+        showToast(e.message || "Error al cancelar la cita", "error");
+      } finally {
+        actionLoadingAppointmentId.value = null;
+      }
+    }
+
+    async function deleteAppointmentAction(appt) {
+      const password = await showConfirm({
+        title: "Eliminar cita",
+        message: `Vas a eliminar permanentemente la cita del ${formatAppointmentDate(appt.appointment_date)} con ${appt.buyer_email || "comprador"} y su solicitud de compra asociada. Esta acción no se puede deshacer. Introduce tu contraseña para confirmar.`,
+        withInput: true,
+        inputType: "password",
+        inputPlaceholder: "Tu contraseña",
+      });
+      if (!password) return;
+
+      actionLoadingAppointmentId.value = appt.id;
+      try {
+        const result = await deleteAppointment(appt.id, password);
+        if (!result?.success) throw new Error(result?.message || "Error");
+        showToast("Cita eliminada", "success");
+        appointments.value = appointments.value.filter((a) => a.id !== appt.id);
+        if (expandedAppointmentId.value === appt.id) {
+          expandedAppointmentId.value = null;
+        }
+        pendingCountsStore.loadCount(true);
+      } catch (e) {
+        showToast(e.message || "Error al eliminar la cita", "error");
+      } finally {
+        actionLoadingAppointmentId.value = null;
+      }
+    }
+
+    function toggleExpandDeletion(id) {
+      expandedDeletionId.value = expandedDeletionId.value === id ? null : id;
+    }
+
+    function formatRequesterName(req) {
+      const full = [req.requester_first_name, req.requester_last_name]
+        .filter(Boolean)
+        .join(" ")
+        .trim();
+      return full || req.requester_username || "-";
+    }
+
+    async function approveDeletion(req) {
+      const password = await showConfirm({
+        title: "Aprobar eliminación de propiedad",
+        message: `Vas a eliminar permanentemente "${req.property_title || ('Propiedad #' + req.property_id)}" junto con todos sus registros asociados. Introduce tu contraseña para confirmar.`,
+        withInput: true,
+        inputType: "password",
+        inputPlaceholder: "Tu contraseña",
+      });
+      if (!password) return;
+
+      actionLoadingDeletionId.value = req.id;
+      try {
+        const result = await approvePropertyDeletion(req.id, password);
+        if (!result?.success) throw new Error(result?.message || "Error");
+        showToast("Propiedad eliminada. Usuario notificado.", "success");
+        propertyDeletions.value = propertyDeletions.value.filter((r) => r.id !== req.id);
+        if (expandedDeletionId.value === req.id) expandedDeletionId.value = null;
+        pendingCountsStore.loadCount(true);
+      } catch (e) {
+        showToast(e.message || "Error al aprobar la solicitud", "error");
+      } finally {
+        actionLoadingDeletionId.value = null;
+      }
+    }
+
+    async function rejectDeletion(req) {
+      const password = await showConfirm({
+        title: "Rechazar solicitud de eliminación",
+        message: `Vas a rechazar la petición de eliminar "${req.property_title || ('Propiedad #' + req.property_id)}". La propiedad se mantendrá y el usuario será notificado. Introduce tu contraseña para confirmar.`,
+        withInput: true,
+        inputType: "password",
+        inputPlaceholder: "Tu contraseña",
+      });
+      if (!password) return;
+
+      actionLoadingDeletionId.value = req.id;
+      try {
+        const result = await rejectPropertyDeletion(req.id, password);
+        if (!result?.success) throw new Error(result?.message || "Error");
+        showToast("Solicitud rechazada. Usuario notificado.", "success");
+        propertyDeletions.value = propertyDeletions.value.filter((r) => r.id !== req.id);
+        if (expandedDeletionId.value === req.id) expandedDeletionId.value = null;
+        pendingCountsStore.loadCount(true);
+      } catch (e) {
+        showToast(e.message || "Error al rechazar la solicitud", "error");
+      } finally {
+        actionLoadingDeletionId.value = null;
+      }
     }
 
     function formatBuyerName(doc) {
@@ -679,15 +1179,18 @@ export default {
     }
 
     async function approveRequest(req) {
-      const confirmed = await showConfirm({
+      const password = await showConfirm({
         title: "Aprobar solicitud",
-        message: `¿Aprobar a ${req.user_email} como usuario Real?`,
+        message: `Introduce tu contraseña para aprobar a ${req.user_email} como usuario Premium.`,
+        withInput: true,
+        inputType: "password",
+        inputPlaceholder: "Tu contraseña",
       });
-      if (!confirmed) return;
+      if (!password) return;
 
       actionLoadingId.value = req.id;
       try {
-        const result = await approvePendingRequest(req.id);
+        const result = await approvePendingRequest(req.id, password);
         if (!result?.success) throw new Error(result?.message || "No se pudo aprobar.");
         requests.value = requests.value.filter((r) => r.id !== req.id);
         if (expandedId.value === req.id) expandedId.value = null;
@@ -700,15 +1203,18 @@ export default {
     }
 
     async function rejectRequest(req) {
-      const confirmed = await showConfirm({
+      const password = await showConfirm({
         title: "Rechazar solicitud",
-        message: `¿Rechazar la solicitud de ${req.user_email}?`,
+        message: `Introduce tu contraseña para rechazar la solicitud de ${req.user_email}.`,
+        withInput: true,
+        inputType: "password",
+        inputPlaceholder: "Tu contraseña",
       });
-      if (!confirmed) return;
+      if (!password) return;
 
       actionLoadingId.value = req.id;
       try {
-        const result = await rejectPendingRequest(req.id);
+        const result = await rejectPendingRequest(req.id, password);
         if (!result?.success) throw new Error(result?.message || "No se pudo rechazar.");
         requests.value = requests.value.filter((r) => r.id !== req.id);
         if (expandedId.value === req.id) expandedId.value = null;
@@ -743,15 +1249,18 @@ export default {
 
     async function changePurchaseStatus(purchase, newStatus) {
       const labels = { contacted: "marcar como contactada", closed: "cerrar", pending: "reabrir" };
-      const confirmed = await showConfirm({
+      const password = await showConfirm({
         title: "Cambiar estado",
-        message: `¿Quieres ${labels[newStatus]} la solicitud de ${purchase.buyer_email}?`,
+        message: `Introduce tu contraseña para ${labels[newStatus]} la solicitud de ${purchase.buyer_email}.`,
+        withInput: true,
+        inputType: "password",
+        inputPlaceholder: "Tu contraseña",
       });
-      if (!confirmed) return;
+      if (!password) return;
 
       actionLoadingPurchaseId.value = purchase.id;
       try {
-        const result = await updatePurchaseRequestStatus(purchase.id, newStatus);
+        const result = await updatePurchaseRequestStatus(purchase.id, newStatus, password);
         if (!result?.success) throw new Error(result?.message || "No se pudo actualizar.");
         purchase.status = newStatus;
         purchase.resolved_at = newStatus === "pending" ? null : new Date().toISOString();
@@ -764,15 +1273,18 @@ export default {
     }
 
     async function approveDocument(doc) {
-      const confirmed = await showConfirm({
+      const password = await showConfirm({
         title: "Aprobar documentación",
-        message: `¿Aprobar los documentos firmados de ${doc.buyer_email || formatBuyerName(doc)} para la propiedad "${doc.property_title || '#' + doc.property_id}"?`,
+        message: `Introduce tu contraseña para aprobar los documentos firmados de ${doc.buyer_email || formatBuyerName(doc)} para la propiedad "${doc.property_title || '#' + doc.property_id}".`,
+        withInput: true,
+        inputType: "password",
+        inputPlaceholder: "Tu contraseña",
       });
-      if (!confirmed) return;
+      if (!password) return;
 
       actionLoadingDocId.value = doc.id;
       try {
-        const result = await approveDocumentReviewAsAdmin(doc.id);
+        const result = await approveDocumentReviewAsAdmin(doc.id, password);
         if (!result?.success) throw new Error(result?.message || "No se pudo aprobar.");
         documentReviews.value = documentReviews.value.filter((d) => d.id !== doc.id);
         if (expandedDocId.value === doc.id) expandedDocId.value = null;
@@ -785,15 +1297,18 @@ export default {
     }
 
     async function rejectDocument(doc) {
-      const confirmed = await showConfirm({
+      const password = await showConfirm({
         title: "Rechazar documentación",
-        message: `¿Rechazar los documentos firmados de ${doc.buyer_email || formatBuyerName(doc)}? El comprador deberá volver a subirlos.`,
+        message: `Introduce tu contraseña para rechazar los documentos firmados de ${doc.buyer_email || formatBuyerName(doc)}. El comprador deberá volver a subirlos.`,
+        withInput: true,
+        inputType: "password",
+        inputPlaceholder: "Tu contraseña",
       });
-      if (!confirmed) return;
+      if (!password) return;
 
       actionLoadingDocId.value = doc.id;
       try {
-        const result = await rejectDocumentReviewAsAdmin(doc.id);
+        const result = await rejectDocumentReviewAsAdmin(doc.id, password);
         if (!result?.success) throw new Error(result?.message || "No se pudo rechazar.");
         documentReviews.value = documentReviews.value.filter((d) => d.id !== doc.id);
         if (expandedDocId.value === doc.id) expandedDocId.value = null;
@@ -805,12 +1320,81 @@ export default {
       }
     }
 
+    const pdfViewer = ref({
+      open: false,
+      loading: false,
+      url: "",
+      title: "",
+      error: "",
+    });
+
+    async function openSignedPdf(filePath, title) {
+      if (!filePath) {
+        showToast("Este documento aún no está disponible.", "error");
+        return;
+      }
+
+      if (pdfViewer.value.url) {
+        window.URL.revokeObjectURL(pdfViewer.value.url);
+      }
+
+      pdfViewer.value = {
+        open: true,
+        loading: true,
+        url: "",
+        title: title || "Documento firmado",
+        error: "",
+      };
+
+      try {
+        const url = `${API_BASE}/download_document.php?file=${encodeURIComponent(filePath)}`;
+        const response = await fetch(url, {
+          method: "GET",
+          credentials: "include",
+          headers: auth.authHeaders(),
+        });
+
+        if (!response.ok) {
+          const text = await response.text();
+          throw new Error(text || "No se pudo cargar el documento.");
+        }
+
+        const blob = await response.blob();
+        pdfViewer.value.url = window.URL.createObjectURL(blob);
+        pdfViewer.value.loading = false;
+      } catch (err) {
+        pdfViewer.value.loading = false;
+        pdfViewer.value.error = err?.message || "No se pudo cargar el documento.";
+      }
+    }
+
+    function closePdfViewer() {
+      if (pdfViewer.value.url) {
+        window.URL.revokeObjectURL(pdfViewer.value.url);
+      }
+      pdfViewer.value = {
+        open: false,
+        loading: false,
+        url: "",
+        title: "",
+        error: "",
+      };
+    }
+
     onMounted(load);
+
+    onBeforeUnmount(() => {
+      if (pdfViewer.value.url) {
+        window.URL.revokeObjectURL(pdfViewer.value.url);
+      }
+    });
 
     return {
       requests,
       documentReviews,
       purchaseRequests,
+      appointments,
+      propertyDeletions,
       filteredRequests,
       filteredDocumentReviews,
       filteredPurchaseRequests,
@@ -823,19 +1407,38 @@ export default {
       expandedId,
       expandedDocId,
       expandedPurchaseId,
+      expandedAppointmentId,
+      expandedDeletionId,
       actionLoadingId,
       actionLoadingDocId,
       actionLoadingPurchaseId,
+      actionLoadingAppointmentId,
+      actionLoadingDeletionId,
       activeTab,
       pendingPurchaseCount,
+      pendingAppointmentCount,
+      totalPending,
       toasts,
       confirmModal,
+      pdfViewer,
+      openSignedPdf,
+      closePdfViewer,
       toggleExpand,
       toggleExpandDoc,
       toggleExpandPurchase,
+      toggleExpandAppointment,
+      toggleExpandDeletion,
       formatDate,
+      formatAppointmentDate,
       formatName,
       formatBuyerName,
+      formatRequesterName,
+      completeAppointment,
+      cancelAppointment,
+      deleteAppointmentAction,
+      approveDeletion,
+      rejectDeletion,
+      formatOwnerName,
       formatPrice,
       statusLabel,
       approveRequest,
@@ -1260,15 +1863,23 @@ export default {
 
 .pending-item__details {
   padding: 0 30px 30px 30px;
-  border-top: 1px solid #f1f5f9;
-  background: #fcfcfc;
+  border-top: 1px solid #e2e8f0;
+  background: #f1f5f9;
 }
 
 .details-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 30px;
-  padding: 30px 0;
+  gap: 20px;
+  padding: 24px 0;
+}
+
+.details-block {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 14px;
+  padding: 22px;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
 }
 
 .details-block--full {
@@ -1282,11 +1893,11 @@ export default {
   font-size: 0.85rem;
   text-transform: uppercase;
   color: #c4aa1c;
-  margin: 0 0 18px 0;
+  margin: 0 0 16px 0;
   letter-spacing: 0.1em;
   font-weight: 800;
-  border-bottom: 2px solid rgba(196, 170, 28, 0.1);
-  padding-bottom: 8px;
+  border-bottom: 2px solid rgba(196, 170, 28, 0.2);
+  padding-bottom: 10px;
 }
 
 .details-block ul {
@@ -1300,9 +1911,11 @@ export default {
   font-size: 0.95rem;
   color: #1e293b;
   display: grid;
-  grid-template-columns: 130px 1fr;
-  gap: 12px;
+  grid-template-columns: 100px minmax(0, 1fr);
+  gap: 8px;
   align-items: start;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .details-block li strong {
@@ -1375,6 +1988,140 @@ export default {
   box-shadow: 0 8px 18px rgba(220, 38, 38, 0.22);
 }
 
+.action-btn--view {
+  background: rgba(59, 130, 246, 0.12);
+  color: #1d4ed8;
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.action-btn--view:hover:not(:disabled) {
+  background: #2563eb;
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.22);
+}
+
+.action-btn--delete {
+  background: #7f1d1d;
+  color: #fff;
+  border-color: #7f1d1d;
+}
+
+.action-btn--delete:hover:not(:disabled) {
+  background: #991b1b;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(127, 29, 29, 0.35);
+}
+
+.pdf-viewer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 24px;
+}
+
+.pdf-viewer-window {
+  width: min(960px, 92vw);
+  height: min(85vh, 900px);
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 30px 60px rgba(15, 23, 42, 0.35);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.pdf-viewer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 20px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f8fafc;
+}
+
+.pdf-viewer-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1e293b;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pdf-viewer-close {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  color: #475569;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease;
+}
+
+.pdf-viewer-close:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.pdf-viewer-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1e293b;
+  overflow: hidden;
+}
+
+.pdf-viewer-frame {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: #fff;
+}
+
+.pdf-viewer-state {
+  color: #e2e8f0;
+  font-size: 14px;
+  padding: 24px;
+  text-align: center;
+}
+
+.pdf-viewer-state--error {
+  color: #fecaca;
+}
+
+.pdf-fade-enter-active,
+.pdf-fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.pdf-fade-enter-active .pdf-viewer-window,
+.pdf-fade-leave-active .pdf-viewer-window {
+  transition: transform 0.22s ease;
+}
+
+.pdf-fade-enter-from,
+.pdf-fade-leave-to {
+  opacity: 0;
+}
+
+.pdf-fade-enter-from .pdf-viewer-window,
+.pdf-fade-leave-to .pdf-viewer-window {
+  transform: scale(0.97);
+}
+
 .expand-enter-active,
 .expand-leave-active {
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1445,6 +2192,24 @@ export default {
   margin: 0;
   color: #475569;
   line-height: 1.6;
+}
+
+.modal-input {
+  width: 100%;
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  box-sizing: border-box;
+  color: #0f172a;
+}
+
+.modal-input:focus {
+  outline: none;
+  border-color: #0b3d91;
+  box-shadow: 0 0 0 3px rgba(11, 61, 145, 0.15);
 }
 
 .custom-modal-actions {
@@ -1577,5 +2342,21 @@ export default {
   .action-btn {
     width: 100%;
   }
+}
+
+.status-badge--scheduled {
+  background: rgba(11, 61, 145, 0.12);
+  color: #0b3d91;
+  border: 1px solid rgba(11, 61, 145, 0.3);
+}
+.status-badge--completed {
+  background: rgba(34, 197, 94, 0.12);
+  color: #15803d;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+.status-badge--cancelled {
+  background: rgba(239, 68, 68, 0.12);
+  color: #b91c1c;
+  border: 1px solid rgba(239, 68, 68, 0.3);
 }
 </style>

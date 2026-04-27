@@ -5,6 +5,7 @@ require_once dirname(__DIR__) . '/config/db.php';
 require_once dirname(__DIR__) . '/config/auth.php';
 require_once __DIR__ . '/../config/cors.php';
 require_once dirname(__DIR__) . '/lib/audit.php';
+require_once dirname(__DIR__) . '/lib/error_reporting.php';
 
 applyCors();
 handlePreflight();
@@ -30,14 +31,19 @@ try {
             p.categoria       AS property_category,
             p.ciudad          AS property_city,
             p.zona            AS property_zone,
+            df.nda_file_path  AS nda_file_path,
+            df.loi_file_path  AS loi_file_path,
             u.email           AS buyer_email,
             u.username        AS buyer_username,
             u.first_name      AS buyer_first_name,
             u.last_name       AS buyer_last_name,
             u.phone           AS buyer_phone
         FROM signed_document_review_tokens t
-        LEFT JOIN inmobiliaria.propiedades p ON p.id = t.property_id
-        LEFT JOIN regladousers.users u       ON u.id = t.buyer_user_id
+        LEFT JOIN inmobiliaria.propiedades p  ON p.id = t.property_id
+        LEFT JOIN inmobiliaria.documentos_firmados df
+               ON df.propiedad_id = t.property_id
+              AND df.user_id = t.buyer_user_id
+        LEFT JOIN regladousers.users u        ON u.id = t.buyer_user_id
         WHERE t.approved_at IS NULL
           AND t.expires_at > NOW()
         ORDER BY t.created_at DESC, t.id DESC
@@ -56,8 +62,9 @@ try {
         'reviews'  => $rows,
     ]);
 } catch (Throwable $e) {
+    $errorId = logAndReferenceError('get_pending_document_reviews', $e);
     respondJson(500, [
         'success' => false,
-        'message' => 'Error al consultar las revisiones pendientes: ' . $e->getMessage()
+        'message' => 'Error al consultar las revisiones pendientes. Referencia: ' . $errorId,
     ]);
 }

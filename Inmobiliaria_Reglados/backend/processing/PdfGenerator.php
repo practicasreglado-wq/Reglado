@@ -16,9 +16,10 @@ class PdfGenerator
         }
 
         if (!is_dir($this->storageDir)) {
-            if (!mkdir($this->storageDir, 0777, true) && !is_dir($this->storageDir)) {
+            if (!mkdir($this->storageDir, 0750, true) && !is_dir($this->storageDir)) {
                 throw new RuntimeException('No se pudo crear el directorio de textos');
             }
+            @chmod($this->storageDir, 0750);
         }
     }
 

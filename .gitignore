@@ -3,6 +3,8 @@ ApiLoging/.env.local.bak
 Inmobiliaria_Reglados/backend/uploads/
 ApiLoging/vendor/
 Inmobiliaria_Reglados/backend/vendor/
+Inmobiliaria_Reglados/vendor/
+Inmobiliaria_Reglados/.phpunit.cache/
 .env
 Pruebas/
 RegladoBienesRaices/

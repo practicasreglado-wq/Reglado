@@ -350,6 +350,14 @@
         <div class="custom-modal">
           <h3>{{ confirmModal.title }}</h3>
           <p>{{ confirmModal.message }}</p>
+          <input
+            v-if="confirmModal.withInput"
+            v-model="confirmModal.inputValue"
+            :type="confirmModal.inputType || 'text'"
+            :placeholder="confirmModal.inputPlaceholder || ''"
+            class="custom-modal-input"
+            @keyup.enter="confirmModal.confirm"
+          />
           <div class="custom-modal-actions">
             <button class="btn-cancel" type="button" @click="confirmModal.cancel">Cancelar</button>
             <button class="btn-confirm" type="button" @click="confirmModal.confirm">Confirmar</button>
@@ -394,6 +402,10 @@ export default {
       show: false,
       title: '',
       message: '',
+      withInput: false,
+      inputType: 'text',
+      inputPlaceholder: '',
+      inputValue: '',
       confirm: () => {},
       cancel: () => {}
     });
@@ -421,15 +433,20 @@ export default {
       }, 3200);
     };
 
-    const showConfirm = ({ title, message }) => {
+    const showConfirm = ({ title, message, withInput = false, inputType = 'text', inputPlaceholder = '' }) => {
       return new Promise((resolve) => {
         confirmModal.value = {
           show: true,
           title,
           message,
+          withInput,
+          inputType,
+          inputPlaceholder,
+          inputValue: '',
           confirm: () => {
+            const value = confirmModal.value.inputValue;
             confirmModal.value.show = false;
-            resolve(true);
+            resolve(withInput ? value : true);
           },
           cancel: () => {
             confirmModal.value.show = false;
@@ -597,17 +614,20 @@ export default {
     };
 
     async function markAsSold(property) {
-      const confirmed = await showConfirm({
+      const password = await showConfirm({
         title: 'Marcar como vendida',
-        message: `¿Seguro que quieres marcar la propiedad #${property.id} como vendida?`
+        message: `Introduce tu contraseña para marcar la propiedad #${property.id} como vendida.`,
+        withInput: true,
+        inputType: 'password',
+        inputPlaceholder: 'Tu contraseña'
       });
 
-      if (!confirmed) return;
+      if (!password) return;
 
       actionLoadingId.value = property.id;
 
       try {
-        const result = await updatePropertyStatus(property.id, 'vendido');
+        const result = await updatePropertyStatus(property.id, 'vendido', password);
 
         if (!result?.success) {
           throw new Error(result?.message || 'No se pudo actualizar el estado.');
@@ -628,17 +648,20 @@ export default {
     }
 
     async function markAsAvailable(property) {
-      const confirmed = await showConfirm({
+      const password = await showConfirm({
         title: 'Marcar como disponible',
-        message: `¿Seguro que quieres marcar la propiedad #${property.id} como disponible?`
+        message: `Introduce tu contraseña para marcar la propiedad #${property.id} como disponible.`,
+        withInput: true,
+        inputType: 'password',
+        inputPlaceholder: 'Tu contraseña'
       });
 
-      if (!confirmed) return;
+      if (!password) return;
 
       actionLoadingId.value = property.id;
 
       try {
-        const result = await updatePropertyStatus(property.id, 'disponible');
+        const result = await updatePropertyStatus(property.id, 'disponible', password);
 
         if (!result?.success) {
           throw new Error(result?.message || 'No se pudo actualizar el estado.');
@@ -659,17 +682,20 @@ export default {
     }
 
     async function removeProperty(property) {
-      const confirmed = await showConfirm({
+      const password = await showConfirm({
         title: 'Eliminar propiedad',
-        message: `¿Seguro que quieres eliminar la propiedad #${property.id}? Esta acción eliminará también registros relacionados y archivos asociados.`
+        message: `Vas a eliminar la propiedad #${property.id} junto con sus registros y archivos asociados. Esta acción no se puede deshacer. Introduce tu contraseña para confirmar.`,
+        withInput: true,
+        inputType: 'password',
+        inputPlaceholder: 'Tu contraseña'
       });
 
-      if (!confirmed) return;
+      if (!password) return;
 
       actionLoadingId.value = property.id;
 
       try {
-        const result = await deletePropertyAsAdmin(property.id);
+        const result = await deletePropertyAsAdmin(property.id, password);
 
         if (!result?.success) {
           throw new Error(result?.message || 'No se pudo eliminar la propiedad.');
@@ -971,15 +997,23 @@ export default {
 
 .prop-item__details {
   padding: 0 35px 35px 35px;
-  border-top: 1px solid #f1f5f9;
-  background: #fcfcfc;
+  border-top: 1px solid #e2e8f0;
+  background: #f1f5f9;
 }
 
 .details-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 40px;
-  padding: 35px 0;
+  gap: 20px;
+  padding: 28px 0;
+}
+
+.details-block {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 14px;
+  padding: 22px;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
 }
 
 .details-block h4 {
@@ -989,11 +1023,11 @@ export default {
   font-size: 0.85rem;
   text-transform: uppercase;
   color: #c4aa1c;
-  margin: 0 0 20px 0;
+  margin: 0 0 16px 0;
   letter-spacing: 0.1em;
   font-weight: 800;
-  border-bottom: 2px solid rgba(196, 170, 28, 0.1);
-  padding-bottom: 8px;
+  border-bottom: 2px solid rgba(196, 170, 28, 0.2);
+  padding-bottom: 10px;
 }
 
 .details-block ul {
@@ -1007,9 +1041,11 @@ export default {
   font-size: 1rem;
   color: #1e293b;
   display: grid;
-  grid-template-columns: 140px 1fr;
-  gap: 12px;
+  grid-template-columns: 110px minmax(0, 1fr);
+  gap: 8px;
   align-items: start;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .details-block li strong,
@@ -1417,6 +1453,24 @@ export default {
   margin: 0;
   color: #475569;
   line-height: 1.6;
+}
+
+.custom-modal-input {
+  width: 100%;
+  margin-top: 16px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  font-size: 0.95rem;
+  color: #0f172a;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.custom-modal-input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
 
 .custom-modal-actions {

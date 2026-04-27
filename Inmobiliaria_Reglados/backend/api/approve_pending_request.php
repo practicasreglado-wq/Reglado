@@ -7,6 +7,9 @@ require_once dirname(__DIR__) . '/config/auth.php';
 require_once __DIR__ . '/../config/cors.php';
 require_once dirname(__DIR__) . '/lib/notifications_helper.php';
 require_once dirname(__DIR__) . '/lib/audit.php';
+require_once dirname(__DIR__) . '/lib/email_layout.php';
+require_once dirname(__DIR__) . '/lib/error_reporting.php';
+require_once dirname(__DIR__) . '/lib/admin_password_check.php';
 require_once dirname(__DIR__) . '/send_mail.php';
 
 loadEnv(dirname(__DIR__) . '/.env');
@@ -28,10 +31,17 @@ if ($role !== 'admin') {
 
 $input = json_decode(file_get_contents('php://input') ?: '{}', true);
 $requestId = (int) ($input['request_id'] ?? 0);
+$adminPassword = (string) ($input['admin_password'] ?? '');
 
 if ($requestId <= 0) {
     respondJson(422, ['success' => false, 'message' => 'ID de solicitud no válido.']);
 }
+
+requireAdminPasswordConfirmation(
+    (int) ($auth['sub'] ?? 0),
+    $adminPassword,
+    'admin_role_approve'
+);
 
 $host = (string) getenv('DB_HOST');
 $port = (string) getenv('DB_PORT');
@@ -89,7 +99,7 @@ try {
         'user_id'    => (int) $userRow['id'],
         'user_email' => $email,
         'title'      => 'Solicitud aprobada',
-        'message'    => 'Tu solicitud para acceder como usuario real ha sido aprobada. Ya puedes acceder a las funciones habilitadas para este perfil.',
+        'message'    => 'Tu solicitud para acceder como usuario Premium ha sido aprobada. Ya puedes acceder a las funciones habilitadas para este perfil.',
         'type'       => 'success',
         'link'       => '/profile',
     ]);
@@ -98,47 +108,22 @@ try {
     $pdo->commit();
 
     if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $emailBody = <<<'HTML'
-<!DOCTYPE html>
-<html lang="es">
-<head><meta charset="UTF-8"><title>Solicitud aprobada</title></head>
-<body style="margin:0;padding:0;background-color:#f4f6f8;font-family:Arial,sans-serif;color:#1f2937;">
-<table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f8;padding:30px 0;">
-<tr><td align="center">
-<table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,0.08);">
-<tr><td style="background:linear-gradient(135deg,#0b3d91,#123f7a);padding:30px;text-align:center;color:#ffffff;">
-<h2 style="margin:0;font-size:24px;font-weight:700;">Solicitud aprobada</h2>
-<p style="margin:10px 0 0;font-size:14px;color:rgba(255,255,255,0.85);">Acceso como usuario real activado</p>
-</td></tr>
-<tr><td style="padding:32px;color:#374151;">
-<div style="display:inline-block;background:#e9f9ef;color:#1f7a3d;font-size:13px;font-weight:700;padding:8px 14px;border-radius:999px;margin-bottom:20px;">
-Acceso aprobado
-</div>
-<p style="font-size:15px;line-height:1.7;margin:0 0 16px;">
-Nos complace informarle que su solicitud para acceder como <strong>usuario real</strong> ha sido <strong>aprobada correctamente</strong>.
-</p>
-<p style="font-size:15px;line-height:1.7;margin:0 0 16px;">
-A partir de este momento ya puede acceder a las funcionalidades habilitadas para este perfil dentro de la plataforma.
-</p>
+        $emailBody = renderEmailLayout(
+            'Solicitud aprobada',
+            'Acceso como usuario Premium activado',
+            <<<'HTML'
+<div style="display:inline-block;background:#e9f9ef;color:#1f7a3d;font-size:13px;font-weight:700;padding:8px 14px;border-radius:999px;margin-bottom:20px;">Acceso aprobado</div>
+<p style="margin:0 0 16px;">Nos complace informarle que su solicitud para acceder como <strong>usuario Premium</strong> ha sido <strong>aprobada correctamente</strong>.</p>
+<p style="margin:0 0 16px;">A partir de este momento ya puede acceder a las funcionalidades habilitadas para este perfil dentro de la plataforma.</p>
 <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:18px;margin:20px 0;">
 <p style="margin:0 0 8px;font-weight:700;color:#111827;">¿Qué puede hacer ahora?</p>
-<p style="margin:0;font-size:14px;color:#4b5563;line-height:1.6;">
-Ya puede iniciar sesión y utilizar las opciones y accesos reservados para usuarios reales dentro de su cuenta.
-</p>
+<p style="margin:0;font-size:14px;color:#4b5563;line-height:1.6;">Ya puede iniciar sesión y utilizar las opciones y accesos reservados para usuarios Premium dentro de su cuenta.</p>
 </div>
-</td></tr>
-<tr><td style="padding:18px;text-align:center;font-size:12px;color:#9ca3af;border-top:1px solid #e5e7eb;">
-Reglado Real Estate
-</td></tr>
-</table>
-</td></tr>
-</table>
-</body>
-</html>
-HTML;
+HTML
+        );
 
         try {
-            sendNotificationEmail($email, 'Solicitud de acceso como usuario real - Aprobada', $emailBody);
+            sendNotificationEmail($email, 'Solicitud de acceso Premium - Aprobada', $emailBody);
         } catch (Throwable $emailEx) {
             error_log('[approve_pending_request] email falló: ' . $emailEx->getMessage());
         }
@@ -158,5 +143,9 @@ HTML;
 } catch (Throwable $e) {
     if ($pdoAuth instanceof PDO && $pdoAuth->inTransaction()) $pdoAuth->rollBack();
     if ($pdo->inTransaction()) $pdo->rollBack();
-    respondJson(500, ['success' => false, 'message' => 'Error al aprobar la solicitud: ' . $e->getMessage()]);
+    $errorId = logAndReferenceError('approve_pending_request', $e);
+    respondJson(500, [
+        'success' => false,
+        'message' => 'Error al aprobar la solicitud. Referencia: ' . $errorId,
+    ]);
 }

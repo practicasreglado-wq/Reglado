@@ -256,7 +256,9 @@ class DossierService
     private function ensureDirectory(string $dir): void
     {
         if (!is_dir($dir)) {
-            mkdir($dir, 0777, true);
+            if (mkdir($dir, 0750, true)) {
+                @chmod($dir, 0750);
+            }
         }
     }
 

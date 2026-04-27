@@ -7,11 +7,11 @@
         </svg>
       </div>
       <h2>Acceso Restringido</h2>
-      <p class="main-msg">Necesitas ser un usuario <strong>REAL</strong> para acceder a esta sección.</p>
-      
+      <p class="main-msg">Necesitas ser un usuario <strong>PREMIUM</strong> para acceder a esta sección.</p>
+
       <div class="notice-box">
         <p>Tu cuenta actualmente tiene acceso limitado.</p>
-        <p>Para acceder al catálogo completo de propiedades y a todas las herramientas de la plataforma necesitas una cuenta <strong>REAL</strong>.</p>
+        <p>Para acceder al catálogo completo de propiedades y a todas las herramientas de la plataforma necesitas una cuenta <strong>PREMIUM</strong>.</p>
       </div>
 
       <p class="sub-msg">Ponte en contacto con nosotros para activar todos los servicios.</p>
@@ -40,7 +40,7 @@ export default {
   backdrop-filter: blur(20px);
   padding: 40px;
   border-radius: 32px;
-  box-shadow: 
+  box-shadow:
     0 25px 50px rgba(18, 36, 77, 0.12),
     0 10px 20px rgba(18, 36, 77, 0.08);
   text-align: center;

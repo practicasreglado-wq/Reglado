@@ -4,7 +4,7 @@ declare(strict_types=1);
 function fetchUserNotifications(PDO $pdo, int $userId, int $limit = 30, int $offset = 0): array
 {
     $stmt = $pdo->prepare(
-        'SELECT id, title, message, type, is_read, related_request_id, created_at
+        'SELECT id, title, message, type, is_read, related_request_id, action_url, created_at
          FROM notifications
          WHERE user_id = :user_id
          ORDER BY is_read ASC, created_at DESC
@@ -67,6 +67,8 @@ function createUserNotificationRecord(PDO $pdo, array $payload): int
     $relatedRequestId = isset($payload['related_request_id']) && $payload['related_request_id'] !== ''
         ? (int) $payload['related_request_id']
         : null;
+    $actionUrl = isset($payload['action_url']) ? trim((string) $payload['action_url']) : '';
+    $actionUrl = $actionUrl !== '' ? $actionUrl : null;
 
     if ($userId <= 0 || $title === '' || $message === '') {
         throw new InvalidArgumentException('Identificador de usuario, titulo y mensaje son obligatorios.');
@@ -77,8 +79,8 @@ function createUserNotificationRecord(PDO $pdo, array $payload): int
     }
 
     $stmt = $pdo->prepare(
-        'INSERT INTO notifications (user_id, title, message, type, related_request_id, is_read, created_at, updated_at)
-         VALUES (:user_id, :title, :message, :type, :related_request_id, 0, NOW(), NOW())'
+        'INSERT INTO notifications (user_id, title, message, type, related_request_id, action_url, is_read, created_at, updated_at)
+         VALUES (:user_id, :title, :message, :type, :related_request_id, :action_url, 0, NOW(), NOW())'
     );
 
     $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
@@ -90,6 +92,12 @@ function createUserNotificationRecord(PDO $pdo, array $payload): int
         $stmt->bindValue(':related_request_id', null, PDO::PARAM_NULL);
     } else {
         $stmt->bindValue(':related_request_id', $relatedRequestId, PDO::PARAM_INT);
+    }
+
+    if ($actionUrl === null) {
+        $stmt->bindValue(':action_url', null, PDO::PARAM_NULL);
+    } else {
+        $stmt->bindValue(':action_url', $actionUrl, PDO::PARAM_STR);
     }
 
     $stmt->execute();
@@ -124,6 +132,7 @@ function createNotification(PDO $pdo, int $userId, array $data): int
         'message' => (string) ($data['message'] ?? ''),
         'type' => (string) ($data['type'] ?? 'info'),
         'related_request_id' => $data['related_request_id'] ?? null,
+        'action_url' => $data['action_url'] ?? null,
     ]);
 }
 
