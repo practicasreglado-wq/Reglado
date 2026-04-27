@@ -121,8 +121,8 @@ function notifyRequesterOfDeletionResolution(
         : null;
 
     $inAppMessage = $approved
-        ? sprintf('La propiedad "%s" (#%d) se ha eliminado tras tu solicitud.', $propertyTitle ?: 'Propiedad', $propertyId)
-        : sprintf('La solicitud de eliminar "%s" (#%d) ha sido rechazada por el administrador.', $propertyTitle ?: 'Propiedad', $propertyId);
+        ? sprintf('La propiedad "%s" se ha eliminado tras tu solicitud.', $propertyTitle ?: 'Propiedad')
+        : sprintf('La solicitud de eliminar "%s" ha sido rechazada por el administrador.', $propertyTitle ?: 'Propiedad');
 
     try {
         createNotification($pdo, $requesterUserId, [
@@ -154,7 +154,7 @@ function notifyRequesterOfDeletionResolution(
         <<<HTML
 <p style="margin:0 0 16px;color:#0f172a;font-size:15px;line-height:1.5;">{$intro}</p>
 <div style="margin:0 0 20px;padding:14px 16px;border-left:4px solid {$bannerColor};background:{$bannerBg};border-radius:6px;color:#1e293b;font-size:14px;">
-    <strong>{$safeTitle}</strong> (#{$propertyId})
+    <strong>{$safeTitle}</strong>
 </div>
 {$notesBlock}
 <p style="margin:0;color:#6b7280;font-size:12px;">Si tienes dudas, contacta con el equipo de Reglado Real Estate.</p>

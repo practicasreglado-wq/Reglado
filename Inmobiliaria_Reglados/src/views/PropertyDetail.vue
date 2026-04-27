@@ -449,8 +449,10 @@ const timeSlots = (() => {
 })();
 
 // Huecos ya reservados para la fecha seleccionada (se consultan al backend).
-// Bloqueamos cada hueco reservado más las 3 horas siguientes: si alguien
-// agenda a las 15:00, nadie puede coger 15:00–17:59. Próximo libre: 18:00.
+// Bloqueamos una ventana de 3 horas antes y 3 horas después de cada cita:
+// si alguien agenda a las 12:00, nadie puede coger entre 09:01 y 14:59.
+// Los extremos exactos (09:00 y 15:00) sí quedan disponibles. Coincide con
+// la validación server-side en request_purchase.php (INTERVAL 180 MINUTE).
 const BLOCK_WINDOW_MINUTES = 180;
 const bookedTimesForDate = ref([]);
 const loadingBookedTimes = ref(false);
@@ -467,7 +469,7 @@ const blockedSlots = computed(() => {
     if (!Number.isFinite(start)) continue;
     for (const slot of timeSlots) {
       const slotMin = slotToMinutes(slot);
-      if (slotMin >= start && slotMin < start + BLOCK_WINDOW_MINUTES) {
+      if (Math.abs(slotMin - start) < BLOCK_WINDOW_MINUTES) {
         set.add(slot);
       }
     }
