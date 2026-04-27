@@ -1,7 +1,24 @@
 # Upgrade PHP local (XAMPP) — pendiente
 
 **Fecha del checklist:** 2026-04-27
-**Aplicar cuando:** se devuelva el proyecto al compañero, o antes si hace falta probar Inmobiliaria localmente.
+**Estado:** En espera. Se aplicó workaround temporal (ver §"Quick fix aplicado").
+**Bloqueante para retomar:** entrega del proyecto FP DAW (Año 2 — Proyecto Final). El upgrade de XAMPP impacta `c:/xampp/htdocs/Instituto/*` (proyectos académicos) y `Desktop/FP DAW/...` (al ejecutar `php -S` con la nueva versión); ambos podrían requerir auditoría de compatibilidad PHP 8.0 → 8.1+. Hasta entregar FP DAW no merece la pena el riesgo.
+
+## Quick fix aplicado (2026-04-27)
+
+Para desbloquear Inmobiliaria local sin tocar XAMPP, se forzó la versión de la dep transitiva problemática en `Inmobiliaria_Reglados/composer.json`:
+
+```json
+"thecodingmachine/safe": "^2.5"
+```
+
+`Safe v2.5.0` requiere PHP `^8.0` y por tanto compatible con XAMPP 8.0.30. La v3.4 (default sin pin) requiere 8.1+.
+
+Verificación: el backend de Inmobiliaria responde correctamente en `http://localhost/Reglado/Inmobiliaria_Reglados/backend/api/*.php` con headers CORS válidos.
+
+**Trade-off**: si en algún momento `dompdf` se actualiza a una versión que requiera Safe v3+ explícitamente, el pin generará conflicto y habrá que volver a abordar el upgrade.
+
+---
 
 ## Problema
 
