@@ -10,8 +10,8 @@
       <a :href="energyUrl">Energía</a>
       <a :href="realstateUrl">Inmobiliaria</a>
       <a :href="mapasUrl">Mapas</a>
-      <a href="#">Ingeniería</a>
-      <a href="#">RBR</a>
+      <a :href="ingenieriaUrl">Ingeniería</a>
+      <a :href="rbrUrl">RBR</a>
     </nav>
 
     <div class="session-box desktop-session">
@@ -91,10 +91,10 @@
         <a :href="mapasUrl" @click="closeMobileMenu">
           Mapas
         </a>
-        <a href="#" @click="closeMobileMenu">
+        <a :href="ingenieriaUrl" @click="closeMobileMenu">
           Ingeniería
         </a>
-        <a href="#" @click="closeMobileMenu">
+        <a :href="rbrUrl" @click="closeMobileMenu">
           RBR
         </a>
       </nav>
@@ -142,6 +142,10 @@ const rawMapasUrl = import.meta.env.VITE_REGLADO_MAPAS_URL || "https://teal-bat-
 const mapasUrl = computed(() => buildExternalProductUrl(rawMapasUrl));
 const rawEnergyUrl = import.meta.env.VITE_REGLADO_ENERGY_URL || "http://localhost:5174";
 const energyUrl = computed(() => buildExternalProductUrl(rawEnergyUrl));
+const rawIngenieriaUrl = import.meta.env.VITE_REGLADO_INGENIERIA_URL || "http://localhost:5177";
+const ingenieriaUrl = computed(() => buildExternalProductUrl(rawIngenieriaUrl));
+const rawRbrUrl = import.meta.env.VITE_REGLADO_RBR_URL || "http://localhost:5178";
+const rbrUrl = computed(() => buildExternalProductUrl(rawRbrUrl));
 
 const userMenuOpen = ref(false);
 const mobileMenuOpen = ref(false);
