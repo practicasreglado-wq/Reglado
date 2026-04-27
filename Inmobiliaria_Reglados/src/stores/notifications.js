@@ -1,4 +1,17 @@
-﻿import { defineStore } from "pinia";
+﻿/**
+ * Store de notificaciones in-app (Pinia).
+ *
+ * Lo consume NotificationBell.vue del header para mostrar el badge de no
+ * leídas + el dropdown con la lista. Usa polling cada 15s
+ * (`startAutoRefresh`) contra api/notifications_unread_count.php para
+ * mantener el contador sin recargar la lista entera (ahorra ancho de banda).
+ *
+ * El listado completo solo se descarga (loadNotifications) cuando el
+ * usuario abre el dropdown. Marcar como leído (markAsRead) actualiza
+ * tanto el array local como el contador del servidor.
+ */
+
+import { defineStore } from "pinia";
 import { backendJson } from "../services/backend";
 
 export const useNotificationsStore = defineStore("notifications", {

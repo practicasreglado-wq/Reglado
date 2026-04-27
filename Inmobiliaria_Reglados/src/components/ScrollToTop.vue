@@ -1,3 +1,8 @@
+<!--
+  Botón flotante "subir arriba" que aparece después de hacer scroll una
+  cierta distancia. Renderizado en App.vue, presente en todas las páginas.
+  Sin estado de negocio, solo UX.
+-->
 <template>
   <transition name="scroll-to-top">
     <button

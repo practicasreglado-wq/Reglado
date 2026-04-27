@@ -1,3 +1,12 @@
+<!--
+  Panel del cuestionario de preferencias de matching del usuario.
+
+  Muestra las preferencias activas (categoría seleccionada + respuestas
+  guardadas en match_preferences) y permite editarlas. Compone el formulario
+  con PreferenceQuestionsForm.vue.
+
+  POST → save_preferences.php → upsertUserMatchPreferences en backend.
+-->
 <template>
   <section class="preference-panel">
     <div class="panel-header">

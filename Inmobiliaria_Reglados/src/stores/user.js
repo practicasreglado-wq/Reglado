@@ -1,3 +1,21 @@
+/**
+ * Store global del USUARIO autenticado (Pinia, persistido en localStorage).
+ *
+ * Diferencia con services/auth.js:
+ *  - auth.js gestiona el JWT en sí (token, login/logout/cookies).
+ *  - user.js gestiona los DATOS del usuario logueado (nombre, rol,
+ *    categoría seleccionada, preferencias) y los expone como getters
+ *    convenientes (isAdmin, isReal, isLoggedIn).
+ *
+ * `initializeSession()` es el flujo de bootstrapping: pide datos a ApiLoging
+ * (auth.initialize) y luego completa con datos propios de Inmobiliaria
+ * (get_user_data.php). Si la segunda llamada falla, mantiene los datos
+ * básicos del JWT.
+ *
+ * `persist: true` viene de pinia-plugin-persistedstate → guarda el state
+ * automáticamente en localStorage para sobrevivir refrescos.
+ */
+
 import { defineStore } from "pinia";
 import { auth } from "../services/auth";
 import { backendJson } from "../services/backend";

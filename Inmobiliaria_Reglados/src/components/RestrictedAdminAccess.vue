@@ -1,3 +1,8 @@
+<!--
+  Versión "admin only" de RestrictedAccess. Sin CTA de promoción (no hay
+  forma de pedir el rol admin desde la SPA — solo se asigna manualmente
+  desde otro admin con update_user_role.php).
+-->
 <template>
   <div class="restricted-admin">
     <div class="restricted-admin__card">

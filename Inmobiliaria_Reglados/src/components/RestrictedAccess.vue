@@ -1,3 +1,11 @@
+<!--
+  Tarjeta "Acceso restringido" que se muestra cuando un usuario 'basic'
+  intenta entrar a una sección que requiere rol 'real' (Premium).
+
+  Incluye CTA para abrir el modal/formulario de solicitud de promoción
+  (ver send_real_user_request.php). La usa RestrictedAccessView.vue como
+  página completa y otras vistas inline.
+-->
 <template>
   <div class="restricted-container">
     <div class="restricted-card">

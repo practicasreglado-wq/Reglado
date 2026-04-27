@@ -1,4 +1,13 @@
-﻿<template>
+﻿<!--
+  Campanita de notificaciones del header.
+
+  - Muestra badge numérico con `unreadCount` de useNotificationsStore.
+  - Al click abre un dropdown con el listado (loadNotifications).
+  - Marcar como leído llama a markAsRead, que actualiza local + servidor.
+  - El polling automático lo arranca el componente padre (App.vue/Header.vue)
+    con `notifications.startAutoRefresh()` cuando el usuario está logueado.
+-->
+<template>
   <div class="notification-bell">
     <button
       ref="anchorRef"

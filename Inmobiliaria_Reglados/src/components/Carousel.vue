@@ -1,3 +1,10 @@
+<!--
+  Carrusel genérico de propiedades destacadas. Lo usa Home.vue para mostrar
+  un slider de "últimas propiedades" o categorías destacadas en la landing.
+
+  Recibe el array a mostrar como prop y maneja navegación + autoplay
+  internamente.
+-->
 <template>
   <div class="carousel">
 

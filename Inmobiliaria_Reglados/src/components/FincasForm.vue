@@ -1,3 +1,7 @@
+<!--
+  Cuestionario de preferencias para "Fincas". Mismo patrón que HotelesForm
+  (wrapper sobre PreferenceQuestionsForm con preguntas específicas).
+-->
 <template>
   <PreferenceQuestionsForm
     :form="form"

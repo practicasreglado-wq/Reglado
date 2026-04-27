@@ -1,3 +1,15 @@
+<!--
+  Tarjeta resumen de una propiedad. Reusable en listados:
+   - PropertiesForSale.vue (catálogo público)
+   - MyPropertiesForSale.vue (las del usuario)
+   - FavoriteProperties.vue (favoritos)
+   - AdminPropertiesView.vue (admin)
+
+  Renderiza un mini-mapa Leaflet con coordenadas DESPLAZADAS (las que vienen
+  ya transformadas por lib/privacy_map.php) — nunca muestra las reales.
+
+  Click → navega a /property/:id (PropertyDetail.vue).
+-->
 <template>
   <article class="property-card">
     <div class="property-card__media property-card__media--map">

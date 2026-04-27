@@ -1,3 +1,13 @@
+<!--
+  Header global de la SPA. Renderizado en App.vue, presente en todas las
+  rutas. Cambia de aspecto según contexto:
+   - Transparente al hacer scroll en /home (hero con vídeo de fondo).
+   - Sólido en cualquier otra ruta o cuando hace scroll.
+
+  Contiene: logo, menú principal, menú de perfil (useProfileMenuStore),
+  campanita de notificaciones (NotificationBell.vue) y badges de pendientes
+  para admins.
+-->
 <template>
   <header class="site-header" :class="{ 'is-scrolled': scrolled && !isInProfile, 'at-top-home': isHome && !scrolled }">
     <div class="logo">
