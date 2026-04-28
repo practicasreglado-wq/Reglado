@@ -73,7 +73,20 @@ n8nJson/
 SkillsClaude/
 ReleasesEstables/
 scripts/
-Chatbot/
+
+# === Chatbot (Node.js + widget JS) ===
+# Ya no ignoramos el proyecto entero — solo lo sensible y generado.
+# Globs `Chatbot/**/...` para tolerar renombres del subdir (V2, V3, ...).
+Chatbot/**/node_modules/
+Chatbot/**/dist/
+Chatbot/**/coverage/
+Chatbot/**/.env
+Chatbot/**/.env.local
+Chatbot/**/backend/google-credentials.json
+Chatbot/**/backend/uploads/
+Chatbot/**/*.db
+Chatbot/**/*.sqlite
+Chatbot/**/*.sqlite3
 
 # === Variables de entorno en raíz ===
 .env
