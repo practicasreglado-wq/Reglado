@@ -14,7 +14,7 @@
  * sobre este — no llaman a fetch() crudo.
  */
 
-import { auth, clearAllAuthArtifacts } from "./auth";
+import { auth } from "./auth";
 
 export const BACKEND_BASE =
   import.meta.env.VITE_INMOBILIARIA_BACKEND_BASE ||
@@ -78,12 +78,12 @@ export async function backendJson(path, options = {}) {
       if (typeof window !== "undefined") {
         isRedirecting = true;
         auth.clearSession();
-        clearAllAuthArtifacts();
 
         setTimeout(() => {
           if (window.location.pathname !== "/login") {
             window.location.replace("/login");
           }
+          isRedirecting = false;
         }, 150);
       }
     }
