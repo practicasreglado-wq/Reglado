@@ -138,7 +138,7 @@ const emit = defineEmits(["open-login", "logout"]);
 const router = useRouter();
 const route = useRoute();
 const realstateUrl = import.meta.env.VITE_REGLADO_REALSTATE_URL || "#";
-const rawMapasUrl = import.meta.env.VITE_REGLADO_MAPAS_URL || "https://teal-bat-675895.hostingersite.com/";
+const rawMapasUrl = import.meta.env.VITE_REGLADO_MAPAS_URL || "https://regladomaps.com/";
 const mapasUrl = computed(() => buildExternalProductUrl(rawMapasUrl));
 const rawEnergyUrl = import.meta.env.VITE_REGLADO_ENERGY_URL || "http://localhost:5174";
 const energyUrl = computed(() => buildExternalProductUrl(rawEnergyUrl));

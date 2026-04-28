@@ -21,13 +21,17 @@ const SSO_ALLOWED_RETURNS = [
   "http://127.0.0.1:5176",
   "http://localhost:5177",
   "http://127.0.0.1:5177",
-  // Prod
+  // Prod (siempre apex + www — Google y otros referrers pueden mandar
+  // cualquiera de las dos formas; sin ambas la SSO falla con CORS).
   "https://regladogroup.com",
   "https://www.regladogroup.com",
   "https://regladoenergy.com",
-  "https://teal-bat-675895.hostingersite.com", // Reglado Maps (dominio Hostinger provisional)
-  "https://regladorealestate.com", // Inmobiliaria_Reglados
-  // TODO: añadir dominio final de Maps y el de Ingeniería cuando estén listos.
+  "https://www.regladoenergy.com",
+  "https://regladomaps.com",
+  "https://www.regladomaps.com",
+  "https://regladorealestate.com",
+  "https://www.regladorealestate.com",
+  // TODO: añadir dominio final de Ingeniería (apex + www) cuando esté listo.
 ];
 
 /**
@@ -88,10 +92,12 @@ const SSO_THEMES = {
   "http://localhost:5174": ENERGY_THEME(),
   "http://127.0.0.1:5174": ENERGY_THEME(),
   "https://regladoenergy.com": ENERGY_THEME(),
+  "https://www.regladoenergy.com": ENERGY_THEME(),
   // Maps — dark + cyan
   "http://localhost:5176": MAPS_THEME(),
   "http://127.0.0.1:5176": MAPS_THEME(),
-  "https://teal-bat-675895.hostingersite.com": MAPS_THEME(),
+  "https://regladomaps.com": MAPS_THEME(),
+  "https://www.regladomaps.com": MAPS_THEME(),
   // Ingeniería — light + steel blue
   "http://localhost:5177": INGENIERIA_THEME(),
   "http://127.0.0.1:5177": INGENIERIA_THEME(),
@@ -99,6 +105,7 @@ const SSO_THEMES = {
   "http://localhost:5175": INMOBILIARIA_THEME(),
   "http://127.0.0.1:5175": INMOBILIARIA_THEME(),
   "https://regladorealestate.com": INMOBILIARIA_THEME(),
+  "https://www.regladorealestate.com": INMOBILIARIA_THEME(),
 };
 
 function ENERGY_THEME() {

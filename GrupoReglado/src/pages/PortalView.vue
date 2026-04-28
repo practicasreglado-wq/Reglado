@@ -177,7 +177,7 @@ const heroStyle = computed(() => ({
 
 const realstateUrl = import.meta.env.VITE_REGLADO_REALSTATE_URL || "#";
 const energyUrl = import.meta.env.VITE_REGLADO_ENERGY_URL || "http://localhost:5174";
-const mapasUrl = import.meta.env.VITE_REGLADO_MAPAS_URL || "https://teal-bat-675895.hostingersite.com/";
+const mapasUrl = import.meta.env.VITE_REGLADO_MAPAS_URL || "https://regladomaps.com/";
 const mapasEntryUrl = computed(() => buildExternalProductUrl(mapasUrl));
 const enProcesoUrl = import.meta.env.VITE_REGLADO_ENPROCESO_URL || "#";
 const energyEntryUrl = computed(() => buildExternalProductUrl(energyUrl));

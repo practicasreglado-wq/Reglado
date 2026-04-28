@@ -1,0 +1,16 @@
+<!-- cambios finales -->
+
+
+1. -*CAMBIAR La URL DE WEBHOOK 
+
+2. CAMBIAR LOS LOCALHOST POR EL DOMINIO DE LA WEB EN EL .ENV (AQUEL QUE SE COMPRE).
+
+
+
+
+
+
+
+
+
+
