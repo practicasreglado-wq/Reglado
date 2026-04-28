@@ -42,7 +42,7 @@ src/
 
 `src/components/SiteHeader.vue`
 - Header fijo superior.
-- Muestra logo y enlaces a otras plataformas (`Realstate`, `Energy`, `Mapas`, `EnProceso`).
+- Muestra logo y enlaces a otras plataformas (`RealEstate`, `Energy`, `Mapas`, `EnProceso`).
 - Si hay usuario logueado, muestra menu de usuario (configuracion/cerrar sesion).
 - Si no hay usuario, muestra boton `Login`.
 - Emite eventos:

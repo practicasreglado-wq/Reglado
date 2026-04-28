@@ -7,7 +7,7 @@
 
           <div class="modal-header">
             <h2>Iniciar sesión</h2>
-            <p>Accede a tu cuenta de Reglado RealState</p>
+            <p>Accede a tu cuenta de Reglado RealEstate</p>
           </div>
 
           <form @submit.prevent="handleLogin" class="login-form">

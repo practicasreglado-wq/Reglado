@@ -6,7 +6,7 @@ Esta guia describe como pasar el ecosistema Reglado desde local a produccion con
 
 - `GrupoReglado`: `https://regladogroup.com`
 - `ApiLoging`: alojada dentro del mismo dominio de `GrupoReglado`
-- `Inmobiliaria_Reglados`: `https://realstate.com`
+- `Inmobiliaria_Reglados`: `https://regladorealestate.com`
 - `RegladoEnergy`: `https://regladoenergy.com`
 
 ## 2. Arquitectura final esperada
@@ -25,7 +25,7 @@ Si mantienes `ApiLoging` en el mismo dominio que `GrupoReglado`, reduces problem
 ### 2.2 Productos externos
 
 - `RegladoEnergy` en `https://regladoenergy.com`
-- `Inmobiliaria_Reglados` en `https://realstate.com`
+- `Inmobiliaria_Reglados` en `https://regladorealestate.com`
 
 Ambos seguiran redirigiendo a `GrupoReglado` para login y registro.
 
@@ -70,8 +70,8 @@ JWT_SECRET=TU_SECRETO_LARGO_Y_UNICO
 JWT_TTL_SECONDS=86400
 JWT_ISSUER=regladogroup.com
 
-CORS_ALLOWED_ORIGINS=https://regladogroup.com,https://regladoenergy.com,https://realstate.com
-REDIRECT_ALLOWED_ORIGINS=https://regladogroup.com,https://regladoenergy.com,https://realstate.com
+CORS_ALLOWED_ORIGINS=https://regladogroup.com,https://regladoenergy.com,https://regladorealestate.com
+REDIRECT_ALLOWED_ORIGINS=https://regladogroup.com,https://regladoenergy.com,https://regladorealestate.com
 
 EMAIL_VERIFY_URL_BASE=https://regladogroup.com/auth/verify-email
 EMAIL_VERIFY_REDIRECT_URL=https://regladogroup.com/verificacion-exitosa
@@ -103,7 +103,7 @@ Debes poner:
 
 ```env
 VITE_AUTH_API_URL=https://regladogroup.com
-VITE_REGLADO_REALSTATE_URL=https://realstate.com
+VITE_REGLADO_REALSTATE_URL=https://regladorealestate.com
 VITE_REGLADO_ENERGY_URL=https://regladoenergy.com
 VITE_REGLADO_MAPAS_URL=#
 VITE_REGLADO_ENPROCESO_URL=#
@@ -164,19 +164,19 @@ VITE_AUTH_API_URL=https://regladogroup.com
 VITE_GRUPO_REGLADO_BASE_URL=https://regladogroup.com
 VITE_GRUPO_REGLADO_LOGIN_PATH=/login
 VITE_GRUPO_REGLADO_REGISTER_PATH=/registro
-VITE_INMOBILIARIA_BACKEND_BASE=https://realstate.com/backend
+VITE_INMOBILIARIA_BACKEND_BASE=https://regladorealestate.com/backend
 ```
 
 ### Backend de Inmobiliaria
 
 El backend de inmobiliaria debe:
 - validar JWT usando el mismo `JWT_SECRET`
-- aceptar peticiones desde `https://realstate.com`
+- aceptar peticiones desde `https://regladorealestate.com`
 - si hay endpoints llamados desde frontend, permitir `Origin` de su dominio real
 
 Si mantienes la misma estructura:
-- `https://realstate.com/backend/get_user_data.php`
-- `https://realstate.com/backend/save_preferences.php`
+- `https://regladorealestate.com/backend/get_user_data.php`
+- `https://regladorealestate.com/backend/save_preferences.php`
 
 ## 5. Parametros que deben coincidir entre proyectos
 
@@ -210,7 +210,7 @@ VITE_GRUPO_REGLADO_BASE_URL=https://regladogroup.com
 En `ApiLoging`, `REDIRECT_ALLOWED_ORIGINS` debe incluir:
 - `https://regladogroup.com`
 - `https://regladoenergy.com`
-- `https://realstate.com`
+- `https://regladorealestate.com`
 
 Si falta uno:
 - el login o la verificacion pueden no devolver al proyecto correcto
@@ -220,7 +220,7 @@ Si falta uno:
 En `ApiLoging`, `CORS_ALLOWED_ORIGINS` debe incluir:
 - `https://regladogroup.com`
 - `https://regladoenergy.com`
-- `https://realstate.com`
+- `https://regladorealestate.com`
 
 ## 6. Enlaces de correo en produccion
 
@@ -276,7 +276,7 @@ Los correos deben abrir siempre paginas publicas reales:
 ### Inmobiliaria
 
 - `Iniciar sesion` redirige a `regladogroup.com/login`
-- tras login correcto vuelve a `realstate.com`
+- tras login correcto vuelve a `regladorealestate.com`
 - el usuario queda logeado
 - `dashboard` y `profile` cargan datos
 - `iduser` se relaciona correctamente con el usuario de auth
@@ -320,8 +320,8 @@ Revisar:
 ```env
 APP_ENV=production
 JWT_ISSUER=regladogroup.com
-CORS_ALLOWED_ORIGINS=https://regladogroup.com,https://regladoenergy.com,https://realstate.com
-REDIRECT_ALLOWED_ORIGINS=https://regladogroup.com,https://regladoenergy.com,https://realstate.com
+CORS_ALLOWED_ORIGINS=https://regladogroup.com,https://regladoenergy.com,https://regladorealestate.com
+REDIRECT_ALLOWED_ORIGINS=https://regladogroup.com,https://regladoenergy.com,https://regladorealestate.com
 EMAIL_VERIFY_URL_BASE=https://regladogroup.com/auth/verify-email
 EMAIL_VERIFY_REDIRECT_URL=https://regladogroup.com/verificacion-exitosa
 EMAIL_CHANGE_VERIFY_URL_BASE=https://regladogroup.com/auth/confirm-email-change
@@ -333,7 +333,7 @@ PASSWORD_RESET_URL_BASE=https://regladogroup.com/restablecer-contrasena
 
 ```env
 VITE_AUTH_API_URL=https://regladogroup.com
-VITE_REGLADO_REALSTATE_URL=https://realstate.com
+VITE_REGLADO_REALSTATE_URL=https://regladorealestate.com
 VITE_REGLADO_ENERGY_URL=https://regladoenergy.com
 ```
 
@@ -350,5 +350,5 @@ VITE_CONTACT_ENDPOINT=https://regladoenergy.com/BACKEND/contact.php
 ```env
 VITE_AUTH_API_URL=https://regladogroup.com
 VITE_GRUPO_REGLADO_BASE_URL=https://regladogroup.com
-VITE_INMOBILIARIA_BACKEND_BASE=https://realstate.com/backend
+VITE_INMOBILIARIA_BACKEND_BASE=https://regladorealestate.com/backend
 ```

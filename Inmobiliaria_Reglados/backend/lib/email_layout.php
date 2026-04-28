@@ -44,7 +44,7 @@ function renderEmailLayout(string $title, string $subtitle, string $bodyHtml): s
           <tr>
             <td style="padding:20px 36px;background:#f8fafc;border-top:1px solid #e2e8f0;">
               <p style="margin:0 0 4px;font-size:13px;font-weight:700;color:#0f172a;">Reglado Real Estate</p>
-              <p style="margin:0;font-size:12px;color:#94a3b8;line-height:1.5;">Correo automático generado por la plataforma. &copy; {$year} Reglado Real State.</p>
+              <p style="margin:0;font-size:12px;color:#94a3b8;line-height:1.5;">Correo automático generado por la plataforma. &copy; {$year} Reglado Real Estate.</p>
             </td>
           </tr>
 

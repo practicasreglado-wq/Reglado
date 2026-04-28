@@ -10,18 +10,18 @@
         <section>
           <h2>1. TITULARIDAD DEL PORTAL</h2>
           <p>
-            <strong>REGLADO REAL STATE</strong>, es la titular y responsable de este sitio web, poniendo a disposición de los usuarios el presente documento, con el que pretende dar cumplimiento a las obligaciones dispuestas en la Ley 34/2002, de 11 de julio, de Servicios de la Sociedad de la Información y del Comercio Electrónico (LSSICE), así como informar a todos los usuarios del sitio web respecto a cuáles son las condiciones de uso. Toda persona que acceda a este sitio web asume el papel de usuario, comprometiéndose a la observancia y cumplimiento riguroso de las disposiciones aquí dispuestas, así como a cualquier otra disposición legal que fuera de aplicación.
+            <strong>REGLADO REAL ESTATE</strong>, es la titular y responsable de este sitio web, poniendo a disposición de los usuarios el presente documento, con el que pretende dar cumplimiento a las obligaciones dispuestas en la Ley 34/2002, de 11 de julio, de Servicios de la Sociedad de la Información y del Comercio Electrónico (LSSICE), así como informar a todos los usuarios del sitio web respecto a cuáles son las condiciones de uso. Toda persona que acceda a este sitio web asume el papel de usuario, comprometiéndose a la observancia y cumplimiento riguroso de las disposiciones aquí dispuestas, así como a cualquier otra disposición legal que fuera de aplicación.
           </p>
           <p>
-            <strong>REGLADO REAL STATE</strong> se reserva el derecho de modificar cualquier tipo de información que pudiera aparecer en el sitio web, sin que exista obligación de preavisar o poner en conocimiento de los usuarios dichas obligaciones, entendiéndose como suficiente con la publicación en el sitio web.
+            <strong>REGLADO REAL ESTATE</strong> se reserva el derecho de modificar cualquier tipo de información que pudiera aparecer en el sitio web, sin que exista obligación de preavisar o poner en conocimiento de los usuarios dichas obligaciones, entendiéndose como suficiente con la publicación en el sitio web.
           </p>
         </section>
 
         <section>
           <h2>2. DATOS IDENTIFICATIVOS</h2>
           <ul class="data-list">
-            <li><strong>Denominación social:</strong> REGLADO REAL STATE</li>
-            <li><strong>Nombre Comercial:</strong> REGLADO REAL STATE</li>
+            <li><strong>Denominación social:</strong> REGLADO REAL ESTATE</li>
+            <li><strong>Nombre Comercial:</strong> REGLADO REAL ESTATE</li>
             <li><strong>CIF:</strong> B09662081</li>
             <li><strong>Domicilio:</strong> AVDA. ISLA GRACIOSA, 7 PISO 1º DESPACHOS 5-6 28703 SAN SEBASTIÁN DE LOS REYES.</li>
             <li><strong>Teléfono:</strong> +34 911 462 674 / 615 641 081</li>
@@ -125,7 +125,7 @@
             El Usuario se obliga a no reproducir de ningún modo, ni siquiera mediante un hiperenlace o hipervínculo, el Espacio Web, así como ninguno de sus contenidos, salvo autorización expresa y por escrito del responsable del fichero.
           </p>
           <p>
-            En el caso de que se dispusiesen enlaces o hipervínculos hacía otros sitios de Internet, directa o indirectamente, a recursos o páginas web de Internet que se encuentran fuera del Portal, <strong>REGLADO REAL STATE</strong> no ejercerá ningún tipo de control sobre dichos sitios y contenidos, ni asumirá responsabilidad alguna por los contenidos de algún enlace perteneciente a una web ajeno.
+            En el caso de que se dispusiesen enlaces o hipervínculos hacía otros sitios de Internet, directa o indirectamente, a recursos o páginas web de Internet que se encuentran fuera del Portal, <strong>REGLADO REAL ESTATE</strong> no ejercerá ningún tipo de control sobre dichos sitios y contenidos, ni asumirá responsabilidad alguna por los contenidos de algún enlace perteneciente a una web ajeno.
           </p>
         </section>
 
@@ -139,14 +139,14 @@
         <section>
           <h2>12. DURACIÓN Y MODIFICACIÓN</h2>
           <p>
-            <strong>REGLADO REAL STATE</strong> se reserva el derecho de modificar el presente Aviso Legal y/o las condiciones particulares que, en su caso, hayan sido establecidas para la utilización y/o contratación de los productos o servicios prestados a través del Portal, cuando lo considere oportuno o con la finalidad de adecuarse a los cambios legislativos y tecnológicos.
+            <strong>REGLADO REAL ESTATE</strong> se reserva el derecho de modificar el presente Aviso Legal y/o las condiciones particulares que, en su caso, hayan sido establecidas para la utilización y/o contratación de los productos o servicios prestados a través del Portal, cuando lo considere oportuno o con la finalidad de adecuarse a los cambios legislativos y tecnológicos.
           </p>
         </section>
 
         <section>
           <h2>13. COMUNICACIONES</h2>
           <p>
-            Cualquier comunicación entre <strong>REGLADO REAL STATE</strong> y el Usuario, deberá dirigirse a la Empresa a la dirección electrónica: <strong>info@regladoconsultores.com</strong>
+            Cualquier comunicación entre <strong>REGLADO REAL ESTATE</strong> y el Usuario, deberá dirigirse a la Empresa a la dirección electrónica: <strong>info@regladoconsultores.com</strong>
           </p>
         </section>
 

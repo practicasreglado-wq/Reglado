@@ -7,7 +7,7 @@
         <span class="highlight">Crea tu cuenta</span>
       </h1>
       <p>
-        Accede al ecosistema de Reglado Realstate. Te enviaremos un correo
+        Accede al ecosistema de Reglado Real Estate. Te enviaremos un correo
         para activar tu cuenta una vez completes el registro.
       </p>
       <p class="login-link">

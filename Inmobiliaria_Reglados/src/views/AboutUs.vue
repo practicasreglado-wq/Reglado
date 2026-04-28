@@ -7,11 +7,11 @@
     </div>
 
     <div class="about-content">
-      <span class="about-kicker">Reglado Real State</span>
+      <span class="about-kicker">Reglado Real Estate</span>
       <h2>Quiénes somos</h2>
       <div class="about-text">
         <p class="about-lead">
-          En Reglado Real State trabajamos con un enfoque más exclusivo, orientado a clientes que saben exactamente qué inversión están buscando.
+          En Reglado Real Estate trabajamos con un enfoque más exclusivo, orientado a clientes que saben exactamente qué inversión están buscando.
         </p>
       </div>
 

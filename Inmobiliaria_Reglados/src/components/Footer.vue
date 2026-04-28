@@ -6,7 +6,7 @@
   <footer class="footer">
     <div class="container footer-inner">
       <div class="col brand-col">
-        <div class="footer-pill">Reglado Real State</div>
+        <div class="footer-pill">Reglado Real Estate</div>
         <p class="footer-copy">
           Boutique inmobiliaria especializada en activos singulares, edificios,
           hoteles y grandes operaciones. Discrecion, analisis y resultados.
@@ -39,13 +39,13 @@
         <div class="footer-pill">Contacto</div>
         <div class="footer-contact-info">
           <div><strong>Tel:</strong> +34 911 462 674 / 615 641 081</div>
-          <div><strong>Email:</strong> realstate@regladoconsultores.com</div>
+          <div><strong>Email:</strong> info@regladoconsultores.com</div>
         </div>
       </div>
     </div>
 
     <div class="container footer-bottom">
-      <div class="small">© 2026 REGLADO REAL STATE. Todos los derechos reservados.</div>
+      <div class="small">© 2026 REGLADO REAL ESTATE. Todos los derechos reservados.</div>
       <div class="footer-legal">
         <router-link to="/legal">Aviso legal y privacidad</router-link>
       </div>

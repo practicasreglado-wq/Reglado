@@ -18,7 +18,7 @@
     <!-- Structural Sidebar -->
     <div class="hero-sidebar">
       <div class="hero-sidebar-line"></div>
-      <span class="hero-sidebar-text">Reglado . Real State</span>
+      <span class="hero-sidebar-text">Reglado . Real Estate</span>
       <div class="hero-sidebar-line"></div>
     </div>
 
@@ -35,7 +35,7 @@
         <div class="hero-title-wrapper animate-in" style="animation-delay: 400ms">
           <h1 class="hero-title">
             Reglado<br />
-            <em class="hero-title-accent">Real State</em>
+            <em class="hero-title-accent">Real Estate</em>
           </h1>
         </div>
 

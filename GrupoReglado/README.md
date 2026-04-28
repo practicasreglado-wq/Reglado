@@ -50,7 +50,7 @@ Ejemplo de produccion:
 
 ```env
 VITE_AUTH_API_URL=https://regladogroup.com
-VITE_REGLADO_REALSTATE_URL=https://realstate.com
+VITE_REGLADO_REALSTATE_URL=https://regladorealestate.com
 VITE_REGLADO_ENERGY_URL=https://regladoenergy.com
 VITE_REGLADO_MAPAS_URL=#
 VITE_REGLADO_ENPROCESO_URL=#

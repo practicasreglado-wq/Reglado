@@ -82,6 +82,17 @@ bootLog('BOOT 22 antes loadEnv');
 loadEnv(__DIR__ . '/.env');
 bootLog('BOOT 23 despues loadEnv');
 
+// Validar token compartido con CloudMailin: rechaza peticiones sin el token
+// correcto antes de tocar BD, SMTP o Claude. CloudMailin debe llamar la URL
+// con ?token=<INBOUND_WEBHOOK_TOKEN>. hash_equals evita timing attacks.
+$expectedWebhookToken = (string) getenv('INBOUND_WEBHOOK_TOKEN');
+$providedWebhookToken = (string) ($_GET['token'] ?? '');
+if ($expectedWebhookToken === '' || !hash_equals($expectedWebhookToken, $providedWebhookToken)) {
+    bootLog('WEBHOOK rechazado por token invalido o ausente');
+    http_response_code(403);
+    exit('forbidden');
+}
+
 bootLog('BOOT 24 antes send_mail.php');
 require_once __DIR__ . '/send_mail.php';
 require_once __DIR__ . '/lib/email_layout.php';

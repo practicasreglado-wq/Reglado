@@ -14,7 +14,7 @@
       <router-link to="/" class="logo-link">
         <div class="logo-wrapper">
           <img src="@/assets/Logo_RegladoRS.svg" alt="Reglado Logo" class="brand-icon" />
-          <h1 class="brand-text">RS</h1>
+          <h1 class="brand-text"><span class="rr-mirror">R</span>R</h1>
         </div>
       </router-link>
     </div>
@@ -785,6 +785,34 @@ header:not(.at-top-home) .admin-badge {
 
 header.at-top-home .brand-icon {
   filter: brightness(0) invert(1);
+}
+
+.rr-mirror {
+  display: inline-block;
+  transform: scaleX(-1);
+  margin-right: 2px;
+  /* El gradient se redefine aquí porque el background-clip del padre no
+     se propaga a un hijo con transform (queda invisible si no). */
+  background: linear-gradient(
+    135deg,
+    #5f4b08 0%,
+    #bd9b2c 20%,
+    #c9a227 45%,
+    #f2d46b 55%,
+    #c6a233 75%,
+    #6e560c 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: #bd9b2c;
+}
+
+header.at-top-home .rr-mirror {
+  background: none;
+  -webkit-text-fill-color: #ffffff;
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
 .brand-text {

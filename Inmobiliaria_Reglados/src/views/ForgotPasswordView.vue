@@ -15,7 +15,7 @@
         <p v-if="success" class="feedback success">{{ success }}</p>
 
         <p v-if="success" class="text-muted helper">
-          Haz clic en el enlace del correo para introducir la nueva contraseña y volver a Reglado RealState.
+          Haz clic en el enlace del correo para introducir la nueva contraseña y volver a Reglado RealEstate.
         </p>
 
         <button class="btn-primary" type="submit" :disabled="loading">
