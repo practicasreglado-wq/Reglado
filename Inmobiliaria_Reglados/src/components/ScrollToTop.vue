@@ -111,7 +111,7 @@ watch(
 .scroll-to-top {
   position: fixed;
   right: 30px;
-  bottom: 80px; /* Raised to avoid overlapping footer text */
+  bottom: 20px;
   z-index: 1200;
   display: inline-flex;
   align-items: center;
@@ -241,7 +241,7 @@ watch(
 @media (max-width: 640px) {
   .scroll-to-top {
     right: 15px;
-    bottom: 75px; /* Raised for mobile */
+    bottom: 25px;
     width: 40px;
     height: 40px;
   }

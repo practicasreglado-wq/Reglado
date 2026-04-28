@@ -12,11 +12,11 @@
   -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
-    script-src 'self' 'unsafe-inline';
+    script-src 'self' 'unsafe-inline' https://chatbot.regladogroup.com;
     style-src 'self' 'unsafe-inline';
     font-src 'self' data:;
     img-src 'self' data: blob: https:;
-    connect-src 'self' http://localhost http://localhost:8000 http://localhost:8002 https://regladogroup.com https://regladorealestate.com;
+    connect-src 'self' http://localhost http://localhost:8000 http://localhost:8002 https://regladogroup.com https://regladorealestate.com https://chatbot.regladogroup.com;
     media-src 'self' blob:;
     base-uri 'self';
     form-action 'self';
@@ -30,6 +30,112 @@
 <body>
   <div id="app"></div>  <!-- Aquí se monta la aplicación Vue -->
 <script type="module" src="/src/main.js"></script>
+ <!-- Chatbot Reglado Real Estate -->
+    <script>
+      window.ChatbotRegladoConfig = {
+        apiUrl: "https://chatbot.regladogroup.com/chat",
+        title: "Asistente Reglado Real Estate",
+        greeting: "¡Hola! Soy el asistente de Reglado Real Estate. ¿En qué puedo ayudarte?",
+        primaryColor: "#bd9b2c",
+        placeholder: "Escribe tu duda aquí...",
+        sendButtonLabel: "Enviar",
+      };
+    </script>
+    <style>
+      /* Chatbot Design — Reglado Real Estate (paleta inmobiliaria) */
+      /* --azul-principal: #1a2545 / --azul-secundario: #4a72c6 / dorado: #bd9b2c → #9b7e1e */
 
+      .cr-chat-window {
+        border: 1px solid rgba(189, 155, 44, 0.25) !important;
+        background: radial-gradient(900px 420px at 12% 10%, rgba(189, 155, 44, 0.08), transparent 60%),
+                    radial-gradient(900px 420px at 88% 0%, rgba(74, 114, 198, 0.08), transparent 62%),
+                    #1a2545 !important;
+        backdrop-filter: blur(20px) !important;
+        border-radius: 20px !important;
+        box-shadow: 0 26px 80px rgba(15, 23, 48, 0.6) !important;
+      }
+      .cr-chat-header {
+        background: linear-gradient(135deg, rgba(189, 155, 44, 0.22), rgba(15, 23, 48, 0.85)) !important;
+        border-bottom: 1px solid rgba(189, 155, 44, 0.3) !important;
+        color: #ffffff !important;
+      }
+      .cr-chat-messages {
+        background: transparent !important;
+      }
+      .cr-chat-bubble {
+        font-family: "Outfit", "Century Gothic", sans-serif !important;
+        border-radius: 14px !important;
+      }
+      .cr-chat-row.bot .cr-chat-bubble {
+        background: rgba(255, 255, 255, 0.06) !important;
+        color: #e9eef6 !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+      }
+      .cr-chat-row.user .cr-chat-bubble {
+        background: linear-gradient(135deg, #4a72c6, #1a2545) !important;
+        color: #ffffff !important;
+        border: 1px solid rgba(189, 155, 44, 0.25) !important;
+      }
+      .cr-chat-footer {
+        background: transparent !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+      }
+      .cr-chat-input-wrapper {
+        background: rgba(255, 255, 255, 0.05) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 12px !important;
+      }
+      .cr-chat-input-wrapper:focus-within {
+        border-color: #bd9b2c !important;
+        box-shadow: 0 0 0 3px rgba(189, 155, 44, 0.18) !important;
+      }
+      .cr-chat-input {
+        color: #e9eef6 !important;
+        scrollbar-width: none !important;
+      }
+      .cr-chat-input::-webkit-scrollbar {
+        display: none !important;
+      }
+      .cr-chat-messages {
+        scrollbar-width: thin !important;
+        scrollbar-color: rgba(189, 155, 44, 0.4) transparent !important;
+      }
+      .cr-chat-messages::-webkit-scrollbar {
+        width: 6px !important;
+      }
+      .cr-chat-messages::-webkit-scrollbar-track {
+        background: transparent !important;
+      }
+      .cr-chat-messages::-webkit-scrollbar-thumb {
+        background: rgba(189, 155, 44, 0.4) !important;
+        border-radius: 999px !important;
+      }
+      .cr-chat-messages::-webkit-scrollbar-thumb:hover {
+        background: rgba(189, 155, 44, 0.65) !important;
+      }
+      .cr-chat-submit {
+        background: linear-gradient(135deg, #bd9b2c, #9b7e1e) !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 12px rgba(189, 155, 44, 0.3) !important;
+        border-radius: 12px !important;
+        border: none !important;
+        font-weight: 600 !important;
+        letter-spacing: 0.02em !important;
+        transition: all 0.25s ease !important;
+      }
+      .cr-chat-submit:hover:not(:disabled) {
+        background: linear-gradient(135deg, #9b7e1e, #7d6418) !important;
+        box-shadow: 0 6px 16px rgba(189, 155, 44, 0.45) !important;
+        transform: translateY(-1px) !important;
+      }
+      .cr-chat-submit:disabled {
+        opacity: 0.5 !important;
+        box-shadow: none !important;
+      }
+      .cr-chat-typing span {
+        background: #bd9b2c !important;
+      }
+    </style>
+    <script src="https://chatbot.regladogroup.com/widget/chatbotReglado.js"></script>
 </body>
 </html>
