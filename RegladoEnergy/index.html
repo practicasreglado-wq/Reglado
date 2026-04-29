@@ -52,6 +52,7 @@
       content="https://regladoenergy.com/og-image.png"
     />
 
+    <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta
       name="twitter:title"
@@ -74,15 +75,35 @@
     <!-- Canonical (se actualiza dinámicamente en la SPA) -->
     <link rel="canonical" href="https://regladoenergy.com/" />
 
-    <!-- Schema.org Organization -->
+    <!-- Schema.org LocalBusiness (Energy tiene dirección física) -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "Organization",
+        "@type": "LocalBusiness",
         "name": "Reglado Energy",
         "url": "https://regladoenergy.com/",
-        "logo": "https://regladoenergy.com/logo.png",
-        "description": "Consultoría energética independiente especializada en la optimización y gestión de contratos de luz y gas."
+        "logo": "https://regladoenergy.com/reglado-logo.png",
+        "image": "https://regladoenergy.com/og-image.png",
+        "description": "Consultoría energética independiente especializada en la optimización y gestión de contratos de luz y gas.",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Avda. Isla Graciosa, 7",
+          "addressLocality": "San Sebastián de los Reyes",
+          "postalCode": "28703",
+          "addressRegion": "Madrid",
+          "addressCountry": "ES"
+        },
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "telephone": "+34 911462674",
+          "contactType": "customer service",
+          "email": "info@regladoenergy.com",
+          "areaServed": "ES",
+          "availableLanguage": ["Spanish"]
+        },
+        "sameAs": [
+          "https://www.linkedin.com/in/reglado-abogados-y-consultores-90b7a0233/"
+        ]
       }
     </script>
   </head>

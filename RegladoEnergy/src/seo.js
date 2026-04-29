@@ -13,6 +13,25 @@ function upsertMeta(attrName, attrValue, content, isProperty = false) {
   el.setAttribute("content", content);
 }
 
+// Normaliza el href:
+//   - Limpia el prefijo `/#/` (residuo del antiguo hash-mode del router) y
+//     cualquier `#fragmento` posterior, que Lighthouse marca como inválido.
+//   - Si el path es relativo, lo monta sobre window.location.origin para
+//     garantizar URL absoluta (requerida por Google y Lighthouse para canonical).
+function normalizeCanonical(href) {
+  if (!href) return href;
+  let path = href.trim();
+  // Quita el primer "#" y la barra inicial duplicada que deja el legacy hash.
+  path = path.replace(/^\/?#\/?/, "/");
+  // Quita cualquier fragmento residual.
+  path = path.split("#")[0];
+  // Si ya es absoluta, devolverla tal cual.
+  if (/^https?:\/\//i.test(path)) return path;
+  if (typeof window === "undefined") return path;
+  if (!path.startsWith("/")) path = "/" + path;
+  return window.location.origin + path;
+}
+
 function setCanonical(href) {
   let link = document.querySelector('link[rel="canonical"]');
   if (!link) {
@@ -20,7 +39,7 @@ function setCanonical(href) {
     link.setAttribute("rel", "canonical");
     document.head.appendChild(link);
   }
-  link.setAttribute("href", href);
+  link.setAttribute("href", normalizeCanonical(href));
 }
 
 export function setSeo({ title, description, canonical, ogImage, ogTitle, ogDescription }) {
@@ -46,9 +65,8 @@ export function setSeo({ title, description, canonical, ogImage, ogTitle, ogDesc
   }
 
   if (canonical) {
-    // If running on localhost, keep canonical relative to avoid wrong domain.
-    // If in production, you can set canonical to your real domain via env.
-    setCanonical(canonical);
-    upsertMeta("property", "og:url", canonical, true);
+    const normalized = normalizeCanonical(canonical);
+    setCanonical(normalized);
+    upsertMeta("property", "og:url", normalized, true);
   }
 }
