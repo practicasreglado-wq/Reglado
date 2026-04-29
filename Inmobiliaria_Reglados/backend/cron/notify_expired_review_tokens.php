@@ -25,6 +25,7 @@ require_once dirname(__DIR__) . '/config/db.php';
 require_once dirname(__DIR__) . '/lib/notifications.php';
 require_once dirname(__DIR__) . '/lib/env_loader.php';
 require_once dirname(__DIR__) . '/lib/email_layout.php';
+require_once dirname(__DIR__) . '/lib/apiloging_client.php';
 require_once dirname(__DIR__) . '/send_mail.php';
 
 loadEnv(dirname(__DIR__) . '/.env');
@@ -56,6 +57,9 @@ function logExpiredTokenJob(string $message, array $context = []): void
 }
 
 try {
+    // Tokens expirados (BD local). El JOIN con users sale por separado vía
+    // ApiLogin para no depender de cross-DB. Resolvemos en batch para que
+    // el cron haga 1 round-trip por ejecución, no 1 por token.
     $sql = "
         SELECT
             t.id,
@@ -64,16 +68,11 @@ try {
             t.expires_at,
             t.expiration_notified_at,
             t.expiration_email_sent_at,
-            u.email,
-            u.first_name,
-            u.last_name,
             p.tipo_propiedad,
             p.ciudad,
             p.zona
-        FROM inmobiliaria.signed_document_review_tokens t
-        INNER JOIN regladousers.users u
-            ON u.id = t.buyer_user_id
-        LEFT JOIN inmobiliaria.propiedades p
+        FROM signed_document_review_tokens t
+        LEFT JOIN propiedades p
             ON p.id = t.property_id
         WHERE t.expires_at IS NOT NULL
         AND t.expires_at < NOW()
@@ -83,13 +82,21 @@ try {
     $stmt = $pdo->query($sql);
     $tokens = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+    $buyerIds = array_values(array_unique(array_filter(array_map(
+        static fn(array $r): int => (int) ($r['buyer_user_id'] ?? 0),
+        $tokens
+    ))));
+    $buyersById = $buyerIds === [] ? [] : apilogingFindManyUsersIndexedById($buyerIds);
+
     foreach ($tokens as $token) {
         $tokenId = (int) ($token['id'] ?? 0);
         $buyerUserId = (int) ($token['buyer_user_id'] ?? 0);
         $propertyId = (int) ($token['property_id'] ?? 0);
-        $email = trim((string) ($token['email'] ?? ''));
-        $firstName = trim((string) ($token['first_name'] ?? ''));
-        $lastName = trim((string) ($token['last_name'] ?? ''));
+
+        $buyer = $buyersById[$buyerUserId] ?? [];
+        $email = trim((string) ($buyer['email'] ?? ''));
+        $firstName = trim((string) ($buyer['first_name'] ?? ''));
+        $lastName = trim((string) ($buyer['last_name'] ?? ''));
 
         if ($tokenId <= 0 || $buyerUserId <= 0) {
             continue;
@@ -119,7 +126,7 @@ try {
                 ]);
 
                 $updateNotif = $pdo->prepare("
-                    UPDATE inmobiliaria.signed_document_review_tokens
+                    UPDATE signed_document_review_tokens
                     SET expiration_notified_at = NOW()
                     WHERE id = :id
                     LIMIT 1
@@ -156,7 +163,7 @@ try {
                 sendNotificationEmail($email, $subject, $body);
 
                 $updateMail = $pdo->prepare("
-                    UPDATE inmobiliaria.signed_document_review_tokens
+                    UPDATE signed_document_review_tokens
                     SET expiration_email_sent_at = NOW()
                     WHERE id = :id
                     LIMIT 1

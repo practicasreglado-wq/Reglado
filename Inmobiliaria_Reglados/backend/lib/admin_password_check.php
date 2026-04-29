@@ -2,9 +2,11 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/error_reporting.php';
+require_once __DIR__ . '/env_loader.php';
+require_once __DIR__ . '/apiloging_client.php';
 
 /**
- * Verifica la contraseña del admin contra regladousers.users y aplica rate
+ * Verifica la contraseña del admin contra ApiLogin (vía HTTP) y aplica rate
  * limit por scope (5 intentos fallidos en 15 minutos).
  *
  * Si la contraseña es válida → limpia el contador y devuelve el control.
@@ -15,6 +17,10 @@ require_once __DIR__ . '/error_reporting.php';
  * ID de admin y el scope único de la acción (ej. 'admin_appointment_action',
  * 'admin_role_approve', etc.) — el scope permite tener contadores de rate
  * limit separados por acción.
+ *
+ * Antes hacíamos PDO directo a regladousers.users; ahora ApiLogin valida
+ * la contraseña por HTTP. La tabla de rate_limits sí sigue siendo local
+ * (inmobiliaria.rate_limits) — cada servicio gestiona su propio throttle.
  */
 function requireAdminPasswordConfirmation(int $adminId, string $adminPassword, string $scope): void
 {
@@ -26,9 +32,9 @@ function requireAdminPasswordConfirmation(int $adminId, string $adminPassword, s
     }
 
     try {
-        $pdoAuth = new PDO(
+        $rlPdo = new PDO(
             sprintf(
-                'mysql:host=%s;port=%s;dbname=regladousers;charset=utf8mb4',
+                'mysql:host=%s;port=%s;dbname=' . dbNameInmobiliaria() . ';charset=utf8mb4',
                 (string) getenv('DB_HOST'),
                 (string) getenv('DB_PORT')
             ),
@@ -41,7 +47,7 @@ function requireAdminPasswordConfirmation(int $adminId, string $adminPassword, s
         $rateWindowSeconds = 900;
         $rateMaxFailures = 5;
 
-        $rlRead = $pdoAuth->prepare('SELECT id, attempts, updated_at FROM rate_limits WHERE key_hash = ? AND scope_name = ? LIMIT 1');
+        $rlRead = $rlPdo->prepare('SELECT id, attempts, updated_at FROM rate_limits WHERE key_hash = ? AND scope_name = ? LIMIT 1');
         $rlRead->execute([$rateKeyHash, $scope]);
         $rlRow = $rlRead->fetch();
 
@@ -55,20 +61,18 @@ function requireAdminPasswordConfirmation(int $adminId, string $adminPassword, s
             ]);
         }
 
-        $adminStmt = $pdoAuth->prepare('SELECT password FROM users WHERE id = :id LIMIT 1');
-        $adminStmt->execute(['id' => $adminId]);
-        $adminRow = $adminStmt->fetch();
+        $passwordValid = apilogingVerifyUserPassword($adminId, $adminPassword);
 
-        if (!$adminRow || !password_verify($adminPassword, (string) $adminRow['password'])) {
+        if (!$passwordValid) {
             if (!$rlRow) {
-                $pdoAuth->prepare('INSERT INTO rate_limits(key_hash, scope_name, attempts, updated_at, created_at) VALUES(?, ?, 1, NOW(), NOW())')
-                        ->execute([$rateKeyHash, $scope]);
+                $rlPdo->prepare('INSERT INTO rate_limits(key_hash, scope_name, attempts, updated_at, created_at) VALUES(?, ?, 1, NOW(), NOW())')
+                      ->execute([$rateKeyHash, $scope]);
             } elseif (!$withinWindow) {
-                $pdoAuth->prepare('UPDATE rate_limits SET attempts = 1, updated_at = NOW() WHERE id = ?')
-                        ->execute([(int) $rlRow['id']]);
+                $rlPdo->prepare('UPDATE rate_limits SET attempts = 1, updated_at = NOW() WHERE id = ?')
+                      ->execute([(int) $rlRow['id']]);
             } else {
-                $pdoAuth->prepare('UPDATE rate_limits SET attempts = attempts + 1, updated_at = NOW() WHERE id = ?')
-                        ->execute([(int) $rlRow['id']]);
+                $rlPdo->prepare('UPDATE rate_limits SET attempts = attempts + 1, updated_at = NOW() WHERE id = ?')
+                      ->execute([(int) $rlRow['id']]);
             }
             respondJson(401, [
                 'success' => false,
@@ -77,8 +81,8 @@ function requireAdminPasswordConfirmation(int $adminId, string $adminPassword, s
         }
 
         // Contraseña correcta: limpiar contador
-        $pdoAuth->prepare('DELETE FROM rate_limits WHERE key_hash = ? AND scope_name = ?')
-                ->execute([$rateKeyHash, $scope]);
+        $rlPdo->prepare('DELETE FROM rate_limits WHERE key_hash = ? AND scope_name = ?')
+              ->execute([$rateKeyHash, $scope]);
     } catch (Throwable $e) {
         $errorId = logAndReferenceError('admin_password_check.' . $scope, $e);
         respondJson(500, [

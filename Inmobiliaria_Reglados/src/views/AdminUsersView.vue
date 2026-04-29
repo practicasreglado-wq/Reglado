@@ -183,7 +183,8 @@
 
 <script>
 import { ref, computed, onMounted } from "vue";
-import { fetchInmoUsers, updateUserRole } from "../services/admin";
+import { fetchInmoUsers } from "../services/admin";
+import { updateUserRole } from "../services/users";
 
 export default {
   name: "AdminUsersView",

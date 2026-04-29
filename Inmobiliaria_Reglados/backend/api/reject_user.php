@@ -18,6 +18,7 @@ require_once dirname(__DIR__) . '/lib/notifications_helper.php';
 require_once dirname(__DIR__) . '/lib/audit.php';
 require_once dirname(__DIR__) . '/lib/email_layout.php';
 require_once dirname(__DIR__) . '/lib/error_reporting.php';
+require_once dirname(__DIR__) . '/lib/apiloging_client.php';
 
 loadEnv(dirname(__DIR__) . '/.env');
 
@@ -35,21 +36,12 @@ $dbUser = (string) getenv('DB_USER');
 $dbPass = (string) getenv('DB_PASS');
 
 $pdoInmo = null;
-$pdoAuth = null;
+$userRow = null;
+$userEmail = '';
 
 try {
     $pdoInmo = new PDO(
-        "mysql:host={$host};port={$port};dbname=inmobiliaria;charset=utf8mb4",
-        $dbUser,
-        $dbPass,
-        [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        ]
-    );
-
-    $pdoAuth = new PDO(
-        "mysql:host={$host};port={$port};dbname=regladousers;charset=utf8mb4",
+        "mysql:host={$host};port={$port};dbname=" . dbNameInmobiliaria() . ";charset=utf8mb4",
         $dbUser,
         $dbPass,
         [
@@ -59,7 +51,6 @@ try {
     );
 
     $pdoInmo->beginTransaction();
-    $pdoAuth->beginTransaction();
 
     $tokenHash = hash('sha256', $token);
 
@@ -76,21 +67,14 @@ try {
     $userEmail = $request ? (string) $request['user_email'] : '';
 
     if (!$request) {
-        $pdoAuth->rollBack();
         $pdoInmo->rollBack();
-
         echo "<h1 style='color:orange;font-family:sans-serif;'>Esta solicitud ya ha sido procesada o el enlace no es válido.</h1>";
         exit;
     }
 
-    $stmtUser = $pdoAuth->prepare("
-        SELECT id, email
-        FROM users
-        WHERE email = ?
-        LIMIT 1
-    ");
-    $stmtUser->execute([$userEmail]);
-    $userRow = $stmtUser->fetch();
+    // Lookup del usuario (no obligatorio: si no existe seguimos rechazando
+    // la solicitud, simplemente la notificación in-app no apunta a user_id).
+    $userRow = apilogingFindUserByEmail($userEmail);
 
     $stmtMarkResolved = $pdoInmo->prepare("
         UPDATE role_promotion_requests
@@ -109,7 +93,6 @@ try {
         'link'       => '/profile',
     ]);
 
-    $pdoAuth->commit();
     $pdoInmo->commit();
 
     auditLog($pdoInmo, 'role.promotion.reject', [
@@ -120,10 +103,6 @@ try {
     ]);
 
 } catch (Throwable $e) {
-    if ($pdoAuth instanceof PDO && $pdoAuth->inTransaction()) {
-        $pdoAuth->rollBack();
-    }
-
     if ($pdoInmo instanceof PDO && $pdoInmo->inTransaction()) {
         $pdoInmo->rollBack();
     }

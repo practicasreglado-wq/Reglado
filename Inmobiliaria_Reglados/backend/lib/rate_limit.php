@@ -1,12 +1,14 @@
 <?php
 declare(strict_types=1);
 
+require_once __DIR__ . '/env_loader.php';
+
 /**
  * Rate limit genérico por clave (IP, user id, email, etc.).
  *
- * Usa la tabla `regladousers.rate_limits` (la misma que ya consume el sistema
- * de auth y los otros endpoints que aplican rate limit). La tabla tiene la
- * forma: (key_hash, scope_name, attempts, updated_at, created_at).
+ * Usa la tabla `inmobiliaria.rate_limits` (propia del servicio de
+ * inmobiliaria; ApiLogin tiene la suya separada en regladousers). La tabla
+ * tiene la forma: (key_hash, scope_name, attempts, updated_at, created_at).
  *
  * - $scope: nombre único de la acción (ej. 'property_listing',
  *   'purchase_request'). Permite contadores independientes por acción.
@@ -32,7 +34,7 @@ function enforceIpRateLimit(string $scope, string $identifier, int $maxAttempts,
     try {
         $rlPdo = new PDO(
             sprintf(
-                'mysql:host=%s;port=%s;dbname=regladousers;charset=utf8mb4',
+                'mysql:host=%s;port=%s;dbname=' . dbNameInmobiliaria() . ';charset=utf8mb4',
                 (string) getenv('DB_HOST'),
                 (string) getenv('DB_PORT')
             ),

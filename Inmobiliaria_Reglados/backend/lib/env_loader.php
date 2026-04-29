@@ -71,3 +71,17 @@ function loadEnv(string $path): void
         $_SERVER[$name] = $value;
     }
 }
+
+/**
+ * Devuelve el nombre real de la BD principal (inmobiliaria) según el entorno.
+ * En local suele ser 'inmobiliaria'; en producción Hostinger lleva prefijo
+ * tipo 'u123456_inmobiliaria'. Se usa para construir DSN PDO y para resolver
+ * nombres en SQL que usen el alias `inmobiliaria.` (ver DbAliasPdo en
+ * config/db.php).
+ */
+if (!function_exists('dbNameInmobiliaria')) {
+    function dbNameInmobiliaria(): string
+    {
+        return (string) (getenv('DB_NAME') ?: 'inmobiliaria');
+    }
+}

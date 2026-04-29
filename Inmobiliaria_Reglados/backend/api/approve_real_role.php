@@ -6,13 +6,18 @@ declare(strict_types=1);
  *
  * El admin llega aquí desde el email enviado por send_real_user_request.php
  * con un token en query string. Si es válido y la solicitud sigue pendiente:
- *  1) Sube el rol del usuario a 'real' en regladousers.users.
+ *  1) Sube el rol del usuario a 'real' vía ApiLogin (HTTP).
  *  2) Marca la fila de role_promotion_requests como resolved (approved).
  *  3) Notifica al usuario (in-app + email) de la aprobación.
  *
- * Trabaja con DOS bases de datos en transacciones separadas (inmobiliaria y
- * regladousers) — si la segunda falla, la primera se rollbackea para evitar
- * estados inconsistentes.
+ * Solo abre transacción contra la BD local (inmobiliaria). El cambio de
+ * rol en ApiLogin se hace primero — si falla, la solicitud queda 'pending'
+ * y se puede reintentar. Si el cambio de rol va bien pero algo local
+ * falla después (notification, audit), el rol queda promovido pero la
+ * solicitud revertida — coste aceptable: en el peor caso el admin ve la
+ * solicitud aún pending y al volver a aprobar es no-op.
+ *
+ * Si el target ya es 'real' o 'admin', salta el cambio de rol.
  *
  * Devuelve HTML directo (no JSON) porque se accede desde el navegador del
  * admin, no desde la SPA.
@@ -23,6 +28,7 @@ require_once dirname(__DIR__) . '/lib/notifications_helper.php';
 require_once dirname(__DIR__) . '/lib/audit.php';
 require_once dirname(__DIR__) . '/lib/email_layout.php';
 require_once dirname(__DIR__) . '/lib/error_reporting.php';
+require_once dirname(__DIR__) . '/lib/apiloging_client.php';
 
 loadEnv(dirname(__DIR__) . '/.env');
 
@@ -40,12 +46,13 @@ $user = (string) getenv('DB_USER');
 $pass = (string) getenv('DB_PASS');
 
 $pdoInmo = null;
-$pdoAuth = null;
 $stmtUpdateUserRowCount = 0;
+$userRow = null;
+$email = '';
 
 try {
     $pdoInmo = new PDO(
-        "mysql:host={$host};port={$port};dbname=inmobiliaria;charset=utf8mb4",
+        "mysql:host={$host};port={$port};dbname=" . dbNameInmobiliaria() . ";charset=utf8mb4",
         $user,
         $pass,
         [
@@ -54,18 +61,10 @@ try {
         ]
     );
 
-    $pdoAuth = new PDO(
-        "mysql:host={$host};port={$port};dbname=regladousers;charset=utf8mb4",
-        $user,
-        $pass,
-        [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        ]
-    );
-
+    // Solo abrimos transacción en inmobiliaria. ApiLogin gestiona su propia
+    // BD vía HTTP — si la llamada al cambio de rol falla, atrapamos el error
+    // y rollbackeamos la BD local sin haber tocado la suya.
     $pdoInmo->beginTransaction();
-    $pdoAuth->beginTransaction();
 
     $tokenHash = hash('sha256', $token);
 
@@ -82,38 +81,34 @@ try {
     $email = $request ? (string) $request['user_email'] : '';
 
     if (!$request) {
-        $pdoAuth->rollBack();
         $pdoInmo->rollBack();
-
         echo "<h1 style='color:orange;font-family:sans-serif;'>Esta solicitud ya ha sido procesada o el enlace no es válido.</h1>";
         exit;
     }
 
-    $stmtUser = $pdoAuth->prepare("
-        SELECT id, role, email
-        FROM users
-        WHERE email = ?
-        LIMIT 1
-    ");
-    $stmtUser->execute([$email]);
-    $userRow = $stmtUser->fetch();
+    $userRow = apilogingFindUserByEmail($email);
 
     if (!$userRow) {
-        $pdoAuth->rollBack();
         $pdoInmo->rollBack();
-
         http_response_code(404);
         echo "<h1 style='color:red;font-family:sans-serif;'>No se ha encontrado el usuario en la base de datos de autenticación.</h1>";
         exit;
     }
 
-    $stmtUpdateUser = $pdoAuth->prepare("
-        UPDATE users
-        SET role = 'real'
-        WHERE email = ?
-    ");
-    $stmtUpdateUser->execute([$email]);
-    $stmtUpdateUserRowCount = $stmtUpdateUser->rowCount();
+    // Cambiar el rol en ApiLogin ANTES de marcar resuelta la solicitud:
+    // si el cambio falla, queremos que la solicitud siga 'pending' para que
+    // se pueda reintentar. Si tras tocar ApiLogin falla algo en local
+    // (notification, audit), el rol en ApiLogin queda promovido pero la
+    // solicitud local revertida — coste aceptable, en el peor caso el admin
+    // ve la solicitud todavía pending y al volver a aprobar es no-op.
+    //
+    // Si el usuario ya es 'real' o 'admin' saltamos el update (no-op
+    // funcional + evita el 409 'cannot demote last admin' de ApiLogin).
+    $currentRole = strtolower((string) ($userRow['role'] ?? ''));
+    if (!in_array($currentRole, ['real', 'admin'], true)) {
+        apilogingUpdateUserRole((int) $userRow['id'], 'real');
+    }
+    $stmtUpdateUserRowCount = 1;
 
     $stmtMarkResolved = $pdoInmo->prepare("
         UPDATE role_promotion_requests
@@ -132,7 +127,6 @@ try {
         'link'       => '/profile',
     ]);
 
-    $pdoAuth->commit();
     $pdoInmo->commit();
 
     auditLog($pdoInmo, 'role.promotion.approve', [
@@ -143,10 +137,6 @@ try {
     ]);
 
 } catch (Throwable $e) {
-    if ($pdoAuth instanceof PDO && $pdoAuth->inTransaction()) {
-        $pdoAuth->rollBack();
-    }
-
     if ($pdoInmo instanceof PDO && $pdoInmo->inTransaction()) {
         $pdoInmo->rollBack();
     }

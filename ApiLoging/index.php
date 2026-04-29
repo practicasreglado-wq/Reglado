@@ -95,6 +95,22 @@ if ($uri === '/auth/admin/users' && $method === 'GET') {
     AuthController::adminUsers();
 }
 
+if ($uri === '/auth/admin/users/by-id' && $method === 'GET') {
+    AuthController::adminUserById();
+}
+
+if ($uri === '/auth/admin/users/by-email' && $method === 'GET') {
+    AuthController::adminUserByEmail();
+}
+
+if ($uri === '/auth/admin/users-batch' && $method === 'POST') {
+    AuthController::adminUsersBatch();
+}
+
+if ($uri === '/auth/admin/verify-password' && $method === 'POST') {
+    AuthController::adminVerifyPassword();
+}
+
 if ($uri === '/auth/admin/update-role' && $method === 'POST') {
     AuthController::adminUpdateRole();
 }

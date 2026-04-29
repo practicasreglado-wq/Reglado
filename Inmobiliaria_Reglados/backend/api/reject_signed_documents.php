@@ -23,6 +23,7 @@ require_once __DIR__ . '/../lib/notifications.php';
 require_once __DIR__ . '/../lib/audit.php';
 require_once __DIR__ . '/../lib/email_layout.php';
 require_once __DIR__ . '/../lib/error_reporting.php';
+require_once __DIR__ . '/../lib/apiloging_client.php';
 require_once __DIR__ . '/../config/cors.php';
 
 applyCors();
@@ -90,14 +91,7 @@ if (!empty($review['is_expired'])) {
         ]);
     }
 
-    $stmtUser = $pdo->prepare('
-        SELECT id, email, name, first_name, last_name
-        FROM regladousers.users
-        WHERE id = :id
-        LIMIT 1
-    ');
-    $stmtUser->execute(['id' => $buyerUserId]);
-    $buyerUserRecord = $stmtUser->fetch(PDO::FETCH_ASSOC);
+    $buyerUserRecord = apilogingFindUserById($buyerUserId);
 
     if (
         $buyerUserRecord &&
@@ -185,14 +179,7 @@ try {
         ]);
     }
 
-    $userStmt = $pdo->prepare('
-        SELECT id, email, name, first_name, last_name
-        FROM regladousers.users
-        WHERE id = :id
-        LIMIT 1
-    ');
-    $userStmt->execute(['id' => $buyerUserId]);
-    $buyerUserRecord = $userStmt->fetch(PDO::FETCH_ASSOC);
+    $buyerUserRecord = apilogingFindUserById($buyerUserId);
 
     $pdo->commit();
 

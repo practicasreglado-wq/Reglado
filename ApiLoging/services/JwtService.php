@@ -73,4 +73,35 @@ class JwtService
 
         return $decoded;
     }
+
+    /**
+     * Verifica un Service JWT (servicio-a-servicio, p.ej. inmobiliaria
+     * llamando a /auth/admin/*).
+     *
+     * Usa SERVICE_JWT_SECRET (NO JWT_SECRET) para que el secreto que
+     * comparte un servicio externo no sirva para mintear JWTs de
+     * usuarios humanos. Si el servidor que mintea Service JWTs se ve
+     * comprometido, el atacante NO puede suplantar admins en ApiLogin.
+     *
+     * Si SERVICE_JWT_SECRET no está configurado en el entorno, lanza
+     * RuntimeException — no hay fallback al JWT_SECRET de usuarios
+     * para evitar regresiones de seguridad silenciosas.
+     */
+    public static function verifyService(string $token): array
+    {
+        $secret = getenv('SERVICE_JWT_SECRET') ?: '';
+        if ($secret === '') {
+            throw new RuntimeException('SERVICE_JWT_SECRET not configured');
+        }
+        $expectedIssuer = getenv('JWT_ISSUER') ?: 'reglado-auth';
+
+        $decoded = (array) JWT::decode($token, new Key($secret, 'HS256'));
+
+        $issuer = (string) ($decoded['iss'] ?? '');
+        if ($issuer !== $expectedIssuer) {
+            throw new RuntimeException('jwt issuer mismatch');
+        }
+
+        return $decoded;
+    }
 }

@@ -265,6 +265,21 @@ CREATE TABLE `purchase_requests` (
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `rate_limits`
+--
+
+CREATE TABLE `rate_limits` (
+  `id` int(11) NOT NULL,
+  `key_hash` char(64) NOT NULL,
+  `scope_name` varchar(100) NOT NULL,
+  `attempts` int(11) NOT NULL DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `role_promotion_requests`
 --
 
@@ -472,6 +487,14 @@ ALTER TABLE `purchase_requests`
   ADD KEY `idx_created` (`created_at`);
 
 --
+-- Indices de la tabla `rate_limits`
+--
+ALTER TABLE `rate_limits`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uniq_key_hash` (`key_hash`),
+  ADD KEY `idx_scope_updated` (`scope_name`,`updated_at`);
+
+--
 -- Indices de la tabla `role_promotion_requests`
 --
 ALTER TABLE `role_promotion_requests`
@@ -592,6 +615,12 @@ ALTER TABLE `purchase_appointments`
 --
 ALTER TABLE `purchase_requests`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+
+--
+-- AUTO_INCREMENT de la tabla `rate_limits`
+--
+ALTER TABLE `rate_limits`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `role_promotion_requests`

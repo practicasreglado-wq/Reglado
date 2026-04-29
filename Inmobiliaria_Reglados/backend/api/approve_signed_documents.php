@@ -25,6 +25,7 @@ require_once __DIR__ . '/../lib/notifications.php';
 require_once __DIR__ . '/../lib/audit.php';
 require_once __DIR__ . '/../lib/email_layout.php';
 require_once __DIR__ . '/../lib/error_reporting.php';
+require_once __DIR__ . '/../lib/apiloging_client.php';
 require_once __DIR__ . '/../config/cors.php';
 
 applyCors();
@@ -98,14 +99,7 @@ if (!empty($review['is_expired'])) {
         ]);
     }
 
-    $stmtUser = $pdo->prepare('
-        SELECT id, email, name, first_name, last_name
-        FROM regladousers.users
-        WHERE id = :id
-        LIMIT 1
-    ');
-    $stmtUser->execute(['id' => $buyerUserId]);
-    $buyerUserRecord = $stmtUser->fetch(PDO::FETCH_ASSOC);
+    $buyerUserRecord = apilogingFindUserById($buyerUserId);
 
     if (
         $buyerUserRecord &&
@@ -178,19 +172,7 @@ try {
         'rowCount' => $updateDocStmt->rowCount(),
     ]);
 
-    $userStmt = $pdo->prepare('
-        SELECT 
-            id,
-            email,
-            name,
-            first_name,
-            last_name
-        FROM regladousers.users
-        WHERE id = :id
-        LIMIT 1
-    ');
-    $userStmt->execute(['id' => $buyerUserId]);
-    $buyerUserRecord = $userStmt->fetch(PDO::FETCH_ASSOC);
+    $buyerUserRecord = apilogingFindUserById($buyerUserId);
 
     approveDebug('BUYER USER RECORD', $buyerUserRecord);
 
@@ -204,9 +186,7 @@ try {
     $approverId = null;
     $reviewerEmailStored = (string) ($review['reviewer_email'] ?? '');
     if ($reviewerEmailStored !== '') {
-        $approverStmt = $pdo->prepare('SELECT id FROM regladousers.users WHERE email = :email LIMIT 1');
-        $approverStmt->execute(['email' => $reviewerEmailStored]);
-        $approverRow = $approverStmt->fetch(PDO::FETCH_ASSOC);
+        $approverRow = apilogingFindUserByEmail($reviewerEmailStored);
         $approverId = $approverRow ? (int) $approverRow['id'] : null;
     }
 

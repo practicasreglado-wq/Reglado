@@ -251,16 +251,6 @@ export async function fetchInmoUsers(mode = "active") {
   return payload;
 }
 
-export async function updateUserRole(userId, newRole, adminPassword) {
-  const response = await fetch(`${API_BASE}/update_user_role.php`, {
-    method: "POST",
-    credentials: "include",
-    headers: { "Content-Type": "application/json", ...auth.authHeaders() },
-    body: JSON.stringify({ user_id: userId, role: newRole, admin_password: adminPassword }),
-  });
-  return response.json();
-}
-
 export async function fetchAuditLog(params = {}) {
   const query = new URLSearchParams();
   if (params.page) query.set("page", String(params.page));

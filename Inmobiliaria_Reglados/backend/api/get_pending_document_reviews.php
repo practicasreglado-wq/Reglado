@@ -14,6 +14,7 @@ require_once dirname(__DIR__) . '/config/auth.php';
 require_once __DIR__ . '/../config/cors.php';
 require_once dirname(__DIR__) . '/lib/audit.php';
 require_once dirname(__DIR__) . '/lib/error_reporting.php';
+require_once dirname(__DIR__) . '/lib/apiloging_client.php';
 
 applyCors();
 handlePreflight();
@@ -27,6 +28,8 @@ if ($role !== 'admin') {
 }
 
 try {
+    // Datos locales (tokens + propiedad + documentos firmados). El JOIN con
+    // users sale por separado vía ApiLogin para no depender de cross-DB.
     $stmt = $pdo->prepare("
         SELECT
             t.id,
@@ -40,24 +43,35 @@ try {
             p.ciudad          AS property_city,
             p.zona            AS property_zone,
             df.nda_file_path  AS nda_file_path,
-            df.loi_file_path  AS loi_file_path,
-            u.email           AS buyer_email,
-            u.username        AS buyer_username,
-            u.first_name      AS buyer_first_name,
-            u.last_name       AS buyer_last_name,
-            u.phone           AS buyer_phone
+            df.loi_file_path  AS loi_file_path
         FROM signed_document_review_tokens t
-        LEFT JOIN inmobiliaria.propiedades p  ON p.id = t.property_id
-        LEFT JOIN inmobiliaria.documentos_firmados df
+        LEFT JOIN propiedades p  ON p.id = t.property_id
+        LEFT JOIN documentos_firmados df
                ON df.propiedad_id = t.property_id
               AND df.user_id = t.buyer_user_id
-        LEFT JOIN regladousers.users u        ON u.id = t.buyer_user_id
         WHERE t.approved_at IS NULL
           AND t.expires_at > NOW()
         ORDER BY t.created_at DESC, t.id DESC
     ");
     $stmt->execute();
     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Resolución batch de buyers vía ApiLogin.
+    $buyerIds = array_values(array_unique(array_filter(array_map(
+        static fn(array $r): int => (int) ($r['buyer_user_id'] ?? 0),
+        $rows
+    ))));
+    $buyersById = $buyerIds === [] ? [] : apilogingFindManyUsersIndexedById($buyerIds);
+
+    foreach ($rows as &$row) {
+        $buyer = $buyersById[(int) ($row['buyer_user_id'] ?? 0)] ?? null;
+        $row['buyer_email']      = $buyer['email'] ?? null;
+        $row['buyer_username']   = $buyer['username'] ?? null;
+        $row['buyer_first_name'] = $buyer['first_name'] ?? null;
+        $row['buyer_last_name']  = $buyer['last_name'] ?? null;
+        $row['buyer_phone']      = $buyer['phone'] ?? null;
+    }
+    unset($row);
 
     auditLog($pdo, 'admin.list_pending_document_reviews', array_merge(
         auditContextFromAuth($auth),

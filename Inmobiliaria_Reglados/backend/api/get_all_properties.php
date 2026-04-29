@@ -17,6 +17,7 @@ require_once dirname(__DIR__) . '/config/auth.php';
 require_once __DIR__ . '/../config/cors.php';
 require_once dirname(__DIR__) . '/lib/audit.php';
 require_once dirname(__DIR__) . '/lib/error_reporting.php';
+require_once dirname(__DIR__) . '/lib/apiloging_client.php';
 
 applyCors();
 handlePreflight();
@@ -34,35 +35,44 @@ if ($role !== 'admin') {
 }
 
 try {
-    $query = "
-        SELECT
-            p.*,
-
-            owner.id AS owner_id,
-            owner.username AS owner_username,
-            owner.email AS owner_email,
-            owner.first_name AS owner_first_name,
-            owner.last_name AS owner_last_name,
-            owner.phone AS owner_phone,
-
-            creator.id AS creator_id,
-            creator.username AS creator_username,
-            creator.email AS creator_email,
-            creator.first_name AS creator_first_name,
-            creator.last_name AS creator_last_name,
-            creator.phone AS creator_phone
-
-        FROM inmobiliaria.propiedades p
-        LEFT JOIN regladousers.users owner
-            ON p.owner_user_id = owner.id
-        LEFT JOIN regladousers.users creator
-            ON p.created_by_user_id = creator.id
-        ORDER BY p.created_at DESC
-    ";
-
-    $stmt = $pdo->prepare($query);
+    // Lectura de propiedades (BD local) + JOIN cross-service con users vía
+    // ApiLogin. Se hace en dos pasos: primero traemos propiedades, luego
+    // resolvemos los user_ids únicos (owner + creator) en una sola batch
+    // request a ApiLogin, y finalmente joinamos en PHP.
+    $stmt = $pdo->prepare('SELECT p.* FROM propiedades p ORDER BY p.created_at DESC');
     $stmt->execute();
-    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $rawProps = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $userIds = [];
+    foreach ($rawProps as $row) {
+        if (!empty($row['owner_user_id']))      $userIds[] = (int) $row['owner_user_id'];
+        if (!empty($row['created_by_user_id'])) $userIds[] = (int) $row['created_by_user_id'];
+    }
+    $usersById = $userIds === [] ? [] : apilogingFindManyUsersIndexedById(array_unique($userIds));
+
+    // Pre-procesa cada fila añadiéndole los campos owner_* y creator_* que el
+    // resto del bloque (sin cambios) espera consumir.
+    $rows = [];
+    foreach ($rawProps as $row) {
+        $owner   = $usersById[(int) ($row['owner_user_id'] ?? 0)] ?? null;
+        $creator = $usersById[(int) ($row['created_by_user_id'] ?? 0)] ?? null;
+
+        $row['owner_id']         = $owner['id'] ?? null;
+        $row['owner_username']   = $owner['username'] ?? null;
+        $row['owner_email']      = $owner['email'] ?? null;
+        $row['owner_first_name'] = $owner['first_name'] ?? null;
+        $row['owner_last_name']  = $owner['last_name'] ?? null;
+        $row['owner_phone']      = $owner['phone'] ?? null;
+
+        $row['creator_id']         = $creator['id'] ?? null;
+        $row['creator_username']   = $creator['username'] ?? null;
+        $row['creator_email']      = $creator['email'] ?? null;
+        $row['creator_first_name'] = $creator['first_name'] ?? null;
+        $row['creator_last_name']  = $creator['last_name'] ?? null;
+        $row['creator_phone']      = $creator['phone'] ?? null;
+
+        $rows[] = $row;
+    }
 
     $properties = [];
 

@@ -24,6 +24,7 @@ require_once dirname(__DIR__) . '/lib/audit.php';
 require_once dirname(__DIR__) . '/lib/email_layout.php';
 require_once dirname(__DIR__) . '/lib/error_reporting.php';
 require_once dirname(__DIR__) . '/lib/admin_password_check.php';
+require_once dirname(__DIR__) . '/lib/apiloging_client.php';
 require_once dirname(__DIR__) . '/send_mail.php';
 
 loadEnv(dirname(__DIR__) . '/.env');
@@ -125,9 +126,7 @@ try {
         error_log('[approve_document_review_admin] notificación falló: ' . $e->getMessage());
     }
 
-    $buyerStmt = $pdo->prepare('SELECT email FROM regladousers.users WHERE id = :id LIMIT 1');
-    $buyerStmt->execute(['id' => $buyerUserId]);
-    $buyerRow = $buyerStmt->fetch(PDO::FETCH_ASSOC);
+    $buyerRow = apilogingFindUserById($buyerUserId);
     $buyerEmail = $buyerRow['email'] ?? null;
 
     $pdo->commit();

@@ -1,8 +1,10 @@
 <?php
 declare(strict_types=1);
 
+require_once __DIR__ . '/env_loader.php';
 require_once __DIR__ . '/notifications.php';
 require_once __DIR__ . '/email_layout.php';
+require_once __DIR__ . '/apiloging_client.php';
 require_once dirname(__DIR__) . '/send_mail.php';
 
 /**
@@ -171,9 +173,14 @@ HTML
 function fetchAdminUsersForDeletion(): array
 {
     try {
-        $pdoAuth = openRegladoUsersConnection();
-        $stmt = $pdoAuth->query("SELECT id, email FROM users WHERE LOWER(role) = 'admin'");
-        return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        $allUsers = apilogingListAllUsers();
+        $admins = array_values(array_filter($allUsers, static function (array $u): bool {
+            return strtolower((string) ($u['role'] ?? '')) === 'admin';
+        }));
+        // Normaliza al shape antiguo (id, email) que el caller espera.
+        return array_map(static function (array $u): array {
+            return ['id' => (int) ($u['id'] ?? 0), 'email' => $u['email'] ?? null];
+        }, $admins);
     } catch (Throwable $e) {
         error_log('[property_deletion] No se pudieron cargar admins: ' . $e->getMessage());
         return [];
@@ -184,10 +191,8 @@ function fetchUserEmailById(int $userId): ?string
 {
     if ($userId <= 0) return null;
     try {
-        $pdoAuth = openRegladoUsersConnection();
-        $stmt = $pdoAuth->prepare('SELECT email FROM users WHERE id = :id LIMIT 1');
-        $stmt->execute(['id' => $userId]);
-        $email = trim((string) ($stmt->fetchColumn() ?: ''));
+        $user = apilogingFindUserById($userId);
+        $email = trim((string) ($user['email'] ?? ''));
         return ($email !== '' && filter_var($email, FILTER_VALIDATE_EMAIL)) ? $email : null;
     } catch (Throwable $e) {
         error_log('[property_deletion] fetchUserEmailById: ' . $e->getMessage());
@@ -199,10 +204,7 @@ function fetchUserDisplayById(int $userId): array
 {
     if ($userId <= 0) return ['email' => null, 'name' => ''];
     try {
-        $pdoAuth = openRegladoUsersConnection();
-        $stmt = $pdoAuth->prepare('SELECT email, first_name, last_name, username FROM users WHERE id = :id LIMIT 1');
-        $stmt->execute(['id' => $userId]);
-        $row = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+        $row = apilogingFindUserById($userId) ?? [];
         $name = trim(trim((string) ($row['first_name'] ?? '')) . ' ' . trim((string) ($row['last_name'] ?? '')));
         if ($name === '') {
             $name = (string) ($row['username'] ?? '');
@@ -215,18 +217,4 @@ function fetchUserDisplayById(int $userId): array
         error_log('[property_deletion] fetchUserDisplayById: ' . $e->getMessage());
         return ['email' => null, 'name' => ''];
     }
-}
-
-function openRegladoUsersConnection(): PDO
-{
-    return new PDO(
-        sprintf(
-            'mysql:host=%s;port=%s;dbname=regladousers;charset=utf8mb4',
-            (string) getenv('DB_HOST'),
-            (string) getenv('DB_PORT')
-        ),
-        (string) getenv('DB_USER'),
-        (string) getenv('DB_PASS'),
-        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]
-    );
 }

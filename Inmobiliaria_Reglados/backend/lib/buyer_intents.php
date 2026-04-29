@@ -1,8 +1,10 @@
 <?php
 declare(strict_types=1);
 
+require_once __DIR__ . '/env_loader.php';
 require_once __DIR__ . '/notifications.php';
 require_once __DIR__ . '/email_layout.php';
+require_once __DIR__ . '/apiloging_client.php';
 require_once dirname(__DIR__) . '/send_mail.php';
 
 /**
@@ -172,32 +174,18 @@ function fetchBuyerIntentDetails(PDO $pdo, int $intentId): ?array
  */
 function notifyUsersAboutBuyerIntent(PDO $pdo, int $intentId, int $buyerUserId, string $summary, ?string $category): int
 {
-    $dbHost = (string) getenv('DB_HOST');
-    $dbPort = (string) getenv('DB_PORT');
-    $dbUser = (string) getenv('DB_USER');
-    $dbPass = (string) getenv('DB_PASS');
-
     try {
-        $usersPdo = new PDO(
-            sprintf('mysql:host=%s;port=%s;dbname=regladousers;charset=utf8mb4', $dbHost, $dbPort),
-            $dbUser,
-            $dbPass,
-            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]
-        );
+        $allUsers = apilogingListAllUsers();
     } catch (Throwable $e) {
-        error_log('[buyer_intents] No se pudo conectar a regladousers: ' . $e->getMessage());
+        error_log('[buyer_intents] No se pudo obtener users de ApiLogin: ' . $e->getMessage());
         return 0;
     }
 
     // Se excluye al comprador y a los admins (estos no venden activos).
-    $q = $usersPdo->prepare("
-        SELECT id, email, first_name
-        FROM users
-        WHERE id != :me
-          AND LOWER(role) != 'admin'
-    ");
-    $q->execute(['me' => $buyerUserId]);
-    $users = $q->fetchAll();
+    $users = array_values(array_filter($allUsers, static function (array $u) use ($buyerUserId): bool {
+        return (int) ($u['id'] ?? 0) !== $buyerUserId
+            && strtolower((string) ($u['role'] ?? '')) !== 'admin';
+    }));
 
     $categoryParam = $category !== null && $category !== '' ? $category : '';
     $actionPath = '/profile/create-property'
@@ -348,7 +336,7 @@ function notifyBuyerOfIntentMatch(PDO $pdo, array $intent, int $propertyId, arra
             $buyerEmail = fetchBuyerEmailById($buyerUserId);
 
             if ($buyerEmail === null) {
-                error_log('[buyer_intents] Email de match NO enviado: buyer_user_id=' . $buyerUserId . ' no tiene email válido en regladousers.users.');
+                error_log('[buyer_intents] Email de match NO enviado: buyer_user_id=' . $buyerUserId . ' no tiene email válido (ApiLogin no devolvió user o el campo email está vacío).');
             } else {
                 error_log('[buyer_intents] Enviando email de match a buyer_user_id=' . $buyerUserId . ' email=' . $buyerEmail . ' property_id=' . $propertyId);
 
@@ -387,7 +375,7 @@ HTML
 }
 
 /**
- * Devuelve el email del comprador consultando regladousers.users.
+ * Devuelve el email del comprador consultando ApiLogin.
  */
 function fetchBuyerEmailById(int $userId): ?string
 {
@@ -396,21 +384,8 @@ function fetchBuyerEmailById(int $userId): ?string
     }
 
     try {
-        $dbHost = (string) getenv('DB_HOST');
-        $dbPort = (string) getenv('DB_PORT');
-        $dbUser = (string) getenv('DB_USER');
-        $dbPass = (string) getenv('DB_PASS');
-
-        $usersPdo = new PDO(
-            sprintf('mysql:host=%s;port=%s;dbname=regladousers;charset=utf8mb4', $dbHost, $dbPort),
-            $dbUser,
-            $dbPass,
-            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]
-        );
-
-        $stmt = $usersPdo->prepare('SELECT email FROM users WHERE id = :id LIMIT 1');
-        $stmt->execute(['id' => $userId]);
-        $email = trim((string) ($stmt->fetchColumn() ?: ''));
+        $user = apilogingFindUserById($userId);
+        $email = trim((string) ($user['email'] ?? ''));
 
         if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return null;

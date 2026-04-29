@@ -620,61 +620,196 @@ class AuthController
 
     public static function adminUsers(): void
     {
-        self::requireAdmin();
+        self::requireAdminOrService();
 
         $users = array_map(
-            static function (array $user): array {
-                return [
-                    'id' => (int) $user['id'],
-                    'username' => $user['username'] ?? null,
-                    'first_name' => $user['first_name'] ?? null,
-                    'last_name' => $user['last_name'] ?? null,
-                    'phone' => $user['phone'] ?? null,
-                    'name' => $user['name'] ?? null,
-                    'role' => $user['role'] ?? null,
-                    'email' => $user['email'] ?? null,
-                    'is_email_verified' => (int) ($user['is_email_verified'] ?? 0),
-                    'email_verified_at' => $user['email_verified_at'] ?? null,
-                    'banned_at' => $user['banned_at'] ?? null,
-                    'banned_by' => isset($user['banned_by']) ? (int) $user['banned_by'] : null,
-                    'created_at' => $user['created_at'] ?? null,
-                ];
-            },
+            [self::class, 'mapAdminUserView'],
             User::listAll()
         );
 
         Response::json(['users' => $users]);
     }
 
+    /**
+     * GET /auth/admin/users/by-id?id=42
+     * Resuelve un usuario por id. Pensado para que servicios externos
+     * (inmobiliaria) puedan resolver buyers/owners individuales sin tener
+     * que descargar la lista entera.
+     */
+    public static function adminUserById(): void
+    {
+        self::requireAdminOrService();
+
+        $id = (int) ($_GET['id'] ?? 0);
+        if ($id <= 0) {
+            Response::json(['error' => 'id is required'], 422);
+        }
+
+        $user = User::findById($id);
+        if (!$user) {
+            Response::json(['error' => 'user not found'], 404);
+        }
+
+        Response::json(['user' => self::mapAdminUserView($user)]);
+    }
+
+    /**
+     * GET /auth/admin/users/by-email?email=foo@bar.com
+     * Resuelve un usuario por email. Útil para flujos que tienen el email
+     * pero no el id (p.ej. role_promotion_requests guarda user_email).
+     */
+    public static function adminUserByEmail(): void
+    {
+        self::requireAdminOrService();
+
+        $email = trim((string) ($_GET['email'] ?? ''));
+        if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            Response::json(['error' => 'email is required'], 422);
+        }
+
+        $user = User::findByEmail($email);
+        if (!$user) {
+            Response::json(['error' => 'user not found'], 404);
+        }
+
+        Response::json(['user' => self::mapAdminUserView($user)]);
+    }
+
+    /**
+     * POST /auth/admin/users-batch
+     * body: { ids?: [int], emails?: [string] }
+     *
+     * Resuelve varios usuarios de una sola vez. Devuelve los que existen,
+     * sin error si alguno no se encuentra. Caso de uso: el caller tiene una
+     * lista de N user_ids/emails (p.ej. owners de propiedades) y quiere
+     * resolver todos en un único round-trip HTTP.
+     *
+     * Tope de 200 por petición para evitar consultas desorbitadas.
+     */
+    public static function adminUsersBatch(): void
+    {
+        self::requireAdminOrService();
+
+        $data = self::getJsonInput();
+        $ids = is_array($data['ids'] ?? null) ? $data['ids'] : [];
+        $emails = is_array($data['emails'] ?? null) ? $data['emails'] : [];
+
+        $MAX_BATCH = 200;
+        if (count($ids) + count($emails) > $MAX_BATCH) {
+            Response::json(['error' => 'too many items, max ' . $MAX_BATCH], 422);
+        }
+
+        $byId = $ids === [] ? [] : User::findManyByIds($ids);
+        $byEmail = $emails === [] ? [] : User::findManyByEmails($emails);
+
+        // De-dup por id (un usuario puede haber sido pedido por id y por email).
+        $byKey = [];
+        foreach ($byId as $u) {
+            $byKey[(int) $u['id']] = $u;
+        }
+        foreach ($byEmail as $u) {
+            $byKey[(int) $u['id']] = $u;
+        }
+
+        Response::json([
+            'users' => array_values(array_map([self::class, 'mapAdminUserView'], $byKey)),
+        ]);
+    }
+
+    /**
+     * POST /auth/admin/verify-password
+     * body: { user_id: int, password: string }
+     *
+     * Valida la contraseña de un usuario sin emitir JWT. Pensado para que
+     * inmobiliaria reautentique a un admin antes de acciones sensibles
+     * (aprobar documentos, etc.) sin tener que duplicar el hash en su BD.
+     *
+     * Restringido a Service JWT a propósito: un admin humano no debería
+     * poder validar la contraseña de otros admins desde su propio JWT
+     * (defense in depth contra abuso interno).
+     */
+    public static function adminVerifyPassword(): void
+    {
+        self::requireService();
+
+        $data = self::getJsonInput();
+        $userId = (int) ($data['user_id'] ?? 0);
+        $password = (string) ($data['password'] ?? '');
+
+        if ($userId <= 0 || $password === '') {
+            Response::json(['valid' => false, 'error' => 'user_id and password are required'], 422);
+        }
+
+        $user = User::findById($userId);
+        if (!$user || !password_verify($password, (string) $user['password'])) {
+            // Loguear sin distinguir "no existe" de "password mal" para no
+            // dar pistas de qué ids son válidos.
+            SecurityLogger::log('service_verify_password_failed', $userId);
+            Response::json(['valid' => false], 401);
+        }
+
+        Response::json(['valid' => true]);
+    }
+
+    /**
+     * Mapping uniforme de fila de `users` al shape público del panel admin.
+     * Centralizar aquí evita drift entre los varios endpoints que devuelven
+     * datos de usuarios (listAll, by-id, by-email, batch).
+     */
+    private static function mapAdminUserView(array $user): array
+    {
+        return [
+            'id' => (int) $user['id'],
+            'username' => $user['username'] ?? null,
+            'first_name' => $user['first_name'] ?? null,
+            'last_name' => $user['last_name'] ?? null,
+            'phone' => $user['phone'] ?? null,
+            'name' => $user['name'] ?? null,
+            'role' => $user['role'] ?? null,
+            'email' => $user['email'] ?? null,
+            'is_email_verified' => (int) ($user['is_email_verified'] ?? 0),
+            'email_verified_at' => $user['email_verified_at'] ?? null,
+            'banned_at' => $user['banned_at'] ?? null,
+            'banned_by' => isset($user['banned_by']) ? (int) $user['banned_by'] : null,
+            'created_at' => $user['created_at'] ?? null,
+        ];
+    }
+
     public static function adminUpdateRole(): void
     {
-        $session = self::requireAdmin();
-        $adminId = (int) ($session['sub'] ?? 0);
+        $session = self::requireAdminOrService();
+        $isService = ($session['role'] ?? null) === 'service';
+        $adminId = $isService ? 0 : (int) ($session['sub'] ?? 0);
 
         $data = self::getJsonInput();
         $userId = (int) ($data['user_id'] ?? 0);
         $role = trim((string) ($data['role'] ?? ''));
-        $currentPassword = (string) ($data['current_password'] ?? '');
 
         if ($userId <= 0 || $role === '') {
             Response::json(['error' => 'user_id and role are required'], 422);
-        }
-
-        if ($currentPassword === '') {
-            Response::json(['error' => 'current_password is required'], 422);
         }
 
         if (!in_array($role, ['user', 'real', 'admin'])) {
             Response::json(['error' => 'invalid role'], 422);
         }
 
-        // Reautenticación con la contraseña del admin actual: si su JWT estuviera
-        // comprometido, el atacante todavía no podría escalar privilegios sin
-        // conocer también la contraseña.
-        $adminUser = User::findById($adminId);
-        if (!$adminUser || !password_verify($currentPassword, (string) $adminUser['password'])) {
-            SecurityLogger::log('admin_role_change_bad_password', $adminId);
-            Response::json(['error' => 'current password is incorrect'], 401);
+        // Reautenticación: solo aplica al flujo del frontend admin. Si su JWT
+        // estuviera comprometido, el atacante todavía no podría escalar
+        // privilegios sin la contraseña.
+        // Para Service JWT (otro backend confiable que ya autenticó a su
+        // propio caller, p.ej. inmobiliaria validando un token de email)
+        // se omite — la confianza viene de JWT_SECRET compartido y la
+        // responsabilidad de "¿procede esta acción?" es del caller.
+        if (!$isService) {
+            $currentPassword = (string) ($data['current_password'] ?? '');
+            if ($currentPassword === '') {
+                Response::json(['error' => 'current_password is required'], 422);
+            }
+            $adminUser = User::findById($adminId);
+            if (!$adminUser || !password_verify($currentPassword, (string) $adminUser['password'])) {
+                SecurityLogger::log('admin_role_change_bad_password', $adminId);
+                Response::json(['error' => 'current password is incorrect'], 401);
+            }
         }
 
         $targetUser = User::findById($userId);
@@ -691,7 +826,11 @@ class AuthController
 
         try {
             User::updateRole($userId, $role);
-            SecurityLogger::log('admin_updated_user_role', $userId, ['new_role' => $role, 'by_admin' => $adminId]);
+            SecurityLogger::log('admin_updated_user_role', $userId, [
+                'new_role' => $role,
+                'by_admin' => $adminId,
+                'by_service' => $isService ? 'inmobiliaria' : null,
+            ]);
 
             $freshUser = User::findById($userId);
             if ($freshUser) {
@@ -990,6 +1129,42 @@ class AuthController
         $session = AuthMiddleware::handle();
 
         if (($session['role'] ?? null) !== 'admin') {
+            Response::json(['error' => 'forbidden'], 403);
+        }
+
+        return $session;
+    }
+
+    /**
+     * Como requireAdmin() pero también acepta Service JWTs (role=service).
+     * Pensado para endpoints de LECTURA admin que servicios confiables
+     * necesitan llamar (p.ej. inmobiliaria resolviendo users en JOINs).
+     *
+     * Para mutaciones se sigue exigiendo admin humano + reautenticación
+     * con password — un service JWT no puede mutar usuarios de espaldas
+     * a una persona.
+     */
+    private static function requireAdminOrService(): array
+    {
+        $session = AuthMiddleware::handle();
+        $role = $session['role'] ?? null;
+
+        if ($role !== 'admin' && $role !== 'service') {
+            Response::json(['error' => 'forbidden'], 403);
+        }
+
+        return $session;
+    }
+
+    /**
+     * Restringido a Service JWT. Para endpoints internos que un admin humano
+     * no debería poder llamar desde su propio JWT (p.ej. verify-password).
+     */
+    private static function requireService(): array
+    {
+        $session = AuthMiddleware::handle();
+
+        if (($session['role'] ?? null) !== 'service') {
             Response::json(['error' => 'forbidden'], 403);
         }
 

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 require_once dirname(__DIR__) . '/lib/geocoding.php';
 require_once dirname(__DIR__) . '/lib/address_hash.php';
+require_once dirname(__DIR__) . '/lib/apiloging_client.php';
 
 /**
  * Capa de acceso a BD para el pipeline de procesado de propiedades entrantes
@@ -407,15 +408,12 @@ class Repository
             return null;
         }
 
-        $stmt = $this->pdo->prepare('SELECT id FROM regladousers.users WHERE LOWER(email) = :email LIMIT 1');
-        $stmt->execute(['email' => $normalized]);
-        $id = $stmt->fetchColumn();
-
-        if ($id === false || $id === null) {
+        $user = apilogingFindUserByEmail($normalized);
+        if ($user === null) {
             return null;
         }
 
-        return (int) $id;
+        return (int) ($user['id'] ?? 0) ?: null;
     }
 
     public function updatePropertyDocuments(int $propertyId, array $documents): void

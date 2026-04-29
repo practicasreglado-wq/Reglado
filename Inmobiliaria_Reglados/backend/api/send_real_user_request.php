@@ -24,6 +24,7 @@ require_once __DIR__ . '/../config/cors.php';
 require_once dirname(__DIR__) . '/lib/email_layout.php';
 require_once dirname(__DIR__) . '/lib/error_reporting.php';
 require_once dirname(__DIR__) . '/lib/audit.php';
+require_once dirname(__DIR__) . '/lib/apiloging_client.php';
 
 applyCors();
 handlePreflight();
@@ -57,7 +58,7 @@ if ($userId <= 0) {
 try {
     $rlPdo = new PDO(
         sprintf(
-            'mysql:host=%s;port=%s;dbname=regladousers;charset=utf8mb4',
+            'mysql:host=%s;port=%s;dbname=' . dbNameInmobiliaria() . ';charset=utf8mb4',
             (string) getenv('DB_HOST'),
             (string) getenv('DB_PORT')
         ),
@@ -100,30 +101,13 @@ try {
     error_log('[send_real_user_request] rate limit falló: ' . $e->getMessage());
 }
 
-$userStmt = $pdo->prepare("
-    SELECT
-        id,
-        email,
-        first_name,
-        last_name,
-        username
-    FROM regladousers.users
-    WHERE id = :id
-    LIMIT 1
-");
-$userStmt->execute([
-    ':id' => $userId
-]);
-$user = $userStmt->fetch(PDO::FETCH_ASSOC);
-
-if (!$user) {
-    respondJson(404, ['success' => false, 'message' => 'No se encontro el usuario autenticado.']);
-}
-
-$firstName = trim((string) ($user['first_name'] ?? ''));
-$lastName = trim((string) ($user['last_name'] ?? ''));
-$username = trim((string) ($user['username'] ?? ''));
-$userEmail = trim((string) ($user['email'] ?? ''));
+// El solicitante ES el usuario autenticado: leemos sus datos del JWT
+// directamente en vez de hacer un round-trip HTTP a ApiLogin. La firma
+// del JWT garantiza que los claims son válidos.
+$firstName = trim((string) ($auth['first_name'] ?? ''));
+$lastName  = trim((string) ($auth['last_name'] ?? ''));
+$username  = trim((string) ($auth['username'] ?? ''));
+$userEmail = trim((string) ($auth['email'] ?? ''));
 
 if ($userEmail === '' || !filter_var($userEmail, FILTER_VALIDATE_EMAIL)) {
     respondJson(422, ['success' => false, 'message' => 'El usuario no tiene un email valido.']);

@@ -13,6 +13,7 @@ require_once dirname(__DIR__) . '/config/db.php';
 require_once dirname(__DIR__) . '/config/auth.php';
 require_once __DIR__ . '/../config/cors.php';
 require_once dirname(__DIR__) . '/lib/error_reporting.php';
+require_once dirname(__DIR__) . '/lib/apiloging_client.php';
 
 applyCors();
 handlePreflight();
@@ -28,7 +29,7 @@ if ($role !== 'admin') {
 try {
     $hasTitulo = (bool) $pdo
         ->query("SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
-                 WHERE TABLE_SCHEMA='inmobiliaria' AND TABLE_NAME='propiedades' AND COLUMN_NAME='titulo' LIMIT 1")
+                 WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='propiedades' AND COLUMN_NAME='titulo' LIMIT 1")
         ->fetchColumn();
 
     $titleExpr = $hasTitulo ? 'COALESCE(NULLIF(p.titulo, ""), p.tipo_propiedad)' : 'p.tipo_propiedad';
@@ -46,20 +47,31 @@ try {
             p.categoria        AS property_category,
             p.ciudad           AS property_city,
             p.zona             AS property_zone,
-            p.precio           AS property_price,
-            u.email            AS requester_email,
-            u.username         AS requester_username,
-            u.first_name       AS requester_first_name,
-            u.last_name        AS requester_last_name,
-            u.phone            AS requester_phone
+            p.precio           AS property_price
         FROM property_deletion_requests pdr
-        LEFT JOIN inmobiliaria.propiedades p ON p.id = pdr.property_id
-        LEFT JOIN regladousers.users u       ON u.id = pdr.requester_user_id
+        LEFT JOIN propiedades p ON p.id = pdr.property_id
         WHERE pdr.status = 'pending'
         ORDER BY pdr.created_at DESC, pdr.id DESC
     ");
     $stmt->execute();
     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Resolución batch de los requesters (users) vía ApiLogin.
+    $requesterIds = array_values(array_unique(array_filter(array_map(
+        static fn(array $r): int => (int) ($r['requester_user_id'] ?? 0),
+        $rows
+    ))));
+    $usersById = $requesterIds === [] ? [] : apilogingFindManyUsersIndexedById($requesterIds);
+
+    foreach ($rows as &$row) {
+        $u = $usersById[(int) ($row['requester_user_id'] ?? 0)] ?? null;
+        $row['requester_email']      = $u['email'] ?? null;
+        $row['requester_username']   = $u['username'] ?? null;
+        $row['requester_first_name'] = $u['first_name'] ?? null;
+        $row['requester_last_name']  = $u['last_name'] ?? null;
+        $row['requester_phone']      = $u['phone'] ?? null;
+    }
+    unset($row);
 
     respondJson(200, [
         'success'  => true,

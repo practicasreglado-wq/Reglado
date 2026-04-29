@@ -2,12 +2,13 @@
 declare(strict_types=1);
 
 /**
- * Lista de usuarios de la plataforma inmobiliaria (de regladousers.users)
- * para el panel admin → "Gestión de usuarios".
+ * Lista de usuarios de la plataforma inmobiliaria para el panel admin →
+ * "Gestión de usuarios".
  *
- * Devuelve email, rol, fechas, flags de bloqueo, etc. Lo usa el admin para
- * subir/bajar de rol (update_user_role.php), bloquear acceso, forzar
- * re-login, etc.
+ * Los datos de usuario los resuelve ApiLogin por HTTP (Service JWT). La
+ * actividad por usuario (propiedades, audit, purchase_requests, accesos)
+ * se calcula con queries locales contra inmobiliaria, y luego se hace JOIN
+ * en PHP entre ambos lados.
  *
  * Audit log: 'admin.list_users'. Solo role=admin.
  */
@@ -18,6 +19,7 @@ require_once dirname(__DIR__) . '/config/auth.php';
 require_once __DIR__ . '/../config/cors.php';
 require_once dirname(__DIR__) . '/lib/audit.php';
 require_once dirname(__DIR__) . '/lib/error_reporting.php';
+require_once dirname(__DIR__) . '/lib/apiloging_client.php';
 
 loadEnv(dirname(__DIR__) . '/.env');
 applyCors();
@@ -37,24 +39,8 @@ if (!in_array($mode, $allowed, true)) {
     $mode = 'active';
 }
 
-$host = (string) getenv('DB_HOST');
-$port = (string) getenv('DB_PORT');
-$dbUser = (string) getenv('DB_USER');
-$dbPass = (string) getenv('DB_PASS');
-
 try {
-    $pdoAuth = new PDO(
-        "mysql:host={$host};port={$port};dbname=regladousers;charset=utf8mb4",
-        $dbUser, $dbPass,
-        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]
-    );
-
-    $usersStmt = $pdoAuth->query("
-        SELECT id, username, email, first_name, last_name, phone, role, created_at
-        FROM users
-        ORDER BY created_at DESC, id DESC
-    ");
-    $allUsers = $usersStmt->fetchAll(PDO::FETCH_ASSOC);
+    $allUsers = apilogingListAllUsers();
 
     $propStmt = $pdo->query("
         SELECT user_id, COUNT(*) AS total FROM (

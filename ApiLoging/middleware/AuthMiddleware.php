@@ -5,6 +5,14 @@
  * comprueba que no esté revocado y que sea posterior al último cambio de
  * contraseña del usuario. Si cualquiera de estas comprobaciones falla,
  * responde 401 sin que la petición alcance al controlador.
+ *
+ * Service JWTs (role=service): emitidos por servicios confiables que comparten
+ * JWT_SECRET (p.ej. el backend de inmobiliaria llamando a /auth/admin/*).
+ * Saltan los chequeos de estado de usuario (revoked_tokens, password_changed_at,
+ * sessions) porque no representan a un humano. Su seguridad descansa en:
+ *  1) la firma con JWT_SECRET, validada por JwtService::verify;
+ *  2) el iss (issuer) que JwtService::verify ya comprueba;
+ *  3) un TTL corto (≤5 min) que limita la ventana de replay si se filtra.
  */
 class AuthMiddleware
 {
@@ -16,11 +24,27 @@ class AuthMiddleware
             Response::json(['error' => 'unauthorized'], 401);
         }
 
+        // Peek al payload (sin verificar firma todavía) solo para saber
+        // qué secreto usar al verificar. Esto NO se usa para confiar en
+        // el contenido — la firma se valida justo después con la clave
+        // correcta. Si el atacante miente sobre `role`, el verify falla.
+        $claimedRole = self::peekClaim($token, 'role');
+
         try {
-            $decoded = JwtService::verify($token);
+            $decoded = $claimedRole === 'service'
+                ? JwtService::verifyService($token)
+                : JwtService::verify($token);
         } catch (Throwable $e) {
             SecurityLogger::log('invalid_token_attempt', null, ['message' => 'invalid token']);
             Response::json(['error' => 'invalid token'], 401);
+        }
+
+        // Service JWT: salta los chequeos de estado del usuario humano.
+        // El iss ya se valida en JwtService::verifyService y la firma con
+        // SERVICE_JWT_SECRET garantiza que solo un servicio confiable
+        // pudo emitirlo. JWT_SECRET de usuarios queda aislado.
+        if (($decoded['role'] ?? null) === 'service') {
+            return $decoded;
         }
 
         try {
@@ -80,6 +104,34 @@ class AuthMiddleware
         }
 
         return [];
+    }
+
+    /**
+     * Lee un claim del payload del JWT SIN verificar la firma.
+     *
+     * Útil exclusivamente para decidir CON QUÉ clave verificar después
+     * (caso clásico: claves diferentes para JWTs de usuario vs Service
+     * JWTs). El valor leído aquí NO debe usarse para autorizar nada —
+     * la única fuente de verdad es el `$decoded` que devuelve la
+     * verificación con la clave correcta.
+     *
+     * Devuelve null si el token está malformado o el claim no existe.
+     */
+    private static function peekClaim(string $token, string $claim)
+    {
+        $parts = explode('.', $token);
+        if (count($parts) !== 3) {
+            return null;
+        }
+        $payloadJson = base64_decode(strtr($parts[1], '-_', '+/'), true);
+        if ($payloadJson === false) {
+            return null;
+        }
+        $payload = json_decode($payloadJson, true);
+        if (!is_array($payload)) {
+            return null;
+        }
+        return $payload[$claim] ?? null;
     }
 
     public static function extractBearerToken(): ?string

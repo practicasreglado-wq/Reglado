@@ -9,8 +9,12 @@ declare(strict_types=1);
  *  - Aquel: enlace de email con token, sin login.
  *  - Este: SPA del admin con JWT + confirmación de pwd.
  *
- * Mismo efecto de fondo: sube el rol a 'real' en regladousers.users +
- * notificación al usuario + audit 'role.promotion.approve'.
+ * Mismo efecto de fondo: sube el rol a 'real' vía ApiLogin (HTTP) +
+ * marca la solicitud como 'approved' en BD local + notifica al usuario
+ * (in-app + email) + audit 'role.promotion.approve'.
+ *
+ * Si el target ya tiene rol 'real' o 'admin', salta el cambio de rol
+ * (no-op funcional, evita el 409 de ApiLogin "cannot demote last admin").
  */
 
 require_once dirname(__DIR__) . '/lib/env_loader.php';
@@ -22,6 +26,7 @@ require_once dirname(__DIR__) . '/lib/audit.php';
 require_once dirname(__DIR__) . '/lib/email_layout.php';
 require_once dirname(__DIR__) . '/lib/error_reporting.php';
 require_once dirname(__DIR__) . '/lib/admin_password_check.php';
+require_once dirname(__DIR__) . '/lib/apiloging_client.php';
 require_once dirname(__DIR__) . '/send_mail.php';
 
 loadEnv(dirname(__DIR__) . '/.env');
@@ -55,22 +60,8 @@ requireAdminPasswordConfirmation(
     'admin_role_approve'
 );
 
-$host = (string) getenv('DB_HOST');
-$port = (string) getenv('DB_PORT');
-$user = (string) getenv('DB_USER');
-$pass = (string) getenv('DB_PASS');
-
-$pdoAuth = null;
-
 try {
-    $pdoAuth = new PDO(
-        "mysql:host={$host};port={$port};dbname=regladousers;charset=utf8mb4",
-        $user, $pass,
-        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]
-    );
-
     $pdo->beginTransaction();
-    $pdoAuth->beginTransaction();
 
     $stmtCheck = $pdo->prepare("
         SELECT id, user_email FROM role_promotion_requests
@@ -81,24 +72,30 @@ try {
 
     if (!$request) {
         $pdo->rollBack();
-        $pdoAuth->rollBack();
         respondJson(404, ['success' => false, 'message' => 'La solicitud no existe o ya fue procesada.']);
     }
 
     $email = (string) $request['user_email'];
 
-    $stmtUser = $pdoAuth->prepare("SELECT id, role, email FROM users WHERE email = ? LIMIT 1");
-    $stmtUser->execute([$email]);
-    $userRow = $stmtUser->fetch();
+    $userRow = apilogingFindUserByEmail($email);
 
     if (!$userRow) {
         $pdo->rollBack();
-        $pdoAuth->rollBack();
         respondJson(404, ['success' => false, 'message' => 'Usuario no encontrado.']);
     }
 
-    $stmtUpdateUser = $pdoAuth->prepare("UPDATE users SET role = 'real' WHERE email = ?");
-    $stmtUpdateUser->execute([$email]);
+    // Cambio de rol vía ApiLogin antes de marcar la solicitud como resuelta:
+    // si la promoción falla, queremos que la solicitud siga 'pending' para
+    // poder reintentar.
+    //
+    // Si el usuario ya es 'real' o 'admin' (rol igual o superior a Premium),
+    // saltamos el update — promocionar a alguien que ya está al nivel
+    // pedido es un no-op, y "promocionar" a un admin lo degradaría
+    // (ApiLogin lo protege con un 409 'cannot demote last admin').
+    $currentRole = strtolower((string) ($userRow['role'] ?? ''));
+    if (!in_array($currentRole, ['real', 'admin'], true)) {
+        apilogingUpdateUserRole((int) $userRow['id'], 'real');
+    }
 
     $stmtMarkResolved = $pdo->prepare("
         UPDATE role_promotion_requests
@@ -116,7 +113,6 @@ try {
         'link'       => '/profile',
     ]);
 
-    $pdoAuth->commit();
     $pdo->commit();
 
     if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -153,7 +149,6 @@ HTML
     respondJson(200, ['success' => true, 'message' => 'Solicitud aprobada correctamente.']);
 
 } catch (Throwable $e) {
-    if ($pdoAuth instanceof PDO && $pdoAuth->inTransaction()) $pdoAuth->rollBack();
     if ($pdo->inTransaction()) $pdo->rollBack();
     $errorId = logAndReferenceError('approve_pending_request', $e);
     respondJson(500, [

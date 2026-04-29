@@ -28,6 +28,7 @@ require_once __DIR__ . '/../lib/env_loader.php';
 require_once __DIR__ . '/../lib/email_layout.php';
 require_once __DIR__ . '/../lib/error_reporting.php';
 require_once __DIR__ . '/../lib/audit.php';
+require_once __DIR__ . '/../lib/apiloging_client.php';
 require_once __DIR__ . '/../send_mail.php';
 
 loadEnv(__DIR__ . '/../.env');
@@ -91,11 +92,11 @@ purchaseLog('appointmentDate', $appointmentDate);
 
 if ($buyerUserId > 0) {
     // Rate limit: máx. 5 solicitudes de compra por usuario cada hora.
-    // Reutiliza la tabla regladousers.rate_limits del sistema de auth.
+    // Usa inmobiliaria.rate_limits (propia del servicio).
     try {
         $rlPdo = new PDO(
             sprintf(
-                'mysql:host=%s;port=%s;dbname=regladousers;charset=utf8mb4',
+                'mysql:host=%s;port=%s;dbname=' . dbNameInmobiliaria() . ';charset=utf8mb4',
                 (string) getenv('DB_HOST'),
                 (string) getenv('DB_PORT')
             ),
@@ -146,31 +147,20 @@ if ($buyerUserId <= 0) {
     ]);
 }
 
-$buyerStmt = $pdo->prepare('
-    SELECT
-        id,
-        email,
-        first_name,
-        last_name,
-        username,
-        phone
-    FROM regladousers.users
-    WHERE id = :id
-    LIMIT 1
-');
-$buyerStmt->execute([
-    'id' => $buyerUserId,
-]);
-$buyer = $buyerStmt->fetch(PDO::FETCH_ASSOC);
+// El comprador ES el usuario autenticado: sus datos (email, nombre,
+// teléfono, etc.) ya viajan en el JWT firmado por ApiLogin. Construimos
+// la fila desde $auth en lugar de hacer un round-trip HTTP. Si el JWT
+// pasa la firma, asumimos que sus claims son válidos.
+$buyer = [
+    'id'         => $buyerUserId,
+    'email'      => $auth['email'] ?? null,
+    'first_name' => $auth['first_name'] ?? null,
+    'last_name'  => $auth['last_name'] ?? null,
+    'username'   => $auth['username'] ?? null,
+    'phone'      => $auth['phone'] ?? null,
+];
 
-purchaseLog('BUYER DB', ['found' => (bool) $buyer]);
-
-if (!$buyer) {
-    respondJson(404, [
-        'success' => false,
-        'message' => 'No se encontró el comprador autenticado en la base de datos.',
-    ]);
-}
+purchaseLog('BUYER FROM JWT', ['email' => $buyer['email']]);
 
 if ($propertyId <= 0) {
     respondJson(422, [
@@ -190,26 +180,33 @@ try {
         p.precio,
         p.metros_cuadrados,
         p.categoria,
-        p.caracteristicas_json,
-
-        u.id AS owner_id,
-        u.first_name AS owner_first_name,
-        u.last_name AS owner_last_name,
-        u.email AS owner_email,
-        u.phone AS owner_phone
+        p.caracteristicas_json
     FROM propiedades p
-    LEFT JOIN regladousers.users u ON u.id = p.owner_user_id
     WHERE p.id = :id
     LIMIT 1
 ');
     $stmt->execute(['id' => $propertyId]);
     $property = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    // Resuelve el owner vía ApiLogin para mantener el shape que usa el resto
+    // del archivo (owner_id, owner_first_name, etc.).
+    $owner = $property && !empty($property['owner_user_id'])
+        ? apilogingFindUserById((int) $property['owner_user_id'])
+        : null;
+    if ($property) {
+        $property['owner_id']         = $owner['id'] ?? null;
+        $property['owner_first_name'] = $owner['first_name'] ?? null;
+        $property['owner_last_name']  = $owner['last_name'] ?? null;
+        $property['owner_email']      = $owner['email'] ?? null;
+        $property['owner_phone']      = $owner['phone'] ?? null;
+    }
+
     $ownerFirstName = trim((string) ($property['owner_first_name'] ?? ''));
-$ownerLastName = trim((string) ($property['owner_last_name'] ?? ''));
-$ownerFullName = trim($ownerFirstName . ' ' . $ownerLastName);
-$ownerEmail = trim((string) ($property['owner_email'] ?? ''));
-$ownerPhone = trim((string) ($property['owner_phone'] ?? ''));
-$ownerId = (int) ($property['owner_id'] ?? 0);
+    $ownerLastName  = trim((string) ($property['owner_last_name'] ?? ''));
+    $ownerFullName  = trim($ownerFirstName . ' ' . $ownerLastName);
+    $ownerEmail     = trim((string) ($property['owner_email'] ?? ''));
+    $ownerPhone     = trim((string) ($property['owner_phone'] ?? ''));
+    $ownerId        = (int) ($property['owner_id'] ?? 0);
     purchaseLog('PROPERTY', $property);
 
     if (!$property) {

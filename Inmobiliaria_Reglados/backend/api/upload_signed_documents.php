@@ -112,12 +112,12 @@ if ($buyerUserId <= 0 || $propertyId <= 0) {
     ]);
 }
 
-// Rate limit por usuario: máximo 10 subidas por hora. Reutiliza la tabla
-// regladousers.rate_limits que ya usan el login y otros endpoints sensibles.
+// Rate limit por usuario: máximo 10 subidas por hora. Usa la tabla
+// inmobiliaria.rate_limits propia del servicio.
 try {
     $rlPdo = new PDO(
         sprintf(
-            'mysql:host=%s;port=%s;dbname=regladousers;charset=utf8mb4',
+            'mysql:host=%s;port=%s;dbname=' . dbNameInmobiliaria() . ';charset=utf8mb4',
             (string) getenv('DB_HOST'),
             (string) getenv('DB_PORT')
         ),
@@ -682,7 +682,7 @@ $mailErrorMessage = null;
 
 try {
     sendNotificationEmail(
-        'practicasreglado@gmail.com',
+        $reviewerEmail,
         sprintf(
             'Documentación firmada pendiente de revisión - Propiedad #%d - Comprador %s',
             $propertyId,
@@ -696,7 +696,7 @@ try {
     $mailSent = true;
 
     uploadLog('Correo de revisión enviado', [
-        'to' => 'practicasreglado@gmail.com',
+        'to' => $reviewerEmail,
         'approval_link' => $approvalLink,
         'attachments' => $attachments,
     ]);

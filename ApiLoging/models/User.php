@@ -480,6 +480,70 @@ class User
     }
 
     /**
+     * Resuelve varios usuarios por id en una sola consulta. Devuelve los que
+     * encuentre, sin error si alguno no existe. Lista vacía → []. Pensado
+     * para JOINs cross-service: el caller (inmobiliaria) tiene N user_ids
+     * en sus tablas locales y necesita resolverlos a info de perfil sin
+     * hacer N round-trips HTTP.
+     *
+     * @param int[] $ids
+     * @return array<int, array<string, mixed>>
+     */
+    public static function findManyByIds(array $ids): array
+    {
+        $clean = array_values(array_unique(array_filter(array_map('intval', $ids), static fn(int $id): bool => $id > 0)));
+        if ($clean === []) {
+            return [];
+        }
+
+        $placeholders = implode(',', array_fill(0, count($clean), '?'));
+        $db = Database::connect();
+        $stmt = $db->prepare(
+            'SELECT id, username, email, name, first_name, last_name, phone, role, is_email_verified, email_verified_at, banned_at, banned_by, created_at
+             FROM users
+             WHERE id IN (' . $placeholders . ')'
+        );
+        $stmt->execute($clean);
+
+        return $stmt->fetchAll() ?: [];
+    }
+
+    /**
+     * Igual que findManyByIds() pero por email. Hace LOWER() en ambos lados
+     * para que el lookup sea case-insensitive (los emails se guardan en
+     * minúsculas pero algún caller podría mandar "Foo@Bar.com").
+     *
+     * @param string[] $emails
+     * @return array<int, array<string, mixed>>
+     */
+    public static function findManyByEmails(array $emails): array
+    {
+        $clean = [];
+        foreach ($emails as $email) {
+            $normalized = strtolower(trim((string) $email));
+            if ($normalized !== '' && filter_var($normalized, FILTER_VALIDATE_EMAIL)) {
+                $clean[$normalized] = true;
+            }
+        }
+        $clean = array_keys($clean);
+
+        if ($clean === []) {
+            return [];
+        }
+
+        $placeholders = implode(',', array_fill(0, count($clean), '?'));
+        $db = Database::connect();
+        $stmt = $db->prepare(
+            'SELECT id, username, email, name, first_name, last_name, phone, role, is_email_verified, email_verified_at, banned_at, banned_by, created_at
+             FROM users
+             WHERE LOWER(email) IN (' . $placeholders . ')'
+        );
+        $stmt->execute($clean);
+
+        return $stmt->fetchAll() ?: [];
+    }
+
+    /**
      * Devuelve el country_code del último login legítimo (status neutral o
      * confirmed). Los pending y rejected se excluyen a propósito: así una
      * alerta no respondida o una rechazada no envenena la referencia del

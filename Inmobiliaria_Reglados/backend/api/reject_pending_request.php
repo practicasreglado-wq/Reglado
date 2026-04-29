@@ -18,6 +18,7 @@ require_once dirname(__DIR__) . '/lib/audit.php';
 require_once dirname(__DIR__) . '/lib/email_layout.php';
 require_once dirname(__DIR__) . '/lib/error_reporting.php';
 require_once dirname(__DIR__) . '/lib/admin_password_check.php';
+require_once dirname(__DIR__) . '/lib/apiloging_client.php';
 require_once dirname(__DIR__) . '/send_mail.php';
 
 loadEnv(dirname(__DIR__) . '/.env');
@@ -51,20 +52,7 @@ requireAdminPasswordConfirmation(
     'admin_role_reject'
 );
 
-$host = (string) getenv('DB_HOST');
-$port = (string) getenv('DB_PORT');
-$user = (string) getenv('DB_USER');
-$pass = (string) getenv('DB_PASS');
-
-$pdoAuth = null;
-
 try {
-    $pdoAuth = new PDO(
-        "mysql:host={$host};port={$port};dbname=regladousers;charset=utf8mb4",
-        $user, $pass,
-        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]
-    );
-
     $pdo->beginTransaction();
 
     $stmtCheck = $pdo->prepare("
@@ -81,9 +69,10 @@ try {
 
     $email = (string) $request['user_email'];
 
-    $stmtUser = $pdoAuth->prepare("SELECT id FROM users WHERE email = ? LIMIT 1");
-    $stmtUser->execute([$email]);
-    $userRow = $stmtUser->fetch();
+    // Lookup opcional del user_id (para la notificación in-app). Si el
+    // usuario no se encuentra, seguimos rechazando: la notificación
+    // simplemente quedará asociada solo al email.
+    $userRow = apilogingFindUserByEmail($email);
 
     $stmtMarkResolved = $pdo->prepare("
         UPDATE role_promotion_requests
