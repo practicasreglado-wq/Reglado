@@ -1,118 +1,110 @@
 # RegladoEnergy
 
-Frontend corporativo de Reglado Energy con autenticacion delegada en `GrupoReglado` y `ApiLoging`.
+Web corporativa de Reglado Energy: consultoría energética independiente para
+particulares, empresas, sector público y administradores de fincas.
+Autenticación delegada en el SSO Hub de `GrupoReglado`.
 
-Incluye:
-- sitio corporativo
-- formulario de contacto con backend PHP
-- panel admin para solicitudes
-- boton de administracion visible solo para usuarios con rol `admin`
+## Qué hace
 
-## Requisitos
+- Sitio corporativo (servicios, casos, contacto).
+- Formulario de contacto con backend PHP propio.
+- Panel admin de solicitudes (visible solo para usuarios con rol `admin`).
+- Integración con SSO Hub para sesión compartida con el resto del ecosistema.
 
-- Node.js 18+
-- `ApiLoging` funcionando
-- `GrupoReglado` funcionando
-- XAMPP o servidor PHP para `BACKEND/`
-- MySQL o MariaDB para la base del formulario de contacto
+## Stack
 
-## Instalacion
+- **Frontend**: Vue 3 + Vite, Vue Router (modo `history`).
+- **Backend** (`BACKEND/`): PHP 8 + MySQL/MariaDB para gestionar formularios y panel admin.
+- JWT firmado por ApiLoging, validado por el backend de Energy.
 
-1. Instalar dependencias:
+## Cómo arrancar (dev)
 
-```bash
-npm install
-```
-
-2. Crear `RegladoEnergy/.env` a partir de `RegladoEnergy/.env.example`.
-
-3. Arrancar el frontend:
+**Frontend:**
 
 ```bash
-npm run dev
+npm install                      # solo la primera vez
+cp .env.example .env             # ajustar valores
+npm run dev                      # arranca en http://localhost:5174
 ```
 
-4. Generar build:
+**Backend PHP:**
 
 ```bash
-npm run build
+cd BACKEND
+cp .env.example .env             # ajustar BD + JWT_SECRET (mismo que ApiLoging)
+php -S localhost:8001            # endpoint usado por el formulario de contacto
 ```
 
-## Variables de entorno del frontend
+Requisitos: **Node 18+**, **PHP 8.1+**, **MySQL/MariaDB**, **ApiLoging** y **GrupoReglado** corriendo.
 
-- `VITE_AUTH_API_URL`
-- `VITE_GRUPO_REGLADO_BASE_URL`
-- `VITE_GRUPO_REGLADO_SETTINGS_PATH`
-- `VITE_BACKEND_BASE`
-- `VITE_CONTACT_ENDPOINT`
+Primera vez con BD: `SOURCE BACKEND/sql/facturas.sql;` desde MySQL.
 
-## Autenticacion
+## Servicio en el ecosistema
 
-Energy no tiene login propio.
+- **Consume**: `ApiLoging` (identidad) y `GrupoReglado` (SSO Hub para login/registro).
+- **No expone APIs públicas**: el `BACKEND/` es de uso interno (form de contacto, panel admin).
+- El frontend NO tiene login propio — todo redirige al hub.
 
-Flujo:
-1. El usuario pulsa `Iniciar sesion / registrarse`.
-2. Se redirige a `GrupoReglado`.
-3. `GrupoReglado` autentica contra `ApiLoging`.
-4. El usuario vuelve a `#/auth/callback?token=...`.
-5. Energy inicializa sesion con `/auth/me`.
+## Dominio en producción
 
-## Rutas principales
+`https://regladoenergy.com` (apex y `www.`)
 
-- `#/`
-- `#/servicios`
-- `#/clientes`
-- `#/contacto`
-- `#/admin`
-- `#/auth/callback`
+## Variables de entorno
 
-## Backend PHP
+**Frontend (`.env`):**
 
-La carpeta `BACKEND/` contiene:
-- [contact.php](c:\xampp\htdocs\Reglado\RegladoEnergy\BACKEND\contact.php): recibe formularios con adjuntos.
-- [admin_list.php](c:\xampp\htdocs\Reglado\RegladoEnergy\BACKEND\admin_list.php): lista solicitudes.
-- [admin_download.php](c:\xampp\htdocs\Reglado\RegladoEnergy\BACKEND\admin_download.php): descarga adjuntos.
-- [auth.php](c:\xampp\htdocs\Reglado\RegladoEnergy\BACKEND\auth.php): validacion de JWT y rol admin.
-- [db.php](c:\xampp\htdocs\Reglado\RegladoEnergy\BACKEND\db.php): conexion a base de datos.
-- [sql/facturas.sql](c:\xampp\htdocs\Reglado\RegladoEnergy\BACKEND\sql\facturas.sql): script de tablas.
-
-## Configuracion del backend
-
-1. Ejecutar:
-
-```sql
-SOURCE BACKEND/sql/facturas.sql;
+```
+VITE_AUTH_API_URL=http://localhost:8000
+VITE_GRUPO_REGLADO_BASE_URL=http://localhost:5173
+VITE_BACKEND_BASE=http://localhost:8001
+VITE_CONTACT_ENDPOINT=/contact.php
 ```
 
-2. Crear `BACKEND/.env` con la configuracion real del servidor.
+**Backend (`BACKEND/.env`):**
 
-3. Configurar `JWT_SECRET` en el backend para que coincida con `ApiLoging`.
-
-Ejemplo de `BACKEND/.env`:
-
-```env
-APP_ENV=production
+```
+APP_ENV=development
 DB_HOST=localhost
-DB_PORT=3306
 DB_NAME=facturas
-DB_USER=TU_USUARIO
-DB_PASS=TU_PASSWORD
-JWT_SECRET=EL_MISMO_SECRET_DE_APILOGING
-CORS_ALLOWED_ORIGINS=https://regladoenergy.com,https://regladogroup.com
+DB_USER=...
+DB_PASS=...
+JWT_SECRET=EL_MISMO_QUE_APILOGING
+CORS_ALLOWED_ORIGINS=http://localhost:5174,https://regladoenergy.com,https://www.regladoenergy.com
 CONTACT_MAIL_TO=info@regladoenergy.com
-CONTACT_MAIL_FROM=no-reply@regladoenergy.com
+```
+
+Ejemplos completos en [`.env.example`](.env.example) y [`BACKEND/.env.example`](BACKEND/.env.example).
+
+## Estructura
+
+```
+RegladoEnergy/
+├── public/                     # assets estáticos (favicon, og-image, sitemap.xml, robots.txt)
+├── src/
+│   ├── components/             # UI reutilizable (FeatureCard, LoginModal, SiteHeader, ...)
+│   ├── pages/                  # vistas por ruta (Home, Services, Contact, Admin, ...)
+│   ├── services/               # auth.js, ssoClient.js
+│   ├── router/                 # con meta.title por ruta
+│   ├── App.vue
+│   └── main.js
+├── BACKEND/
+│   ├── contact.php             # recibe formularios con adjuntos
+│   ├── admin_list.php          # lista solicitudes (rol admin)
+│   ├── admin_download.php      # descarga adjuntos (rol admin)
+│   ├── auth.php                # validación JWT + rol
+│   ├── db.php                  # conexión MySQL
+│   └── sql/facturas.sql        # esquema BD
+├── index.html                  # con CSP, JSON-LD LocalBusiness, meta tags SEO
+└── package.json
 ```
 
 ## Seguridad relevante
 
-- El boton admin en frontend es solo UX.
-- La proteccion real esta en `BACKEND/admin_list.php` y `BACKEND/admin_download.php`.
-- Ambos exigen token valido y rol `admin`.
+- El botón "Admin" en el frontend es solo UX — no aporta seguridad.
+- La protección real está en `BACKEND/admin_*.php`: ambos exigen JWT válido + rol `admin`.
 
-## Archivos clave
+## Más documentación
 
-- [src/components/SiteHeader.vue](c:\xampp\htdocs\Reglado\RegladoEnergy\src\components\SiteHeader.vue)
-- [src/pages/AuthCallback.vue](c:\xampp\htdocs\Reglado\RegladoEnergy\src\pages\AuthCallback.vue)
-- [src/pages/Admin.vue](c:\xampp\htdocs\Reglado\RegladoEnergy\src\pages\Admin.vue)
-- [src/services/auth.js](c:\xampp\htdocs\Reglado\RegladoEnergy\src\services\auth.js)
-- [src/router/index.js](c:\xampp\htdocs\Reglado\RegladoEnergy\src\router\index.js)
+- [DOCUMENTACION_PROYECTO.md](DOCUMENTACION_PROYECTO.md) — arquitectura del proyecto.
+- [README raíz del repo](../README.md) — visión global del ecosistema.
+- [docs/ECOSYSTEM_AUTH_SSO_HUB.md](../docs/ECOSYSTEM_AUTH_SSO_HUB.md) — spec del SSO Hub.

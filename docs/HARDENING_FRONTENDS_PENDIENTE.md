@@ -60,7 +60,7 @@ Añadir un `<meta http-equiv="Content-Security-Policy">` al `<head>` de cada `in
 
 ### 🟡 F2 — Auditoría de dependencias npm (supply chain)
 
-**Estado:** ✅ Primera pasada hecha el 2026-04-30. Los 4 frontends internos en **0 vulnerabilidades** (`npm audit`). Se subió Vite de 5.4.x → 6.4.2 en Maps, Ingenieria y Energy (Energy estaba además desincronizado: `package.json` pedía Vite 8 pero el lock seguía en 5.4.21). La integración continua con Dependabot/Snyk no se ha implementado — queda como mejora opcional para detectar nuevas vulnerabilidades en el futuro.
+**Estado:** ✅ Primera pasada hecha el 2026-04-30. Los 4 frontends internos en **0 vulnerabilidades** (`npm audit`). Se subió Vite de 5.4.x → 6.4.2 en Maps, Ingenieria y Energy (Energy estaba además desincronizado: `package.json` pedía Vite 8 pero el lock seguía en 5.4.21). **CI activa desde 2026-04-30** en [`.github/workflows/audit.yml`](../.github/workflows/audit.yml): ejecuta `npm audit --audit-level=high` en los 4 frontends en cada push y PR a `main`, bloqueando el merge si aparece una vuln high/critical. Dependabot/Snyk siguen sin implementar — opcional como mejora futura (PRs automáticas de bumps).
 
 **Baseline de versiones acordada (usar en proyectos nuevos del ecosistema):**
 

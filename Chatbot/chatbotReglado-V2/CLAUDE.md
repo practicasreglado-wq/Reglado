@@ -1,5 +1,0 @@
-- Piensa antes de actuar. Lee los archivos existentes antes de escribir código.
-- Sé conciso en la salida, pero exhaustivo en el razonamiento.
-- Prefiere editar a reescribir archivos completos.
-- Mantén las soluciones simples y directas.
-- NO CAMBIES NADA DEL CÓDIGO SIN ANTES PREGUNTARME. PROPÓN CAMBIOS Y YO TE DARÉ EL OK PARA QUE LOS APLIQUES.
