@@ -37,6 +37,8 @@ Además, se implementó **defensa en profundidad contra fuerza bruta** en el log
 
 ### 🟢 OP-1 — Operacional: limpieza automática y monitoreo
 
+**Estado:** ✅ Hecho. Script en [`ApiLoging/scripts/cleanup.php`](../ApiLoging/scripts/cleanup.php) (cubre `rate_limits >7d` y `revoked_tokens >30d`, idempotente) y cron activo en producción (`0 0 * * *` → `public_html/api_backend/scripts/cleanup.php`, verificado el 2026-04-30). Las "alertas básicas" (fase 2 opcional) no se han implementado y se descartan por ahora.
+
 **Severidad:** Operacional (no es vulnerabilidad, es mantenimiento).
 **Motivación:** Las tablas `rate_limits` y `revoked_tokens` crecen indefinidamente con el uso. En 3-6 meses sin limpieza, degradan el rendimiento de cada request autenticada (SELECT en middleware).
 
@@ -60,6 +62,8 @@ Además, se implementó **defensa en profundidad contra fuerza bruta** en el log
 ---
 
 ### 🟢 L2 — Refresh tokens
+
+**⚠️ Nota arquitectónica añadida 2026-04-30:** los proyectos del ecosistema viven en **dominios independientes** (eTLD+1 distintos: `regladogroup.com`, `regladoenergy.com`, `regladomaps.com`, `regladorealestate.com`, etc.), no en subdominios. Por eso el plan original del doc se queda corto: el `refresh_token` en cookie HttpOnly no se puede compartir entre dominios. Las opciones reales serían: (a) cookie de refresh por dominio + endpoint `/auth/refresh` por CORS con `credentials: 'include'` y `SameSite=None; Secure` (en riesgo por la deprecación de third-party cookies); (b) refresh siempre a través del SSO Hub con fragment-token (más latencia, más complejidad). Cualquier retomada de L2 debe empezar por decidir esta arquitectura antes que el código.
 
 **Severidad:** Leve (defensa en profundidad).
 **Motivación:** Reducir de 24h a 15min la ventana útil de un JWT comprometido. Es la mejora de seguridad más relevante del bloque.
@@ -91,6 +95,8 @@ Además, se implementó **defensa en profundidad contra fuerza bruta** en el log
 
 ### 🟢 L7 — Cookie HttpOnly para el JWT
 
+**⚠️ El plan descrito en este doc queda OBSOLETO (revisión 2026-04-30):** asumía dominios bajo un apex común (`Domain=.regladogroup.com`). La realidad es que el ecosistema vive en **dominios independientes** (`regladogroup.com`, `regladoenergy.com`, `regladomaps.com`, `regladorealestate.com`, etc.) — la cookie compartida cross-domain es físicamente imposible. Si se quiere recuperar L7, hay que rediseñar: cookie HttpOnly **por dominio individual** + el SSO Hub seguiría siendo el único transportador del JWT entre dominios (vía fragment-token, como ya hace). El "esperar a producción real con subdominios" del doc original NO se va a cumplir; ese requisito está cancelado. **Antes de retomar L7, escribir un nuevo plan que parta de la arquitectura real.**
+
 **Severidad:** Leve (defensa en profundidad contra XSS).
 **Motivación:** Un XSS en cualquier frontend no podría robar el JWT porque JavaScript no accedería a la cookie.
 
@@ -119,6 +125,8 @@ Además, se implementó **defensa en profundidad contra fuerza bruta** en el log
 
 ### 🔴 L6 — Tokens de verificación vía POST en lugar de GET
 
+**⚠️ Alcance real revisado 2026-04-30:** el doc original dice que "solo toca GrupoReglado", pero al verificar el código se descubre que los 4 frontends internos (Grupo, Energy, Maps, Ingenieria) tienen su propia ruta `/verificacion-exitosa` con `EmailVerifiedView`. El flujo actual es: email → backend → backend redirige al frontend de origen (vía `return_origin`). Si el email pasa a apuntar a Grupo, **hay que decidir cómo el usuario acaba viendo el feedback de "verificado" en el frontend desde el que se registró**. Tres caminos viables: (1) feedback en Grupo + SSO al origen (UX visible cambia de dominio), (2) Grupo verifica en silencio y redirige con flag `?email_verified=1` al origen (toca Grupo + 4 frontends internos), (3) Grupo verifica y reusa la `EmailVerifiedView` del origen vía fragment-token (toca Grupo + las 4 vistas existentes). Cualquier opción **toca más proyectos que los que dice el doc original**. Aplazar hasta tener acceso a Inmobiliaria para hacerlo de una pasada en los 5 frontends.
+
 **Severidad:** Leve (muy baja).
 **Motivación:** Los tokens de verificación de email y cambio de email quedan en logs del servidor, historial del navegador y cabecera `Referer` al llevarlos en query string. Un atacante con acceso a esos logs en el momento preciso (antes de que expiren o sean usados) podría consumirlos.
 
@@ -145,7 +153,7 @@ Además, se implementó **defensa en profundidad contra fuerza bruta** en el log
 
 | Tarea | ApiLoging | GrupoReglado | Energy | Maps | Ingenieria | Inmobiliaria |
 |---|---|---|---|---|---|---|
-| OP-1 — Cron + alertas | ✅ | — | — | — | — | — |
+| OP-1 — Cron + alertas | ✅ Hecho | — | — | — | — | — |
 | L2 — Refresh tokens | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ (externo) |
 | L7 — Cookie HttpOnly | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ (externo) |
 | L6 — GET → POST | ✅ | ✅ | — | — | — | — |
