@@ -1,0 +1,53 @@
+# Auditoría automática de dependencias npm en los frontends del ecosistema.
+#
+# Se ejecuta en cada PR a main y en push directo a main. Si aparece una
+# vulnerabilidad de severidad high o critical en cualquiera de los 4 frontends
+# internos, el job falla y bloquea el merge hasta que se resuelva.
+#
+# Inmobiliaria_Reglados queda fuera (la mantiene un equipo externo).
+# RegladoBienesRaices queda fuera (proyecto histórico sin uso activo).
+#
+# Este workflow es solo de lectura: nunca modifica código ni abre PRs.
+# Para PRs automáticas de bumps de seguridad, ver Dependabot (no configurado
+# por ahora — ver HARDENING_FRONTENDS_PENDIENTE.md / F2).
+
+name: NPM Audit
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:  # permite lanzarlo a mano desde la UI de Actions
+
+jobs:
+  audit:
+    name: Audit ${{ matrix.project }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false  # si uno falla, los demás siguen — vemos el panorama completo
+      matrix:
+        project:
+          - GrupoReglado
+          - RegladoEnergy
+          - RegladoMaps
+          - RegladoIngenieria
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: ${{ matrix.project }}/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ${{ matrix.project }}
+        run: npm ci
+
+      - name: Run npm audit
+        working-directory: ${{ matrix.project }}
+        run: npm audit --audit-level=high
