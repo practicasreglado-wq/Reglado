@@ -1,4 +1,17 @@
 User-agent: *
 Allow: /
 
+# Rutas internas / no indexables
+Disallow: /admin
+Disallow: /configuracion
+Disallow: /login
+Disallow: /registro
+Disallow: /recuperar-contrasena
+Disallow: /restablecer-contrasena
+Disallow: /verificacion-exitosa
+Disallow: /confirmar-acceso
+Disallow: /sso-handshake
+Disallow: /sso-store
+Disallow: /sso-logout
+
 Sitemap: https://regladogroup.com/sitemap.xml

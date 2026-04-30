@@ -54,7 +54,7 @@ Ejemplo completo en `.env.example` (si existe; añadir cuando se necesite).
 ```
 RegladoMaps/
 ├── public/
-│   ├── video/video.mp4         # hero del home (pesado — pendiente comprimir)
+│   ├── video/video.mp4         # hero del home (loop de 21s, 7.5 MB sin audio)
 │   ├── apimapa/                # bundle estático del backend antiguo
 │   └── favicon.png, sitemap.xml, robots.txt
 ├── src/

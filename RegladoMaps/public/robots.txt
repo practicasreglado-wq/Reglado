@@ -1,2 +1,13 @@
 User-agent: *
 Allow: /
+
+# Rutas internas / no indexables
+Disallow: /admin
+Disallow: /registro
+Disallow: /recuperar-contrasena
+Disallow: /restablecer-contrasena
+Disallow: /verificacion-exitosa
+Disallow: /confirmar-acceso
+Disallow: /auth/
+
+Sitemap: https://regladomaps.com/sitemap.xml
