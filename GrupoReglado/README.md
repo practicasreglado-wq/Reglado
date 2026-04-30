@@ -1,94 +1,82 @@
 # GrupoReglado
 
-Frontend principal del ecosistema Reglado.
+Frontend principal del ecosistema Reglado y **hub central de identidad/SSO**:
+todos los demás frontends redirigen aquí para login, registro y propagación
+de sesión cross-domain.
 
-Se encarga de:
-- portal corporativo con enlaces al resto de proyectos
-- login y registro centralizados
-- verificacion de correo
-- recuperacion de contrasena
-- configuracion de cuenta
-- acceso a panel admin de usuarios
+## Qué hace
 
-## Requisitos
+- Portal corporativo con enlaces al resto de productos (Energy, Maps, Ingeniería, Inmobiliaria).
+- Login, registro, verificación de email, recuperación de contraseña.
+- Configuración de cuenta del usuario.
+- Panel admin de usuarios.
+- **SSO Hub**: vistas `/sso-handshake`, `/sso-store`, `/sso-logout` que sincronizan sesión entre dominios independientes vía fragment-token.
 
-- Node.js 18+
-- `ApiLoging` funcionando
+## Stack
 
-## Instalacion
+- Vue 3 (Composition API) + Vite
+- Vue Router (modo `history`)
+- Cliente HTTP nativo `fetch`
+- Cookie compartida `reglado_auth_token` (autenticación local del propio dominio)
 
-1. Instalar dependencias:
-
-```bash
-npm install
-```
-
-2. Crear `GrupoReglado/.env` a partir de `GrupoReglado/.env.example`.
-   Para despliegue en Hostinger puedes partir de `GrupoReglado/.env.production.example`.
-
-3. Arrancar en desarrollo:
+## Cómo arrancar (dev)
 
 ```bash
-npm run dev
+npm install                      # solo la primera vez
+cp .env.example .env             # ajustar valores
+npm run dev                      # arranca en http://localhost:5173
 ```
 
-4. Build:
+Requisitos: **Node 18+**, **ApiLoging** corriendo en `http://localhost:8000`.
 
-```bash
-npm run build
-```
+## Servicio en el ecosistema
+
+- **Consume**: `ApiLoging` (puerto 8000) — única fuente de verdad de identidad.
+- **Es consumido por**: Energy, Maps, Ingeniería, Inmobiliaria — todos redirigen aquí para login y propagación de sesión vía SSO Hub.
+- No valida permisos de productos ajenos: solo autentica y devuelve el JWT.
+
+## Dominio en producción
+
+`https://regladogroup.com` (apex y `www.`)
 
 ## Variables de entorno
 
-- `VITE_AUTH_API_URL`
-- `VITE_REGLADO_REALSTATE_URL`
-- `VITE_REGLADO_ENERGY_URL`
-- `VITE_REGLADO_MAPAS_URL`
-- `VITE_REGLADO_ENPROCESO_URL`
-
-Ejemplo de produccion:
-
-```env
-VITE_AUTH_API_URL=https://regladogroup.com
-VITE_REGLADO_REALSTATE_URL=https://regladorealestate.com
-VITE_REGLADO_ENERGY_URL=https://regladoenergy.com
-VITE_REGLADO_MAPAS_URL=#
-VITE_REGLADO_ENPROCESO_URL=#
+```
+VITE_AUTH_API_URL=http://localhost:8000
+VITE_REGLADO_REALSTATE_URL=...
+VITE_REGLADO_ENERGY_URL=...
+VITE_REGLADO_MAPAS_URL=...
+VITE_REGLADO_ENPROCESO_URL=...
 ```
 
-## Rutas principales
+Ejemplos completos en [`.env.example`](.env.example) y [`.env.production.example`](.env.production.example).
 
-- `/`
-- `/login`
-- `/registro`
-- `/recuperar-contrasena`
-- `/restablecer-contrasena`
-- `/configuracion`
-- `/verificacion-exitosa`
-- `/admin`
+## Estructura
 
-## Flujo de autenticacion
+```
+GrupoReglado/
+├── public/             # assets estáticos (favicon, og-image, sitemap.xml, robots.txt)
+├── src/
+│   ├── components/     # UI reutilizable (LoginModal, SiteHeader, SiteFooter, ...)
+│   ├── pages/          # vistas asociadas a rutas (Login, Register, Portal, SsoHandshake, ...)
+│   ├── views/          # vistas legacy (en migración a pages/)
+│   ├── services/       # auth.js, ssoHub.js, ssoClient.js
+│   ├── router/         # vue-router con meta.title por ruta
+│   ├── App.vue
+│   └── main.js
+├── index.html          # con CSP, JSON-LD Organization, meta tags SEO
+├── package.json
+└── vite.config.js
+```
 
-1. El usuario entra en `GrupoReglado`.
-2. El frontend llama a `ApiLoging`.
-3. Si el login es correcto, se guarda JWT en `localStorage` y cookie.
-4. Si llega una URL `returnTo`, el usuario vuelve al proyecto origen con `?token=...`.
+## Más documentación
 
-## Estructura util
-
-- [src/pages/PortalView.vue](c:\xampp\htdocs\Reglado\GrupoReglado\src\pages\PortalView.vue): home del portal.
-- [src/components/SiteHeader.vue](c:\xampp\htdocs\Reglado\GrupoReglado\src\components\SiteHeader.vue): cabecera y sesion.
-- [src/components/SiteFooter.vue](c:\xampp\htdocs\Reglado\GrupoReglado\src\components\SiteFooter.vue): pie global.
-- [src/components/LoginModal.vue](c:\xampp\htdocs\Reglado\GrupoReglado\src\components\LoginModal.vue): modal de login.
-- [src/components/auth/RegisterForm.vue](c:\xampp\htdocs\Reglado\GrupoReglado\src\components\auth\RegisterForm.vue): formulario de registro.
-- [src/services/auth.js](c:\xampp\htdocs\Reglado\GrupoReglado\src\services\auth.js): cliente de autenticacion.
-- [src/router/index.js](c:\xampp\htdocs\Reglado\GrupoReglado\src\router\index.js): rutas.
-
-## Relacion con otros proyectos
-
-- `RegladoEnergy` y `Inmobiliaria_Reglados` redirigen aqui para login y registro.
-- `GrupoReglado` no valida permisos de producto ajenos: solo autentica y devuelve el token.
+- [DOCUMENTACION_PROYECTO.md](DOCUMENTACION_PROYECTO.md) — arquitectura interna y flujos detallados.
+- [FUNCIONALIDAD.md](FUNCIONALIDAD.md) — funcionalidades por vista.
+- [README raíz del repo](../README.md) — visión global del ecosistema.
+- [docs/ECOSYSTEM_AUTH_SSO_HUB.md](../docs/ECOSYSTEM_AUTH_SSO_HUB.md) — spec del SSO Hub.
 
 ## Nota operativa
 
-Si cambias el rol de un usuario en base de datos, ese usuario debe cerrar sesion y volver a iniciar sesion para recibir un JWT nuevo con el rol actualizado.
+Tras un cambio de rol en BBDD, el usuario debe cerrar sesión y volver a
+iniciarla para recibir un JWT con el rol actualizado.

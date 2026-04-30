@@ -27,7 +27,7 @@ backends PHP y el chatbot. La identidad de usuarios es central: vive en
 
 | Carpeta | Descripción |
 |---|---|
-| [Chatbot/chatbotReglado-V2/](Chatbot/chatbotReglado-V2/) | Chatbot del ecosistema (Node.js + widget JS). |
+| [Chatbot/](Chatbot/) | Chatbot del ecosistema (Node.js + widget JS). |
 
 ## Documentación
 

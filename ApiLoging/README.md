@@ -1,88 +1,58 @@
 # ApiLoging
 
-API de autenticación central del ecosistema Reglado. Esta es la única fuente de verdad para la identidad de los usuarios en todos los productos (Energy, Inmobiliaria, Maps).
+API de **autenticación central** del ecosistema Reglado. Única fuente de
+verdad de la identidad de usuarios para todos los productos (Grupo, Energy,
+Maps, Ingeniería, Inmobiliaria).
 
-## Funcionalidades Principales
-- **Autenticación Centralizada**: Registro único y acceso global.
-- **Gestión de Identidad**: Confirmación de email, recuperación de credenciales y cambios seguros de correo.
-- **Seguridad**: Emisión de JWT firmados, rate-limiting, y logs de seguridad.
-- **Integración Operativa**: Sincronización automática de usuarios con Notion.
+## Qué hace
 
-## Requisitos
+- Registro y login centralizados.
+- Verificación de email, recuperación y cambio de contraseña, cambio de email.
+- Emisión y validación de JWT firmados.
+- Rate-limiting (anti fuerza bruta) + account lockout.
+- Geo login alerts (detección de login desde país nuevo).
+- Single-session enforcement (un solo dispositivo activo por usuario).
+- Force-logout y ban desde panel admin.
+- Sincronización de usuarios con Notion (espejo operativo).
 
-- PHP 8.1+
-- MySQL o MariaDB
-- Composer
+## Stack
 
-## Instalacion
+- PHP 8.1+ (arquitectura MVC propia).
+- MySQL/MariaDB.
+- Composer (vendor autoload).
+- GeoIP2 + MaxMind GeoLite2 para geo alerts.
 
-1. Instalar dependencias:
+## Cómo arrancar (dev)
 
 ```bash
-composer install
+composer install                 # solo la primera vez
+cp .env.example .env             # ajustar BD + JWT_SECRET + mail
+php -S localhost:8000            # arranca la API
 ```
 
-2. Crear `ApiLoging/.env` a partir de `ApiLoging/.env.example`.
-
-3. Crear base de datos:
-
-Instalacion limpia:
+Primera vez con BD:
 
 ```sql
-SOURCE database/create_regladousers.sql;
-```
-
-Base existente:
-
-```sql
+SOURCE database/create_regladousers.sql;     # instalación limpia
+-- o sobre BD existente:
 SOURCE database/schema.sql;
 ```
 
-4. Arrancar la API:
+Requisitos: **PHP 8.1+**, **MySQL/MariaDB**, **Composer**.
 
-```bash
-php -S localhost:8000
-```
+## Servicio en el ecosistema
 
-## Variables de entorno principales
+- **Consumido por**: todos los frontends (Grupo, Energy, Maps, Ingeniería, Inmobiliaria) — vía `Authorization: Bearer <jwt>` en cada request.
+- **Consumido por**: backends de productos (Energy/BACKEND, Ingeniería/BACKEND, etc.) — validan el mismo JWT con el `JWT_SECRET` compartido.
+- **No depende** de otros backends del ecosistema. Es la raíz del árbol de identidad.
 
-Base de datos:
-- `DB_HOST`
-- `DB_PORT`
-- `DB_NAME`
-- `DB_USER`
-- `DB_PASS`
+## Dominio en producción
 
-JWT:
-- `JWT_SECRET`
-- `JWT_TTL_SECONDS`
-- `JWT_ISSUER`
-
-Seguridad:
-- `APP_ENV`
-- `CORS_ALLOWED_ORIGINS`
-- `REDIRECT_ALLOWED_ORIGINS`
-
-Correo:
-- `MAIL_DRIVER`
-- `MAIL_HOST`
-- `MAIL_PORT`
-- `MAIL_ENCRYPTION`
-- `MAIL_USERNAME`
-- `MAIL_PASSWORD`
-- `MAIL_FROM`
-- `MAIL_FROM_NAME`
-
-Flujos de correo:
-- `EMAIL_VERIFY_URL_BASE`
-- `EMAIL_VERIFY_REDIRECT_URL`
-- `EMAIL_CHANGE_VERIFY_URL_BASE`
-- `EMAIL_CHANGE_REDIRECT_URL`
-- `PASSWORD_RESET_URL_BASE`
+`https://regladogroup.com` (mismo dominio que GrupoReglado, bajo paths `/auth/...` y `/api/...`).
 
 ## Endpoints
 
-Publicos:
+**Públicos:**
 - `POST /auth/register`
 - `POST /auth/login`
 - `GET /auth/verify-email?token=...`
@@ -90,38 +60,72 @@ Publicos:
 - `POST /auth/request-password-reset`
 - `POST /auth/reset-password`
 
-Protegidos:
+**Protegidos** (requieren JWT):
 - `GET /auth/me`
 - `POST /auth/logout`
-- `POST /auth/update-username`
-- `POST /auth/update-name`
-- `POST /auth/update-phone`
+- `POST /auth/update-username` / `update-name` / `update-phone`
 - `POST /auth/request-email-change`
 - `GET /auth/confirm-email-change?token=...`
 - `POST /auth/change-password`
+- `POST /auth/confirm-login-location` (geo alerts)
 
-Admin:
+**Admin** (requieren JWT + rol admin):
 - `GET /auth/admin/users`
+- `POST /auth/admin/update-role`
+- `POST /auth/admin/ban-user`
+- `POST /auth/admin/force-logout`
 
-## Flujo general
+## Variables de entorno
 
-1. Un frontend redirige al usuario a `GrupoReglado`.
-2. `GrupoReglado` llama a `ApiLoging`.
-3. `ApiLoging` emite un JWT.
-4. El frontend de destino usa ese JWT en `Authorization: Bearer <token>`.
-5. Cada backend de producto valida el token por su cuenta.
+**Base de datos:**
+- `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASS`
 
-## Archivos importantes
+**JWT:**
+- `JWT_SECRET` (debe ser el mismo en todos los backends que validen)
+- `JWT_TTL_SECONDS` (default 86400 = 24h)
+- `JWT_ISSUER`
 
-- [index.php](c:\xampp\htdocs\Reglado\ApiLoging\index.php): punto de entrada y enrutado simple.
-- [controllers/AuthController.php](c:\xampp\htdocs\Reglado\ApiLoging\controllers\AuthController.php): flujos de autenticacion y perfil.
-- [middleware/AuthMiddleware.php](c:\xampp\htdocs\Reglado\ApiLoging\middleware\AuthMiddleware.php): validacion de JWT.
-- [models/User.php](c:\xampp\htdocs\Reglado\ApiLoging\models\User.php): acceso a datos.
-- [services/MailService.php](c:\xampp\htdocs\Reglado\ApiLoging\services\MailService.php): envio de correos.
-- [database/create_regladousers.sql](c:\xampp\htdocs\Reglado\ApiLoging\database\create_regladousers.sql): script completo de base de datos.
+**Seguridad:**
+- `APP_ENV` (`local` / `production`)
+- `CORS_ALLOWED_ORIGINS` (incluir todos los frontends, apex + www)
+- `REDIRECT_ALLOWED_ORIGINS` (destinos válidos de `returnTo`)
 
-## Notas de despliegue
+**Correo:**
+- `MAIL_DRIVER`, `MAIL_HOST`, `MAIL_PORT`, `MAIL_ENCRYPTION`
+- `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_FROM`, `MAIL_FROM_NAME`
 
-- `JWT_SECRET` debe ser el mismo que usen los backends que validan los tokens.
-- `CORS_ALLOWED_ORIGINS` debe incluir todos los frontends del ecosistema.
-- `REDIRECT_ALLOWED_ORIGINS` debe incluir todos los destinos validos de `returnTo`.
+**Flujos de email:**
+- `EMAIL_VERIFY_URL_BASE`, `EMAIL_VERIFY_REDIRECT_URL`
+- `EMAIL_CHANGE_VERIFY_URL_BASE`, `EMAIL_CHANGE_REDIRECT_URL`
+- `PASSWORD_RESET_URL_BASE`
+
+Ejemplos completos en [`.env.example`](.env.example) y [`.env.production.example`](.env.production.example).
+
+## Estructura
+
+```
+ApiLoging/
+├── index.php                   # punto de entrada y enrutado
+├── config/                     # Env, Database, Cors
+├── controllers/AuthController.php
+├── middleware/AuthMiddleware.php
+├── models/User.php
+├── services/                   # JwtService, MailService, RateLimiter, NotionService, ...
+├── utils/Security.php
+├── database/                   # schema.sql, create_regladousers.sql, migrate_*.sql
+├── data/                       # MaxMind GeoLite2 (gitignored)
+└── scripts/cleanup.php         # OP-1: limpieza periódica (cron diario)
+```
+
+## Notas operativas
+
+- `JWT_SECRET` debe coincidir entre ApiLoging y todos los backends que validen tokens.
+- `CORS_ALLOWED_ORIGINS` y `REDIRECT_ALLOWED_ORIGINS` deben listar **apex + www** de cada dominio.
+- En producción hay un **cron diario** (`0 0 * * *`) ejecutando `scripts/cleanup.php` para purgar `rate_limits` y `revoked_tokens` antiguos.
+
+## Más documentación
+
+- [FUNCIONALIDAD.md](FUNCIONALIDAD.md) — funcionalidades detalladas.
+- [README raíz del repo](../README.md) — visión global del ecosistema.
+- [docs/HARDENING_APILOGING_PENDIENTE.md](../docs/HARDENING_APILOGING_PENDIENTE.md) — hardening cerrado y pendiente.
+- [docs/ECOSYSTEM_AUTH_SSO_HUB.md](../docs/ECOSYSTEM_AUTH_SSO_HUB.md) — spec del SSO Hub.

@@ -1,26 +1,74 @@
 # RegladoMaps
 
-Visualización cartográfica interactiva de activos del ecosistema Reglado.
+Visualización cartográfica interactiva del **mapa energético de España**:
+plantas de producción (eólica, solar, hidráulica, biodiésel, biometano,
+hidrógeno) sobre un mapa navegable.
 
-## Propósito
-Permite a los usuarios visualizar inmuebles y recursos energéticos sobre un mapa interactivo, facilitando la búsqueda por ubicación y el análisis espacial de activos.
+## Qué hace
 
-## Integración
-- **Autenticación**: Al igual que el resto del ecosistema, depende de la cookie compartida `reglado_auth_token`.
-- **Datos**: Consume APIs locales para obtener las coordenadas y metadatos de los puntos a mostrar.
-- **Interfaz**: Construido con Vue.js y Vite para un rendimiento óptimo.
+- Visor interactivo de plantas energéticas por tipo de tecnología.
+- Filtros por categoría, búsqueda por ubicación.
+- Páginas legales (aviso legal, privacidad, cookies) con SSO compartido.
 
-## Requisitos
-- Node.js 18+
-- [ApiLoging](file:///c:/xampp/htdocs/Reglado/ApiLoging) activo para validación de tokens.
+## Stack
 
-## Comandos de Desarrollo
+- Vue 3 + Vite, Vue Router (modo `history`).
+- Backend de datos: [`ApiMapa/`](../ApiMapa/) (PHP) — sirve los puntos del mapa.
+- SSO compartido vía hub `GrupoReglado` para sesión cross-domain.
+
+## Cómo arrancar (dev)
+
 ```bash
-npm install
-npm run dev -- --port 5176
+npm install                      # solo la primera vez
+npm run dev -- --port 5176       # arranca en http://localhost:5176
 ```
 
-## Estructura de Archivos Clave
-- `src/App.vue`: Punto de entrada de la aplicación y lógica de inicialización.
-- `src/router.js`: Definición de rutas y navegación.
-- `src/components/`: Componentes específicos de mapas y filtros.
+El backend (`ApiMapa/`) se sirve aparte con XAMPP/Apache (no con `php -S`)
+porque vive bajo `regladoconsultores.com/mapa/` en producción.
+
+Requisitos: **Node 18+**, **ApiLoging** corriendo (validación JWT) y opcionalmente
+**ApiMapa** local si se quieren datos en dev.
+
+## Servicio en el ecosistema
+
+- **Consume**: `ApiLoging` (identidad) y `ApiMapa` (datos geográficos).
+- **No expone APIs propias**: es solo frontend.
+- Sesión sincronizada con el resto del ecosistema vía SSO Hub de Grupo.
+
+## Dominio en producción
+
+`https://regladomaps.com` (apex y `www.`)
+
+## Variables de entorno
+
+```
+VITE_AUTH_API_URL=http://localhost:8000
+VITE_GRUPO_REGLADO_BASE_URL=http://localhost:5173
+VITE_API_MAPA_URL=...
+```
+
+Ejemplo completo en `.env.example` (si existe; añadir cuando se necesite).
+
+## Estructura
+
+```
+RegladoMaps/
+├── public/
+│   ├── video/video.mp4         # hero del home (pesado — pendiente comprimir)
+│   ├── apimapa/                # bundle estático del backend antiguo
+│   └── favicon.png, sitemap.xml, robots.txt
+├── src/
+│   ├── components/             # MapView, AdminPanel, PoliticaCookies, ...
+│   ├── services/               # auth.js, ssoClient.js
+│   ├── App.vue
+│   ├── main.js
+│   └── router.js               # rutas + meta.title
+├── index.html                  # con CSP, JSON-LD, meta tags SEO
+└── package.json
+```
+
+## Más documentación
+
+- [FUNCIONALIDAD.md](FUNCIONALIDAD.md) — funcionalidades por vista.
+- [ApiMapa/README.md](../ApiMapa/README.md) — backend que sirve los datos del mapa.
+- [README raíz del repo](../README.md) — visión global del ecosistema.

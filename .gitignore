@@ -81,8 +81,10 @@ ReleasesEstables/
 scripts/
 
 # === Chatbot (Node.js + widget JS) ===
-# Ya no ignoramos el proyecto entero — solo lo sensible y generado.
-# Globs `Chatbot/**/...` para tolerar renombres del subdir (V2, V3, ...).
+# Solo ignoramos lo sensible y generado. Los globs `Chatbot/**/...`
+# matchean tanto `Chatbot/X` directo (sin subdir, configuración actual)
+# como `Chatbot/V2/X`, `Chatbot/V3/X` etc. si en algún momento se
+# reintroduce un subdirectorio versionado.
 Chatbot/**/node_modules/
 Chatbot/**/dist/
 Chatbot/**/coverage/
