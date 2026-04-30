@@ -123,9 +123,11 @@ Además, se implementó **defensa en profundidad contra fuerza bruta** en el log
 
 ---
 
-### 🔴 L6 — Tokens de verificación vía POST en lugar de GET
+### 🔴 L6 — Tokens de verificación vía POST en lugar de GET ❌ DESCARTADO
 
-**⚠️ Alcance real revisado 2026-04-30:** el doc original dice que "solo toca GrupoReglado", pero al verificar el código se descubre que los 4 frontends internos (Grupo, Energy, Maps, Ingenieria) tienen su propia ruta `/verificacion-exitosa` con `EmailVerifiedView`. El flujo actual es: email → backend → backend redirige al frontend de origen (vía `return_origin`). Si el email pasa a apuntar a Grupo, **hay que decidir cómo el usuario acaba viendo el feedback de "verificado" en el frontend desde el que se registró**. Tres caminos viables: (1) feedback en Grupo + SSO al origen (UX visible cambia de dominio), (2) Grupo verifica en silencio y redirige con flag `?email_verified=1` al origen (toca Grupo + 4 frontends internos), (3) Grupo verifica y reusa la `EmailVerifiedView` del origen vía fragment-token (toca Grupo + las 4 vistas existentes). Cualquier opción **toca más proyectos que los que dice el doc original**. Aplazar hasta tener acceso a Inmobiliaria para hacerlo de una pasada en los 5 frontends.
+**Estado:** ❌ **Descartado el 2026-04-30.** El propio doc lo califica de "muy baja severidad" y "considerar descartar si no aporta frente al coste". Tras revisar el código real, el alcance es **mayor del que decía el doc original**: los 4 frontends internos tienen su propia ruta `/verificacion-exitosa` con `EmailVerifiedView`, y al cambiar el flujo hay que decidir cómo el usuario ve el feedback de verificación en el frontend desde el que se registró (3 caminos viables, todos tocan múltiples frontends). El vector de ataque es muy específico (acceso a logs del servidor en ventana corta, tokens de un solo uso con expiración corta) y el coste de implementación supera el beneficio de seguridad real. Se mantiene el flujo `GET /auth/verify-email?token=...` actual.
+
+Los apartados siguientes de esta sección quedan como referencia histórica del plan inicial; no se ejecutarán salvo que cambie la prioridad.
 
 **Severidad:** Leve (muy baja).
 **Motivación:** Los tokens de verificación de email y cambio de email quedan en logs del servidor, historial del navegador y cabecera `Referer` al llevarlos en query string. Un atacante con acceso a esos logs en el momento preciso (antes de que expiren o sean usados) podría consumirlos.
@@ -156,7 +158,7 @@ Además, se implementó **defensa en profundidad contra fuerza bruta** en el log
 | OP-1 — Cron + alertas | ✅ Hecho | — | — | — | — | — |
 | L2 — Refresh tokens | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ (externo) |
 | L7 — Cookie HttpOnly | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ (externo) |
-| L6 — GET → POST | ✅ | ✅ | — | — | — | — |
+| L6 — GET → POST | ❌ Descartado | ❌ Descartado | — | — | — | — |
 
 `Inmobiliaria_Reglados` aparece como **(externo)** porque lo mantiene otra persona. Cuando retomemos estos pendientes habrá que coordinar con su responsable para que aplique el cambio del lado de su frontend.
 
@@ -167,7 +169,7 @@ Además, se implementó **defensa en profundidad contra fuerza bruta** en el log
 1. **OP-1** — Primero. Cero impacto multi-proyecto, beneficio inmediato y duradero.
 2. **L2** — Segundo. Siguiendo la estrategia de fases A→B→C para no romper nada.
 3. **L7** — Cuando producción esté estable con dominio común de subdominios.
-4. **L6** — Opcional. Descartar si no aporta frente al coste.
+4. ~~**L6**~~ — Descartado el 2026-04-30 (ver sección L6).
 
 ---
 
