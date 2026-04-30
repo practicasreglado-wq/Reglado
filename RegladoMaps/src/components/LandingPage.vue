@@ -6,12 +6,12 @@
   mecánica de navegación y ahorrar redundancia de código en los anclajes directos.
 -->
 <template>
-  <div class="landing-page" :class="{ visible: showContent }">
+  <header class="landing-page" :class="{ visible: showContent }">
       <h1 class="titulo">{{ msg }}</h1>
     <p class="descripcion">Descubre todas las plantas, parques y estaciones de energía renovable a través de nuestros datos interactivos.</p>
     <button class="landing-button" @click="irAlMapa">Abrir mapa interactivo</button>
 
-    <div class="nav-anchors">
+    <nav class="nav-anchors">
       <button 
         v-for="(item, index) in energyTypes" 
         :key="item.id" 
@@ -91,8 +91,8 @@
         </div>
         <span class="card-text">{{ item.label }}</span>
       </button>
-    </div>
-  </div>
+    </nav>
+  </header>
 </template>
 
 <script>
@@ -133,8 +133,8 @@ export default {
 .landing-page.visible { opacity: 1; transform: translateY(0); }
 .titulo { font-size: 3.75rem; margin-bottom: 0.5rem; }
 .descripcion { font-size: 1.25rem; margin-top: 0.5rem; }
-.landing-button { margin-top: 1.875rem; padding: 1rem 2.25rem; font-size: 1.125rem; font-weight: 600; border: none; border-radius: 0.625rem; background-color: #00A86B; color: white; cursor: pointer; box-shadow: 0 0.25rem 0.9375rem rgba(0, 168, 107, 0.3); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-.landing-button:hover { transform: translateY(-4px); background-color: #00c67d; box-shadow: 0 0.625rem 1.25rem rgba(0, 168, 107, 0.5); }
+.landing-button { margin-top: 1.875rem; padding: 1rem 2.25rem; font-size: 1.125rem; font-weight: 600; border: none; border-radius: 0.625rem; background-color: #008550; color: white; cursor: pointer; box-shadow: 0 0.25rem 0.9375rem rgba(0, 133, 80, 0.3); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.landing-button:hover { transform: translateY(-4px); background-color: #007a48; box-shadow: 0 0.625rem 1.25rem rgba(0, 122, 72, 0.5); }
 .nav-anchors { margin-top: 3.75rem; display: grid; grid-template-columns: repeat(6, 1fr); gap: 1.25rem; width: 100%; max-width: 68.75rem; }
 .anchor-card { position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem 0.625rem; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 1rem; backdrop-filter: blur(10px); cursor: pointer; opacity: 0; transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease; z-index: 1; }
 

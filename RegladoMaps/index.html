@@ -23,16 +23,77 @@
       object-src 'none';
     " />
 
-    <link rel="icon" type="image/svg+xml" href="/reglado-logo.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Reglado Maps - Plataforma interactiva para la gestión y visualización de recursos energéticos, propiedades y ubicaciones de Grupo Reglado." />
-    <meta property="og:title" content="Reglado Maps - Búsqueda de recursos y propiedades" />
-    <meta property="og:description" content="Explora el mapa interactivo de Reglado para encontrar propiedades, recursos energéticos y localizaciones estratégicas." />
-    <title>Reglado Maps</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <title>Reglado Maps | Mapa energético de España</title>
+    <meta
+      name="description"
+      content="Reglado Maps - Plataforma interactiva para la gestión y visualización de recursos energéticos, propiedades y ubicaciones de Grupo Reglado."
+    />
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="Reglado Maps" />
+    <meta
+      name="keywords"
+      content="mapa energético España, plantas eólicas, plantas solares, energía hidráulica, biodiésel, biometano, hidrógeno, recursos energéticos, visor de mapa, Reglado Group"
+    />
+
+    <!-- Open Graph / Social -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Reglado Maps" />
+    <meta property="og:title" content="Reglado Maps | Mapa energético de España" />
+    <meta
+      property="og:description"
+      content="Visualiza el mapa energético de España: plantas eólicas, solares, hidráulicas, biodiésel, biometano e hidrógeno sobre un visor interactivo."
+    />
+    <meta property="og:url" content="https://regladomaps.com/" />
+    <meta property="og:image" content="https://regladomaps.com/og-image.png" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Reglado Maps | Mapa energético de España" />
+    <meta
+      name="twitter:description"
+      content="Visualiza el mapa energético de España: plantas eólicas, solares, hidráulicas, biodiésel, biometano e hidrógeno sobre un visor interactivo."
+    />
+    <meta name="twitter:image" content="https://regladomaps.com/og-image.png" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/reglado-logo.svg" />
+
+    <!-- Canonical (se actualiza dinámicamente en la SPA) -->
     <link rel="canonical" href="https://regladomaps.com/" />
+
+    <!-- Fuente corporativa Outfit (Google Fonts) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Schema.org Organization -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Reglado Maps",
+        "url": "https://regladomaps.com/",
+        "logo": "https://regladomaps.com/logo_circulo.png",
+        "image": "https://regladomaps.com/og-image.png",
+        "description": "Plataforma interactiva para la visualización del mapa energético de España: plantas eólicas, solares, hidráulicas, biodiésel, biometano e hidrógeno.",
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "telephone": "+34 911462674",
+          "contactType": "customer service",
+          "email": "info@regladoconsultores.com",
+          "areaServed": "ES",
+          "availableLanguage": ["Spanish"]
+        },
+        "sameAs": [
+          "https://www.linkedin.com/in/reglado-abogados-y-consultores-90b7a0233/"
+        ]
+      }
+    </script>
   </head>
   <body>
     <div id="app"></div>

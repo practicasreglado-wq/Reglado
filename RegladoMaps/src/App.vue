@@ -21,7 +21,7 @@
       </button>
     </nav>
 
-    <div class="pantalla-inicio" v-show="$route.path === '/'">
+    <main class="pantalla-inicio" v-show="$route.path === '/'">
       <div class="video-container">
         <video ref="video" autoplay muted id="background-video" @ended="restartVideo">
           <source src="/video/video.mp4" type="video/mp4">
@@ -30,7 +30,7 @@
         <LandingPage msg="El mapa energético de España" @scrollTo="scrollToSection" />
       </div>
 
-      <div class="seccion eolica" ref="eolica">
+      <section class="seccion eolica" ref="eolica">
         <!-- Aerogeneradores de Fondo -->
         <div class="eolica-fondo">
           <svg class="turbina t1" viewBox="0 0 24 24" fill="none">
@@ -77,12 +77,12 @@
           <button class="btn-ver-mapa btn-ver-eolica" @click="goToMap('eolica')">Ver en el mapa <span
               class="arrow">→</span></button>
         </div>
-        <img src="@/assets/eolica.jpg" alt="Energía Eólica" class="imagen-eolica fade-right" />
-      </div>
+        <img src="@/assets/eolica.webp" width="1600" height="1200" alt="Energía Eólica" class="imagen-eolica fade-right" />
+      </section>
 
-      <div class="seccion solar" ref="solar" @mousemove="handleMouseMove" @mouseenter="handleMouseEnter"
+      <section class="seccion solar" ref="solar" @mousemove="handleMouseMove" @mouseenter="handleMouseEnter"
         @mouseleave="handleMouseLeave">
-        <img src="@/assets/solar.jpg" alt="Energía Solar" class="imagen-solar fade-left" />
+        <img src="@/assets/solar.webp" width="1600" height="2396" alt="Energía Solar" class="imagen-solar fade-left" />
         <div class="seccion-texto-solar fade-right">
           <h2 class="titulo-solar">Instalaciones Fotovoltaicas</h2>
           <p class="texto-solar">La energía solar fotovoltaica y termosolar aprovecha la radiación del sol para generar
@@ -91,9 +91,9 @@
           <button class="btn-ver-mapa btn-ver-solar" @click="goToMap('solar')">Ver en el mapa <span
               class="arrow">→</span></button>
         </div>
-      </div>
+      </section>
 
-      <div class="seccion hidrogeno" ref="hidrogeno">
+      <section class="seccion hidrogeno" ref="hidrogeno">
         <!-- Flujo de Gas de Fondo -->
         <svg class="seccion-flujo" viewBox="0 0 120 120" preserveAspectRatio="none">
           <path d="M-20,25 Q30,10 60,25 T140,25" stroke="rgba(0, 229, 255, 0.15)" stroke-width="1.2" fill="none" />
@@ -111,13 +111,13 @@
           <button class="btn-ver-mapa btn-ver-hidrogeno" @click="goToMap('hidrogeno')">Ver en el mapa <span
               class="arrow">→</span></button>
         </div>
-        <img src="@/assets/hidrogeno.jpg" alt="Hidrógeno" class="imagen-hidrogeno fade-right" />
-      </div>
+        <img src="@/assets/hidrogeno.webp" width="1600" height="1150" alt="Hidrógeno" class="imagen-hidrogeno fade-right" />
+      </section>
 
-      <div class="seccion biometano" ref="biometano" @mousemove="handleMouseMove" @mouseenter="handleMouseEnter"
+      <section class="seccion biometano" ref="biometano" @mousemove="handleMouseMove" @mouseenter="handleMouseEnter"
         @mouseleave="handleMouseLeave">
         <div class="biometano-interactivo"></div>
-        <img src="@/assets/biometano.jpg" alt="Biometano" class="imagen-biometano fade-left" />
+        <img src="@/assets/biometano.webp" width="1280" height="850" alt="Biometano" class="imagen-biometano fade-left" />
         <div class="seccion-texto-biometano fade-right">
           <h2 class="titulo-biometano">Centrales de Biometano</h2>
           <p class="texto-biometano">El biometano es un gas renovable producido a partir de la descomposición natural de
@@ -126,9 +126,9 @@
           <button class="btn-ver-mapa btn-ver-biometano" @click="goToMap('biometano')">Ver en el mapa <span
               class="arrow">→</span></button>
         </div>
-      </div>
+      </section>
 
-      <div class="seccion biodiesel" ref="biodiesel">
+      <section class="seccion biodiesel" ref="biodiesel">
         <div class="seccion-texto-biodiesel fade-left">
           <h2 class="titulo-biodiesel">Plantas de Biodiésel</h2>
           <p class="texto-biodiesel">El biodiésel es un biocarburante líquido que se obtiene a partir de aceites
@@ -137,10 +137,10 @@
           <button class="btn-ver-mapa btn-ver-biodiesel" @click="goToMap('biodiesel')">Ver en el mapa <span
               class="arrow">→</span></button>
         </div>
-        <img src="@/assets/biodiesel.jpg" alt="Biodiesel" class="imagen-biodiesel fade-right" />
-      </div>
+        <img src="@/assets/biodiesel.webp" width="1600" height="960" alt="Biodiesel" class="imagen-biodiesel fade-right" />
+      </section>
 
-      <div class="seccion hidraulica" ref="hidraulica">
+      <section class="seccion hidraulica" ref="hidraulica">
         <div class="wave-overlay"></div>
         <div class="glass-texture"></div>
 
@@ -164,7 +164,7 @@
             fill="url(#secAgua2)" />
         </svg>
 
-        <img src="@/assets/hidraulica.jpg" alt="Energía Hidráulica" class="imagen-hidraulica fade-left" />
+        <img src="@/assets/hidraulica.webp" width="1600" height="2398" alt="Energía Hidráulica" class="imagen-hidraulica fade-left" />
         <div class="seccion-texto-hidraulica fade-right">
           <h2 class="titulo-hidraulica">Centrales Hidroeléctricas</h2>
           <p class="texto-hidraulica">La energía hidráulica aprovecha la fuerza y el movimiento natural del agua.
@@ -172,8 +172,8 @@
           <button class="btn-ver-mapa btn-ver-hidraulica" @click="goToMap('hidraulica')">Ver en el mapa <span
               class="arrow">→</span></button>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
 
     <router-view v-show="$route.path !== '/'" />
     <LPFooter ref="footer" @scrollTo="scrollToSection" />

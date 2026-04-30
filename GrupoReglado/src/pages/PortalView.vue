@@ -4,7 +4,6 @@
       <video ref="heroVideoRef" class="hero-video" autoplay="autoplay" muted="muted" playsinline preload="auto" @ended="handleVideoEnded">
         <source src="/Bissness.webm" type="video/webm" />
         <source src="/Bissness.mp4" type="video/mp4" />
-        <source src="/HandShacke.mp4" type="video/mp4" />
       </video>
       <div class="hero-overlay"></div>
       <div class="hero-particles"></div>
@@ -469,6 +468,18 @@ if (typeof document !== 'undefined') {
 .hero-cta:hover {
   transform: translateY(-2px);
   background: #1f324d;
+}
+
+/* Dark mode: el --primary cambia a #60a5fa (azul claro). Texto blanco sobre
+   ese azul claro da contraste 2.5:1 (falla WCAG AA). Mantenemos el azul claro
+   pero invertimos el texto a oscuro → contraste 7.35:1. */
+body.dark-mode .hero-cta {
+  color: #0c1220;
+}
+
+body.dark-mode .hero-cta:hover {
+  color: #0c1220;
+  background: var(--primary-hover);
 }
 
 .hero-scroll-indicator {
