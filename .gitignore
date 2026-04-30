@@ -53,6 +53,13 @@ RegladoIngenieria/.env.*
 !RegladoIngenieria/.env.example
 RegladoIngenieria/BACKEND/.env
 
+# === RegladoBienesRaices (Vue + Vite) ===
+RegladoBienesRaices/node_modules/
+RegladoBienesRaices/dist/
+RegladoBienesRaices/.env
+RegladoBienesRaices/.env.*
+!RegladoBienesRaices/.env.example
+
 # === Inmobiliaria_Reglados (gestionado por su equipo) ===
 # Reglas adicionales locales en Inmobiliaria_Reglados/.gitignore — no
 # duplicar ni modificar desde aquí. Estas son las únicas que ya estaban
@@ -68,7 +75,6 @@ ApiMapa/vendor/
 
 # === Carpetas de trabajo locales / artefactos ===
 Pruebas/
-RegladoBienesRaices/
 n8nJson/
 SkillsClaude/
 ReleasesEstables/
