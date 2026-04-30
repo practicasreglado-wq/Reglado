@@ -204,6 +204,22 @@ Esto requiere un **redeploy de Grupo** tras el cambio.
 
 Siguiendo el patrón exacto de los 3 proyectos ya migrados: **1-2 horas** + 30 min para actualizar la allowlist y tema en Grupo + redeploy. Total: medio día.
 
+## Versión de Vite — alinear con baseline (añadido 2026-04-30)
+
+Tras la pasada de F2 ([HARDENING_FRONTENDS_PENDIENTE.md](HARDENING_FRONTENDS_PENDIENTE.md)), los 4 frontends internos del ecosistema (Grupo, Energy, Maps, Ingenieria) quedaron alineados en:
+
+- `vite`: `^6.4.2`
+- `@vitejs/plugin-vue`: `^5.2.0`
+
+**Inmobiliaria_Reglados está por encima** de esa baseline: hoy declara `vite ^7.3.1` + `@vitejs/plugin-vue ^6.0.4`. No es vulnerable (Vite 7 incluye los parches de la advisory `GHSA-67mh-4wv8-2f99`), pero sí desalineado.
+
+**Cuando volváis a tener disponibilidad sobre Inmobiliaria**, decidir conjuntamente:
+
+- **Opción A — bajar Inmobiliaria a `vite ^6.4.2`:** alineamiento total, sin sobresaltos en build/dev. Es lo más probable que funcione sin tocar nada más.
+- **Opción B — subir el resto del ecosistema a `vite ^7.x`:** reescribiríamos `package.json` de los 4 frontends y haríamos otra ronda de `npm install` + `npm run build`. Riesgo bajo (Vite 7 mantiene compatibilidad con plugin-vue 5 también), pero requiere ventana de prueba.
+
+No es urgente — los dos extremos son seguros y funcionales. Es solo cuestión de mantener la consistencia entre proyectos del ecosistema.
+
 ## Qué NO hay que hacer
 
 - **Tocar schema de BBDD** — Inmobiliaria no tiene BBDD propia para auth; todo va contra la de ApiLoging. El schema ya está migrado.
