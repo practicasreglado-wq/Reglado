@@ -44,9 +44,61 @@ Toda la documentación técnica del ecosistema está en [docs/](docs/):
 
 ## Cómo levantar el entorno
 
-Usa la skill `skill-levantar-reglado` (arranca los 9 servidores en orden
-estricto con verificación final de puertos). MySQL se arranca a mano desde el
-Control Panel de XAMPP.
+**Pre-requisito:** MySQL arrancado desde el Control Panel de XAMPP (no se gestiona con scripts).
+
+### Servidores y comandos
+
+| # | Servicio | Ruta | Comando | Puerto |
+|---|---|---|---|---|
+| 1 | ApiLoging | `ApiLoging/` | `php -S localhost:8000` | 8000 |
+| 2 | GrupoReglado | `GrupoReglado/` | `npm run dev` | 5173 |
+| 3 | RegladoEnergy | `RegladoEnergy/` | `npm run dev` | 5174 |
+| 4 | Inmobiliaria_Reglados | `Inmobiliaria_Reglados/` | `npm run dev -- --port 5175` | 5175 |
+| 5 | RegladoMaps | `RegladoMaps/` | `npm run dev` | 5176 |
+| 6 | RegladoIngenieria | `RegladoIngenieria/` | `npm run dev -- --port 5177` | 5177 |
+| 7 | RegladoEnergy BACKEND | `RegladoEnergy/BACKEND/` | `php -S localhost:8001` | 8001 |
+| 8 | Inmobiliaria backend | `Inmobiliaria_Reglados/backend/` | `php -S localhost:8002` | 8002 |
+| 9 | RegladoIngenieria BACKEND | `RegladoIngenieria/BACKEND/` | `php -S localhost:8003` | 8003 |
+
+### Arrancar todo en orden (bash, copy-paste)
+
+Lanza los 9 servidores en background con pausas entre cada uno y loguea cada servicio en `/tmp/reglado_NN_*.log`. **Mantén el orden**: ApiLoging primero (los frontends dependen de él para auth) y los `BACKEND` PHP después de sus respectivos frontends:
+
+```bash
+cd c:/xampp/htdocs/Reglado/ApiLoging && php -S localhost:8000 > /tmp/reglado_01_apiloging.log 2>&1 &
+sleep 1
+cd c:/xampp/htdocs/Reglado/GrupoReglado && npm run dev > /tmp/reglado_02_grupo.log 2>&1 &
+sleep 1
+cd c:/xampp/htdocs/Reglado/RegladoEnergy && npm run dev > /tmp/reglado_03_energy.log 2>&1 &
+sleep 1
+cd c:/xampp/htdocs/Reglado/Inmobiliaria_Reglados && npm run dev -- --port 5175 > /tmp/reglado_04_inmo.log 2>&1 &
+sleep 1
+cd c:/xampp/htdocs/Reglado/RegladoMaps && npm run dev > /tmp/reglado_05_maps.log 2>&1 &
+sleep 1
+cd c:/xampp/htdocs/Reglado/RegladoIngenieria && npm run dev -- --port 5177 > /tmp/reglado_06_inge.log 2>&1 &
+sleep 1
+cd c:/xampp/htdocs/Reglado/RegladoEnergy/BACKEND && php -S localhost:8001 > /tmp/reglado_07_energy_api.log 2>&1 &
+sleep 1
+cd c:/xampp/htdocs/Reglado/Inmobiliaria_Reglados/backend && php -S localhost:8002 > /tmp/reglado_08_inmo_api.log 2>&1 &
+sleep 1
+cd c:/xampp/htdocs/Reglado/RegladoIngenieria/BACKEND && php -S localhost:8003 > /tmp/reglado_09_inge_api.log 2>&1 &
+sleep 3
+```
+
+### Verificar que los 9 puertos están sirviendo
+
+```bash
+for port in 8000 5173 5174 5175 5176 5177 8001 8002 8003; do
+  pid=$(netstat -ano 2>/dev/null | grep "LISTENING" | grep ":$port " | awk '{print $NF}' | head -1)
+  [ -n "$pid" ] && echo "✓ puerto $port (pid $pid)" || echo "✗ puerto $port LIBRE"
+done
+```
+
+Cualquier puerto que aparezca como `LIBRE` indica que ese servicio no arrancó — revisa su log en `/tmp/reglado_NN_*.log`.
+
+**Acceso al portal**: <http://localhost:5173/>
+
+> Atajo desde Claude Code: la skill `skill-levantar-reglado` ejecuta exactamente estos pasos con verificación incluida.
 
 ## Estructura del repo
 
