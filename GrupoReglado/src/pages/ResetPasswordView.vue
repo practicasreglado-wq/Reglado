@@ -7,12 +7,12 @@
       <form class="clean-form" @submit.prevent="submitReset">
         <label>
           Nueva contraseña
-          <PasswordField v-model="newPassword" placeholder="********" required minlength="6" />
+          <PasswordField v-model="newPassword" placeholder="********" required minlength="8" />
         </label>
 
         <label>
           Confirmar contraseña
-          <PasswordField v-model="newPasswordConfirmation" placeholder="********" required minlength="6" />
+          <PasswordField v-model="newPasswordConfirmation" placeholder="********" required minlength="8" />
         </label>
 
         <p v-if="error" class="feedback error">{{ error }}</p>

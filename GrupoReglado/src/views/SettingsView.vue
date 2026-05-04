@@ -129,11 +129,11 @@
           </label>
           <label>
             Nueva contraseña
-            <input v-model="passwordForm.newPassword" type="password" required minlength="6" />
+            <input v-model="passwordForm.newPassword" type="password" required minlength="8" />
           </label>
           <label>
             Confirmar nueva contraseña
-            <input v-model="passwordForm.newPasswordConfirmation" type="password" required minlength="6" />
+            <input v-model="passwordForm.newPasswordConfirmation" type="password" required minlength="8" />
           </label>
         </template>
 
