@@ -42,6 +42,20 @@ Toda la documentación técnica del ecosistema está en [docs/](docs/):
 - [PENDIENTE_INMOBILIARIA_APILOGING.md](docs/PENDIENTE_INMOBILIARIA_APILOGING.md) — integración Inmobiliaria ↔ ApiLoging.
 - [UPGRADE_PHP_DEV.md](docs/UPGRADE_PHP_DEV.md) — notas del upgrade de PHP en dev.
 
+## Stack y versiones
+
+| Capa | Versión | Dónde aplica / notas |
+|---|---|---|
+| PHP | **8.0+** (probado en 8.0.30 / XAMPP) | Todos los backends PHP: `ApiLoging/`, `ApiMapa/`, `RegladoEnergy/BACKEND/`, `RegladoIngenieria/BACKEND/`, `Inmobiliaria_Reglados/backend/`. Upgrade a PHP 8.1+ pospuesto — ver [docs/UPGRADE_PHP_DEV.md](docs/UPGRADE_PHP_DEV.md). |
+| Composer | requerido por `ApiLoging/` | Dependencias: `firebase/php-jwt ^6.11`, `phpmailer/phpmailer ^7.0`, `geoip2/geoip2 ^2.13` |
+| MySQL / MariaDB | XAMPP estándar | BD principal `regladousers` (auth) más BDs por proyecto |
+| Node.js | **≥ 18** (probado en 24.x) | Para `npm run dev` y `npm run build` de los frontends |
+| Vue | `^3.5.0` (Vue Router `^4.4.0`) | Frontends Vue 3 con Composition API |
+| Vite | `^6.4.2` (baseline) | Acordada el 2026-04-30. **Excepción**: `Inmobiliaria_Reglados` está en `^7.3.1` (mantenida por equipo externo) |
+| @vitejs/plugin-vue | `^5.2.0` (baseline) | Inmobiliaria en `^6.0.4` |
+
+> Para proyectos nuevos del ecosistema, usar la baseline `vite ^6.4.2` + `@vitejs/plugin-vue ^5.2.0` para mantener el lockstep con Energy, Grupo, Maps e Ingeniería.
+
 ## Cómo levantar el entorno
 
 **Pre-requisito:** MySQL arrancado desde el Control Panel de XAMPP (no se gestiona con scripts).
