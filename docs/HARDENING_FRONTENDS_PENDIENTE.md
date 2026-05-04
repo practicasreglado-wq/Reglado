@@ -114,6 +114,45 @@ Esta es la versión mínima a la que están alineados los 4 frontends internos (
 
 ---
 
+### 🟡 F4 — Security Headers HTTP en `.htaccess`
+
+**Estado:** ✅ Hecho el 2026-05-04 en Energy, Grupo y Maps. Ingeniería pospuesto (en desarrollo, sin escanear). Inmobiliaria pendiente coordinar (externo). BienesRaices y Chatbot fuera del alcance actual.
+
+**Severidad:** Media (defensa en profundidad ante clickjacking, MIME sniffing, downgrade HTTP, filtrado de Referer y abuso de APIs del navegador).
+**Motivación:** Auditoría con [securityheaders.com](https://securityheaders.com/) dio nota **D** a `regladogroup.com`, `regladoenergy.com` y `regladomaps.com`. Tienen CSP (F1) pero les faltaban los 5 headers HTTP que sí emite ApiLoging desde PHP en `utils/Security.php`. Apache servía los frontends estáticos sin ningún header adicional.
+
+**Qué se implementó:**
+
+Bloque idéntico al inicio del `.htaccess` de los tres proyectos (en `public/.htaccess`, que Vite copia tal cual a `dist/`):
+
+```apache
+# Security headers (hardening F4 - 2026-05-04)
+<IfModule mod_headers.c>
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "geolocation=(), camera=(), microphone=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=(), fullscreen=(self)"
+</IfModule>
+```
+
+**Decisiones tomadas:**
+
+- **HSTS sin `preload`**: `max-age=31536000; includeSubDomains` cubre apex + subdominios HTTPS (relevante para `chatbot.regladogroup.com`). Se descarta `preload` por irreversibilidad: revertirlo requiere quitar el dominio de la lista de Chrome/Firefox y esperar meses. Si en el futuro se quiere A+ en securityheaders, se valora añadirlo entonces.
+- **`X-Frame-Options: SAMEORIGIN`** (no `DENY`): permite el visor de PDFs en iframe `blob:` de Inmobiliaria (mismo origen). Para los demás frontends da igual — no embeben nada. Si en el futuro se quisiera embeber un proyecto en otro (ej. Maps dentro de Group), se cambiaría por `Content-Security-Policy: frame-ancestors` con la lista permitida.
+- **Permissions-Policy con `fullscreen=(self)`**: ningún proyecto del ecosistema usa `navigator.geolocation`, `mediaDevices`, etc. (verificado con grep). La geolocalización de ApiLoging es **server-side por IP** (`GeoLite2-Country.mmdb`), no API del navegador, por lo que `geolocation=()` no la afecta.
+- **Conflicto Apache↔PHP en Group (asumido)**: Group rewrites `/auth` y `/api/profile` → `api_backend/index.php` (ApiLoging local), que ya emite sus propios headers desde `Security.php`. `Header always set` los pisa para esos endpoints, dejando valores **menos estrictos pero seguros** (ej. `X-Frame-Options: SAMEORIGIN` en vez de `DENY`, `Referrer-Policy: strict-origin-when-cross-origin` en vez de `no-referrer`). Decisión: aceptar el override, no añadir `<If>` de exclusión. Razones: (a) la CSP de PHP (`default-src 'none'; frame-ancestors 'none'`) **no se pisa** porque Apache no añade CSP; (b) los headers degradados son irrelevantes para respuestas JSON (no hay clickjacking sobre JSON, las APIs no llevan tokens en URL); (c) la simplicidad y consistencia entre los tres frontends gana sobre defensa en profundidad redundante.
+
+**Aislamiento cross-proyecto:** los headers están encapsulados en cada eTLD+1. HSTS no se filtra a otros dominios del ecosistema (Maps, Energy, etc. son apex distintos), Permissions-Policy y X-Frame-Options son por origen, y Referrer-Policy `strict-origin-when-cross-origin` no rompe el SSO porque éste viaja por fragment-token (los fragments nunca se envían en `Referer`).
+
+**Proyectos afectados:** Energy, Grupo, Maps. Pendiente Ingeniería (cuando salga de desarrollo) e Inmobiliaria (coordinar externo).
+
+**Coste estimado:** ~5 minutos por proyecto, incluyendo verificación post-deploy.
+
+**Verificación:** escaneo en [securityheaders.com](https://securityheaders.com/) tras `npm run build` + deploy. Esperado: subida de **D → A**. No se alcanza A+ porque falta `preload` en HSTS (descartado).
+
+---
+
 ## 3. Matriz de impacto por proyecto
 
 | Tarea | Energy | Grupo | Maps | Ingeniería | Inmobiliaria |
@@ -121,6 +160,7 @@ Esta es la versión mínima a la que están alineados los 4 frontends internos (
 | F1 — CSP | ✅ Hecho | ✅ Hecho | ✅ Hecho | ✅ Hecho | ⏳ (externo) |
 | F2 — npm audit | ✅ Hecho | ✅ Hecho | ✅ Hecho | ✅ Hecho | ⏳ (externo) |
 | F3 — Quitar localStorage | ✅ Hecho | ✅ Hecho | ✅ Hecho | ✅ Hecho | ⏳ (externo) |
+| F4 — Security headers HTTP | ✅ Hecho | ✅ Hecho | ✅ Hecho | ⏸️ (en desarrollo) | ⏳ (externo) |
 
 Inmobiliaria_Reglados aparece como **(externo)** por el mismo motivo que en [HARDENING_APILOGING_PENDIENTE.md](HARDENING_APILOGING_PENDIENTE.md): lo mantiene otra persona y habrá que coordinar.
 
@@ -136,4 +176,5 @@ Se mantiene la carga vía `<script src="https://chatbot.regladogroup.com/widget/
 
 1. **F2 — npm audit** — primero. Cero impacto multi-proyecto, solo detecta lo que ya hay. Útil para saber si hay alguna bomba de tiempo.
 2. **F1 — CSP** — después. Es el de mayor impacto de seguridad. Requiere más iteración pero protege ante XSS.
-3. **F3 — Quitar localStorage** — solo si no está previsto atacar **L7** del backend (cookie HttpOnly) a medio plazo. Si L7 está en el roadmap, saltarse F3.
+3. **F4 — Security headers HTTP** — barato y rápido (~5 min/proyecto). Eleva la nota en securityheaders.com de D a A y cubre clickjacking, MIME sniffing y downgrade HTTP. Hacer junto con F1 si se aborda un frontend nuevo.
+4. **F3 — Quitar localStorage** — solo si no está previsto atacar **L7** del backend (cookie HttpOnly) a medio plazo. Si L7 está en el roadmap, saltarse F3.
